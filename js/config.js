@@ -3,8 +3,8 @@
  * API Key Gemini sudah tertanam di sini, langsung aktif di semua HP & Komputer!
  */
 const APP_CONFIG = {
-    appName: "Qalbun Finance AI",
-    businessName: "Qalbun Salim",
+    appName: "Finance AI Master",
+    businessName: "Master System",
     ownerName: "Neil",
     periodName: "November 2026",
     
