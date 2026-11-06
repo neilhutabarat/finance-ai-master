@@ -127,7 +127,7 @@ function triggerGalleryPick() {
     document.getElementById('gallery-file-input').click();
 }
 
-// PROSES BACA FOTO STRUK VIA GEMINI FLASH ASLI
+// PROSES BACA FOTO STRUK VIA GEMINI 1.5 FLASH
 async function processReceiptImage(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -148,14 +148,14 @@ async function processReceiptImage(event) {
         const apiKey = APP_CONFIG.geminiApiKey;
 
         if (!apiKey || apiKey.length < 10) {
-            alert("API Key Gemini belum terkonfigurasi dengan benar.");
+            alert("API Key Gemini belum disetel.");
             document.getElementById('ai-loading').classList.add('hidden');
             return;
         }
 
         try {
             const promptText = 
-                "Kamu adalah asisten akuntansi OCR presisi tinggi. Analisis foto struk/nota belanja ini secara teliti.\n" +
+                "Kamu adalah asisten akuntansi OCR presisi tinggi. Analisis foto struk/nota belanja ini.\n" +
                 "Tugas utama: Cari GRAND TOTAL / TOTAL AKHIR yang harus dibayar.\n" +
                 "Jangan tertukar dengan harga satuan, diskon, atau subtotal.\n" +
                 "Kembalikan HANYA format JSON valid tanpa format markdown (tanpa ```json):\n" +
@@ -208,7 +208,7 @@ async function processReceiptImage(event) {
                 document.getElementById('ai-detect-badge').innerText = `AI Sukses: ${formatRupiah(finalAmount)}`;
                 document.getElementById('ai-detect-badge').className = "text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded";
             } else {
-                throw new Error("Respon AI tidak berisi data kandidat.");
+                throw new Error("Respon AI kosong.");
             }
         } catch (err) {
             console.error("Gemini Error:", err);
