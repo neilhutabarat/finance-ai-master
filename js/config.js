@@ -14,7 +14,7 @@ const APP_CONFIG = {
     // KONFIGURASI FIREBASE CLOUD (Agar HP Karyawan & HP Owner Sinkron Otomatis)
     // Jika nanti Anda mau ganti database firebase, cukup ganti teks di dalam tanda kutip ini:
     firebase: {
-        apiKey: "",
+        apiKey: "QVEuQWI4Uk42S0VIZ1Bab2FJNnp0eTI2YXVQS1BQbV9wMVRjeUlCYWJxRkw5MWdub2JiVkE=",
         authDomain: "",
         projectId: "",
         storageBucket: "",
