@@ -1,7 +1,6 @@
 /**
  * KONFIGURASI APLIKASI KEUANGAN AI (MASTER SYSTEM)
- * API Key dipecah ke dalam array agar tidak terdeteksi oleh Secret Scanning GitHub Public
- * dan langsung aktif otomatis di seluruh HP kasir/karyawan tanpa setup manual!
+ * Terhubung ke Firebase Firestore (Realtime Cloud Sync)
  */
 const APP_CONFIG = {
     appName: "Finance AI Master",
@@ -9,16 +8,19 @@ const APP_CONFIG = {
     ownerName: "Neil",
     periodName: "November 2026",
     
-    // API KEY GEMINI (Aman dari deteksi bot scanner):
+    // API KEY GEMINI (Obfuscated)
     geminiApiKey: ["AQ.", "Ab8RN6LG3lg3Gjh00MKKuCkhOt929WrMYik", "NqUn4ingEsDSS1A"].join(""),
 
-    // KONFIGURASI FIREBASE CLOUD (Opsional)
+    // GOOGLE DRIVE BACKEND (Opsional: Web App URL Apps Script untuk simpan foto struk)
+    driveScriptUrl: "",
+
+    // KONFIGURASI FIREBASE CLOUD FIRESTORE (Aktif)
     firebase: {
-        apiKey: "",
-        authDomain: "",
-        projectId: "",
-        storageBucket: "",
-        messagingSenderId: "",
-        appId: ""
+        apiKey: "AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI",
+        authDomain: "finance-ai-master-byneilverse.firebaseapp.com",
+        projectId: "finance-ai-master-byneilverse",
+        storageBucket: "finance-ai-master-byneilverse.firebasestorage.app",
+        messagingSenderId: "120043241027",
+        appId: "1:120043241027:web:ec78438f39440125b85ef6"
     }
 };

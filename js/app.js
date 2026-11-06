@@ -1,16 +1,11 @@
 // Inisialisasi Data Keuangan
 let financeData = {
-    income: 3500000,
-    cogs: 1200000,
-    expense: 1700000
+    income: 0,
+    cogs: 0,
+    expense: 0
 };
 
-let txList = [
-    { staff: "Kasir Maya", desc: "Penjualan Paket Layanan", amount: 1500000, type: "income", date: "10:15" },
-    { staff: "Terapis Budi", desc: "Beli Minyak & Bahan Baku", amount: 400000, type: "cogs", date: "11:20" },
-    { staff: "Admin", desc: "Bayar Listrik & Operasional", amount: 500000, type: "expense", date: "12:00" }
-];
-
+let txList = [];
 let isOwner = false;
 let db = null;
 
@@ -20,7 +15,7 @@ function formatRupiah(num) {
         style: 'currency',
         currency: 'IDR',
         maximumFractionDigits: 0
-    }).format(num);
+    }).format(num || 0);
 }
 
 // Inisialisasi Aplikasi
@@ -28,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     initAppConfig();
     initFirebase();
-    renderTransactions();
     updateNumbers();
 });
 
@@ -39,19 +33,35 @@ function initAppConfig() {
     document.getElementById('txt-report-period').innerText = "Periode: " + APP_CONFIG.periodName;
 }
 
-// Inisialisasi Firebase Cloud
+// Inisialisasi Firebase Cloud Firestore
 function initFirebase() {
-    if (APP_CONFIG.firebase && APP_CONFIG.firebase.apiKey && APP_CONFIG.firebase.apiKey.length > 5) {
+    if (APP_CONFIG.firebase && APP_CONFIG.firebase.apiKey) {
         try {
-            firebase.initializeApp(APP_CONFIG.firebase);
+            if (!firebase.apps.length) {
+                firebase.initializeApp(APP_CONFIG.firebase);
+            }
             db = firebase.firestore();
+            
+            // Set badge cloud status
+            const badge = document.getElementById('cloud-status-badge');
+            if (badge) {
+                badge.innerText = "Cloud Online";
+                badge.className = "text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center";
+            }
+            
             listenCloudUpdates();
         } catch (e) {
-            console.log("Firebase offline mode");
+            console.error("Firebase init error:", e);
+            const badge = document.getElementById('cloud-status-badge');
+            if (badge) {
+                badge.innerText = "Cloud Offline";
+                badge.className = "text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full flex items-center";
+            }
         }
     }
 }
 
+// Sinkronisasi Realtime Firestore
 function listenCloudUpdates() {
     if (!db) return;
     db.collection("transactions").orderBy("timestamp", "desc")
@@ -60,13 +70,17 @@ function listenCloudUpdates() {
             txList = [];
             snapshot.forEach((doc) => {
                 const data = doc.data();
+                data.id = doc.id;
                 txList.push(data);
-                if (data.type === 'income') financeData.income += data.amount;
-                if (data.type === 'cogs') financeData.cogs += data.amount;
-                if (data.type === 'expense') financeData.expense += data.amount;
+                const amount = Number(data.amount) || 0;
+                if (data.type === 'income') financeData.income += amount;
+                if (data.type === 'cogs') financeData.cogs += amount;
+                if (data.type === 'expense') financeData.expense += amount;
             });
             updateNumbers();
             renderTransactions();
+        }, (error) => {
+            console.error("Firestore listen error:", error);
         });
 }
 
@@ -91,6 +105,11 @@ function renderTransactions() {
     document.getElementById('total-tx-count').innerText = txList.length + " Transaksi";
     container.innerHTML = "";
 
+    if (txList.length === 0) {
+        container.innerHTML = `<p class="text-center text-gray-400 py-4 text-xs">Belum ada transaksi di cloud database.</p>`;
+        return;
+    }
+
     txList.forEach((item) => {
         let badgeColor = "text-orange-600 bg-orange-50";
         let prefix = "-";
@@ -106,8 +125,8 @@ function renderTransactions() {
         div.className = "flex justify-between items-center p-2.5 rounded-lg bg-gray-50 border border-gray-100";
         div.innerHTML = `
             <div>
-                <p class="font-bold text-gray-800 text-xs">${item.desc}</p>
-                <p class="text-[10px] text-gray-400">Oleh: <span class="font-semibold text-gray-600">${item.staff || 'Staff'}</span> • ${item.date || 'Hari ini'}</p>
+                <p class="font-bold text-gray-800 text-xs">${item.desc || 'Transaksi'}</p>
+                <p class="text-[10px] text-gray-400">Oleh: <span class="font-semibold text-gray-600">${item.staff || 'Kasir'}</span> • ${item.date || 'Hari ini'}</p>
             </div>
             <span class="font-extrabold text-xs px-2 py-1 rounded ${badgeColor}">
                 ${prefix} ${formatRupiah(item.amount)}
@@ -117,17 +136,16 @@ function renderTransactions() {
     });
 }
 
-// Buka Kamera Belakang HP Langsung
+// Trigger input kamera & galeri
 function triggerCameraCapture() {
     document.getElementById('camera-file-input').click();
 }
 
-// Buka Galeri HP
 function triggerGalleryPick() {
     document.getElementById('gallery-file-input').click();
 }
 
-// PROSES BACA FOTO STRUK VIA GEMINI 1.5 FLASH
+// PROSES BACA FOTO STRUK VIA GEMINI
 async function processReceiptImage(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -197,7 +215,6 @@ async function processReceiptImage(event) {
                 rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
                 const parsed = JSON.parse(rawText);
 
-                // Masukkan hasil analisis AI asli ke form
                 const finalAmount = Number(parsed.totalAmount) || 0;
                 document.getElementById('form-amount').value = finalAmount;
                 document.getElementById('form-desc').value = (parsed.storeName ? parsed.storeName + " - " : "") + (parsed.description || "Struk Pembelian");
@@ -222,9 +239,9 @@ async function processReceiptImage(event) {
     reader.readAsDataURL(file);
 }
 
-// Simpan Transaksi Baru
-function submitTransactionCloud() {
-    const staff = document.getElementById('form-staff-name').value.trim() || "Karyawan Kasir";
+// Simpan Transaksi Baru ke Firestore Realtime
+async function submitTransactionCloud() {
+    const staff = document.getElementById('form-staff-name').value.trim() || "Kasir";
     const amount = parseFloat(document.getElementById('form-amount').value) || 0;
     const desc = document.getElementById('form-desc').value.trim() || "Belanja operasional";
     const type = document.getElementById('form-category').value;
@@ -240,27 +257,29 @@ function submitTransactionCloud() {
         amount: amount,
         type: type,
         date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: new Date()
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     if (db) {
-        db.collection("transactions").add(newTx)
-            .then(() => {
-                alert("Berhasil! Transaksi otomatis tersimpan ke cloud.");
-                resetForm();
-            })
-            .catch((err) => {
-                alert("Gagal mengirim ke cloud: " + err.message);
-            });
+        try {
+            await db.collection("transactions").add(newTx);
+            alert("Berhasil! Transaksi otomatis tersimpan dan tersinkronisasi ke seluruh HP.");
+            resetForm();
+        } catch (err) {
+            console.error("Firestore write error:", err);
+            alert("Gagal menyimpan ke Firestore: " + err.message);
+        }
     } else {
-        txList.unshift(newTx);
+        txList.unshift({
+            ...newTx,
+            timestamp: new Date()
+        });
         if (type === 'income') financeData.income += amount;
         if (type === 'cogs') financeData.cogs += amount;
         if (type === 'expense') financeData.expense += amount;
-        
         updateNumbers();
         renderTransactions();
-        alert("Tersimpan! Laba rugi otomatis diperbarui.");
+        alert("Mode Offline: Transaksi tersimpan lokal.");
         resetForm();
     }
 }
