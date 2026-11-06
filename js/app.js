@@ -6,9 +6,9 @@ let financeData = {
 };
 
 let txList = [
-    { staff: "Kasir Maya", desc: "Penjualan Paket Bekam 10 Orang", amount: 1500000, type: "income", date: "10:15" },
-    { staff: "Terapis Budi", desc: "Beli Minyak Herba & Sarung Tangan", amount: 400000, type: "cogs", date: "11:20" },
-    { staff: "Admin", desc: "Bayar Listrik & Sewa Ruangan", amount: 500000, type: "expense", date: "12:00" }
+    { staff: "Kasir Maya", desc: "Penjualan Paket Layanan", amount: 1500000, type: "income", date: "10:15" },
+    { staff: "Terapis Budi", desc: "Beli Minyak & Bahan Baku", amount: 400000, type: "cogs", date: "11:20" },
+    { staff: "Admin", desc: "Bayar Listrik & Operasional", amount: 500000, type: "expense", date: "12:00" }
 ];
 
 let isOwner = false;
@@ -23,7 +23,7 @@ function formatRupiah(num) {
     }).format(num);
 }
 
-// Inisialisasi
+// Inisialisasi Aplikasi
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     initAppConfig();
@@ -47,7 +47,7 @@ function initFirebase() {
             db = firebase.firestore();
             listenCloudUpdates();
         } catch (e) {
-            console.log("Firebase initialized error or offline mode");
+            console.log("Firebase offline mode");
         }
     }
 }
@@ -117,7 +117,7 @@ function renderTransactions() {
     });
 }
 
-// Buka Kamera HP Langsung
+// Buka Kamera Belakang HP Langsung
 function triggerCameraCapture() {
     document.getElementById('camera-file-input').click();
 }
@@ -127,7 +127,7 @@ function triggerGalleryPick() {
     document.getElementById('gallery-file-input').click();
 }
 
-// PROSES BACA FOTO STRUK VIA GEMINI 1.5 FLASH ASLI
+// PROSES BACA FOTO STRUK VIA GEMINI FLASH ASLI
 async function processReceiptImage(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -143,23 +143,34 @@ async function processReceiptImage(event) {
         const mimeType = file.type || 'image/jpeg';
 
         document.getElementById('ai-loading').classList.remove('hidden');
-        document.getElementById('ai-loading-text').innerText = "AI sedang membaca foto struk...";
+        document.getElementById('ai-loading-text').innerText = "AI Gemini sedang menganalisis nota...";
 
         const apiKey = APP_CONFIG.geminiApiKey;
 
+        if (!apiKey || apiKey.length < 10) {
+            alert("API Key Gemini belum terkonfigurasi dengan benar.");
+            document.getElementById('ai-loading').classList.add('hidden');
+            return;
+        }
+
         try {
-            // Panggil Endpoint Resmi Google Gemini Vision
+            const promptText = 
+                "Kamu adalah asisten akuntansi OCR presisi tinggi. Analisis foto struk/nota belanja ini secara teliti.\n" +
+                "Tugas utama: Cari GRAND TOTAL / TOTAL AKHIR yang harus dibayar.\n" +
+                "Jangan tertukar dengan harga satuan, diskon, atau subtotal.\n" +
+                "Kembalikan HANYA format JSON valid tanpa format markdown (tanpa ```json):\n" +
+                "{\"storeName\":\"Nama Toko / Kasir\", \"totalAmount\": 0, \"category\":\"cogs\", \"description\":\"Rincian barang/pembelian\"}\n" +
+                "Keterangan aturan:\n" +
+                "- totalAmount WAJIB berupa angka murni tanpa titik/koma (contoh: 600000).\n" +
+                "- category: 'cogs' (jika beli barang dagangan/bahan baku), 'expense' (jika bayar operasional/sewa/listrik/atk), 'income' (jika struk penjualan ke pelanggan).";
+
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{
                         parts: [
-                            {
-                                text: "Kamu adalah asisten akuntansi OCR. Baca foto struk/nota ini dan temukan TOTAL AKHIR BELANJAAN (Grand Total). Jawab HANYA dalam JSON valid tanpa format markdown: " +
-                                      "{\"storeName\":\"nama toko/merchant\", \"totalAmount\": 0, \"category\": \"cogs atau expense atau income\", \"description\": \"ringkasan barang yang dibeli\"} " +
-                                      "Aturan: totalAmount harus berupa angka murni (contoh: 250000). Jika beli barang stok/bahan baku pilih category 'cogs'. Jika bayar operasional/listrik/sewa pilih 'expense'. Jika penerimaan uang pilih 'income'."
-                            },
+                            { text: promptText },
                             {
                                 inlineData: {
                                     mimeType: mimeType,
@@ -167,34 +178,43 @@ async function processReceiptImage(event) {
                                 }
                             }
                         ]
-                    }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        responseMimeType: "application/json"
+                    }
                 })
             });
 
             const data = await response.json();
-            if (data.candidates && data.candidates[0].content) {
-                let text = data.candidates[0].content.parts[0].text.trim();
-                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                const parsed = JSON.parse(text);
 
-                // Otomatis Isi Kolom Form!
-                document.getElementById('form-amount').value = parsed.totalAmount || 0;
-                document.getElementById('form-desc').value = (parsed.storeName ? parsed.storeName + " - " : "") + (parsed.description || "Pembelian barang");
+            if (data.error) {
+                throw new Error(data.error.message || "Gagal menghubungi Gemini API");
+            }
+
+            if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts.length > 0) {
+                let rawText = data.candidates[0].content.parts[0].text.trim();
+                rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+                const parsed = JSON.parse(rawText);
+
+                // Masukkan hasil analisis AI asli ke form
+                const finalAmount = Number(parsed.totalAmount) || 0;
+                document.getElementById('form-amount').value = finalAmount;
+                document.getElementById('form-desc').value = (parsed.storeName ? parsed.storeName + " - " : "") + (parsed.description || "Struk Pembelian");
                 if (parsed.category) {
                     document.getElementById('form-category').value = parsed.category;
                 }
 
-                document.getElementById('ai-detect-badge').innerText = "AI Berhasil Membaca Angka!";
+                document.getElementById('ai-detect-badge').innerText = `AI Sukses: ${formatRupiah(finalAmount)}`;
                 document.getElementById('ai-detect-badge').className = "text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded";
             } else {
-                throw new Error("Gagal mengenali teks nota");
+                throw new Error("Respon AI tidak berisi data kandidat.");
             }
         } catch (err) {
-            console.warn("AI Fallback:", err);
-            // Fallback cerdas agar pengguna tetap bisa pakai jika koneksi lambat
-            document.getElementById('form-amount').value = 175000;
-            document.getElementById('form-desc').value = "Struk Belanja Toko (Auto)";
-            document.getElementById('ai-detect-badge').innerText = "Angka Diisi Otomatis";
+            console.error("Gemini Error:", err);
+            alert("Gagal scan otomatis: " + err.message + "\n\nSilakan ketik nominal struk secara manual di kolom bawah.");
+            document.getElementById('ai-detect-badge').innerText = "Scan Gagal - Input Manual";
+            document.getElementById('ai-detect-badge').className = "text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded";
         } finally {
             document.getElementById('ai-loading').classList.add('hidden');
         }
@@ -210,7 +230,7 @@ function submitTransactionCloud() {
     const type = document.getElementById('form-category').value;
 
     if (amount <= 0) {
-        alert("Nominal transaksi masih kosong! Pastikan foto struk terlihat jelas atau ketik manual angkanya.");
+        alert("Nominal transaksi masih kosong! Masukkan angka yang sesuai di kolom nominal.");
         return;
     }
 
@@ -226,11 +246,11 @@ function submitTransactionCloud() {
     if (db) {
         db.collection("transactions").add(newTx)
             .then(() => {
-                alert("Berhasil! Data terkirim langsung ke HP Owner.");
+                alert("Berhasil! Transaksi otomatis tersimpan ke cloud.");
                 resetForm();
             })
             .catch((err) => {
-                alert("Gagal koneksi ke cloud: " + err.message);
+                alert("Gagal mengirim ke cloud: " + err.message);
             });
     } else {
         txList.unshift(newTx);
@@ -240,7 +260,7 @@ function submitTransactionCloud() {
         
         updateNumbers();
         renderTransactions();
-        alert("Terkirim! Data laba rugi toko otomatis terhitung.");
+        alert("Tersimpan! Laba rugi otomatis diperbarui.");
         resetForm();
     }
 }
@@ -288,7 +308,7 @@ function verifyOwnerPin() {
         document.getElementById('role-badge').className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
         document.getElementById('karyawan-notice').classList.add('hidden');
         toggleRoleModal();
-        alert("Akses Owner Terbuka! Anda sekarang dapat melihat keuntungan bersih.");
+        alert("Akses Owner Terbuka! Anda sekarang dapat melihat ringkasan keuangan.");
         switchTab('dashboard');
     } else {
         alert("PIN salah! Hanya Owner yang memiliki akses laporan.");
@@ -308,14 +328,14 @@ function generatePDF() {
     doc.text(APP_CONFIG.businessName, 20, 25);
     doc.setFontSize(11);
     doc.setTextColor(50, 50, 50);
-    doc.text("REKAP LABA RUGI TERINTEGRASI", 20, 32);
+    doc.text("REKAP LABA RUGI USAHA", 20, 32);
     doc.line(20, 38, 190, 38);
 
     let y = 48;
-    doc.text("Total Pendapatan Tim", 20, y);
+    doc.text("Total Pendapatan", 20, y);
     doc.text(formatRupiah(financeData.income), 190, y, { align: "right" });
     y += 10;
-    doc.text("Total HPP (Stok Toko)", 20, y);
+    doc.text("Total HPP (Bahan & Stok)", 20, y);
     doc.text("(" + formatRupiah(financeData.cogs) + ")", 190, y, { align: "right" });
     y += 6;
     doc.line(20, y, 190, y);
@@ -339,12 +359,12 @@ function generatePDF() {
 function shareReport() {
     const grossProfit = financeData.income - financeData.cogs;
     const netProfit = grossProfit - financeData.expense;
-    const msg = `*REKAP KEUANGAN TIM - ${APP_CONFIG.businessName}*\n\n` +
+    const msg = `*REKAP KEUANGAN - ${APP_CONFIG.businessName}*\n\n` +
                 `Total Pendapatan: ${formatRupiah(financeData.income)}\n` +
                 `Total HPP: ${formatRupiah(financeData.cogs)}\n` +
                 `Total Beban: ${formatRupiah(financeData.expense)}\n` +
                 `-----------------------------------\n` +
                 `*TOTAL LABA BERSIH: ${formatRupiah(netProfit)}*\n\n` +
-                `_Laporan otomatis via ${APP_CONFIG.appName}_`;
+                `_Laporan dibuat otomatis via ${APP_CONFIG.appName}_`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
 }
