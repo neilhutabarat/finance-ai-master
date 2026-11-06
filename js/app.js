@@ -42,10 +42,9 @@ function initFirebase() {
             }
             db = firebase.firestore();
             
-            // Set badge cloud status
             const badge = document.getElementById('cloud-status-badge');
             if (badge) {
-                badge.innerText = "Cloud Online";
+                badge.innerText = "Firestore Online";
                 badge.className = "text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center";
             }
             
@@ -80,7 +79,7 @@ function listenCloudUpdates() {
             updateNumbers();
             renderTransactions();
         }, (error) => {
-            console.error("Firestore listen error:", error);
+            console.error("Firestore error:", error);
         });
 }
 
@@ -106,7 +105,7 @@ function renderTransactions() {
     container.innerHTML = "";
 
     if (txList.length === 0) {
-        container.innerHTML = `<p class="text-center text-gray-400 py-4 text-xs">Belum ada transaksi di cloud database.</p>`;
+        container.innerHTML = `<p class="text-center text-gray-400 py-4 text-xs">Belum ada transaksi di Firestore.</p>`;
         return;
     }
 
@@ -136,7 +135,7 @@ function renderTransactions() {
     });
 }
 
-// Trigger input kamera & galeri
+// Buka Kamera Belakang HP Langsung
 function triggerCameraCapture() {
     document.getElementById('camera-file-input').click();
 }
@@ -145,96 +144,20 @@ function triggerGalleryPick() {
     document.getElementById('gallery-file-input').click();
 }
 
-// PROSES BACA FOTO STRUK VIA GEMINI
-async function processReceiptImage(event) {
+// Menampilkan Preview Struk dari Kamera/Galeri
+function handleReceiptPreview(event) {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = async function(e) {
+    reader.onload = function(e) {
         document.getElementById('preview-empty').classList.add('hidden');
         const img = document.getElementById('image-preview');
         img.src = e.target.result;
         img.classList.remove('hidden');
 
-        const base64Data = e.target.result.split(',')[1];
-        const mimeType = file.type || 'image/jpeg';
-
-        document.getElementById('ai-loading').classList.remove('hidden');
-        document.getElementById('ai-loading-text').innerText = "AI Gemini sedang menganalisis nota...";
-
-        const apiKey = APP_CONFIG.geminiApiKey;
-
-        if (!apiKey || apiKey.length < 10) {
-            alert("API Key Gemini belum disetel.");
-            document.getElementById('ai-loading').classList.add('hidden');
-            return;
-        }
-
-        try {
-            const promptText = 
-                "Kamu adalah asisten akuntansi OCR presisi tinggi. Analisis foto struk/nota belanja ini.\n" +
-                "Tugas utama: Cari GRAND TOTAL / TOTAL AKHIR yang harus dibayar.\n" +
-                "Jangan tertukar dengan harga satuan, diskon, atau subtotal.\n" +
-                "Kembalikan HANYA format JSON valid tanpa format markdown (tanpa ```json):\n" +
-                "{\"storeName\":\"Nama Toko / Kasir\", \"totalAmount\": 0, \"category\":\"cogs\", \"description\":\"Rincian barang/pembelian\"}\n" +
-                "Keterangan aturan:\n" +
-                "- totalAmount WAJIB berupa angka murni tanpa titik/koma (contoh: 600000).\n" +
-                "- category: 'cogs' (jika beli barang dagangan/bahan baku), 'expense' (jika bayar operasional/sewa/listrik/atk), 'income' (jika struk penjualan ke pelanggan).";
-
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [
-                            { text: promptText },
-                            {
-                                inlineData: {
-                                    mimeType: mimeType,
-                                    data: base64Data
-                                }
-                            }
-                        ]
-                    }],
-                    generationConfig: {
-                        temperature: 0.1,
-                        responseMimeType: "application/json"
-                    }
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.error) {
-                throw new Error(data.error.message || "Gagal menghubungi Gemini API");
-            }
-
-            if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts.length > 0) {
-                let rawText = data.candidates[0].content.parts[0].text.trim();
-                rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-                const parsed = JSON.parse(rawText);
-
-                const finalAmount = Number(parsed.totalAmount) || 0;
-                document.getElementById('form-amount').value = finalAmount;
-                document.getElementById('form-desc').value = (parsed.storeName ? parsed.storeName + " - " : "") + (parsed.description || "Struk Pembelian");
-                if (parsed.category) {
-                    document.getElementById('form-category').value = parsed.category;
-                }
-
-                document.getElementById('ai-detect-badge').innerText = `AI Sukses: ${formatRupiah(finalAmount)}`;
-                document.getElementById('ai-detect-badge').className = "text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded";
-            } else {
-                throw new Error("Respon AI kosong.");
-            }
-        } catch (err) {
-            console.error("Gemini Error:", err);
-            alert("Gagal scan otomatis: " + err.message + "\n\nSilakan ketik nominal struk secara manual di kolom bawah.");
-            document.getElementById('ai-detect-badge').innerText = "Scan Gagal - Input Manual";
-            document.getElementById('ai-detect-badge').className = "text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded";
-        } finally {
-            document.getElementById('ai-loading').classList.add('hidden');
-        }
+        document.getElementById('status-badge').innerText = "Foto Struk Terlampir";
+        document.getElementById('status-badge').className = "text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded";
     };
     reader.readAsDataURL(file);
 }
@@ -291,6 +214,8 @@ function resetForm() {
     document.getElementById('preview-empty').classList.remove('hidden');
     document.getElementById('camera-file-input').value = "";
     document.getElementById('gallery-file-input').value = "";
+    document.getElementById('status-badge').innerText = "Form Input Kasir";
+    document.getElementById('status-badge').className = "text-[11px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded";
 }
 
 // Navigasi Tab

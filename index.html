@@ -31,7 +31,7 @@
 
         <div class="flex items-center space-x-2">
             <span id="cloud-status-badge" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span> Cloud Online
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span> Firestore Online
             </span>
             <span id="role-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
                 Mode Kasir
@@ -46,20 +46,20 @@
     <main class="max-w-md mx-auto px-4 pt-4">
 
         <!-- NOTIFIKASI KARYAWAN -->
-        <div id="karyawan-notice" class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800 flex items-start space-x-2 mb-4">
-            <i data-lucide="cloud" class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0"></i>
+        <div id="karyawan-notice" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800 flex items-start space-x-2 mb-4">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
             <div>
-                <span class="font-bold">Sinkronisasi Cloud Aktif:</span>
-                <p class="text-[11px] text-blue-700 mt-0.5">Setiap struk/transaksi yang disimpan otomatis tersinkron ke Firestore dan langsung terlihat di HP Owner.</p>
+                <span class="font-bold">Firestore Cloud Aktif:</span>
+                <p class="text-[11px] text-emerald-700 mt-0.5">Semua data transaksi otomatis tersimpan ke server database dan tersinkron ke layar Owner secara instan.</p>
             </div>
         </div>
 
-        <!-- TAB 1: SCAN STRUK -->
+        <!-- TAB 1: INPUT STRUK -->
         <section id="tab-scan" class="space-y-4">
             <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-lg font-bold text-gray-900">Input & Catat Struk</h2>
-                    <p class="text-xs text-gray-500">Mencatat pengeluaran & bahan baku secara akurat</p>
+                    <h2 class="text-lg font-bold text-gray-900">Input Bukti Struk</h2>
+                    <p class="text-xs text-gray-500">Mencatat pengeluaran & stok belanja operasional</p>
                 </div>
             </div>
 
@@ -76,35 +76,30 @@
             </div>
 
             <!-- Input File Hidden -->
-            <input type="file" id="camera-file-input" accept="image/*" capture="environment" class="hidden" onchange="processReceiptImage(event)">
-            <input type="file" id="gallery-file-input" accept="image/*" class="hidden" onchange="processReceiptImage(event)">
+            <input type="file" id="camera-file-input" accept="image/*" capture="environment" class="hidden" onchange="handleReceiptPreview(event)">
+            <input type="file" id="gallery-file-input" accept="image/*" class="hidden" onchange="handleReceiptPreview(event)">
 
-            <!-- Preview Box -->
+            <!-- Preview Box Foto Struk -->
             <div id="preview-box" class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-4 text-center relative overflow-hidden">
                 <div id="preview-empty">
                     <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2">
                         <i data-lucide="receipt" class="w-6 h-6"></i>
                     </div>
-                    <p class="text-xs font-semibold text-gray-700">Foto Struk / Nota Pembelian</p>
-                    <p class="text-[10px] text-gray-400">Tekan "Buka Kamera HP" untuk memotret bukti fisik</p>
+                    <p class="text-xs font-semibold text-gray-700">Lampiran Foto Nota / Struk</p>
+                    <p class="text-[10px] text-gray-400">Tekan tombol kamera di atas untuk memotret nota fisik</p>
                 </div>
                 <img id="image-preview" class="hidden w-full h-48 object-cover rounded-xl mx-auto shadow-sm" alt="Preview Struk">
             </div>
 
-            <!-- Animasi Loading AI -->
-            <div id="ai-loading" class="hidden text-center py-4 bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-                <div class="inline-block animate-spin rounded-full h-7 w-7 border-4 border-emerald-600 border-t-transparent mb-2"></div>
-                <p id="ai-loading-text" class="text-xs font-semibold text-emerald-800">AI Gemini sedang menganalisis nota...</p>
-                <p class="text-[10px] text-gray-400">Membaca nominal grand total belanjaan</p>
-            </div>
-
-            <!-- Form Transaksi -->
+            <!-- Form Transaksi Kasir -->
             <div id="scan-form" class="bg-white p-4 rounded-xl border border-gray-100 space-y-3 shadow-sm">
                 <div class="flex justify-between items-center">
-                    <span id="ai-detect-badge" class="text-[11px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-                        Form Transaksi Kasir
+                    <span id="status-badge" class="text-[11px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                        Form Input Kasir
                     </span>
-                    <span class="text-[10px] text-emerald-700 font-semibold">Sinkron Firestore</span>
+                    <span class="text-[10px] text-emerald-700 font-semibold flex items-center">
+                        <i data-lucide="database" class="w-3 h-3 mr-1"></i> Firestore Sync
+                    </span>
                 </div>
 
                 <div>
@@ -128,7 +123,7 @@
 
                 <div>
                     <label class="text-[11px] font-semibold text-gray-500 block mb-1">Keterangan / Nama Barang</label>
-                    <input type="text" id="form-desc" placeholder="Contoh: Belanja Bahan Baku Herbal / Sayur" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <input type="text" id="form-desc" placeholder="Contoh: Belanja Minyak & Stok Herbal" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
                 <button onclick="submitTransactionCloud()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-xs shadow-md shadow-emerald-600/20 transition flex items-center justify-center space-x-2">
@@ -193,7 +188,7 @@
             <!-- Riwayat Struk Live -->
             <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-xs font-bold text-gray-800">Riwayat Struk Semua HP</h3>
+                    <h3 class="text-xs font-bold text-gray-800">Riwayat Transaksi Firestore</h3>
                     <span id="total-tx-count" class="text-[10px] text-gray-400 font-medium">0 Transaksi</span>
                 </div>
                 <div id="tx-history-list" class="space-y-2 text-xs"></div>
@@ -286,8 +281,8 @@
         </div>
     </div>
 
-    <!-- Script dengan Cache-Buster v=4.0 agar HP langsung menarik koneksi Firestore terbaru -->
-    <script src="js/config.js?v=4.0"></script>
-    <script src="js/app.js?v=4.0"></script>
+    <!-- Script Cache-Buster v=5.0 -->
+    <script src="js/config.js?v=5.0"></script>
+    <script src="js/app.js?v=5.0"></script>
 </body>
 </html>

@@ -1,20 +1,14 @@
 /**
- * KONFIGURASI APLIKASI KEUANGAN AI (MASTER SYSTEM)
- * Terhubung ke Firebase Firestore (Realtime Cloud Sync)
+ * KONFIGURASI APLIKASI KEUANGAN (MASTER SYSTEM)
+ * Realtime Cloud Firestore Aktif
  */
 const APP_CONFIG = {
     appName: "Finance AI Master",
     businessName: "Master System",
     ownerName: "Neil",
     periodName: "November 2026",
-    
-    // API KEY GEMINI (Obfuscated)
-    geminiApiKey: ["AQ.", "Ab8RN6LG3lg3Gjh00MKKuCkhOt929WrMYik", "NqUn4ingEsDSS1A"].join(""),
 
-    // GOOGLE DRIVE BACKEND (Opsional: Web App URL Apps Script untuk simpan foto struk)
-    driveScriptUrl: "",
-
-    // KONFIGURASI FIREBASE CLOUD FIRESTORE (Aktif)
+    // KONFIGURASI FIREBASE CLOUD FIRESTORE
     firebase: {
         apiKey: "AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI",
         authDomain: "finance-ai-master-byneilverse.firebaseapp.com",
