@@ -1,9 +1,9 @@
 /**
  * KONFIGURASI APLIKASI KEUANGAN (MASTER SYSTEM)
- * Realtime Cloud Firestore Aktif
+ * Mendukung Multi-User Login & Offline-First Batch Sync ke Cloud Firestore
  */
 const APP_CONFIG = {
-    appName: "Finance AI Master",
+    appName: "Finance Master",
     businessName: "Master System",
     ownerName: "Neil",
     periodName: "November 2026",

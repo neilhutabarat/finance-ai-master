@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finance AI Master</title>
+    <title>Finance Master</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- jsPDF untuk Download PDF Otomatis -->
+    <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -17,272 +17,266 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased pb-24 select-none">
 
-    <!-- TOP BAR -->
-    <header class="bg-white border-b border-gray-100 sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
-        <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow">
-                <i data-lucide="wallet" class="w-4 h-4"></i>
+    <!-- ================= HALAMAN LOGIN ================= -->
+    <div id="screen-login" class="min-h-screen flex items-center justify-center p-4 bg-slate-900 text-white">
+        <div class="bg-slate-800 border border-slate-700 w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-5">
+            <div class="text-center space-y-1">
+                <div class="w-12 h-12 bg-emerald-600 rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg shadow-emerald-600/30 mb-2">
+                    <i data-lucide="lock" class="w-6 h-6"></i>
+                </div>
+                <h1 class="text-lg font-bold">Finance Master Login</h1>
+                <p class="text-xs text-slate-400">Pilih akun Anda untuk masuk ke sistem</p>
             </div>
-            <div>
-                <h1 id="txt-app-name" class="font-bold text-sm text-gray-900 leading-tight">Finance AI Master</h1>
-                <p id="txt-business-name" class="text-[11px] text-emerald-700 font-medium">Master System</p>
-            </div>
-        </div>
 
-        <div class="flex items-center space-x-2">
-            <span id="cloud-status-badge" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span> Firestore Online
-            </span>
-            <span id="role-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                Mode Kasir
-            </span>
-            <button onclick="toggleRoleModal()" class="p-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200" title="Login Owner">
-                <i data-lucide="shield-check" class="w-4 h-4"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- MAIN CONTAINER -->
-    <main class="max-w-md mx-auto px-4 pt-4">
-
-        <!-- NOTIFIKASI KARYAWAN -->
-        <div id="karyawan-notice" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800 flex items-start space-x-2 mb-4">
-            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
-            <div>
-                <span class="font-bold">Firestore Cloud Aktif:</span>
-                <p class="text-[11px] text-emerald-700 mt-0.5">Semua data transaksi otomatis tersimpan ke server database dan tersinkron ke layar Owner secara instan.</p>
-            </div>
-        </div>
-
-        <!-- TAB 1: INPUT STRUK -->
-        <section id="tab-scan" class="space-y-4">
-            <div class="flex justify-between items-center">
+            <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <h2 class="text-lg font-bold text-gray-900">Input Bukti Struk</h2>
-                    <p class="text-xs text-gray-500">Mencatat pengeluaran & stok belanja operasional</p>
-                </div>
-            </div>
-
-            <!-- Tombol Kamera & Galeri -->
-            <div class="grid grid-cols-2 gap-2.5">
-                <button onclick="triggerCameraCapture()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-3 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-sm transition">
-                    <i data-lucide="camera" class="w-4 h-4"></i>
-                    <span>Buka Kamera HP</span>
-                </button>
-                <button onclick="triggerGalleryPick()" class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-3 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-sm transition">
-                    <i data-lucide="image" class="w-4 h-4 text-emerald-600"></i>
-                    <span>Pilih dari Galeri</span>
-                </button>
-            </div>
-
-            <!-- Input File Hidden -->
-            <input type="file" id="camera-file-input" accept="image/*" capture="environment" class="hidden" onchange="handleReceiptPreview(event)">
-            <input type="file" id="gallery-file-input" accept="image/*" class="hidden" onchange="handleReceiptPreview(event)">
-
-            <!-- Preview Box Foto Struk -->
-            <div id="preview-box" class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-4 text-center relative overflow-hidden">
-                <div id="preview-empty">
-                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <i data-lucide="receipt" class="w-6 h-6"></i>
-                    </div>
-                    <p class="text-xs font-semibold text-gray-700">Lampiran Foto Nota / Struk</p>
-                    <p class="text-[10px] text-gray-400">Tekan tombol kamera di atas untuk memotret nota fisik</p>
-                </div>
-                <img id="image-preview" class="hidden w-full h-48 object-cover rounded-xl mx-auto shadow-sm" alt="Preview Struk">
-            </div>
-
-            <!-- Form Transaksi Kasir -->
-            <div id="scan-form" class="bg-white p-4 rounded-xl border border-gray-100 space-y-3 shadow-sm">
-                <div class="flex justify-between items-center">
-                    <span id="status-badge" class="text-[11px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-                        Form Input Kasir
-                    </span>
-                    <span class="text-[10px] text-emerald-700 font-semibold flex items-center">
-                        <i data-lucide="database" class="w-3 h-3 mr-1"></i> Firestore Sync
-                    </span>
-                </div>
-
-                <div>
-                    <label class="text-[11px] font-semibold text-gray-500 block mb-1">Nama Petugas / Kasir</label>
-                    <input type="text" id="form-staff-name" placeholder="Misal: Kasir Rina" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none">
-                </div>
-
-                <div>
-                    <label class="text-[11px] font-semibold text-gray-500 block mb-1">Pos Akuntansi</label>
-                    <select id="form-category" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none">
-                        <option value="cogs">HPP (Bahan Baku / Belanja Stok Dagang)</option>
-                        <option value="expense">Beban Operasional (Listrik, Sewa, Gaji, ATK)</option>
-                        <option value="income">Pendapatan Usaha (Kasir Masuk)</option>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Pilih Akun / Petugas</label>
+                    <select id="login-username" class="w-full bg-slate-700 border border-slate-600 rounded-xl p-3 text-sm text-white font-medium outline-none focus:ring-2 focus:ring-emerald-500">
                     </select>
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-semibold text-gray-500 block mb-1">Nominal Rupiah (Rp)</label>
-                    <input type="number" id="form-amount" placeholder="0" class="w-full bg-emerald-50 border border-emerald-300 rounded-lg p-2.5 text-sm font-bold text-emerald-950 focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">PIN Keamanan</label>
+                    <input type="password" id="login-pin" maxlength="6" placeholder="Masukkan PIN" class="w-full bg-slate-700 border border-slate-600 rounded-xl p-3 text-sm text-center tracking-widest text-white font-bold outline-none focus:ring-2 focus:ring-emerald-500" required>
+                    <p class="text-[10px] text-slate-400 mt-1 text-center">Default: Owner = 1234, Kasir = 1111 / 2222</p>
                 </div>
 
-                <div>
-                    <label class="text-[11px] font-semibold text-gray-500 block mb-1">Keterangan / Nama Barang</label>
-                    <input type="text" id="form-desc" placeholder="Contoh: Belanja Minyak & Stok Herbal" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
-                </div>
-
-                <button onclick="submitTransactionCloud()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-xs shadow-md shadow-emerald-600/20 transition flex items-center justify-center space-x-2">
-                    <i data-lucide="cloud-upload" class="w-4 h-4"></i>
-                    <span>Simpan ke Cloud Firestore</span>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-600/30">
+                    Masuk ke Aplikasi
                 </button>
-            </div>
-        </section>
-
-        <!-- TAB 2: DASHBOARD (Khusus Owner) -->
-        <section id="tab-dashboard" class="hidden space-y-4">
-            <div>
-                <h2 class="text-lg font-bold text-gray-900">Ringkasan Laba Bersih</h2>
-                <p class="text-xs text-gray-500">Live data Firestore dari seluruh kasir</p>
-            </div>
-
-            <!-- Total Laba Bersih -->
-            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
-                    <span class="flex items-center space-x-1">
-                        <span>Laba Bersih Toko</span>
-                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
-                    </span>
-                    <span class="text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full flex items-center text-[10px]">
-                        <i data-lucide="activity" class="w-3 h-3 mr-0.5"></i> Live Firestore
-                    </span>
-                </div>
-                <div id="val-net-profit" class="text-3xl font-extrabold text-emerald-700 tracking-tight">
-                    Rp 0
-                </div>
-                <p class="text-[11px] text-gray-400 mt-1">Otomatis dihitung realtime dari seluruh kasir</p>
-            </div>
-
-            <!-- 3 Kolom Metrik -->
-            <div class="grid grid-cols-3 gap-2">
-                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-center">
-                    <span class="text-[10px] text-gray-400 block mb-1">Pendapatan</span>
-                    <span id="val-income" class="text-[11px] font-bold text-gray-800 block">Rp 0</span>
-                </div>
-                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-center">
-                    <span class="text-[10px] text-gray-400 block mb-1">HPP</span>
-                    <span id="val-cogs" class="text-[11px] font-bold text-orange-600 block">Rp 0</span>
-                </div>
-                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-center">
-                    <span class="text-[10px] text-gray-400 block mb-1">Beban</span>
-                    <span id="val-expense" class="text-[11px] font-bold text-rose-600 block">Rp 0</span>
-                </div>
-            </div>
-
-            <!-- Rumus Akuntansi -->
-            <div class="bg-gray-900 text-gray-200 p-4 rounded-xl text-xs space-y-1.5 shadow">
-                <div class="flex items-center space-x-1.5 text-emerald-400 font-semibold">
-                    <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
-                    <span>Rumus Laba Rugi:</span>
-                </div>
-                <p class="text-[11px] text-gray-300 font-mono">
-                    Pendapatan - HPP = <strong class="text-emerald-400">Laba Kotor</strong><br>
-                    Laba Kotor - Beban = <strong class="text-emerald-400">Laba Bersih</strong>
-                </p>
-            </div>
-
-            <!-- Riwayat Struk Live -->
-            <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-xs font-bold text-gray-800">Riwayat Transaksi Firestore</h3>
-                    <span id="total-tx-count" class="text-[10px] text-gray-400 font-medium">0 Transaksi</span>
-                </div>
-                <div id="tx-history-list" class="space-y-2 text-xs"></div>
-            </div>
-        </section>
-
-        <!-- TAB 3: LAPORAN (Khusus Owner) -->
-        <section id="tab-report" class="hidden space-y-4">
-            <div>
-                <h2 class="text-lg font-bold text-gray-900">Rekap Laporan Keuangan</h2>
-                <p class="text-xs text-gray-500">Cetak rekap akhir bulan untuk owner & pembukuan</p>
-            </div>
-
-            <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm space-y-3">
-                <div class="border-b pb-2">
-                    <h3 id="txt-report-biz" class="font-bold text-gray-900 text-sm">Master System</h3>
-                    <p id="txt-report-period" class="text-[10px] text-gray-400">Periode: November 2026</p>
-                </div>
-
-                <div class="space-y-2 text-xs">
-                    <div class="flex justify-between py-1">
-                        <span class="text-gray-600">1. Total Pendapatan Usaha</span>
-                        <span id="rep-income" class="font-bold text-gray-900">Rp 0</span>
-                    </div>
-                    <div class="flex justify-between py-1">
-                        <span class="text-gray-600">2. Total HPP (Bahan Baku / Stok)</span>
-                        <span id="rep-cogs" class="font-bold text-orange-600">Rp 0</span>
-                    </div>
-                    <div class="flex justify-between py-1 bg-emerald-50/50 px-2 rounded">
-                        <span class="font-bold text-emerald-900">Laba Kotor</span>
-                        <span id="rep-gross" class="font-bold text-emerald-800">Rp 0</span>
-                    </div>
-                    <div class="flex justify-between py-1">
-                        <span class="text-gray-600">3. Beban Operasional</span>
-                        <span id="rep-expense" class="font-bold text-rose-600">Rp 0</span>
-                    </div>
-                    <div class="border-t-2 border-gray-900 my-1"></div>
-                    <div class="flex justify-between py-2 bg-emerald-100 px-2 rounded-lg">
-                        <span class="font-extrabold text-emerald-950">Total Laba Bersih</span>
-                        <span id="rep-net" class="font-extrabold text-emerald-900">Rp 0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 pt-2">
-                <button onclick="generatePDF()" class="w-full bg-white border border-gray-300 text-gray-800 font-semibold py-3 px-2 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-sm">
-                    <i data-lucide="download" class="w-4 h-4 text-emerald-600"></i>
-                    <span>Download PDF</span>
-                </button>
-                <button onclick="shareReport()" class="w-full bg-emerald-600 text-white font-semibold py-3 px-2 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-sm">
-                    <i data-lucide="share-2" class="w-4 h-4"></i>
-                    <span>Share WhatsApp</span>
-                </button>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- BOTTOM NAVIGATION -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 py-2 px-6 flex justify-around items-center z-50">
-        <button onclick="switchTab('scan')" id="nav-scan" class="flex flex-col items-center text-emerald-600">
-            <i data-lucide="camera" class="w-5 h-5"></i>
-            <span class="text-[10px] font-semibold mt-1">Input Struk</span>
-        </button>
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center text-gray-400">
-            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-            <span class="text-[10px] font-semibold mt-1">Laba Bersih</span>
-        </button>
-        <button onclick="switchTab('report')" id="nav-report" class="flex flex-col items-center text-gray-400">
-            <i data-lucide="file-text" class="w-5 h-5"></i>
-            <span class="text-[10px] font-semibold mt-1">Laporan PDF</span>
-        </button>
-    </nav>
-
-    <!-- MODAL AKSES OWNER (PIN) -->
-    <div id="modal-role" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-4 text-center">
-            <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto">
-                <i data-lucide="lock" class="w-6 h-6"></i>
-            </div>
-            <h3 class="font-bold text-gray-900 text-sm">Masuk Sebagai Owner</h3>
-            <p class="text-[11px] text-gray-500">
-                Masukkan PIN Owner agar data laba rugi terlindungi dari kasir/karyawan.
-            </p>
-            <input type="password" id="input-pin" maxlength="6" placeholder="PIN Owner (Default: 1234)" class="w-full text-center bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-base tracking-widest font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
-            <div class="flex space-x-2">
-                <button onclick="verifyOwnerPin()" class="flex-1 bg-emerald-600 text-white font-semibold py-2.5 rounded-lg text-xs">Buka Kunci</button>
-                <button onclick="toggleRoleModal()" class="px-4 bg-gray-100 text-gray-600 font-semibold py-2.5 rounded-lg text-xs">Batal</button>
-            </div>
+            </form>
         </div>
     </div>
 
-    <!-- Script Cache-Buster v=5.0 -->
-    <script src="js/config.js?v=5.0"></script>
-    <script src="js/app.js?v=5.0"></script>
+    <!-- ================= HALAMAN UTAMA APLIKASI ================= -->
+    <div id="screen-app" class="hidden">
+
+        <!-- TOP BAR -->
+        <header class="bg-white border-b border-gray-100 sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow">
+                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h1 id="txt-app-name" class="font-bold text-sm text-gray-900 leading-tight">Finance Master</h1>
+                    <p id="user-display-name" class="text-[11px] text-emerald-700 font-semibold leading-none mt-0.5">Petugas</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <span id="role-display-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                    Kasir
+                </span>
+                <button onclick="handleLogout()" class="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:bg-rose-50 hover:text-rose-600" title="Keluar / Ganti Akun">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTAINER -->
+        <main class="max-w-md mx-auto px-4 pt-4">
+
+            <!-- TAB 1: INPUT STRUK & CATATAN (Bisa dibuka Kasir & Owner) -->
+            <section id="tab-scan" class="space-y-4">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">Catat Transaksi</h2>
+                    <p class="text-xs text-gray-500">Foto bukti struk belanja & catat nominalnya</p>
+                </div>
+
+                <!-- Tombol Kamera & Galeri Ringkas -->
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button onclick="triggerCameraCapture()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-sm transition">
+                        <i data-lucide="camera" class="w-4 h-4"></i>
+                        <span>Buka Kamera HP</span>
+                    </button>
+                    <button onclick="triggerGalleryPick()" class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-sm transition">
+                        <i data-lucide="image" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Pilih dari Galeri</span>
+                    </button>
+                </div>
+
+                <!-- Hidden Input File -->
+                <input type="file" id="camera-file-input" accept="image/*" capture="environment" class="hidden" onchange="handleReceiptSelected(event)">
+                <input type="file" id="gallery-file-input" accept="image/*" class="hidden" onchange="handleReceiptSelected(event)">
+
+                <!-- Chip Foto Terlampir (Mungil & Rapi, Tidak Makan Tempat) -->
+                <div id="photo-attached-chip" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-lg text-xs flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="paperclip" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <span id="photo-name-chip" class="font-medium text-[11px] truncate max-w-[200px]">Foto struk siap</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-emerald-600">Terlampir</span>
+                </div>
+
+                <!-- Form Transaksi Kasir -->
+                <div class="bg-white p-4 rounded-xl border border-gray-100 space-y-3 shadow-sm">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-500 block mb-1">Pos Akuntansi</label>
+                        <select id="form-category" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <option value="cogs">HPP (Bahan Baku / Belanja Stok Dagang)</option>
+                            <option value="expense">Beban Operasional (Listrik, Sewa, Gaji, ATK)</option>
+                            <option value="income">Pendapatan Usaha (Kasir Masuk)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-500 block mb-1">Nominal Rupiah (Rp)</label>
+                        <input type="number" id="form-amount" placeholder="0" class="w-full bg-emerald-50 border border-emerald-300 rounded-lg p-2.5 text-base font-bold text-emerald-950 focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-500 block mb-1">Keterangan / Nama Toko / Barang</label>
+                        <input type="text" id="form-desc" placeholder="Contoh: Belanja Minyak & Stok Bahan" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+
+                    <button onclick="submitLocalTransaction()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-xs shadow-md shadow-emerald-600/20 transition flex items-center justify-center space-x-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Simpan Catatan di HP Ini</span>
+                    </button>
+                </div>
+
+                <!-- DAFTAR CATATAN DI HP INI & TOMBOL SINKRON CLOSING -->
+                <div class="bg-white p-4 rounded-xl border border-gray-100 space-y-3 shadow-sm">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold text-gray-900">Catatan Hari Ini di HP Ini</h3>
+                        <span id="unsynced-count-badge" class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                            0 Belum Sinkron
+                        </span>
+                    </div>
+
+                    <div id="local-tx-list" class="space-y-2 text-xs"></div>
+
+                    <!-- Tombol Sinkron ke Owner saat Closing -->
+                    <button onclick="syncLocalToCloud()" id="btn-sync-cloud" class="w-full bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold py-3 px-3 rounded-xl text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center transition">
+                        <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>
+                        <span>Sinkron Data ke Owner (Closing)</span>
+                    </button>
+                    <p class="text-[10px] text-gray-400 text-center">Tekan tombol di atas saat toko tutup / shift berakhir agar data masuk ke Owner.</p>
+                </div>
+            </section>
+
+            <!-- TAB 2: DASHBOARD (HANYA MUNCUL DI AKUN OWNER) -->
+            <section id="tab-dashboard" class="hidden space-y-4">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">Dashboard Owner</h2>
+                    <p class="text-xs text-gray-500">Live data keuangan dari seluruh laporan kasir</p>
+                </div>
+
+                <!-- Total Laba Bersih -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                        <span class="flex items-center space-x-1">
+                            <span>Laba Bersih Keseluruhan</span>
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
+                        </span>
+                        <span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full text-[10px]">
+                            Laporan Owner
+                        </span>
+                    </div>
+                    <div id="val-net-profit" class="text-3xl font-extrabold text-emerald-700 tracking-tight">
+                        Rp 0
+                    </div>
+                    <p class="text-[11px] text-gray-400 mt-1">Dihitung otomatis dari seluruh data closing yang disinkronkan kasir</p>
+                </div>
+
+                <!-- 3 Kolom Metrik -->
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-center">
+                        <span class="text-[10px] text-gray-400 block mb-1">Pendapatan</span>
+                        <span id="val-income" class="text-[11px] font-bold text-gray-800 block">Rp 0</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-center">
+                        <span class="text-[10px] text-gray-400 block mb-1">HPP</span>
+                        <span id="val-cogs" class="text-[11px] font-bold text-orange-600 block">Rp 0</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-center">
+                        <span class="text-[10px] text-gray-400 block mb-1">Beban</span>
+                        <span id="val-expense" class="text-[11px] font-bold text-rose-600 block">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- Riwayat Closing Kasir Masuk -->
+                <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-bold text-gray-800">Semua Transaksi dari Kasir</h3>
+                        <span id="total-tx-count" class="text-[10px] text-gray-400 font-medium">0 Transaksi Masuk</span>
+                    </div>
+                    <div id="owner-tx-list" class="space-y-2 text-xs"></div>
+                </div>
+            </section>
+
+            <!-- TAB 3: LAPORAN (HANYA MUNCUL DI AKUN OWNER) -->
+            <section id="tab-report" class="hidden space-y-4">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">Rekap Laporan Owner</h2>
+                    <p class="text-xs text-gray-500">Cetak rekap closing bulanan / harian</p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm space-y-3">
+                    <div class="border-b pb-2">
+                        <h3 id="txt-report-biz" class="font-bold text-gray-900 text-sm">Master System</h3>
+                        <p id="txt-report-period" class="text-[10px] text-gray-400">Periode: November 2026</p>
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between py-1">
+                            <span class="text-gray-600">1. Total Pendapatan Usaha</span>
+                            <span id="rep-income" class="font-bold text-gray-900">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between py-1">
+                            <span class="text-gray-600">2. Total HPP (Bahan & Stok)</span>
+                            <span id="rep-cogs" class="font-bold text-orange-600">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between py-1 bg-emerald-50/50 px-2 rounded">
+                            <span class="font-bold text-emerald-900">Laba Kotor</span>
+                            <span id="rep-gross" class="font-bold text-emerald-800">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between py-1">
+                            <span class="text-gray-600">3. Beban Operasional</span>
+                            <span id="rep-expense" class="font-bold text-rose-600">Rp 0</span>
+                        </div>
+                        <div class="border-t-2 border-gray-900 my-1"></div>
+                        <div class="flex justify-between py-2 bg-emerald-100 px-2 rounded-lg">
+                            <span class="font-extrabold text-emerald-950">Total Laba Bersih</span>
+                            <span id="rep-net" class="font-extrabold text-emerald-900">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button onclick="generatePDF()" class="w-full bg-white border border-gray-300 text-gray-800 font-semibold py-3 px-2 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-sm">
+                        <i data-lucide="download" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Download PDF</span>
+                    </button>
+                    <button onclick="shareReport()" class="w-full bg-emerald-600 text-white font-semibold py-3 px-2 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-sm">
+                        <i data-lucide="share-2" class="w-4 h-4"></i>
+                        <span>Share WhatsApp</span>
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION DINAMIS -->
+        <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 py-2 px-6 flex justify-around items-center z-50">
+            <button onclick="switchTab('scan')" id="nav-scan" class="flex flex-col items-center text-emerald-600">
+                <i data-lucide="edit-3" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-1">Input Struk</span>
+            </button>
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center text-gray-400">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-1">Laba Bersih</span>
+            </button>
+            <button onclick="switchTab('report')" id="nav-report" class="flex flex-col items-center text-gray-400">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-1">Laporan PDF</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Script Cache-Buster v=6.0 -->
+    <script src="js/config.js?v=6.0"></script>
+    <script src="js/app.js?v=6.0"></script>
 </body>
 </html>
