@@ -9,7 +9,7 @@ const APP_CONFIG = {
     periodName: "November 2026",
     
     // API KEY GEMINI RESMI MILIK ANDA (Otomatis Aktif di Semua Perangkat):
-    geminiApiKey: "AQ.Ab8RN6Lp09LUTFMoiFGaadeXw9lcT6_IWCNVFX81V8r7vgYuVQ", 
+    geminiApiKey: "AQ.Ab8RN6KEHgPZoaI6zty26auPKPPm_plTcyIBabqFL9lgnobbVA", 
 
     // KONFIGURASI FIREBASE CLOUD (Agar HP Karyawan & HP Owner Sinkron Otomatis)
     // Jika nanti Anda mau ganti database firebase, cukup ganti teks di dalam tanda kutip ini:
