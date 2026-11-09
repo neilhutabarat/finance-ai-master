@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Oneilverse - Manager Command Hub</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- jsPDF & AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -24,105 +21,72 @@
             --ios-border: rgba(226, 232, 240, 0.95);
             --oneui-squircle: 24px;
         }
-
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             background-color: var(--app-bg);
             -webkit-tap-highlight-color: transparent;
         }
-
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
         .oneui-hero {
             border-bottom-left-radius: 36px;
             border-bottom-right-radius: 36px;
             background: linear-gradient(145deg, #1e1b4b 0%, #311042 50%, #0f172a 100%);
         }
-
         .ios-glass {
             background: var(--ios-card);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--ios-border);
             border-radius: var(--oneui-squircle);
         }
-
         .ios-pill {
             border-radius: 9999px;
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
         }
-
         .glass-capsule-dark {
             background: rgba(10, 15, 29, 0.75);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15);
             border-radius: 9999px;
         }
-
-        .modal-backdrop {
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
         .modal-sheet {
             animation: sheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-
         @keyframes sheetUp {
             from { opacity: 0; transform: translateY(20px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white pb-6">
 
-    <!-- HERO HEADER: SAMSUNG ONE UI STYLE -->
+    <!-- HEADER SUPERVISOR / MANAGER -->
     <header class="oneui-hero text-white px-5 sm:px-8 pt-6 pb-7 shadow-xl relative overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-72 h-72 bg-purple-500/25 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
-
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div class="flex items-center space-x-4">
-                <div id="topbar-logo-box" class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl flex items-center justify-center text-2xl shadow-inner shadow-white/20">
-                    <span id="topbar-emoji-icon">🛡️</span>
+                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl flex items-center justify-center text-2xl shadow-inner">
+                    🛡️
                 </div>
                 <div>
                     <div class="flex items-center space-x-2">
-                        <h1 id="topbar-store-name" class="font-extrabold text-2xl sm:text-3xl tracking-tight leading-none text-white">Oneilverse</h1>
-                        <span id="tenant-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase bg-purple-500/30 border border-purple-400/40 text-purple-200">
+                        <h1 class="font-extrabold text-2xl sm:text-3xl tracking-tight text-white">Oneilverse</h1>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-purple-500/30 border border-purple-400/40 text-purple-200">
                             ID26110901
                         </span>
                     </div>
-                    <p id="topbar-store-slogan" class="text-xs sm:text-sm text-slate-300 font-medium mt-1">Supervisor & Manager Command Control</p>
+                    <p class="text-xs sm:text-sm text-slate-300 font-medium mt-1">Supervisor & Manager Command Control</p>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
-                <!-- Capsule Kecil Hitam Berbalut Glass (Hari, Tanggal, Bulan, Tahun, Jam:Menit) -->
                 <div class="glass-capsule-dark px-3.5 py-1.5 text-xs text-white flex items-center space-x-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-purple-300"></i>
-                    <span id="realtime-clock-display" class="font-mono font-semibold tracking-wide text-[11px] sm:text-xs">
-                        Memuat Waktu...
-                    </span>
+                    <span id="realtime-clock-display" class="font-mono font-semibold tracking-wide text-[11px] sm:text-xs">Memuat Waktu...</span>
                 </div>
-
-                <a href="kasir.html" class="ios-pill px-3 py-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center space-x-1.5 transition active:scale-95">
-                    <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
-                    <span>Kasir</span>
-                </a>
-                <div class="ios-pill px-3 py-1.5 text-xs font-bold bg-purple-500/25 border border-purple-300/30 flex items-center shadow-sm text-purple-100">
+                <div class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-purple-500/25 border border-purple-300/30 flex items-center shadow-sm text-purple-100">
                     <span>Role: Supervisor / Manager</span>
                 </div>
+                <!-- Tombol kasir dihapus agar manager tidak bisa login semaunya di kasir -->
                 <button onclick="logout()" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     <span>Keluar</span>
@@ -134,10 +98,8 @@
     <!-- MAIN DASHBOARD CONTENT -->
     <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 flex-1 space-y-5 -mt-3">
 
-        <!-- BARIS ATAS: KARTU SALDO AUDIT & STATUS KASIR + KARTU PAJAK KECIL -->
+        <!-- BARIS ATAS: KARTU SALDO & STATUS KASIR + KARTU PAJAK KECIL -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-            
-            <!-- 1. KARTU SALDO HASIL INPUT KASIR (8 Kolom) -->
             <div class="md:col-span-8 bg-white/95 border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col justify-between space-y-3">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                     <div class="flex items-center space-x-2">
@@ -146,28 +108,29 @@
                         </div>
                         <div>
                             <span class="text-xs font-extrabold text-slate-800 uppercase block">Saldo Kas Terverifikasi (Live Kasir)</span>
-                            <span class="text-[10px] text-slate-400">Memantau seluruh transaksi input kasir di lapangan</span>
+                            <span class="text-[10px] text-slate-400">Memantau transaksi yang telah disahkan dan dicetak struknya</span>
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <span id="shift-live-status-pill" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            Shift Aktif
-                        </span>
+                        <button onclick="openModal('add_cashier_request')" class="text-[11px] font-black text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1 rounded-xl transition flex items-center space-x-1">
+                            <i data-lucide="plus-circle" class="w-3 h-3"></i>
+                            <span>+ Buka Kasir Baru</span>
+                        </button>
                         <button onclick="openModal('coa_mgmt')" class="text-[11px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1 rounded-xl transition">
-                            + Kelola Akun COA
+                            Kelola Akun COA
                         </button>
                     </div>
                 </div>
 
                 <div class="flex items-baseline justify-between py-1">
                     <div>
-                        <span class="text-xs text-slate-400 block font-medium">Saldo Kumulatif Buku Kas:</span>
+                        <span class="text-xs text-slate-400 block font-medium">Saldo Kas Bersih Sah:</span>
                         <h2 id="kas-net" class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                             Rp 0
                         </h2>
                     </div>
                     <div class="text-right">
-                        <span class="text-[11px] text-slate-400 block">Total Transaksi Masuk & Keluar:</span>
+                        <span class="text-[11px] text-slate-400 block">Transaksi Sah:</span>
                         <span id="total-tx-badge" class="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-xl border border-slate-200 inline-block mt-0.5 font-mono">
                             0 Transaksi
                         </span>
@@ -175,7 +138,7 @@
                 </div>
 
                 <div class="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
-                    <span>Total Masuk: <b id="kas-total-in" class="text-emerald-600">Rp 0</b> | Total Keluar: <b id="kas-total-out" class="text-rose-600">Rp 0</b></span>
+                    <span>Kas Masuk: <b id="kas-total-in" class="text-emerald-600">Rp 0</b> | Kas Keluar: <b id="kas-total-out" class="text-rose-600">Rp 0</b></span>
                     <button onclick="openModal('mutasi')" class="text-purple-700 font-bold hover:underline flex items-center space-x-1">
                         <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                         <span>Audit Data Kasir</span>
@@ -183,7 +146,7 @@
                 </div>
             </div>
 
-            <!-- 2. KARTU PAJAK 12% KECIL / COMPACT (4 Kolom) -->
+            <!-- Kartu Pajak Kecil -->
             <div onclick="showTaxExplainer()" role="button" tabindex="0" class="md:col-span-4 cursor-pointer bg-amber-50/90 hover:bg-amber-100/90 border border-amber-300 rounded-3xl p-5 shadow-xs transition active:scale-98 flex flex-col justify-between select-none">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-black tracking-wider text-amber-900 uppercase flex items-center">
@@ -204,27 +167,21 @@
                     <span class="font-bold text-amber-800 bg-amber-200/80 px-2 py-0.5 rounded-full text-[10px] shrink-0 ml-1">Info</span>
                 </div>
             </div>
-
         </div>
 
-        <!-- GRID 2 KOLOM: PANEL MANAJEMEN SHIFT & KOREKSI (KIRI) + MENU AUDIT POP-UP (KANAN) -->
+        <!-- GRID 2 KOLOM -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-
-            <!-- PANEL OTORISASI & INSTRUKSI MANAGER (5 Kolom di PC) -->
+            <!-- PANEL KONTROL SHIFT & INSTRUKSI KASIR -->
             <section class="lg:col-span-5 ios-glass p-5 sm:p-6 shadow-sm space-y-4">
                 <div class="border-b border-slate-200/80 pb-3 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
-                            <div class="w-7 h-7 rounded-lg bg-purple-700 text-white flex items-center justify-center shadow">
-                                <i data-lucide="settings-2" class="w-4 h-4"></i>
-                            </div>
-                            <span>Otorisasi & Komunikasi Shift</span>
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Kontrol pergantian shift & pesan ke kasir</p>
-                    </div>
+                    <h2 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
+                        <div class="w-7 h-7 rounded-lg bg-purple-700 text-white flex items-center justify-center shadow">
+                            <i data-lucide="settings-2" class="w-4 h-4"></i>
+                        </div>
+                        <span>Otorisasi & Komunikasi Shift</span>
+                    </h2>
                 </div>
 
-                <!-- Form Ganti Nama Shift untuk Kasir -->
                 <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-2.5">
                     <span class="text-xs font-bold text-purple-950 block">Atur Nama Shift Kasir:</span>
                     <div class="flex space-x-1.5">
@@ -233,10 +190,8 @@
                             Terapkan
                         </button>
                     </div>
-                    <p class="text-[11px] text-slate-500">Nama shift akan langsung tampil di terminal kasir.</p>
                 </div>
 
-                <!-- Kirim Pesan / Instruksi ke Kasir -->
                 <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
                     <span class="text-xs font-bold text-slate-800 block">Kirim Instruksi ke Terminal Kasir:</span>
                     <input type="text" id="mgr-instruction-title" placeholder="Judul Instruksi" class="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500">
@@ -248,161 +203,93 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- Catatan Keamanan Anti-Fraud -->
-                <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start space-x-2.5">
-                    <i data-lucide="shield-alert" class="w-4 h-4 text-amber-700 shrink-0 mt-0.5"></i>
-                    <div>
-                        <span class="font-bold block">Audit Trail Aktif:</span>
-                        <span class="text-[11px] text-amber-800">Setiap koreksi transaksi, penghapusan nota, atau perubahan COA yang dilakukan Manager akan otomatis dicatat di Laman Riwayat Owner.</span>
-                    </div>
-                </div>
             </section>
 
-            <!-- PUSAT MENU POP-UP AUDIT MANAGER (7 Kolom di PC) -->
+            <!-- MENU TOMBOL POP-UP RINGKAS -->
             <section class="lg:col-span-7 space-y-4">
-                
-                <!-- Filter Periode Cepat -->
-                <div class="ios-glass p-5 shadow-sm space-y-3">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                        <span class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
-                            <i data-lucide="filter" class="w-4 h-4 text-purple-600"></i>
-                            <span>Filter Periode Pemeriksaan:</span>
-                        </span>
-                        <span id="filter-result-count" class="text-[10px] font-bold text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full">
-                            Semua Data
-                        </span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                        <div class="sm:col-span-5">
-                            <label class="text-[10px] font-bold text-slate-500 block mb-0.5">Dari Tanggal:</label>
-                            <input type="date" id="filter-date-start" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-purple-500">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button onclick="openModal('mutasi')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
+                        <div class="flex items-center space-x-3 text-left">
+                            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-purple-300">
+                                <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xs">Mutasi Kas Sah</h4>
+                                <p class="text-[10px] text-slate-300">Koreksi & void nota kasir</p>
+                            </div>
                         </div>
-                        <div class="sm:col-span-5">
-                            <label class="text-[10px] font-bold text-slate-500 block mb-0.5">Sampai Tanggal:</label>
-                            <input type="date" id="filter-date-end" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-purple-500">
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                    </button>
+
+                    <button onclick="openModal('tax')" class="p-4 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-between shadow-md transition active:scale-98">
+                        <div class="flex items-center space-x-3 text-left">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                                <i data-lucide="receipt" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xs">Pajak 12%</h4>
+                                <p class="text-[10px] text-amber-100">Verifikasi faktur belanja negara</p>
+                            </div>
                         </div>
-                        <div class="sm:col-span-2 flex space-x-1 pt-3">
-                            <button onclick="applyDateFilter()" class="flex-1 bg-purple-900 hover:bg-purple-950 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">
-                                Terapkan
-                            </button>
-                            <button onclick="resetDateFilter()" class="px-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-xl text-xs transition" title="Reset">
-                                Reset
-                            </button>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-amber-200"></i>
+                    </button>
+
+                    <button onclick="openModal('ledger')" class="p-4 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
+                        <div class="flex items-center space-x-3 text-left">
+                            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-purple-200">
+                                <i data-lucide="book-open" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xs">Buku Besar</h4>
+                                <p class="text-[10px] text-purple-200">YouTube, Server, AI, Tools</p>
+                            </div>
                         </div>
-                    </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-purple-300"></i>
+                    </button>
+
+                    <button onclick="openModal('shift_history')" class="p-4 rounded-2xl bg-indigo-700 hover:bg-indigo-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
+                        <div class="flex items-center space-x-3 text-left">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                                <i data-lucide="history" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xs">Rekap Jam Kerja</h4>
+                                <p class="text-[10px] text-indigo-100">Catatan closing kasir s/d detik</p>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-indigo-200"></i>
+                    </button>
                 </div>
-
-                <!-- MENU TOMBOL POP-UP -->
-                <div class="ios-glass p-5 shadow-sm space-y-3">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                        <span class="text-xs font-extrabold text-slate-900 flex items-center space-x-1.5">
-                            <i data-lucide="layout-grid" class="w-4 h-4 text-purple-600"></i>
-                            <span>Pusat Pop-Up Audit & Laporan Manager:</span>
-                        </span>
-                        <span class="text-[10px] text-slate-400 font-medium">Buka jendela popup</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                        <!-- Pop-up Mutasi Kas (Ada opsi Koreksi & Hapus oleh Manager) -->
-                        <button onclick="openModal('mutasi')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
-                            <div class="flex items-center space-x-3 text-left">
-                                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-purple-300 group-hover:scale-105 transition-transform">
-                                    <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-xs">Pop-Up Mutasi Kas</h4>
-                                    <p class="text-[10px] text-slate-300">Audit rekening koran & koreksi nota</p>
-                                </div>
-                            </div>
-                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-400 group-hover:text-white transition-colors"></i>
-                        </button>
-
-                        <!-- Pop-up Pajak 12% -->
-                        <button onclick="openModal('tax')" class="p-4 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
-                            <div class="flex items-center space-x-3 text-left">
-                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
-                                    <i data-lucide="receipt" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-xs">Pop-Up Pajak 12%</h4>
-                                    <p class="text-[10px] text-amber-100">Verifikasi faktur pajak negara</p>
-                                </div>
-                            </div>
-                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-amber-200 group-hover:text-white transition-colors"></i>
-                        </button>
-
-                        <!-- Pop-up Buku Besar Akun -->
-                        <button onclick="openModal('ledger')" class="p-4 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
-                            <div class="flex items-center space-x-3 text-left">
-                                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-purple-200 group-hover:scale-105 transition-transform">
-                                    <i data-lucide="book-open" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-xs">Pop-Up Buku Besar</h4>
-                                    <p class="text-[10px] text-purple-200">YouTube, Server, AI, CapCut</p>
-                                </div>
-                            </div>
-                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-purple-300 group-hover:text-white transition-colors"></i>
-                        </button>
-
-                        <!-- Pop-up Rekap Closing Shift Kasir -->
-                        <button onclick="openModal('shift_history')" class="p-4 rounded-2xl bg-indigo-700 hover:bg-indigo-800 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
-                            <div class="flex items-center space-x-3 text-left">
-                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
-                                    <i data-lucide="history" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-xs">Rekap Jam Kerja Kasir</h4>
-                                    <p class="text-[10px] text-indigo-100">Catatan closing s/d detik</p>
-                                </div>
-                            </div>
-                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-indigo-200 group-hover:text-white transition-colors"></i>
-                        </button>
-                    </div>
-                </div>
-
             </section>
         </div>
 
     </main>
 
-    <!-- ================= MODAL POP-UP DIALOG UNTUK SEMUA TABEL MANAGER ================= -->
-    <div id="main-modal-container" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-3 sm:p-5">
-        <div class="ios-glass w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl modal-sheet overflow-hidden border border-white/40">
-            
-            <div class="px-6 py-4 border-b border-slate-200/90 flex items-center justify-between bg-white/70">
-                <div class="flex items-center space-x-3">
-                    <div id="modal-icon-badge" class="w-9 h-9 rounded-xl flex items-center justify-center text-white">
-                        <i id="modal-icon" data-lucide="table" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 id="modal-title" class="font-extrabold text-base text-slate-900 leading-tight">Judul Pop-Up</h3>
-                        <p id="modal-subtitle" class="text-xs text-slate-500">Keterangan Laporan Manager</p>
-                    </div>
+    <!-- MODAL POP-UP DIALOG UNIVERSAL -->
+    <div id="main-modal-container" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="ios-glass w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl modal-sheet overflow-hidden bg-white">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 id="modal-title" class="font-black text-base text-slate-900">Judul</h3>
+                    <p id="modal-subtitle" class="text-xs text-slate-400">Keterangan</p>
                 </div>
-                
-                <div class="flex items-center space-x-2">
-                    <div id="modal-header-actions"></div>
-                    <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition active:scale-95">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
             </div>
 
             <div id="modal-body-content" class="p-6 overflow-y-auto flex-1 space-y-4">
-                
-                <!-- 1. MUTASI KAS (DILENGKAPI TOMBOL KOREKSI & HAPUS OLEH MANAGER) -->
+                <!-- 1. MUTASI KAS DENGAN KOREKSI & VOID -->
                 <div id="popup-content-mutasi" class="space-y-4 hidden">
-                    <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="sticky top-0 bg-slate-100/90 backdrop-blur-md text-[11px] font-black text-slate-600 uppercase border-b border-slate-200">
+                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-600 border-b">
                                 <tr>
                                     <th class="py-3 px-3">Waktu</th>
                                     <th class="py-3 px-3">Uraian Transaksi</th>
-                                    <th class="py-3 px-3 text-right">Debit (Masuk)</th>
-                                    <th class="py-3 px-3 text-right">Kredit (Keluar)</th>
-                                    <th class="py-3 px-3 text-right">Saldo Berjalan</th>
+                                    <th class="py-3 px-3 text-right">Debit</th>
+                                    <th class="py-3 px-3 text-right">Kredit</th>
+                                    <th class="py-3 px-3 text-right">Saldo</th>
                                     <th class="py-3 px-3 text-center">Aksi Manager</th>
                                 </tr>
                             </thead>
@@ -414,56 +301,39 @@
                 <!-- 2. PAJAK 12% -->
                 <div id="popup-content-tax" class="space-y-4 hidden">
                     <div class="overflow-x-auto border border-amber-200 rounded-2xl">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-amber-100/70 text-[11px] font-black text-amber-950 uppercase border-b border-amber-200">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-amber-100/70 text-[11px] font-black uppercase text-amber-950 border-b">
                                 <tr>
-                                    <th class="py-3 px-3">No</th>
                                     <th class="py-3 px-3">Tanggal</th>
-                                    <th class="py-3 px-3">Pos Pengeluaran (Outcome)</th>
-                                    <th class="py-3 px-3">Keterangan Belanja</th>
+                                    <th class="py-3 px-3">Pos Pengeluaran</th>
+                                    <th class="py-3 px-3">Keterangan</th>
                                     <th class="py-3 px-3 text-right">Total Transaksi</th>
-                                    <th onclick="showTaxExplainer()" class="py-3 px-3 text-right bg-amber-200/70 font-black text-amber-950 cursor-pointer hover:bg-amber-300 transition" title="Klik untuk penjelasan">Pajak Negara (12%) <i data-lucide="help-circle" class="w-3 h-3 inline ml-0.5 text-amber-800"></i></th>
-                                    <th class="py-3 px-3 text-right">Nilai Bersih (DPP)</th>
+                                    <th class="py-3 px-3 text-right bg-amber-200/70 font-black">Pajak 12%</th>
+                                    <th class="py-3 px-3 text-right">Nilai Bersih</th>
                                 </tr>
                             </thead>
                             <tbody id="tax-table-body"></tbody>
-                            <tfoot class="bg-amber-50 font-black border-t-2 border-amber-300">
-                                <tr>
-                                    <td colspan="4" class="py-3 px-3 text-right uppercase text-slate-700">Total Akumulasi Pajak untuk Negara:</td>
-                                    <td id="tax-foot-gross" class="py-3 px-3 text-right text-slate-900">Rp 0</td>
-                                    <td id="tax-foot-tax" class="py-3 px-3 text-right text-amber-900 text-sm">Rp 0</td>
-                                    <td id="tax-foot-net" class="py-3 px-3 text-right text-slate-700">Rp 0</td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
 
                 <!-- 3. BUKU BESAR -->
                 <div id="popup-content-ledger" class="space-y-4 hidden">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <span id="total-active-accounts" class="text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full">
-                            0 Akun Aktif
-                        </span>
-                        <select id="filter-account-target" onchange="renderPerAccountManager()" class="bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold rounded-xl p-2 outline-none">
-                            <option value="ALL">-- Tampilkan Semua Akun --</option>
-                        </select>
-                    </div>
                     <div id="manager-per-account-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
 
-                <!-- 4. REKAP RIWAYAT SHIFT CLOSING -->
+                <!-- 4. REKAP SHIFT -->
                 <div id="popup-content-shift_history" class="space-y-4 hidden">
-                    <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-slate-100 text-[11px] font-black text-slate-700 uppercase border-b border-slate-200">
+                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-700 border-b">
                                 <tr>
-                                    <th class="py-3 px-3">Waktu Selesai (Detail s/d Detik)</th>
+                                    <th class="py-3 px-3">Waktu Closing</th>
                                     <th class="py-3 px-3">Nama Shift</th>
                                     <th class="py-3 px-3 text-right">Kas Masuk</th>
                                     <th class="py-3 px-3 text-right">Kas Keluar</th>
-                                    <th class="py-3 px-3 text-right font-black text-indigo-950">Uang Diserahkan</th>
-                                    <th class="py-3 px-3 text-center">Petugas Kasir</th>
+                                    <th class="py-3 px-3 text-right">Saldo Diserahkan</th>
+                                    <th class="py-3 px-3 text-center">Petugas</th>
                                 </tr>
                             </thead>
                             <tbody id="shift-history-table-body"></tbody>
@@ -471,13 +341,13 @@
                     </div>
                 </div>
 
-                <!-- 5. KELOLA AKUN COA (TAMBAH / EDIT DENGAN LOG AUDIT) -->
+                <!-- 5. KELOLA AKUN COA (DENGAN EDIT, HAPUS, & REKAM KE OWNER) -->
                 <div id="popup-content-coa_mgmt" class="space-y-4 hidden">
                     <div class="bg-purple-50/70 border border-purple-200 rounded-2xl p-4 space-y-3">
-                        <span class="text-xs font-black text-purple-950 block">Tambah Akun Transaksi Baru (COA):</span>
+                        <span class="text-xs font-black text-purple-950 block">Tambah Akun Baru (COA):</span>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <input type="text" id="new-coa-code" placeholder="Kode (misal: 108 / 208)" class="bg-white border border-purple-300 rounded-xl p-2 text-xs font-mono font-bold outline-none">
-                            <input type="text" id="new-coa-name" placeholder="Nama Akun (misal: YouTube Super Thanks)" class="bg-white border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
+                            <input type="text" id="new-coa-name" placeholder="Nama Akun" class="bg-white border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
                             <select id="new-coa-cat" class="bg-white border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
                                 <option value="sales">Income (Pemasukan)</option>
                                 <option value="cogs">Outcome (Produksi)</option>
@@ -486,19 +356,19 @@
                         </div>
                         <div class="flex justify-end">
                             <button onclick="saveNewCOAByManager()" class="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm">
-                                + Simpan Akun Baru
+                                + Simpan Akun
                             </button>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-slate-100 text-[11px] font-black text-slate-700 uppercase border-b border-slate-200">
+                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-700 border-b">
                                 <tr>
                                     <th class="py-2.5 px-3">Kode</th>
                                     <th class="py-2.5 px-3">Nama Akun</th>
                                     <th class="py-2.5 px-3">Kategori</th>
-                                    <th class="py-2.5 px-3 text-center">Status</th>
+                                    <th class="py-2.5 px-3 text-center">Aksi Manager</th>
                                 </tr>
                             </thead>
                             <tbody id="coa-table-body"></tbody>
@@ -506,24 +376,52 @@
                     </div>
                 </div>
 
+                <!-- 6. PERMOHONAN PENAMBAHAN KASIR BARU KE PROVIDER -->
+                <div id="popup-content-add_cashier_request" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-3">
+                        <div>
+                            <h4 class="font-black text-sm text-indigo-950">Buka Terminal Kasir / Admin Baru</h4>
+                            <p class="text-xs text-indigo-800/80">Permohonan akan langsung dikirimkan ke portal penyedia platform untuk aktivasi lisensi.</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">Jumlah Kasir yang Dibuka:</label>
+                                <select id="req-cashier-qty" class="w-full bg-white border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
+                                    <option value="1">+1 Terminal Kasir</option>
+                                    <option value="2">+2 Terminal Kasir</option>
+                                    <option value="3">+3 Terminal Kasir</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">Nama / Lokasi Kasir:</label>
+                                <input type="text" id="req-cashier-name" placeholder="Misal: Kasir Meja 2 / Kasir Lantai 2" class="w-full bg-white border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-1">
+                            <button onclick="submitCashierRequest()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition active:scale-95 shadow-md flex items-center space-x-1.5">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                <span>Kirim Permohonan ke Penyedia</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="px-6 py-3 border-t border-slate-200/90 bg-white/70 flex justify-end">
-                <button onclick="closeModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs transition active:scale-95">
-                    Tutup Pop-Up
+            <div class="px-6 py-3 border-t border-slate-100 bg-white flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                    Tutup
                 </button>
             </div>
-
         </div>
     </div>
 
-    <!-- MODAL EDIT TRANSAKSI KHUSUS MANAGER (OVERRIDE AUTH) -->
-    <div id="modal-mgr-edit" class="hidden fixed inset-0 z-[60] modal-backdrop flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-md p-6 shadow-2xl modal-sheet space-y-4 bg-white/95 border border-purple-200">
+    <!-- MODAL EDIT TRANSAKSI KHUSUS MANAGER -->
+    <div id="modal-mgr-edit" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl modal-sheet space-y-4 border border-purple-200">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-black text-sm text-slate-900 flex items-center space-x-1.5">
                     <i data-lucide="edit-3" class="w-4 h-4 text-purple-600"></i>
-                    <span>Koreksi Transaksi Kasir (Otorisasi Manager)</span>
+                    <span>Koreksi Transaksi Sah</span>
                 </h3>
                 <button onclick="closeManagerEditModal()" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-4 h-4"></i>
@@ -533,31 +431,31 @@
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="font-bold text-slate-600 block mb-1">Akun Transaksi</label>
-                    <input type="text" id="mgr-edit-account" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl p-2.5 font-bold text-slate-700 outline-none">
+                    <input type="text" id="mgr-edit-account" readonly class="w-full bg-slate-100 border rounded-xl p-2.5 font-bold text-slate-700 outline-none">
                 </div>
                 <div>
                     <label class="font-bold text-slate-600 block mb-1">Nominal Transaksi (Rp)</label>
-                    <input type="text" id="mgr-edit-amount" oninput="formatInputThousand(this)" class="w-full bg-purple-50/50 border border-purple-300 rounded-xl p-3 text-base font-black text-purple-950 outline-none focus:ring-2 focus:ring-purple-500">
+                    <input type="text" id="mgr-edit-amount" oninput="formatInputThousand(this)" class="w-full bg-purple-50/50 border border-purple-300 rounded-xl p-3 text-base font-black text-purple-950 outline-none">
                 </div>
                 <div>
                     <label class="font-bold text-slate-600 block mb-1">Keterangan Koreksi</label>
-                    <input type="text" id="mgr-edit-desc" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-purple-500">
+                    <input type="text" id="mgr-edit-desc" class="w-full bg-slate-50 border rounded-xl p-2.5 outline-none">
                 </div>
             </div>
             <div class="flex space-x-2 pt-2">
                 <button onclick="saveManagerCorrection()" class="flex-1 bg-purple-700 hover:bg-purple-800 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95 shadow-sm">
                     Simpan Perubahan
                 </button>
-                <button onclick="closeManagerEditModal()" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-xs transition active:scale-95">
+                <button onclick="closeManagerEditModal()" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-xs transition">
                     Batal
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL PENJELASAN PAJAK 12% (TAP / KLIK HP & PC) -->
+    <!-- MODAL PENJELASAN PAJAK 12% -->
     <div id="modal-tax-explainer" style="display: none;" class="hidden fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-sm p-6 shadow-2xl modal-sheet space-y-4 bg-white/95 text-center border border-slate-200">
+        <div class="ios-glass w-full max-w-sm p-6 shadow-2xl modal-sheet space-y-4 bg-white text-center border border-slate-200">
             <div class="w-12 h-12 bg-amber-100 text-amber-800 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
                 <i data-lucide="info" class="w-6 h-6"></i>
             </div>
@@ -576,12 +474,10 @@
         </div>
     </div>
 
-    <!-- SCRIPTS -->
     <script src="js/tenants.js"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
     <script>
-        // FORMATTER AMAN (MENDUKUNG ANGKA NEGATIF / MINUS)
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
             const isNeg = n < 0;
@@ -616,78 +512,48 @@
 
         let activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
 
-        if (activeTenant && typeof APP_CONFIG !== 'undefined') {
-            APP_CONFIG.businessName = activeTenant.nama;
-            APP_CONFIG.businessSlogan = activeTenant.slogan;
-            document.title = activeTenant.nama + " - Manager Hub";
-        }
-
-
-        // AUTENTIKASI MANDIRI ANTI-LOOPING (MANAGER)
+        // AUTH MANAGER MANDIRI ANTI-LOOPING
         function checkManagerAuth() {
             let userObj = null;
-            try {
-                userObj = JSON.parse(localStorage.getItem('currentUser'));
-            } catch(e) {}
-
+            try { userObj = JSON.parse(localStorage.getItem('currentUser')); } catch(e) {}
             const role = (userObj && userObj.role) || localStorage.getItem('auth_role') || '';
+            if (role === 'manager' || role === 'owner') return userObj || { role: 'manager', title: 'Supervisor / Manager' };
 
-            // Jika sudah manager atau owner, loloskan langsung
-            if (role === 'manager' || role === 'owner') {
-                return userObj || { role: role, title: role === 'owner' ? 'Owner' : 'Supervisor / Manager' };
-            }
-
-            // Jika bukan manager/owner, minta verifikasi PIN Manager sekali saja
-            const pin = prompt("Halaman Otorisasi Manager & Supervisor.\nMasukkan PIN Manager (Default: 5678 / 1234):");
-            if (pin === "5678" || pin === "1234" || pin === "9999" || pin === "0000") {
-                const mgrUser = { role: 'manager', title: 'Supervisor / Manager', permissions: ['manager'] };
-                localStorage.setItem('currentUser', JSON.stringify(mgrUser));
+            const pin = prompt("Otorisasi Manager.\nMasukkan PIN Manager (Default: 5678 / 1234):");
+            if (pin === "5678" || pin === "1234") {
+                const mgr = { role: 'manager', title: 'Supervisor / Manager' };
+                localStorage.setItem('currentUser', JSON.stringify(mgr));
                 localStorage.setItem('auth_role', 'manager');
-                localStorage.setItem('auth_title', 'Supervisor / Manager');
-                return mgrUser;
+                return mgr;
             } else {
-                alert("PIN tidak valid. Kembali ke halaman kasir.");
-                window.location.replace("kasir.html");
+                window.location.replace("index.html");
                 throw new Error("Unauthorized");
             }
         }
         const user = checkManagerAuth();
 
-
         if (typeof initFirebase === 'function') initFirebase();
         if (window.lucide) lucide.createIcons();
 
         let txList = [];
-        let filteredTxList = [];
         let shiftHistory = JSON.parse(localStorage.getItem('fm_shift_history') || "[]");
 
-        // Kunci penyimpanan data sinkron dengan Kasir
         const tenantStorageKey = (activeTenant && activeTenant.id) ? `fm_v11_tx_${activeTenant.id}` : 'fm_v11_tx';
         const tenantFirestoreCol = (activeTenant && activeTenant.id && activeTenant.id !== 'default') 
             ? `tx_${activeTenant.id}` 
             : 'transactions_v11';
 
-        // JAM REALTIME
         function updateRealtimeClock() {
             const clockEl = document.getElementById('realtime-clock-display');
             if (!clockEl) return;
             const now = new Date();
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-
-            const dayName = days[now.getDay()];
-            const dateNum = String(now.getDate()).padStart(2, '0');
-            const monthName = months[now.getMonth()];
-            const yearNum = now.getFullYear();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-
-            clockEl.innerText = `${dayName}, ${dateNum} ${monthName} ${yearNum} • ${hours}:${minutes}`;
+            clockEl.innerText = `${days[now.getDay()]}, ${String(now.getDate()).padStart(2,'0')} ${months[now.getMonth()]} ${now.getFullYear()} • ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         }
         setInterval(updateRealtimeClock, 1000);
         updateRealtimeClock();
 
-        // LOAD DATA TRANSAKSI SINKRON DENGAN KASIR
         function loadTransactions() {
             const raw = localStorage.getItem(tenantStorageKey);
             txList = raw ? JSON.parse(raw) : [];
@@ -701,10 +567,10 @@
                             d.docId = doc.id;
                             txList.push(d);
                         });
-                        applyDateFilter();
-                    }, () => applyDateFilter());
+                        renderAllReports();
+                    }, () => renderAllReports());
             } else {
-                applyDateFilter();
+                renderAllReports();
             }
         }
 
@@ -712,127 +578,56 @@
             localStorage.setItem(tenantStorageKey, JSON.stringify(txList));
         }
 
-        function applyDateFilter() {
-            const start = document.getElementById('filter-date-start').value;
-            const end = document.getElementById('filter-date-end').value;
-
-            if (!start && !end) {
-                filteredTxList = [...txList];
-                document.getElementById('filter-result-count').innerText = `${filteredTxList.length} Transaksi (Semua)`;
-            } else {
-                filteredTxList = txList.filter(t => {
-                    const txDate = t.dateISO || (new Date(t.timestamp).toISOString().split('T')[0]);
-                    if (start && end) return txDate >= start && txDate <= end;
-                    if (start) return txDate >= start;
-                    if (end) return txDate <= end;
-                    return true;
-                });
-                document.getElementById('filter-result-count').innerText = `${filteredTxList.length} Transaksi Terfilter`;
-            }
-            renderAllReports();
-        }
-
-        function resetDateFilter() {
-            document.getElementById('filter-date-start').value = "";
-            document.getElementById('filter-date-end').value = "";
-            applyDateFilter();
-        }
-
         function renderAllReports() {
             renderManagerTable();
             renderTaxTable();
             renderPerAccountManager();
             renderCOATable();
-            document.getElementById('total-tx-badge').innerText = `${txList.length} Transaksi Terbaca`;
+            document.getElementById('total-tx-badge').innerText = `${txList.length} Transaksi Sah`;
         }
 
-        // RENDER TABEL MUTASI AUDIT DENGAN KOREKSI
         function renderManagerTable() {
             const tbody = document.getElementById('manager-table-body');
+            if (!tbody) return;
             tbody.innerHTML = "";
 
             let totalIn = 0;
             let totalOut = 0;
-
-            const chronoList = [...filteredTxList].reverse();
+            const chronoList = [...txList].reverse();
             let runningBalance = 0;
             const withBalance = chronoList.map(tx => {
-                const isSales = tx.category === 'sales';
-                if (isSales) runningBalance += tx.amount;
+                if (tx.category === 'sales') runningBalance += tx.amount;
                 else runningBalance -= tx.amount;
                 return { ...tx, runningBalance };
             });
 
             const displayList = withBalance.reverse();
-
-            if (displayList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada transaksi mutasi kas kasir tercatat.</td></tr>`;
-                document.getElementById('kas-total-in').innerText = "Rp 0";
-                document.getElementById('kas-total-out').innerText = "Rp 0";
-                document.getElementById('kas-net').innerText = "Rp 0";
-                return;
-            }
-
-            displayList.forEach((tx) => {
-                const isSales = tx.category === 'sales';
-                const inVal = isSales ? tx.amount : 0;
-                const outVal = !isSales ? tx.amount : 0;
-                totalIn += inVal;
-                totalOut += outVal;
+            displayList.forEach(tx => {
+                if (tx.category === 'sales') totalIn += tx.amount;
+                else totalOut += tx.amount;
 
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-100 hover:bg-slate-50/80 text-xs transition";
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 text-xs";
                 tr.innerHTML = `
-                    <td class="py-3 px-3 text-slate-700 whitespace-nowrap">
-                        <span class="font-bold text-slate-900">${tx.dateFull}</span>
-                        <span class="text-[10px] text-slate-400 block font-mono">${tx.date}</span>
-                    </td>
-                    <td class="py-3 px-3">
-                        <span class="font-bold text-slate-900 block">[${tx.accountCode}] ${tx.accountName}</span>
-                        <span class="text-[10px] text-slate-500">${tx.desc} (Petugas: ${tx.staff})</span>
-                    </td>
-                    <td class="py-3 px-3 text-right font-black text-emerald-600 whitespace-nowrap">${inVal > 0 ? formatThousandSeparator(inVal) : '-'}</td>
-                    <td class="py-3 px-3 text-right font-black text-rose-600 whitespace-nowrap">${outVal > 0 ? formatThousandSeparator(outVal) : '-'}</td>
-                    <td class="py-3 px-3 text-right font-black text-slate-900 whitespace-nowrap bg-slate-50/60 font-mono">Rp ${formatThousandSeparator(tx.runningBalance)}</td>
-                    <td class="py-3 px-3 text-center whitespace-nowrap space-x-1">
-                        <button onclick="openManagerEdit('${tx.id}')" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg font-bold text-[10px] border border-purple-200">
-                            Koreksi
-                        </button>
-                        <button onclick="managerDeleteTx('${tx.id}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-bold text-[10px] border border-rose-200">
-                            Void
-                        </button>
+                    <td class="py-2.5 px-3 font-mono">${tx.dateFull} ${tx.date}</td>
+                    <td class="py-2.5 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}<br><span class="text-[10px] text-slate-400 font-normal">${tx.desc || '-'} (Kasir: ${tx.staff})</span></td>
+                    <td class="py-2.5 px-3 text-right font-black text-emerald-600">${tx.category === 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-rose-600">${tx.category !== 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-black font-mono">Rp ${formatThousandSeparator(tx.runningBalance)}</td>
+                    <td class="py-2.5 px-3 text-center whitespace-nowrap space-x-1">
+                        <button onclick="openManagerEdit('${tx.id}')" class="px-2 py-0.5 bg-purple-50 hover:bg-purple-100 text-purple-800 rounded font-bold text-[10px] border border-purple-200">Koreksi</button>
+                        <button onclick="managerDeleteTx('${tx.id}')" class="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-bold text-[10px] border border-rose-200">Void</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            const netKumulatif = totalIn - totalOut;
+            const net = totalIn - totalOut;
             document.getElementById('kas-total-in').innerText = "Rp " + formatThousandSeparator(totalIn);
             document.getElementById('kas-total-out').innerText = "Rp " + formatThousandSeparator(totalOut);
             const netEl = document.getElementById('kas-net');
-            netEl.innerText = formatCurrency(netKumulatif);
-            if (netKumulatif < 0) {
-                netEl.className = "text-3xl sm:text-4xl font-black text-rose-600 tracking-tight";
-            } else {
-                netEl.className = "text-3xl sm:text-4xl font-black text-slate-900 tracking-tight";
-            }
-            if (window.lucide) lucide.createIcons();
-        }
-
-        // KOREKSI TRANSAKSI DENGAN PENCATATAN AUDIT TRAIL UNTUK OWNER
-        function openManagerEdit(id) {
-            const tx = txList.find(t => t.id === id);
-            if (!tx) return;
-
-            document.getElementById('mgr-edit-id').value = tx.id;
-            document.getElementById('mgr-edit-account').value = `[${tx.accountCode}] ${tx.accountName}`;
-            document.getElementById('mgr-edit-amount').value = formatThousandSeparator(tx.amount);
-            document.getElementById('mgr-edit-desc').value = tx.desc || "";
-            document.getElementById('modal-mgr-edit').classList.remove('hidden');
-        }
-
-        function closeManagerEditModal() {
-            document.getElementById('modal-mgr-edit').classList.add('hidden');
+            netEl.innerText = formatCurrency(net);
+            netEl.className = net < 0 ? "text-3xl sm:text-4xl font-black text-rose-600 tracking-tight" : "text-3xl sm:text-4xl font-black text-slate-900 tracking-tight";
         }
 
         function recordAuditLog(actionType, detail, beforeData, afterData) {
@@ -860,29 +655,37 @@
             }
         }
 
+        function openManagerEdit(id) {
+            const tx = txList.find(t => t.id === id);
+            if (!tx) return;
+            document.getElementById('mgr-edit-id').value = tx.id;
+            document.getElementById('mgr-edit-account').value = `[${tx.accountCode}] ${tx.accountName}`;
+            document.getElementById('mgr-edit-amount').value = formatThousandSeparator(tx.amount);
+            document.getElementById('mgr-edit-desc').value = tx.desc || "";
+            document.getElementById('modal-mgr-edit').classList.remove('hidden');
+        }
+
+        function closeManagerEditModal() {
+            document.getElementById('modal-mgr-edit').classList.add('hidden');
+        }
+
         function saveManagerCorrection() {
             const id = document.getElementById('mgr-edit-id').value;
-            const rawAmount = document.getElementById('mgr-edit-amount').value;
-            const amount = parseThousandSeparator(rawAmount);
+            const amount = parseThousandSeparator(document.getElementById('mgr-edit-amount').value);
             const desc = document.getElementById('mgr-edit-desc').value.trim();
-
             if (amount <= 0) return alert("Nominal tidak valid!");
 
             const index = txList.findIndex(t => t.id === id);
             if (index !== -1) {
                 const oldTx = { ...txList[index] };
-                const isOutcome = (txList[index].category === 'cogs' || txList[index].category === 'expense');
+                const isOutcome = (txList[index].category !== 'sales');
                 const tax = isOutcome ? Math.round(amount * 0.12) : 0;
-                const dpp = isOutcome ? (amount - tax) : amount;
 
                 txList[index].amount = amount;
                 txList[index].tax12 = tax;
-                txList[index].dpp = dpp;
+                txList[index].dpp = isOutcome ? (amount - tax) : amount;
                 txList[index].desc = desc + " (Divalidasi Manager)";
-                txList[index].editedBy = user.title;
-                txList[index].editedAt = new Date().toLocaleTimeString('id-ID');
 
-                // CATAT KE AUDIT TRAIL OWNER
                 recordAuditLog(
                     "KOREKSI_NOTA_KASIR",
                     `Koreksi nota [${oldTx.accountName}] oleh ${user.title}`,
@@ -895,70 +698,85 @@
                 }
                 persistData();
                 closeManagerEditModal();
-                applyDateFilter();
-                alert("Koreksi berhasil disimpan dan terekam di Audit Trail Owner!");
+                renderAllReports();
+                alert("Koreksi berhasil disimpan dan terekam di Audit Log Owner!");
             }
         }
 
         function managerDeleteTx(id) {
             const tx = txList.find(t => t.id === id);
             if (!tx) return;
-
-            if (confirm(`Otorisasi Manager: Hapus / Void nota [ ${tx.accountName} - Rp ${formatThousandSeparator(tx.amount)} ]?\n\nAksi ini akan dicatat ke laman audit Owner.`)) {
+            if (confirm(`Hapus / Void nota [ ${tx.accountName} - Rp ${formatThousandSeparator(tx.amount)} ]?\n\nAksi ini akan dicatat ke audit Owner.`)) {
                 const index = txList.findIndex(t => t.id === id);
                 if (index !== -1) {
                     const deleted = txList[index];
-                    recordAuditLog(
-                        "VOID_HAPUS_NOTA",
-                        `Penghapusan nota kasir [${deleted.accountName}] oleh ${user.title}`,
-                        `Rp ${formatThousandSeparator(deleted.amount)} (${deleted.desc})`,
-                        "DIBATALKAN / VOID"
-                    );
-
+                    recordAuditLog("VOID_HAPUS_NOTA", `Void nota kasir [${deleted.accountName}] oleh ${user.title}`, `Rp ${formatThousandSeparator(deleted.amount)}`, "VOID DIBATALKAN");
                     if (typeof db !== 'undefined' && db && deleted.docId) {
                         db.collection(tenantFirestoreCol).doc(deleted.docId).delete().catch(console.error);
                     }
                     txList.splice(index, 1);
                     persistData();
-                    applyDateFilter();
-                    alert("Nota telah dihapus dan terekam di Audit Trail Owner.");
+                    renderAllReports();
+                    alert("Nota telah dihapus.");
                 }
             }
         }
 
-        // KELOLA NAMA SHIFT
-        function saveShiftNameByManager() {
-            const name = document.getElementById('mgr-set-shift-name').value.trim();
-            if (!name) return alert("Ketik nama shift terlebih dahulu!");
-            localStorage.setItem('fm_shift_name', name);
-            recordAuditLog("GANTI_NAMA_SHIFT", `Manager mengubah nama shift menjadi: ${name}`, "-", name);
-            alert(`Nama shift berhasil diubah menjadi: "${name}". Terminal kasir akan mengikuti nama ini.`);
-        }
-
-        // KELOLA COA OLEH MANAGER
+        // KELOLA COA (TAMBAH, EDIT, HAPUS OLEH MANAGER)
         function saveNewCOAByManager() {
             const code = document.getElementById('new-coa-code').value.trim();
             const name = document.getElementById('new-coa-name').value.trim();
             const cat = document.getElementById('new-coa-cat').value;
-
             if (!code || !name) return alert("Kode dan nama akun wajib diisi!");
 
             let coaList = JSON.parse(localStorage.getItem('fm_custom_coa') || "[]");
             if (coaList.length === 0) coaList = [...DEFAULT_ONEILVERSE_COA];
 
-            const exists = coaList.find(c => c.code === code);
-            if (exists) return alert(`Kode akun [${code}] sudah ada!`);
+            if (coaList.some(c => c.code === code)) return alert(`Kode akun [${code}] sudah ada!`);
 
-            const newAccount = { code, name, category: cat };
-            coaList.push(newAccount);
+            coaList.push({ code, name, category: cat });
             localStorage.setItem('fm_custom_coa', JSON.stringify(coaList));
 
-            recordAuditLog("TAMBAH_AKUN_COA", `Manager menambahkan pos akun baru [${code}] ${name}`, "-", `Kategori: ${cat}`);
-            
+            recordAuditLog("TAMBAH_AKUN_COA", `Manager menambahkan akun [${code}] ${name}`, "-", `Kategori: ${cat}`);
             document.getElementById('new-coa-code').value = "";
             document.getElementById('new-coa-name').value = "";
             renderCOATable();
-            alert(`Akun [${code}] ${name} berhasil ditambahkan dan tercatat di Audit Log Owner!`);
+            alert("Akun COA berhasil ditambahkan!");
+        }
+
+        function editCOAItem(code) {
+            let coaList = JSON.parse(localStorage.getItem('fm_custom_coa') || "[]");
+            if (coaList.length === 0) coaList = [...DEFAULT_ONEILVERSE_COA];
+
+            const item = coaList.find(c => c.code === code);
+            if (!item) return;
+
+            const newName = prompt(`Ubah Nama Akun [${item.code}]:`, item.name);
+            if (newName && newName.trim() && newName.trim() !== item.name) {
+                const oldName = item.name;
+                item.name = newName.trim();
+                localStorage.setItem('fm_custom_coa', JSON.stringify(coaList));
+                recordAuditLog("EDIT_AKUN_COA", `Manager mengubah nama akun [${item.code}]`, oldName, item.name);
+                renderCOATable();
+                alert("Perubahan akun COA disimpan dan terekam di audit Owner!");
+            }
+        }
+
+        function deleteCOAItem(code) {
+            let coaList = JSON.parse(localStorage.getItem('fm_custom_coa') || "[]");
+            if (coaList.length === 0) coaList = [...DEFAULT_ONEILVERSE_COA];
+
+            const idx = coaList.findIndex(c => c.code === code);
+            if (idx === -1) return;
+
+            if (confirm(`Hapus akun COA [${coaList[idx].code}] ${coaList[idx].name}?\n\nAksi ini akan dicatat ke laman audit Owner.`)) {
+                const deleted = coaList[idx];
+                coaList.splice(idx, 1);
+                localStorage.setItem('fm_custom_coa', JSON.stringify(coaList));
+                recordAuditLog("HAPUS_AKUN_COA", `Manager menghapus akun [${deleted.code}] ${deleted.name}`, deleted.name, "DIHAPUS");
+                renderCOATable();
+                alert("Akun COA telah dihapus.");
+            }
         }
 
         function renderCOATable() {
@@ -971,216 +789,140 @@
 
             coaList.forEach(c => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                tr.className = "border-b border-slate-100 text-xs";
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono font-bold text-slate-900">${c.code}</td>
                     <td class="py-2.5 px-3 font-bold text-slate-800">${c.name}</td>
-                    <td class="py-2.5 px-3 uppercase text-[10px] font-bold text-slate-500">${c.category}</td>
-                    <td class="py-2.5 px-3 text-center text-emerald-600 font-bold text-[10px]">Aktif</td>
+                    <td class="py-2.5 px-3 uppercase text-[10px] text-slate-500">${c.category}</td>
+                    <td class="py-2.5 px-3 text-center space-x-1">
+                        <button onclick="editCOAItem('${c.code}')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10px]">Edit</button>
+                        <button onclick="deleteCOAItem('${c.code}')" class="px-2 py-0.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px]">Hapus</button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // RENDER TABEL PAJAK 12%
+        // PERMOHONAN KASIR BARU KE PROVIDER
+        function submitCashierRequest() {
+            const qty = document.getElementById('req-cashier-qty').value;
+            const name = document.getElementById('req-cashier-name').value.trim() || `Kasir Tambahan (+${qty})`;
+
+            const ticket = {
+                id: 'req_' + Date.now(),
+                tenantId: activeTenant ? activeTenant.id : 'ID26110901',
+                tenantName: activeTenant ? activeTenant.nama : 'Oneilverse',
+                qty: qty,
+                terminalName: name,
+                status: 'PENDING',
+                requestedBy: user.title,
+                requestedAt: new Date().toLocaleString('id-ID'),
+                timestamp: Date.now()
+            };
+
+            let reqList = JSON.parse(localStorage.getItem('fm_cashier_license_requests') || "[]");
+            reqList.unshift(ticket);
+            localStorage.setItem('fm_cashier_license_requests', JSON.stringify(reqList));
+
+            alert(`Permohonan pembukaan +${qty} terminal kasir baru ("${name}") telah terkirim ke portal penyedia platform!`);
+            closeModal();
+        }
+
+        function saveShiftNameByManager() {
+            const name = document.getElementById('mgr-set-shift-name').value.trim();
+            if (!name) return alert("Ketik nama shift!");
+            localStorage.setItem('fm_shift_name', name);
+            recordAuditLog("GANTI_NAMA_SHIFT", `Manager mengubah nama shift menjadi: ${name}`, "-", name);
+            alert(`Nama shift kasir berhasil diset menjadi: "${name}".`);
+        }
+
+        function submitManagerInstruction() {
+            const title = document.getElementById('mgr-instruction-title').value.trim();
+            const msg = document.getElementById('mgr-instruction-msg').value.trim();
+            if (!title || !msg) return alert("Judul dan pesan wajib diisi!");
+            alert("Instruksi shift berhasil dikirimkan ke kasir!");
+            document.getElementById('mgr-instruction-title').value = "";
+            document.getElementById('mgr-instruction-msg').value = "";
+        }
+
         function renderTaxTable() {
             const tbody = document.getElementById('tax-table-body');
+            if (!tbody) return;
             tbody.innerHTML = "";
-
-            let totalGross = 0;
             let totalTax = 0;
-            let totalNet = 0;
-
-            const outcomeTx = filteredTxList.filter(t => (t.category === 'cogs' || t.category === 'expense'));
-
-            if (outcomeTx.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Belum ada pengeluaran belanja untuk menghitung pajak negara.</td></tr>`;
-                document.getElementById('stat-total-pajak-sumbang').innerText = "Rp 0";
-                document.getElementById('tax-foot-gross').innerText = "Rp 0";
-                document.getElementById('tax-foot-tax').innerText = "Rp 0";
-                document.getElementById('tax-foot-net').innerText = "Rp 0";
-                return;
-            }
-
-            outcomeTx.forEach((tx, idx) => {
-                const gross = tx.amount;
-                const tax = tx.tax12 || Math.round(gross * 0.12);
-                const net = tx.dpp || (gross - tax);
-
-                totalGross += gross;
+            const outcomes = txList.filter(t => t.category !== 'sales');
+            outcomes.forEach(tx => {
+                const tax = tx.tax12 || Math.round(tx.amount * 0.12);
                 totalTax += tax;
-                totalNet += net;
-
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-amber-100 hover:bg-amber-50/50 text-xs transition";
+                tr.className = "border-b border-amber-100 text-xs";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3 text-slate-400 font-mono">${idx + 1}</td>
-                    <td class="py-2.5 px-3 text-slate-700 font-medium whitespace-nowrap">${tx.dateFull}</td>
-                    <td class="py-2.5 px-3 font-bold text-slate-900">[${tx.accountCode}] ${tx.accountName}</td>
-                    <td class="py-2.5 px-3 text-slate-500">${tx.desc || '-'}</td>
-                    <td class="py-2.5 px-3 text-right font-semibold text-slate-900 whitespace-nowrap">Rp ${formatThousandSeparator(gross)}</td>
-                    <td onclick="showTaxExplainer()" class="py-2.5 px-3 text-right font-black text-amber-900 bg-amber-100/60 whitespace-nowrap cursor-pointer hover:bg-amber-200 transition" title="Klik untuk info">Rp ${formatThousandSeparator(tax)} <span class="text-[9px] bg-amber-200 px-1 py-0.5 rounded ml-1 text-amber-900">info</span></td>
-                    <td class="py-2.5 px-3 text-right text-slate-600 whitespace-nowrap">Rp ${formatThousandSeparator(net)}</td>
+                    <td class="py-2 px-3 font-mono">${tx.dateFull}</td>
+                    <td class="py-2 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}</td>
+                    <td class="py-2 px-3 text-slate-500">${tx.desc || '-'}</td>
+                    <td class="py-2 px-3 text-right">Rp ${formatThousandSeparator(tx.amount)}</td>
+                    <td class="py-2 px-3 text-right font-black text-amber-900 bg-amber-100/60 font-mono">Rp ${formatThousandSeparator(tax)}</td>
+                    <td class="py-2 px-3 text-right text-slate-500">Rp ${formatThousandSeparator(tx.dpp || (tx.amount - tax))}</td>
                 `;
                 tbody.appendChild(tr);
             });
-
             document.getElementById('stat-total-pajak-sumbang').innerText = "Rp " + formatThousandSeparator(totalTax);
-            document.getElementById('tax-foot-gross').innerText = "Rp " + formatThousandSeparator(totalGross);
-            document.getElementById('tax-foot-tax').innerText = "Rp " + formatThousandSeparator(totalTax);
-            document.getElementById('tax-foot-net').innerText = "Rp " + formatThousandSeparator(totalNet);
         }
 
-        // BUKU BESAR
         function renderPerAccountManager() {
             const container = document.getElementById('manager-per-account-grid');
+            if (!container) return;
             container.innerHTML = "";
 
-            const targetCode = document.getElementById('filter-account-target').value;
-            let coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0)
-                ? activeTenant.customCOA 
-                : DEFAULT_ONEILVERSE_COA;
-
+            let coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0) ? activeTenant.customCOA : DEFAULT_ONEILVERSE_COA;
             const groups = {};
+            coa.forEach(c => { groups[c.code] = { code: c.code, name: c.name, category: c.category, total: 0, items: [] }; });
 
-            coa.forEach(c => {
-                groups[c.code] = { code: c.code, name: c.name, category: c.category, total: 0, items: [] };
-            });
-
-            filteredTxList.forEach(t => {
+            txList.forEach(t => {
                 if (groups[t.accountCode]) {
                     groups[t.accountCode].total += t.amount;
                     groups[t.accountCode].items.push(t);
                 }
             });
 
-            let activeList = Object.values(groups).filter(a => a.items.length > 0);
-            if (targetCode !== "ALL") {
-                activeList = activeList.filter(a => a.code === targetCode);
-            }
-
-            const badgeEl = document.getElementById('total-active-accounts'); 
-            if (badgeEl) badgeEl.innerText = `${activeList.length} Akun Aktif`;
-
-            if (activeList.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-6 text-center text-xs text-slate-400">Tidak ada transaksi pada akun ini pada periode yang dipilih.</div>`;
-                return;
-            }
-
+            const activeList = Object.values(groups).filter(a => a.items.length > 0);
             activeList.forEach(acc => {
                 const card = document.createElement('div');
-                card.className = "bg-white/90 border border-slate-200/90 rounded-2xl p-4 space-y-2.5 shadow-sm";
-                
-                let badgeColor = "bg-slate-100 text-slate-800";
-                let prefix = "- ";
-                if (acc.category === 'sales') {
-                    badgeColor = "bg-emerald-100 text-emerald-800";
-                    prefix = "+ ";
-                } else if (acc.category === 'cogs') {
-                    badgeColor = "bg-amber-100 text-amber-800";
-                } else if (acc.category === 'expense') {
-                    badgeColor = "bg-rose-100 text-rose-800";
-                } else if (acc.category === 'prive') {
-                    badgeColor = "bg-purple-100 text-purple-800";
-                }
-
+                card.className = "bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2 text-xs";
                 card.innerHTML = `
-                    <div class="flex justify-between items-start border-b border-slate-100 pb-2">
+                    <div class="flex justify-between items-start border-b border-slate-200/60 pb-2">
                         <div>
-                            <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full ${badgeColor}">Kode: ${acc.code}</span>
-                            <h4 class="font-extrabold text-xs text-slate-900 mt-1">${acc.name}</h4>
-                            <span class="text-[10px] text-slate-400">${acc.items.length} kali mutasi</span>
+                            <span class="text-[10px] font-mono font-bold text-slate-500">[${acc.code}]</span>
+                            <h4 class="font-bold text-slate-900">${acc.name}</h4>
                         </div>
-                        <div class="text-right space-y-1">
-                            <span class="font-black text-xs text-slate-900 block">${prefix}Rp ${formatThousandSeparator(acc.total)}</span>
-                        </div>
+                        <span class="font-black text-slate-900 font-mono">Rp ${formatThousandSeparator(acc.total)}</span>
                     </div>
-                    <div class="space-y-1.5 max-h-40 overflow-y-auto pt-1">
-                        ${acc.items.map(it => `
-                            <div class="flex justify-between items-center text-[11px] text-slate-600 bg-slate-50/80 px-2.5 py-1.5 rounded-xl border border-slate-100">
-                                <div>
-                                    <span class="font-bold text-slate-800">${it.desc}</span>
-                                    <span class="text-[10px] text-slate-400 block">${it.dateFull} ${it.date} • ${it.staff}</span>
-                                </div>
-                                <span class="font-black text-slate-900">Rp ${formatThousandSeparator(it.amount)}</span>
-                            </div>
-                        `).join('')}
-                    </div>
+                    <span class="text-[10px] text-slate-400">${acc.items.length} kali mutasi</span>
                 `;
                 container.appendChild(card);
             });
-            if (window.lucide) lucide.createIcons();
         }
 
-        // POP-UP EXPLAINER PAJAK 12%
-        window.showTaxExplainer = function() {
-            var m = document.getElementById('modal-tax-explainer');
-            if (m) {
-                m.classList.remove('hidden');
-                m.style.display = 'flex';
-            } else {
-                alert("Kolom ini hanya catatan transparan agar kamu tahu berapa rupiah dari belanjaanmu yang sudah disumbangkan ke kas negara.");
-            }
-            if (window.lucide) lucide.createIcons();
-        };
-
-        window.closeTaxExplainer = function() {
-            var m = document.getElementById('modal-tax-explainer');
-            if (m) {
-                m.classList.add('hidden');
-                m.style.display = 'none';
-            }
-        };
-
-        // KONTROL MODAL POP-UP
         window.openModal = function(type) {
-            const container = document.getElementById('main-modal-container');
-            const titleEl = document.getElementById('modal-title');
-            const subEl = document.getElementById('modal-subtitle');
-            const iconBadge = document.getElementById('modal-icon-badge');
-            const iconEl = document.getElementById('modal-icon');
-            const actionsEl = document.getElementById('modal-header-actions');
-
-            ['mutasi', 'tax', 'ledger', 'shift_history', 'coa_mgmt'].forEach(k => {
+            ['mutasi', 'tax', 'ledger', 'shift_history', 'coa_mgmt', 'add_cashier_request'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
 
-            actionsEl.innerHTML = "";
-
-            if (type === 'mutasi') {
-                titleEl.innerText = "Audit Rekening Mutasi Kas";
-                subEl.innerText = "Daftar uang masuk, keluar, dan opsi perbaikan langsung oleh Manager";
-                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-slate-900";
-                iconEl.setAttribute('data-lucide', 'arrow-left-right');
-                document.getElementById('popup-content-mutasi').classList.remove('hidden');
-            } else if (type === 'tax') {
-                titleEl.innerText = "Verifikasi Kontribusi Pajak Negara 12% (PPN)";
-                subEl.innerText = "Rincian potongan 12% dari seluruh pos pengeluaran/outcome Oneilverse";
-                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-amber-600";
-                iconEl.setAttribute('data-lucide', 'receipt');
-                document.getElementById('popup-content-tax').classList.remove('hidden');
-            } else if (type === 'ledger') {
-                titleEl.innerText = "Buku Besar Mutasi Per Akun";
-                subEl.innerText = "Akumulasi saldo per masing-masing akun YouTube, Server, AI, dll";
-                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-purple-700";
-                iconEl.setAttribute('data-lucide', 'book-open');
-                document.getElementById('popup-content-ledger').classList.remove('hidden');
-            } else if (type === 'shift_history') {
-                titleEl.innerText = "Rekap Closing Jam Kerja Kasir";
-                subEl.innerText = "Daftar penyerahan uang kas fisik per shift tercatat sampai detik";
-                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-indigo-700";
-                iconEl.setAttribute('data-lucide', 'history');
+            if (type === 'mutasi') document.getElementById('popup-content-mutasi').classList.remove('hidden');
+            else if (type === 'tax') document.getElementById('popup-content-tax').classList.remove('hidden');
+            else if (type === 'ledger') document.getElementById('popup-content-ledger').classList.remove('hidden');
+            else if (type === 'shift_history') {
+                renderShiftHistoryTable();
                 document.getElementById('popup-content-shift_history').classList.remove('hidden');
             } else if (type === 'coa_mgmt') {
-                titleEl.innerText = "Pengelolaan Daftar Akun Transaksi (COA)";
-                subEl.innerText = "Tambah atau ubah pos akun (Setiap aksi dicatat di Audit Log Owner)";
-                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-purple-700";
-                iconEl.setAttribute('data-lucide', 'list-plus');
+                renderCOATable();
                 document.getElementById('popup-content-coa_mgmt').classList.remove('hidden');
+            } else if (type === 'add_cashier_request') {
+                document.getElementById('popup-content-add_cashier_request').classList.remove('hidden');
             }
 
-            container.classList.remove('hidden');
+            document.getElementById('main-modal-container').classList.remove('hidden');
             if (window.lucide) lucide.createIcons();
         };
 
@@ -1188,16 +930,41 @@
             document.getElementById('main-modal-container').classList.add('hidden');
         };
 
-        document.getElementById('main-modal-container').addEventListener('click', (e) => {
-            if (e.target.id === 'main-modal-container') closeModal();
-        });
+        function renderShiftHistoryTable() {
+            const tbody = document.getElementById('shift-history-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = "";
+            shiftHistory.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 text-xs";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 font-mono">${s.closedAt}</td>
+                    <td class="py-2.5 px-3 font-bold">${s.shiftName}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-emerald-600">Rp ${formatThousandSeparator(s.totalIn)}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-rose-600">Rp ${formatThousandSeparator(s.totalOut)}</td>
+                    <td class="py-2.5 px-3 text-right font-black font-mono">Rp ${formatThousandSeparator(s.balance)}</td>
+                    <td class="py-2.5 px-3 text-center text-slate-500">${s.staff}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.showTaxExplainer = function() {
+            const m = document.getElementById('modal-tax-explainer');
+            if (m) { m.classList.remove('hidden'); m.style.display = 'flex'; }
+        };
+        window.closeTaxExplainer = function() {
+            const m = document.getElementById('modal-tax-explainer');
+            if (m) { m.classList.add('hidden'); m.style.display = 'none'; }
+        };
+
+        function formatInputThousand(input) {
+            const clean = input.value.replace(/[^0-9]/g, '');
+            if (!clean) { input.value = ""; return; }
+            input.value = new Intl.NumberFormat('id-ID').format(clean);
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (activeTenant) {
-                document.getElementById('topbar-store-name').innerText = activeTenant.nama;
-                document.getElementById('topbar-store-slogan').innerText = activeTenant.slogan;
-                document.getElementById('tenant-badge-indicator').innerText = activeTenant.id;
-            }
             loadTransactions();
         });
     </script>

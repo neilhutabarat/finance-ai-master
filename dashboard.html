@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Oneilverse - Portal Pengawasan Owner & Eksekutif</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- jsPDF & AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -24,107 +21,69 @@
             --ios-border: rgba(226, 232, 240, 0.95);
             --oneui-squircle: 24px;
         }
-
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             background-color: var(--app-bg);
             -webkit-tap-highlight-color: transparent;
         }
-
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
         .oneui-hero {
             border-bottom-left-radius: 36px;
             border-bottom-right-radius: 36px;
             background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 60%, #311042 100%);
         }
-
         .ios-glass {
             background: var(--ios-card);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--ios-border);
             border-radius: var(--oneui-squircle);
         }
-
         .ios-pill {
             border-radius: 9999px;
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
         }
-
         .glass-capsule-dark {
             background: rgba(10, 15, 29, 0.75);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15);
             border-radius: 9999px;
         }
-
-        .modal-backdrop {
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
         .modal-sheet {
             animation: sheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-
         @keyframes sheetUp {
             from { opacity: 0; transform: translateY(20px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
-    <!-- HERO HEADER: SAMSUNG ONE UI STYLE -->
+    <!-- HEADER OWNER EKSEKUTIF -->
     <header class="oneui-hero text-white px-5 sm:px-8 pt-6 pb-7 shadow-xl relative overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-72 h-72 bg-indigo-500/25 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
-
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div class="flex items-center space-x-4">
-                <div id="topbar-logo-box" class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl flex items-center justify-center text-2xl shadow-inner shadow-white/20">
-                    <span id="topbar-emoji-icon">👑</span>
+                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl flex items-center justify-center text-2xl shadow-inner">
+                    👑
                 </div>
                 <div>
                     <div class="flex items-center space-x-2">
-                        <h1 id="topbar-store-name" class="font-extrabold text-2xl sm:text-3xl tracking-tight leading-none text-white">Oneilverse</h1>
-                        <span id="tenant-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase bg-indigo-500/30 border border-indigo-400/40 text-indigo-200">
+                        <h1 class="font-extrabold text-2xl sm:text-3xl tracking-tight text-white">Oneilverse</h1>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-500/30 border border-indigo-400/40 text-indigo-200">
                             ID26110901
                         </span>
                     </div>
-                    <p id="topbar-store-slogan" class="text-xs sm:text-sm text-slate-300 font-medium mt-1">Portal Eksekutif & Mahkamah Audit Finansial Owner</p>
+                    <p class="text-xs sm:text-sm text-slate-300 font-medium mt-1">Portal Eksekutif & Mahkamah Audit Finansial Owner</p>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
-                <!-- Capsule Kecil Hitam Berbalut Glass (Hari, Tanggal, Bulan, Tahun, Jam:Menit) -->
                 <div class="glass-capsule-dark px-3.5 py-1.5 text-xs text-white flex items-center space-x-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-300"></i>
-                    <span id="realtime-clock-display" class="font-mono font-semibold tracking-wide text-[11px] sm:text-xs">
-                        Memuat Waktu...
-                    </span>
+                    <span id="realtime-clock-display" class="font-mono font-semibold tracking-wide text-[11px] sm:text-xs">Memuat Waktu...</span>
                 </div>
-
-                <a href="kasir.html" class="ios-pill px-3 py-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center space-x-1.5 transition active:scale-95">
-                    <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
-                    <span>Kasir</span>
-                </a>
-                <a href="manager.html" class="ios-pill px-3 py-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/15 flex items-center space-x-1.5 transition active:scale-95">
-                    <i data-lucide="shield" class="w-3.5 h-3.5"></i>
-                    <span>Manager</span>
-                </a>
-                <div class="ios-pill px-3 py-1.5 text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30 flex items-center shadow-sm">
+                <div class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30 flex items-center shadow-sm">
                     <span>Role: Owner Eksekutif</span>
                 </div>
                 <button onclick="logout()" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
@@ -138,9 +97,9 @@
     <!-- MAIN DASHBOARD CONTENT -->
     <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 flex-1 space-y-5 -mt-3">
 
-        <!-- 3 KARTU UTAMA LABA RUGI OPERASIONAL + KARTU PAJAK KECIL -->
+        <!-- 3 KARTU LABA RUGI OPERASIONAL + KARTU PAJAK KECIL -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="ios-glass p-5 shadow-xs border-emerald-200 bg-emerald-50/50 flex flex-col justify-between">
+            <div class="ios-glass p-5 flex flex-col justify-between border-emerald-200 bg-emerald-50/50">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-extrabold text-emerald-800 uppercase tracking-wider">A. Total Income</span>
                     <i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i>
@@ -149,7 +108,7 @@
                 <p class="text-[10px] text-slate-500">Adsense, Apps, Server, Fitur, Pro Mode</p>
             </div>
 
-            <div class="ios-glass p-5 shadow-xs border-rose-200 bg-rose-50/50 flex flex-col justify-between">
+            <div class="ios-glass p-5 flex flex-col justify-between border-rose-200 bg-rose-50/50">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-extrabold text-rose-800 uppercase tracking-wider">B. Total Outcome</span>
                     <i data-lucide="trending-down" class="w-4 h-4 text-rose-600"></i>
@@ -158,16 +117,15 @@
                 <p class="text-[10px] text-slate-500">Music/Video, Server, AI, CapCut Pro</p>
             </div>
 
-            <div class="ios-glass p-5 shadow-md bg-slate-900 text-white border-slate-800 flex flex-col justify-between">
+            <div class="ios-glass p-5 flex flex-col justify-between bg-slate-900 text-white border-slate-800 shadow-md">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider">Laba Bersih Usaha</span>
                     <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
                 </div>
                 <h3 id="card-net-profit" class="text-2xl sm:text-3xl font-black text-emerald-400 my-1">Rp 0</h3>
-                <p class="text-[10px] text-slate-400">Laba operasional sebelum Prive Owner</p>
+                <p class="text-[10px] text-slate-400">Sebelum penarikan Prive Owner</p>
             </div>
 
-            <!-- KARTU PAJAK 12% KECIL / COMPACT SESUAI GAMBAR USER -->
             <div onclick="showTaxExplainer()" role="button" tabindex="0" class="cursor-pointer bg-amber-50/90 hover:bg-amber-100/90 border border-amber-300 rounded-3xl p-5 shadow-xs transition active:scale-98 flex flex-col justify-between select-none">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-black tracking-wider text-amber-900 uppercase flex items-center">
@@ -190,106 +148,54 @@
             </div>
         </div>
 
-        <!-- FILTER TANGGAL PERIODE LABA RUGI -->
-        <div class="ios-glass p-5 shadow-sm space-y-3">
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b border-slate-100 pb-2.5">
-                <div>
-                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center space-x-2">
-                        <i data-lucide="calendar" class="w-4 h-4 text-indigo-600"></i>
-                        <span>Filter Periode Pemeriksaan / Laba Rugi:</span>
-                    </h3>
-                </div>
-                <span id="filter-result-count" class="text-[10px] font-bold text-indigo-800 bg-indigo-100 px-3 py-1 rounded-full self-start sm:self-auto">
-                    Semua Data
-                </span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                <div class="sm:col-span-5">
-                    <label class="text-[10px] font-bold text-slate-500 block mb-0.5">Dari Tanggal:</label>
-                    <input type="date" id="filter-date-start" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <div class="sm:col-span-5">
-                    <label class="text-[10px] font-bold text-slate-500 block mb-0.5">Sampai Tanggal:</label>
-                    <input type="date" id="filter-date-end" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <div class="sm:col-span-2 flex space-x-1 pt-3">
-                    <button onclick="applyDateFilter()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">
-                        Terapkan
-                    </button>
-                    <button onclick="resetDateFilter()" class="px-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-xl text-xs transition" title="Reset">
-                        Reset
+        <!-- MENU POP-UP EKSEKUTIF -->
+        <div class="ios-glass p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <h3 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
+                    <i data-lucide="layout-grid" class="w-5 h-5 text-indigo-600"></i>
+                    <span>Pusat Laporan Eksekutif & Ruang Pengawasan Owner</span>
+                </h3>
+                <div class="flex items-center space-x-2">
+                    <button onclick="openModal('add_cashier_request')" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs transition flex items-center space-x-1 shadow-sm">
+                        <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                        <span>+ Buka Kasir Baru</span>
                     </button>
                 </div>
             </div>
-        </div>
 
-        <!-- PUSAT MENU POP-UP: BUKA SEMUA TABEL TERMASUK LAMAN AUDIT AKTIVITAS MANAGER -->
-        <div class="ios-glass p-6 shadow-sm space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div>
-                    <h3 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
-                        <i data-lucide="layout-grid" class="w-5 h-5 text-indigo-600"></i>
-                        <span>Pusat Laporan Eksekutif & Ruang Pengawasan:</span>
-                    </h3>
-                    <p class="text-xs text-slate-500">Buka tabel keuangan dan jejak rekam tindakan Manager melalui pop-up modal</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
-                <!-- 1. Pop-Up Laba Rugi -->
-                <button onclick="openModal('labarugi')" class="p-4 rounded-2xl bg-indigo-700 hover:bg-indigo-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3 group">
-                    <div class="flex items-center justify-between w-full">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
-                            <i data-lucide="pie-chart" class="w-5 h-5"></i>
-                        </div>
-                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-indigo-200 group-hover:text-white transition-colors"></i>
-                    </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <button onclick="openModal('labarugi')" class="p-4 rounded-2xl bg-indigo-700 hover:bg-indigo-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3">
+                    <i data-lucide="pie-chart" class="w-6 h-6 text-indigo-200"></i>
                     <div>
-                        <h4 class="font-bold text-sm">Pop-Up Laba Rugi</h4>
-                        <p class="text-[11px] text-indigo-100 mt-0.5">Rincian Laba Usaha Oneilverse</p>
+                        <h4 class="font-bold text-sm">Laporan Laba Rugi</h4>
+                        <p class="text-[11px] text-indigo-100">Kalkulasi performa bisnis</p>
                     </div>
                 </button>
 
-                <!-- 2. FITUR KHUSUS OWNER: LAMAN RIWAYAT & AUDIT MANAGER -->
-                <button onclick="openModal('audit_trail')" class="p-4 rounded-2xl bg-rose-700 hover:bg-rose-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3 group">
+                <button onclick="openModal('audit_trail')" class="p-4 rounded-2xl bg-rose-700 hover:bg-rose-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3">
                     <div class="flex items-center justify-between w-full">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
-                            <i data-lucide="shield-alert" class="w-5 h-5 text-amber-300"></i>
-                        </div>
-                        <span class="text-[10px] font-black bg-white/20 px-2 py-0.5 rounded-full text-white">Anti-Fraud</span>
+                        <i data-lucide="shield-alert" class="w-6 h-6 text-amber-300"></i>
+                        <span class="text-[9px] font-black bg-white/20 px-2 py-0.5 rounded-full">Anti-Fraud</span>
                     </div>
                     <div>
                         <h4 class="font-bold text-sm">Riwayat Audit Manager</h4>
-                        <p class="text-[11px] text-rose-100 mt-0.5">Jejak koreksi, void, & COA Manager</p>
+                        <p class="text-[11px] text-rose-100">Jejak koreksi, void, & COA Manager</p>
                     </div>
                 </button>
 
-                <!-- 3. Pop-Up Mutasi Kas -->
-                <button onclick="openModal('mutasi')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3 group">
-                    <div class="flex items-center justify-between w-full">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-purple-300 group-hover:scale-105 transition-transform">
-                            <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
-                        </div>
-                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-400 group-hover:text-white transition-colors"></i>
-                    </div>
+                <button onclick="openModal('mutasi')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3">
+                    <i data-lucide="arrow-left-right" class="w-6 h-6 text-slate-300"></i>
                     <div>
-                        <h4 class="font-bold text-sm">Buku Mutasi Kas</h4>
-                        <p class="text-[11px] text-slate-300 mt-0.5">Rekening koran berjalan realtime</p>
+                        <h4 class="font-bold text-sm">Mutasi Buku Kas</h4>
+                        <p class="text-[11px] text-slate-300">Rekening koran sah kasir</p>
                     </div>
                 </button>
 
-                <!-- 4. Pop-Up Pajak 12% -->
-                <button onclick="openModal('tax')" class="p-4 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3 group">
-                    <div class="flex items-center justify-between w-full">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
-                            <i data-lucide="receipt" class="w-5 h-5"></i>
-                        </div>
-                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-amber-200 group-hover:text-white transition-colors"></i>
-                    </div>
+                <button onclick="openModal('tax')" class="p-4 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3">
+                    <i data-lucide="receipt" class="w-6 h-6 text-amber-100"></i>
                     <div>
                         <h4 class="font-bold text-sm">Tabel Pajak 12%</h4>
-                        <p class="text-[11px] text-amber-100 mt-0.5">Bukti sumbang kas negara</p>
+                        <p class="text-[11px] text-amber-100">Transparansi fiskal negara</p>
                     </div>
                 </button>
             </div>
@@ -297,76 +203,60 @@
 
     </main>
 
-    <!-- ================= MODAL POP-UP DIALOG UNTUK SEMUA LAPORAN DASHBOARD ================= -->
-    <div id="main-modal-container" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-3 sm:p-5">
-        <div class="ios-glass w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl modal-sheet overflow-hidden border border-white/40">
-            
-            <div class="px-6 py-4 border-b border-slate-200/90 flex items-center justify-between bg-white/70">
-                <div class="flex items-center space-x-3">
-                    <div id="modal-icon-badge" class="w-9 h-9 rounded-xl flex items-center justify-center text-white">
-                        <i id="modal-icon" data-lucide="table" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 id="modal-title" class="font-extrabold text-base text-slate-900 leading-tight">Judul Pop-Up</h3>
-                        <p id="modal-subtitle" class="text-xs text-slate-500">Keterangan Laporan Eksekutif</p>
-                    </div>
+    <!-- MODAL POP-UP DIALOG UNIVERSAL -->
+    <div id="main-modal-container" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="ios-glass w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl modal-sheet overflow-hidden bg-white">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 id="modal-title" class="font-black text-base text-slate-900">Judul</h3>
+                    <p id="modal-subtitle" class="text-xs text-slate-400">Keterangan</p>
                 </div>
-                
-                <div class="flex items-center space-x-2">
-                    <div id="modal-header-actions"></div>
-                    <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition active:scale-95">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
             </div>
 
             <div id="modal-body-content" class="p-6 overflow-y-auto flex-1 space-y-4">
-                
-                <!-- 1. LABA RUGI ONEILVERSE -->
+                <!-- 1. LABA RUGI -->
                 <div id="popup-content-labarugi" class="space-y-4 hidden">
-                    <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-slate-100 text-[11px] font-black text-slate-700 uppercase border-b border-slate-200">
+                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-700 border-b">
                                 <tr>
-                                    <th class="py-3 px-3">Kode & Kategori Akun</th>
-                                    <th class="py-3 px-3">Nama Pos Akun Transaksi</th>
-                                    <th class="py-3 px-3 text-center">Jumlah Transaksi</th>
+                                    <th class="py-3 px-3">Kode & Kategori</th>
+                                    <th class="py-3 px-3">Nama Pos Akun</th>
+                                    <th class="py-3 px-3 text-center">Jumlah</th>
                                     <th class="py-3 px-3 text-right">Nominal Akumulasi</th>
                                 </tr>
                             </thead>
                             <tbody id="labarugi-table-body"></tbody>
-                            <tfoot class="bg-slate-50 font-black border-t-2 border-slate-300">
+                            <tfoot class="bg-slate-50 font-black border-t-2 border-slate-200">
                                 <tr class="text-emerald-700">
-                                    <td colspan="3" class="py-2.5 px-3 text-right uppercase">TOTAL A. INCOME (PEMASUKAN):</td>
+                                    <td colspan="3" class="py-2.5 px-3 text-right">TOTAL A. INCOME (PEMASUKAN):</td>
                                     <td id="pop-foot-income" class="py-2.5 px-3 text-right">Rp 0</td>
                                 </tr>
                                 <tr class="text-rose-700">
-                                    <td colspan="3" class="py-2.5 px-3 text-right uppercase">TOTAL B. OUTCOME (BIAYA & TOOLS):</td>
+                                    <td colspan="3" class="py-2.5 px-3 text-right">TOTAL B. OUTCOME (BIAYA & TOOLS):</td>
                                     <td id="pop-foot-outcome" class="py-2.5 px-3 text-right">Rp 0</td>
                                 </tr>
                                 <tr class="text-slate-900 text-sm bg-purple-50">
-                                    <td colspan="3" class="py-3 px-3 text-right uppercase">LABA BERSIH OPERASIONAL (A - B):</td>
-                                    <td id="pop-foot-net" class="py-3 px-3 text-right text-purple-900">Rp 0</td>
+                                    <td colspan="3" class="py-3 px-3 text-right">LABA BERSIH OPERASIONAL (A - B):</td>
+                                    <td id="pop-foot-net" class="py-3 px-3 text-right font-mono">Rp 0</td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 </div>
 
-                <!-- 2. LAMAN RIWAYAT & AUDIT MANAGER (FITUR ANTI-FRAUD OWNER) -->
+                <!-- 2. RIWAYAT AUDIT MANAGER (LAMAN PENGAWASAN OWNER) -->
                 <div id="popup-content-audit_trail" class="space-y-4 hidden">
-                    <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-center justify-between">
-                        <span>Rekaman resmi seluruh tindakan Manager (koreksi nota kasir, void transaksi, ganti shift, dan perubahan COA)</span>
-                        <span class="font-bold text-[10px] bg-rose-200 px-2 py-0.5 rounded-full">Permanen & Terkunci</span>
-                    </div>
-
-                    <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-slate-100 text-[11px] font-black text-slate-700 uppercase border-b border-slate-200">
+                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-700 border-b">
                                 <tr>
                                     <th class="py-3 px-3">Waktu Kejadian</th>
                                     <th class="py-3 px-3">Pelaku / Aktor</th>
-                                    <th class="py-3 px-3">Jenis Tindakan</th>
+                                    <th class="py-3 px-3">Tindakan</th>
                                     <th class="py-3 px-3">Data Sebelum</th>
                                     <th class="py-3 px-3">Data Sesudah</th>
                                 </tr>
@@ -378,15 +268,15 @@
 
                 <!-- 3. MUTASI KAS -->
                 <div id="popup-content-mutasi" class="space-y-4 hidden">
-                    <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="sticky top-0 bg-slate-100/90 backdrop-blur-md text-[11px] font-black text-slate-600 uppercase border-b border-slate-200">
+                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-700 border-b">
                                 <tr>
                                     <th class="py-3 px-3">Waktu</th>
                                     <th class="py-3 px-3">Uraian Transaksi</th>
-                                    <th class="py-3 px-3 text-right">Debit (Masuk)</th>
-                                    <th class="py-3 px-3 text-right">Kredit (Keluar)</th>
-                                    <th class="py-3 px-3 text-right">Saldo Berjalan</th>
+                                    <th class="py-3 px-3 text-right">Debit</th>
+                                    <th class="py-3 px-3 text-right">Kredit</th>
+                                    <th class="py-3 px-3 text-right">Saldo</th>
                                     <th class="py-3 px-3 text-center">Petugas</th>
                                 </tr>
                             </thead>
@@ -398,45 +288,64 @@
                 <!-- 4. PAJAK 12% -->
                 <div id="popup-content-tax" class="space-y-4 hidden">
                     <div class="overflow-x-auto border border-amber-200 rounded-2xl">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-amber-100/70 text-[11px] font-black text-amber-950 uppercase border-b border-amber-200">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-amber-100/70 text-[11px] font-black uppercase text-amber-950 border-b">
                                 <tr>
-                                    <th class="py-3 px-3">No</th>
                                     <th class="py-3 px-3">Tanggal</th>
-                                    <th class="py-3 px-3">Pos Pengeluaran (Outcome)</th>
-                                    <th class="py-3 px-3">Keterangan Belanja</th>
+                                    <th class="py-3 px-3">Pos Pengeluaran</th>
+                                    <th class="py-3 px-3">Keterangan</th>
                                     <th class="py-3 px-3 text-right">Total Transaksi</th>
-                                    <th onclick="showTaxExplainer()" class="py-3 px-3 text-right bg-amber-200/70 font-black text-amber-950 cursor-pointer hover:bg-amber-300 transition" title="Klik untuk penjelasan">Pajak Negara (12%) <i data-lucide="help-circle" class="w-3 h-3 inline ml-0.5 text-amber-800"></i></th>
-                                    <th class="py-3 px-3 text-right">Nilai Bersih (DPP)</th>
+                                    <th class="py-3 px-3 text-right bg-amber-200/70 font-black">Pajak 12%</th>
+                                    <th class="py-3 px-3 text-right">Nilai Bersih</th>
                                 </tr>
                             </thead>
                             <tbody id="tax-table-body"></tbody>
-                            <tfoot class="bg-amber-50 font-black border-t-2 border-amber-300">
-                                <tr>
-                                    <td colspan="4" class="py-3 px-3 text-right uppercase text-slate-700">Total Akumulasi Pajak untuk Negara:</td>
-                                    <td id="tax-foot-gross" class="py-3 px-3 text-right text-slate-900">Rp 0</td>
-                                    <td id="tax-foot-tax" class="py-3 px-3 text-right text-amber-900 text-sm">Rp 0</td>
-                                    <td id="tax-foot-net" class="py-3 px-3 text-right text-slate-700">Rp 0</td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
 
+                <!-- 5. PERMOHONAN KASIR BARU KE PROVIDER -->
+                <div id="popup-content-add_cashier_request" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-3">
+                        <div>
+                            <h4 class="font-black text-sm text-indigo-950">Pengajuan Lisensi Terminal Kasir Tambahan</h4>
+                            <p class="text-xs text-indigo-800/80">Kirim tiket permohonan ke portal penyedia platform untuk membuka meja kasir baru.</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">Jumlah Kasir Tambahan:</label>
+                                <select id="owner-req-cashier-qty" class="w-full bg-white border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
+                                    <option value="1">+1 Terminal Kasir</option>
+                                    <option value="2">+2 Terminal Kasir</option>
+                                    <option value="3">+3 Terminal Kasir</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">Nama / Keterangan Terminal:</label>
+                                <input type="text" id="owner-req-cashier-name" placeholder="Misal: Kasir Lantai 2 / Kasir Cabang" class="w-full bg-white border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-1">
+                            <button onclick="submitCashierRequestFromOwner()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition active:scale-95 shadow-md flex items-center space-x-1.5">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                <span>Kirim Tiket ke Penyedia</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="px-6 py-3 border-t border-slate-200/90 bg-white/70 flex justify-end">
-                <button onclick="closeModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs transition active:scale-95">
-                    Tutup Pop-Up
+            <div class="px-6 py-3 border-t border-slate-100 bg-white flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                    Tutup
                 </button>
             </div>
-
         </div>
     </div>
 
-    <!-- MODAL PENJELASAN PAJAK 12% (TAP / KLIK HP & PC) -->
+    <!-- MODAL PENJELASAN PAJAK 12% -->
     <div id="modal-tax-explainer" style="display: none;" class="hidden fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-sm p-6 shadow-2xl modal-sheet space-y-4 bg-white/95 text-center border border-slate-200">
+        <div class="ios-glass w-full max-w-sm p-6 shadow-2xl modal-sheet space-y-4 bg-white text-center border border-slate-200">
             <div class="w-12 h-12 bg-amber-100 text-amber-800 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
                 <i data-lucide="info" class="w-6 h-6"></i>
             </div>
@@ -455,12 +364,10 @@
         </div>
     </div>
 
-    <!-- SCRIPTS -->
     <script src="js/tenants.js"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
     <script>
-        // FORMATTER AMAN (MENDUKUNG ANGKA NEGATIF / MINUS)
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
             const isNeg = n < 0;
@@ -495,77 +402,44 @@
 
         let activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
 
-        if (activeTenant && typeof APP_CONFIG !== 'undefined') {
-            APP_CONFIG.businessName = activeTenant.nama;
-            APP_CONFIG.businessSlogan = activeTenant.slogan;
-            document.title = activeTenant.nama + " - Portal Eksekutif";
-        }
-
-
-        // AUTENTIKASI MANDIRI ANTI-LOOPING (OWNER)
+        // AUTH OWNER MANDIRI ANTI-LOOPING
         function checkOwnerAuth() {
             let userObj = null;
-            try {
-                userObj = JSON.parse(localStorage.getItem('currentUser'));
-            } catch(e) {}
-
+            try { userObj = JSON.parse(localStorage.getItem('currentUser')); } catch(e) {}
             const role = (userObj && userObj.role) || localStorage.getItem('auth_role') || '';
+            if (role === 'owner') return userObj || { role: 'owner', title: 'Owner Eksekutif' };
 
-            // Jika sudah owner, loloskan langsung
-            if (role === 'owner') {
-                return userObj || { role: 'owner', title: 'Owner Eksekutif' };
-            }
-
-            // Jika bukan owner, minta verifikasi PIN Owner sekali saja tanpa looping
             const pin = prompt("Halaman Khusus Owner Eksekutif.\nMasukkan PIN Owner (Default: 9999 / 0000 / 1234):");
             if (pin === "9999" || pin === "0000" || pin === "1234" || pin === "5678") {
-                const ownerUser = { role: 'owner', title: 'Owner Eksekutif', permissions: ['all'] };
-                localStorage.setItem('currentUser', JSON.stringify(ownerUser));
+                const owner = { role: 'owner', title: 'Owner Eksekutif' };
+                localStorage.setItem('currentUser', JSON.stringify(owner));
                 localStorage.setItem('auth_role', 'owner');
-                localStorage.setItem('auth_title', 'Owner Eksekutif');
-                return ownerUser;
+                return owner;
             } else {
-                alert("PIN tidak valid. Kembali ke halaman utama.");
                 window.location.replace("index.html");
                 throw new Error("Unauthorized");
             }
         }
         const user = checkOwnerAuth();
 
-
         if (typeof initFirebase === 'function') initFirebase();
         if (window.lucide) lucide.createIcons();
 
         let txList = [];
-        let filteredTxList = [];
-
-        // Kunci penyimpanan data sinkron dengan Kasir & Manager
         const tenantStorageKey = (activeTenant && activeTenant.id) ? `fm_v11_tx_${activeTenant.id}` : 'fm_v11_tx';
-        const tenantFirestoreCol = (activeTenant && activeTenant.id && activeTenant.id !== 'default') 
-            ? `tx_${activeTenant.id}` 
-            : 'transactions_v11';
+        const tenantFirestoreCol = (activeTenant && activeTenant.id && activeTenant.id !== 'default') ? `tx_${activeTenant.id}` : 'transactions_v11';
 
-        // JAM REALTIME
         function updateRealtimeClock() {
             const clockEl = document.getElementById('realtime-clock-display');
             if (!clockEl) return;
             const now = new Date();
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-
-            const dayName = days[now.getDay()];
-            const dateNum = String(now.getDate()).padStart(2, '0');
-            const monthName = months[now.getMonth()];
-            const yearNum = now.getFullYear();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-
-            clockEl.innerText = `${dayName}, ${dateNum} ${monthName} ${yearNum} • ${hours}:${minutes}`;
+            clockEl.innerText = `${days[now.getDay()]}, ${String(now.getDate()).padStart(2,'0')} ${months[now.getMonth()]} ${now.getFullYear()} • ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         }
         setInterval(updateRealtimeClock, 1000);
         updateRealtimeClock();
 
-        // LOAD TRANSAKSI SINKRON REALTIME
         function loadTransactions() {
             const raw = localStorage.getItem(tenantStorageKey);
             txList = raw ? JSON.parse(raw) : [];
@@ -579,37 +453,11 @@
                             d.docId = doc.id;
                             txList.push(d);
                         });
-                        applyDateFilter();
-                    }, () => applyDateFilter());
+                        renderAllDashboardReports();
+                    }, () => renderAllDashboardReports());
             } else {
-                applyDateFilter();
+                renderAllDashboardReports();
             }
-        }
-
-        function applyDateFilter() {
-            const start = document.getElementById('filter-date-start').value;
-            const end = document.getElementById('filter-date-end').value;
-
-            if (!start && !end) {
-                filteredTxList = [...txList];
-                document.getElementById('filter-result-count').innerText = `${filteredTxList.length} Transaksi (Semua Data)`;
-            } else {
-                filteredTxList = txList.filter(t => {
-                    const txDate = t.dateISO || (new Date(t.timestamp).toISOString().split('T')[0]);
-                    if (start && end) return txDate >= start && txDate <= end;
-                    if (start) return txDate >= start;
-                    if (end) return txDate <= end;
-                    return true;
-                });
-                document.getElementById('filter-result-count').innerText = `${filteredTxList.length} Transaksi Ditemukan`;
-            }
-            renderAllDashboardReports();
-        }
-
-        function resetDateFilter() {
-            document.getElementById('filter-date-start').value = "";
-            document.getElementById('filter-date-end').value = "";
-            applyDateFilter();
         }
 
         function renderAllDashboardReports() {
@@ -619,40 +467,27 @@
             renderAuditTrailTable();
         }
 
-        // 1. LABA RUGI ONEILVERSE
         function renderLabaRugi() {
             let totalIncome = 0;
             let totalOutcome = 0;
-
             const groups = {};
-            let coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0)
-                ? activeTenant.customCOA 
-                : DEFAULT_ONEILVERSE_COA;
+            let coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0) ? activeTenant.customCOA : DEFAULT_ONEILVERSE_COA;
+            coa.forEach(c => { groups[c.code] = { code: c.code, name: c.name, category: c.category, count: 0, total: 0 }; });
 
-            coa.forEach(c => {
-                groups[c.code] = { code: c.code, name: c.name, category: c.category, count: 0, total: 0 };
-            });
-
-            filteredTxList.forEach(t => {
+            txList.forEach(t => {
                 if (groups[t.accountCode]) {
                     groups[t.accountCode].count += 1;
                     groups[t.accountCode].total += t.amount;
                 }
-                if (t.category === 'sales') {
-                    totalIncome += t.amount;
-                } else if (t.category === 'cogs' || t.category === 'expense') {
-                    totalOutcome += t.amount;
-                }
+                if (t.category === 'sales') totalIncome += t.amount;
+                else totalOutcome += t.amount;
             });
 
             const netProfit = totalIncome - totalOutcome;
-
             document.getElementById('card-total-income').innerText = "Rp " + formatThousandSeparator(totalIncome);
             document.getElementById('card-total-outcome').innerText = "Rp " + formatThousandSeparator(totalOutcome);
             document.getElementById('card-net-profit').innerText = formatCurrency(netProfit);
-            document.getElementById('card-net-profit').className = netProfit >= 0 
-                ? "text-2xl sm:text-3xl font-black text-emerald-400 my-1" 
-                : "text-2xl sm:text-3xl font-black text-rose-400 my-1";
+            document.getElementById('card-net-profit').className = netProfit >= 0 ? "text-2xl sm:text-3xl font-black text-emerald-400 my-1" : "text-2xl sm:text-3xl font-black text-rose-400 my-1";
 
             document.getElementById('pop-foot-income').innerText = "Rp " + formatThousandSeparator(totalIncome);
             document.getElementById('pop-foot-outcome').innerText = "Rp " + formatThousandSeparator(totalOutcome);
@@ -660,54 +495,40 @@
 
             const tbody = document.getElementById('labarugi-table-body');
             tbody.innerHTML = "";
-
             const activeItems = Object.values(groups).filter(g => g.total > 0 && g.category !== 'prive');
-
-            if (activeItems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Belum ada transaksi operasional pada periode yang dipilih.</td></tr>`;
-                return;
-            }
-
             activeItems.forEach(item => {
                 const isInc = item.category === 'sales';
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition";
+                tr.className = "border-b border-slate-100 text-xs";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono ${isInc ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                            ${isInc ? 'INCOME' : 'OUTCOME'} [${item.code}]
-                        </span>
-                    </td>
-                    <td class="py-2.5 px-3 font-bold text-slate-900">${item.name}</td>
-                    <td class="py-2.5 px-3 text-center text-slate-500">${item.count} transaksi</td>
-                    <td class="py-2.5 px-3 text-right font-black ${isInc ? 'text-emerald-700' : 'text-rose-700'}">
-                        Rp ${formatThousandSeparator(item.total)}
-                    </td>
+                    <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono ${isInc ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isInc ? 'INCOME' : 'OUTCOME'} [${item.code}]</span></td>
+                    <td class="py-2.5 px-3 font-bold">${item.name}</td>
+                    <td class="py-2.5 px-3 text-center text-slate-500">${item.count} nota</td>
+                    <td class="py-2.5 px-3 text-right font-black font-mono ${isInc ? 'text-emerald-700' : 'text-rose-700'}">Rp ${formatThousandSeparator(item.total)}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // 2. AUDIT TRAIL MANAGER (REKAMAN SELURUH AKSI MANAGER)
+        // TABEL AUDIT AKTIVITAS MANAGER (LAMAN PENGAWASAN OWNER)
         function renderAuditTrailTable() {
             const tbody = document.getElementById('audit-trail-table-body');
             if (!tbody) return;
             tbody.innerHTML = "";
 
             const logs = JSON.parse(localStorage.getItem('fm_audit_logs') || "[]");
-
             if (logs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada rekaman tindakan atau perubahan dari Manager.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada riwayat tindakan atau perubahan dari Manager.</td></tr>`;
                 return;
             }
 
             logs.forEach(l => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-100 hover:bg-slate-50 text-xs";
+                tr.className = "border-b border-slate-100 text-xs";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-mono text-slate-600 whitespace-nowrap">${l.date}</td>
+                    <td class="py-2.5 px-3 font-mono text-slate-600">${l.date}</td>
                     <td class="py-2.5 px-3 font-bold text-purple-900">${l.actor}</td>
-                    <td class="py-2.5 px-3 font-black text-slate-800"><span class="px-2 py-0.5 rounded-full bg-slate-100 border text-[10px]">${l.action}</span><br><span class="text-[11px] font-normal text-slate-500">${l.detail}</span></td>
+                    <td class="py-2.5 px-3 font-bold text-slate-800"><span class="px-2 py-0.5 rounded-full bg-slate-100 border text-[10px]">${l.action}</span><br><span class="text-[11px] font-normal text-slate-500">${l.detail}</span></td>
                     <td class="py-2.5 px-3 text-rose-600 font-semibold">${l.before || '-'}</td>
                     <td class="py-2.5 px-3 text-emerald-600 font-bold">${l.after || '-'}</td>
                 `;
@@ -715,165 +536,97 @@
             });
         }
 
-        // 3. TABEL PAJAK 12%
         function renderTaxTable() {
             const tbody = document.getElementById('tax-table-body');
+            if (!tbody) return;
             tbody.innerHTML = "";
-
-            let totalGross = 0;
             let totalTax = 0;
-            let totalNet = 0;
-
-            const outcomeTx = filteredTxList.filter(t => (t.category === 'cogs' || t.category === 'expense'));
-
-            if (outcomeTx.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Belum ada pengeluaran belanja untuk menghitung pajak negara.</td></tr>`;
-                document.getElementById('stat-total-pajak-sumbang').innerText = "Rp 0";
-                document.getElementById('tax-foot-gross').innerText = "Rp 0";
-                document.getElementById('tax-foot-tax').innerText = "Rp 0";
-                document.getElementById('tax-foot-net').innerText = "Rp 0";
-                return;
-            }
-
-            outcomeTx.forEach((tx, idx) => {
-                const gross = tx.amount;
-                const tax = tx.tax12 || Math.round(gross * 0.12);
-                const net = tx.dpp || (gross - tax);
-
-                totalGross += gross;
+            const outcomes = txList.filter(t => t.category !== 'sales');
+            outcomes.forEach(tx => {
+                const tax = tx.tax12 || Math.round(tx.amount * 0.12);
                 totalTax += tax;
-                totalNet += net;
-
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-amber-100 hover:bg-amber-50/50 text-xs transition";
+                tr.className = "border-b border-amber-100 text-xs";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3 text-slate-400 font-mono">${idx + 1}</td>
-                    <td class="py-2.5 px-3 text-slate-700 font-medium whitespace-nowrap">${tx.dateFull}</td>
-                    <td class="py-2.5 px-3 font-bold text-slate-900">[${tx.accountCode}] ${tx.accountName}</td>
-                    <td class="py-2.5 px-3 text-slate-500">${tx.desc || '-'}</td>
-                    <td class="py-2.5 px-3 text-right font-semibold text-slate-900 whitespace-nowrap">Rp ${formatThousandSeparator(gross)}</td>
-                    <td onclick="showTaxExplainer()" class="py-2.5 px-3 text-right font-black text-amber-900 bg-amber-100/60 whitespace-nowrap cursor-pointer hover:bg-amber-200 transition" title="Klik untuk info">Rp ${formatThousandSeparator(tax)} <span class="text-[9px] bg-amber-200 px-1 py-0.5 rounded ml-1 text-amber-900">info</span></td>
-                    <td class="py-2.5 px-3 text-right text-slate-600 whitespace-nowrap">Rp ${formatThousandSeparator(net)}</td>
+                    <td class="py-2 px-3 font-mono">${tx.dateFull}</td>
+                    <td class="py-2 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}</td>
+                    <td class="py-2 px-3 text-slate-500">${tx.desc || '-'}</td>
+                    <td class="py-2 px-3 text-right">Rp ${formatThousandSeparator(tx.amount)}</td>
+                    <td class="py-2 px-3 text-right font-black text-amber-900 bg-amber-100/60 font-mono">Rp ${formatThousandSeparator(tax)}</td>
+                    <td class="py-2 px-3 text-right text-slate-500">Rp ${formatThousandSeparator(tx.dpp || (tx.amount - tax))}</td>
                 `;
                 tbody.appendChild(tr);
             });
-
             document.getElementById('stat-total-pajak-sumbang').innerText = "Rp " + formatThousandSeparator(totalTax);
-            document.getElementById('tax-foot-gross').innerText = "Rp " + formatThousandSeparator(totalGross);
-            document.getElementById('tax-foot-tax').innerText = "Rp " + formatThousandSeparator(totalTax);
-            document.getElementById('tax-foot-net').innerText = "Rp " + formatThousandSeparator(totalNet);
         }
 
-        // 4. MUTASI KAS
         function renderMutasiKas() {
             const tbody = document.getElementById('kasir-table-body');
+            if (!tbody) return;
             tbody.innerHTML = "";
-
-            const chronoList = [...filteredTxList].reverse();
+            const chronoList = [...txList].reverse();
             let runningBalance = 0;
             const withBalance = chronoList.map(tx => {
-                const isSales = tx.category === 'sales';
-                if (isSales) runningBalance += tx.amount;
+                if (tx.category === 'sales') runningBalance += tx.amount;
                 else runningBalance -= tx.amount;
                 return { ...tx, runningBalance };
             });
 
-            const displayList = withBalance.reverse();
-
-            if (displayList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada transaksi kas tercatat.</td></tr>`;
-                return;
-            }
-
-            displayList.forEach((tx) => {
-                const isSales = tx.category === 'sales';
-                const inVal = isSales ? tx.amount : 0;
-                const outVal = !isSales ? tx.amount : 0;
-
+            withBalance.reverse().forEach(tx => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-100 hover:bg-slate-50/80 text-xs transition";
+                tr.className = "border-b border-slate-100 text-xs";
                 tr.innerHTML = `
-                    <td class="py-3 px-3 text-slate-700 whitespace-nowrap">
-                        <span class="font-bold text-slate-900">${tx.dateFull}</span>
-                        <span class="text-[10px] text-slate-400 block font-mono">${tx.date}</span>
-                    </td>
-                    <td class="py-3 px-3">
-                        <span class="font-bold text-slate-900 block">[${tx.accountCode}] ${tx.accountName}</span>
-                        <span class="text-[10px] text-slate-500">${tx.desc}</span>
-                    </td>
-                    <td class="py-3 px-3 text-right font-black text-emerald-600 whitespace-nowrap">${inVal > 0 ? formatThousandSeparator(inVal) : '-'}</td>
-                    <td class="py-3 px-3 text-right font-black text-rose-600 whitespace-nowrap">${outVal > 0 ? formatThousandSeparator(outVal) : '-'}</td>
-                    <td class="py-3 px-3 text-right font-black text-slate-900 whitespace-nowrap bg-slate-50/60 font-mono">Rp ${formatThousandSeparator(tx.runningBalance)}</td>
-                    <td class="py-3 px-3 text-center text-slate-500 whitespace-nowrap font-medium">${tx.staff}</td>
+                    <td class="py-2.5 px-3 font-mono">${tx.dateFull} ${tx.date}</td>
+                    <td class="py-2.5 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}<br><span class="text-[10px] text-slate-400 font-normal">${tx.desc || '-'}</span></td>
+                    <td class="py-2.5 px-3 text-right font-black text-emerald-600">${tx.category === 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-rose-600">${tx.category !== 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-black font-mono">Rp ${formatThousandSeparator(tx.runningBalance)}</td>
+                    <td class="py-2.5 px-3 text-center text-slate-400 text-[10px]">${tx.staff}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // POP-UP EXPLAINER PAJAK 12%
-        window.showTaxExplainer = function() {
-            var m = document.getElementById('modal-tax-explainer');
-            if (m) {
-                m.classList.remove('hidden');
-                m.style.display = 'flex';
-            } else {
-                alert("Kolom ini hanya catatan transparan agar kamu tahu berapa rupiah dari belanjaanmu yang sudah disumbangkan ke kas negara.");
-            }
-            if (window.lucide) lucide.createIcons();
-        };
+        function submitCashierRequestFromOwner() {
+            const qty = document.getElementById('owner-req-cashier-qty').value;
+            const name = document.getElementById('owner-req-cashier-name').value.trim() || `Kasir Tambahan (+${qty})`;
 
-        window.closeTaxExplainer = function() {
-            var m = document.getElementById('modal-tax-explainer');
-            if (m) {
-                m.classList.add('hidden');
-                m.style.display = 'none';
-            }
-        };
+            const ticket = {
+                id: 'req_' + Date.now(),
+                tenantId: activeTenant ? activeTenant.id : 'ID26110901',
+                tenantName: activeTenant ? activeTenant.nama : 'Oneilverse',
+                qty: qty,
+                terminalName: name,
+                status: 'PENDING',
+                requestedBy: 'Owner Eksekutif',
+                requestedAt: new Date().toLocaleString('id-ID'),
+                timestamp: Date.now()
+            };
 
-        // KONTROL MODAL POP-UP
+            let reqList = JSON.parse(localStorage.getItem('fm_cashier_license_requests') || "[]");
+            reqList.unshift(ticket);
+            localStorage.setItem('fm_cashier_license_requests', JSON.stringify(reqList));
+
+            alert(`Permohonan lisensi +${qty} terminal kasir baru ("${name}") terkirim ke portal penyedia platform!`);
+            closeModal();
+        }
+
         window.openModal = function(type) {
-            const container = document.getElementById('main-modal-container');
-            const titleEl = document.getElementById('modal-title');
-            const subEl = document.getElementById('modal-subtitle');
-            const iconBadge = document.getElementById('modal-icon-badge');
-            const iconEl = document.getElementById('modal-icon');
-            const actionsEl = document.getElementById('modal-header-actions');
-
-            ['labarugi', 'audit_trail', 'mutasi', 'tax'].forEach(k => {
+            ['labarugi', 'audit_trail', 'mutasi', 'tax', 'add_cashier_request'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
 
-            actionsEl.innerHTML = "";
-
-            if (type === 'labarugi') {
-                titleEl.innerText = "Laporan Laba Rugi Operasional Usaha";
-                subEl.innerText = "Kalkulasi pemasukan software/YouTube vs belanja operasional tools Oneilverse";
-                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-indigo-700";
-                iconEl.setAttribute('data-lucide', 'pie-chart');
-                document.getElementById('popup-content-labarugi').classList.remove('hidden');
-            } else if (type === 'audit_trail') {
-                titleEl.innerText = "Laman Riwayat & Audit Aktivitas Manager";
-                subEl.innerText = "Log pengawasan tindakan Manager (Koreksi nota, void kasir, ubah shift, dan COA)";
-                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-rose-700";
-                iconEl.setAttribute('data-lucide', 'shield-alert');
+            if (type === 'labarugi') document.getElementById('popup-content-labarugi').classList.remove('hidden');
+            else if (type === 'audit_trail') {
                 renderAuditTrailTable();
                 document.getElementById('popup-content-audit_trail').classList.remove('hidden');
-            } else if (type === 'mutasi') {
-                titleEl.innerText = "Buku Mutasi Kas Berjalan (Rekening Koran)";
-                subEl.innerText = "Arus kas debit, kredit, dan saldo berjalan realtime";
-                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-slate-900";
-                iconEl.setAttribute('data-lucide', 'arrow-left-right');
-                document.getElementById('popup-content-mutasi').classList.remove('hidden');
-            } else if (type === 'tax') {
-                titleEl.innerText = "Bukti Kontribusi Pajak Negara 12% (PPN)";
-                subEl.innerText = "Transparansi potongan resmi 12% dari seluruh pengeluaran outcome Oneilverse";
-                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-amber-600";
-                iconEl.setAttribute('data-lucide', 'receipt');
-                document.getElementById('popup-content-tax').classList.remove('hidden');
             }
+            else if (type === 'mutasi') document.getElementById('popup-content-mutasi').classList.remove('hidden');
+            else if (type === 'tax') document.getElementById('popup-content-tax').classList.remove('hidden');
+            else if (type === 'add_cashier_request') document.getElementById('popup-content-add_cashier_request').classList.remove('hidden');
 
-            container.classList.remove('hidden');
+            document.getElementById('main-modal-container').classList.remove('hidden');
             if (window.lucide) lucide.createIcons();
         };
 
@@ -881,16 +634,16 @@
             document.getElementById('main-modal-container').classList.add('hidden');
         };
 
-        document.getElementById('main-modal-container').addEventListener('click', (e) => {
-            if (e.target.id === 'main-modal-container') closeModal();
-        });
+        window.showTaxExplainer = function() {
+            const m = document.getElementById('modal-tax-explainer');
+            if (m) { m.classList.remove('hidden'); m.style.display = 'flex'; }
+        };
+        window.closeTaxExplainer = function() {
+            const m = document.getElementById('modal-tax-explainer');
+            if (m) { m.classList.add('hidden'); m.style.display = 'none'; }
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (activeTenant) {
-                document.getElementById('topbar-store-name').innerText = activeTenant.nama;
-                document.getElementById('topbar-store-slogan').innerText = activeTenant.slogan;
-                document.getElementById('tenant-badge-indicator').innerText = activeTenant.id;
-            }
             loadTransactions();
         });
     </script>
