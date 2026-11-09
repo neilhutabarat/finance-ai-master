@@ -1,143 +1,77 @@
 /**
- * tenants.js - Dynamic Configuration Engine untuk 500+ UMKM
- * Berisi konfigurasi identitas toko, tema warna, fitur aktif, dan daftar akun COA.
+ * tenants.js - Konfigurasi Multi-Tenant untuk Finance Master
+ * Mengatur nama toko, logo emoji, warna identitas, dan COA khusus untuk masing-masing UMKM.
  */
 
 const TENANTS_CONFIG = {
-  // 1. Profil Default (Jika dibuka tanpa parameter URL ?toko=...)
+  // 1. Profil Default (Jika link dibuka biasa tanpa ?toko=...)
   "default": {
     id: "default",
-    nama: "Demo Kasir UMKM",
-    slogan: "Sistem Kasir & Keuangan Pintar",
-    kategori: "retail",
-    warna: "#2563eb", // Biru Modern
-    warnaSekunder: "#dbeafe",
+    nama: "Terminal Kasir & Admin",
+    slogan: "Input Transaksi & Laporan Mutasi Kas / Buku Besar",
+    warna: "#059669", // Emerald Asli
     logoText: "🏪",
-    features: {
-      meja: false,
-      barcode: true,
-      catatanPesanan: true,
-      cetakPdf: true
-    },
-    coaPemasukan: [
-      "[4-1001] Penjualan Barang Retail",
-      "[4-1002] Pendapatan Lain-lain"
-    ],
-    coaPengeluaran: [
-      "[5-1001] Pembelian Stok Barang",
-      "[5-1002] Listrik & Air Operasional",
-      "[5-1003] Sewa Tempat & Kebersihan"
-    ],
-    katalogDefault: [
-      { id: 1, nama: "Produk Contoh A", harga: 15000, stok: 50 },
-      { id: 2, nama: "Produk Contoh B", harga: 25000, stok: 30 }
-    ]
+    // Biarkan customCOA kosong jika ingin memakai getCOA() bawaan js/config.js
+    customCOA: []
   },
 
-  // 2. Klien Kafe / F&B (Contoh: Kopi Senja Utama)
+  // 2. Klien Kafe / Kopi (Contoh: ?toko=kopisenja)
   "kopisenja": {
     id: "kopisenja",
     nama: "Kopi Senja Utama",
     slogan: "Cita Rasa Kopi Pilihan UMKM Juara",
-    kategori: "fnb",
-    warna: "#d97706", // Amber / Cokelat Kopi
-    warnaSekunder: "#fef3c7",
+    warna: "#d97706", // Amber Cokelat
     logoText: "☕",
-    features: {
-      meja: true, // Butuh Nomor Meja
-      barcode: false,
-      catatanPesanan: true,
-      cetakPdf: true
-    },
-    coaPemasukan: [
-      "[4-1001] Penjualan Minuman Kopi & Non-Kopi",
-      "[4-1002] Penjualan Makanan & Pastry"
-    ],
-    coaPengeluaran: [
-      "[5-1001] Belanja Biji Kopi & Susu Fresh",
-      "[5-1002] Cup, Sedotan, & Kemasan",
-      "[5-1003] Listrik, Gas & Es Batu",
-      "[5-1004] Gaji Barista & Operasional"
-    ],
-    katalogDefault: [
-      { id: 101, nama: "Kopi Susu Gula Aren", harga: 18000, stok: 100 },
-      { id: 102, nama: "Americano Iced", harga: 15000, stok: 100 },
-      { id: 103, nama: "Croissant Butter", harga: 22000, stok: 40 },
-      { id: 104, nama: "Matcha Latte Creamy", harga: 20000, stok: 60 }
+    customCOA: [
+      { code: "101", name: "Penjualan Kopi & Minuman", category: "sales" },
+      { code: "102", name: "Penjualan Makanan / Pastry", category: "sales" },
+      { code: "201", name: "Belanja Biji Kopi & Susu", category: "cogs" },
+      { code: "202", name: "Cup, Sedotan & Kemasan", category: "cogs" },
+      { code: "301", name: "Biaya Listrik, Gas & Es Batu", category: "expense" },
+      { code: "302", name: "Gaji Barista & Kebersihan", category: "expense" },
+      { code: "401", name: "Prive Pemilik Toko Kopi", category: "prive" }
     ]
   },
 
-  // 3. Klien Jasa / Laundry (Contoh: Laundry Kilat 99)
+  // 3. Klien Jasa Laundry (Contoh: ?toko=laundrykilat)
   "laundrykilat": {
     id: "laundrykilat",
     nama: "Laundry Kilat 99",
     slogan: "Bersih, Wangi, & Rapi Tepat Waktu",
-    kategori: "service",
     warna: "#0284c7", // Sky Blue
-    warnaSekunder: "#e0f2fe",
     logoText: "🧺",
-    features: {
-      meja: false,
-      barcode: false,
-      catatanPesanan: true, // Catatan khusus pakaian
-      cetakPdf: true
-    },
-    coaPemasukan: [
-      "[4-1001] Pendapatan Cuci Komplit Kiloan",
-      "[4-1002] Pendapatan Setrika Saja",
-      "[4-1003] Cuci Bedcover & Karpet"
-    ],
-    coaPengeluaran: [
-      "[5-1001] Belanja Deterjen, Softener & Parfum",
-      "[5-1002] Plastik Kemasan & Hanger",
-      "[5-1003] Gas Dryer & Listrik",
-      "[5-1004] Servis & Perawatan Mesin"
-    ],
-    katalogDefault: [
-      { id: 201, nama: "Cuci Komplit Reguler (per Kg)", harga: 7000, stok: 999 },
-      { id: 202, nama: "Cuci Komplit Express 1 Hari (per Kg)", harga: 12000, stok: 999 },
-      { id: 203, nama: "Setrika Rapi Saja (per Kg)", harga: 5000, stok: 999 },
-      { id: 204, nama: "Cuci Bedcover Besar (Pcs)", harga: 25000, stok: 999 }
+    customCOA: [
+      { code: "101", name: "Pendapatan Cuci Komplit Kiloan", category: "sales" },
+      { code: "102", name: "Pendapatan Setrika Saja", category: "sales" },
+      { code: "103", name: "Pendapatan Cuci Karpet & Bedcover", category: "sales" },
+      { code: "201", name: "Belanja Deterjen, Softener & Parfum", category: "cogs" },
+      { code: "202", name: "Plastik Packing & Gantungan", category: "cogs" },
+      { code: "301", name: "Listrik, Air & Gas Dryer", category: "expense" },
+      { code: "302", name: "Servis & Perawatan Mesin Cuci", category: "expense" },
+      { code: "401", name: "Prive Pemilik Laundry", category: "prive" }
     ]
   },
 
-  // 4. Klien Bengkel Motor / Mobil (Contoh: Bengkel Maju Lancar)
+  // 4. Klien Bengkel Motor / Mobil (Contoh: ?toko=bengkelmaju)
   "bengkelmaju": {
     id: "bengkelmaju",
     nama: "Bengkel Maju Lancar",
     slogan: "Spesialis Servis, Ganti Oli & Sparepart",
-    kategori: "service_retail",
     warna: "#dc2626", // Merah Racing
-    warnaSekunder: "#fee2e2",
     logoText: "🔧",
-    features: {
-      meja: false,
-      barcode: true,
-      catatanPesanan: true, // Plat nomor kendaraan
-      cetakPdf: true
-    },
-    coaPemasukan: [
-      "[4-1001] Pendapatan Jasa Servis & Pasang",
-      "[4-1002] Penjualan Oli & Cairan Mesin",
-      "[4-1003] Penjualan Sparepart Onderdil"
-    ],
-    coaPengeluaran: [
-      "[5-1001] Belanja Stok Oli & Drum",
-      "[5-1002] Belanja Sparepart Motor",
-      "[5-1003] Tools, Majun & Perlengkapan Bengkel"
-    ],
-    katalogDefault: [
-      { id: 301, nama: "Jasa Servis Ringan + Tune Up", harga: 45000, stok: 999 },
-      { id: 302, nama: "Oli Mesin Matic 0.8L", harga: 55000, stok: 45 },
-      { id: 303, nama: "Kampas Rem Depan", harga: 35000, stok: 20 },
-      { id: 304, nama: "Busi Standar Racing", harga: 25000, stok: 35 }
+    customCOA: [
+      { code: "101", name: "Pendapatan Jasa Servis & Bongkar", category: "sales" },
+      { code: "102", name: "Penjualan Oli & Cairan Mesin", category: "sales" },
+      { code: "103", name: "Penjualan Sparepart Onderdil", category: "sales" },
+      { code: "201", name: "Belanja Drum Oli & Botol", category: "cogs" },
+      { code: "202", name: "Belanja Sparepart Motor", category: "cogs" },
+      { code: "301", name: "Listrik, Kompresor & Majun", category: "expense" },
+      { code: "302", name: "Upah Harian Mekanik", category: "expense" },
+      { code: "401", name: "Prive Pemilik Bengkel", category: "prive" }
     ]
   }
 };
 
-/**
- * Mengambil konfigurasi tenant aktif berdasarkan parameter URL ?toko=...
- */
 function getActiveTenant() {
   const urlParams = new URLSearchParams(window.location.search);
   const tenantKey = (urlParams.get("toko") || "").toLowerCase().trim();
