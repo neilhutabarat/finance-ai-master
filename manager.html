@@ -407,7 +407,7 @@
                                     <th class="py-3 px-3">Pos Pengeluaran (Outcome)</th>
                                     <th class="py-3 px-3">Keterangan Belanja</th>
                                     <th class="py-3 px-3 text-right">Total Transaksi</th>
-                                    <th class="py-3 px-3 text-right bg-rose-100/60 font-black text-rose-900">Pajak Negara (12%)</th>
+                                    <th onclick="showTaxExplainer()" class="py-3 px-3 text-right bg-rose-100/60 font-black text-rose-900 cursor-pointer hover:bg-rose-200 transition" title="Klik untuk penjelasan">Pajak Negara (12%) <i data-lucide="help-circle" class="w-3 h-3 inline ml-0.5 text-rose-600"></i></th>
                                     <th class="py-3 px-3 text-right">Nilai Bersih (DPP)</th>
                                 </tr>
                             </thead>
@@ -451,6 +451,28 @@
                 </button>
             </div>
 
+        </div>
+    </div>
+
+    
+    <!-- MODAL PENJELASAN PAJAK 12% (TAP / KLIK HP & PC) -->
+    <div id="modal-tax-explainer" class="hidden fixed inset-0 z-[70] modal-backdrop flex items-center justify-center p-4">
+        <div class="ios-glass w-full max-w-sm p-6 shadow-2xl modal-sheet space-y-4 bg-white/95 text-center">
+            <div class="w-12 h-12 bg-rose-100 text-rose-700 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+                <i data-lucide="info" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h3 class="font-black text-sm text-slate-900">Bukan Potongan Uang Kas!</h3>
+                <span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200 mt-1 inline-block">
+                    Pajak Belanja Inklusif (Sudah Termasuk)
+                </span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed text-left bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
+                Kolom ini hanya catatan transparan agar kamu tahu berapa rupiah dari belanjaanmu yang sudah disumbangkan ke kas negara.
+            </p>
+            <button onclick="closeTaxExplainer()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95 shadow-md">
+                Saya Paham
+            </button>
         </div>
     </div>
 
@@ -886,7 +908,7 @@
                     <td class="py-2.5 px-3 font-bold text-slate-900">[${tx.accountCode}] ${tx.accountName}</td>
                     <td class="py-2.5 px-3 text-slate-500">${tx.desc || '-'}</td>
                     <td class="py-2.5 px-3 text-right font-semibold text-slate-900 whitespace-nowrap">Rp ${formatThousandSeparator(gross)}</td>
-                    <td class="py-2.5 px-3 text-right font-black text-rose-700 bg-rose-50/70 whitespace-nowrap">Rp ${formatThousandSeparator(tax)}</td>
+                    <td onclick="showTaxExplainer()" class="py-2.5 px-3 text-right font-black text-rose-700 bg-rose-50/70 whitespace-nowrap cursor-pointer hover:bg-rose-100 transition active:scale-95" title="Klik untuk info">Rp ${formatThousandSeparator(tax)} <span class="text-[9px] bg-rose-200/80 px-1 py-0.5 rounded ml-1 text-rose-800">info</span></td>
                     <td class="py-2.5 px-3 text-right text-slate-600 whitespace-nowrap">Rp ${formatThousandSeparator(net)}</td>
                 `;
                 tbody.appendChild(tr);
@@ -1133,6 +1155,19 @@
 
         // ================= KOMUNIKASI SHIFT / NOTICES =================
         let managerNotices = [];
+
+        
+        function showTaxExplainer() {
+            document.getElementById('modal-tax-explainer').classList.remove('hidden');
+            lucide.createIcons();
+        }
+        function closeTaxExplainer() {
+            document.getElementById('modal-tax-explainer').classList.add('hidden');
+        }
+        document.addEventListener('click', function(e) {
+            const m = document.getElementById('modal-tax-explainer');
+            if (m && e.target === m) closeTaxExplainer();
+        });
 
         function loadManagerNotices() {
             managerNotices = typeof getNotices === 'function' ? getNotices() : [];
