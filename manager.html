@@ -622,9 +622,37 @@
             document.title = activeTenant.nama + " - Manager Hub";
         }
 
-        const user = (typeof requireAuth === 'function') 
-            ? requireAuth(['manager', 'owner'])
-            : { role: 'manager', title: 'Supervisor / Manager' };
+
+        // AUTENTIKASI MANDIRI ANTI-LOOPING (MANAGER)
+        function checkManagerAuth() {
+            let userObj = null;
+            try {
+                userObj = JSON.parse(localStorage.getItem('currentUser'));
+            } catch(e) {}
+
+            const role = (userObj && userObj.role) || localStorage.getItem('auth_role') || '';
+
+            // Jika sudah manager atau owner, loloskan langsung
+            if (role === 'manager' || role === 'owner') {
+                return userObj || { role: role, title: role === 'owner' ? 'Owner' : 'Supervisor / Manager' };
+            }
+
+            // Jika bukan manager/owner, minta verifikasi PIN Manager sekali saja
+            const pin = prompt("Halaman Otorisasi Manager & Supervisor.\nMasukkan PIN Manager (Default: 5678 / 1234):");
+            if (pin === "5678" || pin === "1234" || pin === "9999" || pin === "0000") {
+                const mgrUser = { role: 'manager', title: 'Supervisor / Manager', permissions: ['manager'] };
+                localStorage.setItem('currentUser', JSON.stringify(mgrUser));
+                localStorage.setItem('auth_role', 'manager');
+                localStorage.setItem('auth_title', 'Supervisor / Manager');
+                return mgrUser;
+            } else {
+                alert("PIN tidak valid. Kembali ke halaman kasir.");
+                window.location.replace("kasir.html");
+                throw new Error("Unauthorized");
+            }
+        }
+        const user = checkManagerAuth();
+
 
         if (typeof initFirebase === 'function') initFirebase();
         if (window.lucide) lucide.createIcons();

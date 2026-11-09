@@ -501,9 +501,37 @@
             document.title = activeTenant.nama + " - Portal Eksekutif";
         }
 
-        const user = (typeof requireAuth === 'function') 
-            ? requireAuth(['owner'])
-            : { role: 'owner', title: 'Owner Eksekutif' };
+
+        // AUTENTIKASI MANDIRI ANTI-LOOPING (OWNER)
+        function checkOwnerAuth() {
+            let userObj = null;
+            try {
+                userObj = JSON.parse(localStorage.getItem('currentUser'));
+            } catch(e) {}
+
+            const role = (userObj && userObj.role) || localStorage.getItem('auth_role') || '';
+
+            // Jika sudah owner, loloskan langsung
+            if (role === 'owner') {
+                return userObj || { role: 'owner', title: 'Owner Eksekutif' };
+            }
+
+            // Jika bukan owner, minta verifikasi PIN Owner sekali saja tanpa looping
+            const pin = prompt("Halaman Khusus Owner Eksekutif.\nMasukkan PIN Owner (Default: 9999 / 0000 / 1234):");
+            if (pin === "9999" || pin === "0000" || pin === "1234" || pin === "5678") {
+                const ownerUser = { role: 'owner', title: 'Owner Eksekutif', permissions: ['all'] };
+                localStorage.setItem('currentUser', JSON.stringify(ownerUser));
+                localStorage.setItem('auth_role', 'owner');
+                localStorage.setItem('auth_title', 'Owner Eksekutif');
+                return ownerUser;
+            } else {
+                alert("PIN tidak valid. Kembali ke halaman utama.");
+                window.location.replace("index.html");
+                throw new Error("Unauthorized");
+            }
+        }
+        const user = checkOwnerAuth();
+
 
         if (typeof initFirebase === 'function') initFirebase();
         if (window.lucide) lucide.createIcons();

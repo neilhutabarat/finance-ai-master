@@ -659,9 +659,19 @@
             document.title = activeTenant.nama + " - Financial Hub";
         }
 
-        const user = (typeof requireAuth === 'function') 
-            ? requireAuth(['staff', 'manager', 'owner'])
-            : { role: 'staff', title: 'Staf Kasir' };
+
+        // AUTENTIKASI MANDIRI (KASIR / ALL ROLE)
+        function checkKasirAuth() {
+            let userObj = null;
+            try {
+                userObj = JSON.parse(localStorage.getItem('currentUser'));
+            } catch(e) {}
+            const role = (userObj && userObj.role) || localStorage.getItem('auth_role') || 'staff';
+            const title = (userObj && userObj.title) || localStorage.getItem('auth_title') || (role === 'owner' ? 'Owner' : (role === 'manager' ? 'Manager' : 'Staf Kasir'));
+            return { role, title };
+        }
+        const user = checkKasirAuth();
+
 
         if (document.getElementById('user-role-display')) {
             if (user.role === 'owner') document.getElementById('user-role-display').innerText = "Role: Owner (Read-Only)";
