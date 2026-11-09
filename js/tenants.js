@@ -1,74 +1,79 @@
 /**
- * tenants.js - Konfigurasi Multi-Tenant untuk Finance Master
- * Mengatur nama toko, logo emoji, warna identitas, dan COA khusus untuk masing-masing UMKM.
+ * tenants.js - Konfigurasi Multi-Tenant Finance Master
+ * Termasuk Entitas Utama ID: ID26110901 (Oneilverse)
  */
 
 const TENANTS_CONFIG = {
-  // 1. Profil Default (Jika link dibuka biasa tanpa ?toko=...)
+  // 1. Entitas Utama: Oneilverse (ID: ID26110901)
+  "id26110901": {
+    id: "ID26110901",
+    nama: "Oneilverse",
+    slogan: "Creative Production & Software Infrastructure",
+    warna: "#0f172a", // Slate Dark Premium
+    warnaAksen: "#6366f1", // Indigo Modern
+    logoText: "⚡",
+    isMasterEnterprise: true,
+    customCOA: [
+      // --- INCOME (Pemasukan) ---
+      { code: "101", name: "Iklan Video YouTube", category: "sales" },
+      { code: "102", name: "Adsense YouTube", category: "sales" },
+      { code: "103", name: "Beli Aplikasi", category: "sales" },
+      { code: "104", name: "Cicilan Aplikasi", category: "sales" },
+      { code: "105", name: "UMKM Server", category: "sales" },
+      { code: "106", name: "Penambahan Fitur", category: "sales" },
+      { code: "107", name: "Pro Mode", category: "sales" },
+
+      // --- OUTCOME (Pengeluaran / Biaya Operasional & Produksi) ---
+      { code: "201", name: "Music Production", category: "cogs" },
+      { code: "202", name: "Video Production", category: "cogs" },
+      { code: "203", name: "Grok", category: "expense" },
+      { code: "204", name: "Server Internal", category: "expense" },
+      { code: "205", name: "AI Agent", category: "expense" },
+      { code: "206", name: "Poin+", category: "expense" },
+      { code: "207", name: "CapCut Pro", category: "expense" },
+
+      // --- MODAL / PRIVE ---
+      { code: "401", name: "Prive / Penarikan Owner", category: "prive" }
+    ]
+  },
+
+  // Alias jika dibuka dengan ?toko=oneilverse
+  "oneilverse": {
+    id: "ID26110901",
+    nama: "Oneilverse",
+    slogan: "Creative Production & Software Infrastructure",
+    warna: "#0f172a",
+    warnaAksen: "#6366f1",
+    logoText: "⚡",
+    isMasterEnterprise: true,
+    customCOA: [
+      { code: "101", name: "Iklan Video YouTube", category: "sales" },
+      { code: "102", name: "Adsense YouTube", category: "sales" },
+      { code: "103", name: "Beli Aplikasi", category: "sales" },
+      { code: "104", name: "Cicilan Aplikasi", category: "sales" },
+      { code: "105", name: "UMKM Server", category: "sales" },
+      { code: "106", name: "Penambahan Fitur", category: "sales" },
+      { code: "107", name: "Pro Mode", category: "sales" },
+      { code: "201", name: "Music Production", category: "cogs" },
+      { code: "202", name: "Video Production", category: "cogs" },
+      { code: "203", name: "Grok", category: "expense" },
+      { code: "204", name: "Server Internal", category: "expense" },
+      { code: "205", name: "AI Agent", category: "expense" },
+      { code: "206", name: "Poin+", category: "expense" },
+      { code: "207", name: "CapCut Pro", category: "expense" },
+      { code: "401", name: "Prive / Penarikan Owner", category: "prive" }
+    ]
+  },
+
+  // Default bawaan untuk UMKM lain
   "default": {
     id: "default",
     nama: "Terminal Kasir & Admin",
     slogan: "Input Transaksi & Laporan Mutasi Kas / Buku Besar",
-    warna: "#059669", // Emerald Asli
+    warna: "#059669",
+    warnaAksen: "#10b981",
     logoText: "🏪",
-    // Biarkan customCOA kosong jika ingin memakai getCOA() bawaan js/config.js
     customCOA: []
-  },
-
-  // 2. Klien Kafe / Kopi (Contoh: ?toko=kopisenja)
-  "kopisenja": {
-    id: "kopisenja",
-    nama: "Kopi Senja Utama",
-    slogan: "Cita Rasa Kopi Pilihan UMKM Juara",
-    warna: "#d97706", // Amber Cokelat
-    logoText: "☕",
-    customCOA: [
-      { code: "101", name: "Penjualan Kopi & Minuman", category: "sales" },
-      { code: "102", name: "Penjualan Makanan / Pastry", category: "sales" },
-      { code: "201", name: "Belanja Biji Kopi & Susu", category: "cogs" },
-      { code: "202", name: "Cup, Sedotan & Kemasan", category: "cogs" },
-      { code: "301", name: "Biaya Listrik, Gas & Es Batu", category: "expense" },
-      { code: "302", name: "Gaji Barista & Kebersihan", category: "expense" },
-      { code: "401", name: "Prive Pemilik Toko Kopi", category: "prive" }
-    ]
-  },
-
-  // 3. Klien Jasa Laundry (Contoh: ?toko=laundrykilat)
-  "laundrykilat": {
-    id: "laundrykilat",
-    nama: "Laundry Kilat 99",
-    slogan: "Bersih, Wangi, & Rapi Tepat Waktu",
-    warna: "#0284c7", // Sky Blue
-    logoText: "🧺",
-    customCOA: [
-      { code: "101", name: "Pendapatan Cuci Komplit Kiloan", category: "sales" },
-      { code: "102", name: "Pendapatan Setrika Saja", category: "sales" },
-      { code: "103", name: "Pendapatan Cuci Karpet & Bedcover", category: "sales" },
-      { code: "201", name: "Belanja Deterjen, Softener & Parfum", category: "cogs" },
-      { code: "202", name: "Plastik Packing & Gantungan", category: "cogs" },
-      { code: "301", name: "Listrik, Air & Gas Dryer", category: "expense" },
-      { code: "302", name: "Servis & Perawatan Mesin Cuci", category: "expense" },
-      { code: "401", name: "Prive Pemilik Laundry", category: "prive" }
-    ]
-  },
-
-  // 4. Klien Bengkel Motor / Mobil (Contoh: ?toko=bengkelmaju)
-  "bengkelmaju": {
-    id: "bengkelmaju",
-    nama: "Bengkel Maju Lancar",
-    slogan: "Spesialis Servis, Ganti Oli & Sparepart",
-    warna: "#dc2626", // Merah Racing
-    logoText: "🔧",
-    customCOA: [
-      { code: "101", name: "Pendapatan Jasa Servis & Bongkar", category: "sales" },
-      { code: "102", name: "Penjualan Oli & Cairan Mesin", category: "sales" },
-      { code: "103", name: "Penjualan Sparepart Onderdil", category: "sales" },
-      { code: "201", name: "Belanja Drum Oli & Botol", category: "cogs" },
-      { code: "202", name: "Belanja Sparepart Motor", category: "cogs" },
-      { code: "301", name: "Listrik, Kompresor & Majun", category: "expense" },
-      { code: "302", name: "Upah Harian Mekanik", category: "expense" },
-      { code: "401", name: "Prive Pemilik Bengkel", category: "prive" }
-    ]
   }
 };
 
@@ -78,5 +83,6 @@ function getActiveTenant() {
   if (tenantKey && TENANTS_CONFIG[tenantKey]) {
     return TENANTS_CONFIG[tenantKey];
   }
-  return TENANTS_CONFIG["default"];
+  // Jika tidak diisi parameter, default ke ID26110901 (Oneilverse) atau profil default
+  return TENANTS_CONFIG["id26110901"] || TENANTS_CONFIG["default"];
 }
