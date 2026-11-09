@@ -19,11 +19,10 @@
 
     <style>
         :root {
-            --app-bg: #f2f4f8;
-            --ios-card: rgba(255, 255, 255, 0.85);
-            --ios-border: rgba(226, 232, 240, 0.9);
-            --oneui-radius: 28px;
-            --oneui-squircle: 22px;
+            --app-bg: #f1f5f9;
+            --ios-card: rgba(255, 255, 255, 0.92);
+            --ios-border: rgba(226, 232, 240, 0.95);
+            --oneui-squircle: 24px;
         }
 
         body {
@@ -32,7 +31,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Samsung One UI Header / Large Title curve */
+        /* Samsung One UI Header */
         .oneui-hero {
             border-bottom-left-radius: 36px;
             border-bottom-right-radius: 36px;
@@ -58,6 +57,16 @@
             background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
         }
 
+        /* Segmented Control / Tab Switcher ala iOS & One UI */
+        .tab-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tab-btn.active {
+            background-color: #0f172a;
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+        }
+
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -68,15 +77,14 @@
         }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white pb-12">
+<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white pb-10">
 
-    <!-- HERO HEADER: SAMSUNG ONE UI STYLE (EXPANDED LARGE TITLE WITH PILL NAVIGATION) -->
+    <!-- HERO HEADER: SAMSUNG ONE UI STYLE -->
     <header class="oneui-hero text-white px-5 sm:px-8 pt-7 pb-8 shadow-xl relative overflow-hidden">
         <div class="absolute -top-24 -right-24 w-72 h-72 bg-indigo-500/25 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-            <!-- Brand & App Identity -->
             <div class="flex items-center space-x-4">
                 <div id="topbar-logo-box" class="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl flex items-center justify-center text-2xl shadow-inner shadow-white/20 transition-transform active:scale-95">
                     <span id="topbar-emoji-icon">⚡</span>
@@ -92,7 +100,6 @@
                 </div>
             </div>
 
-            <!-- iOS 27 Action Badges & User Status -->
             <div class="flex items-center space-x-2.5 self-start md:self-auto">
                 <div class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-white/10 border border-white/15 flex items-center shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-ping"></span>
@@ -130,17 +137,17 @@
                 </div>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="scrollToTaxTable()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-md flex items-center space-x-1.5 transition active:scale-95">
-                    <i data-lucide="table" class="w-4 h-4 text-rose-400"></i>
-                    <span>Lihat Rincian Pajak</span>
+                <button onclick="switchTab('tax')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center space-x-1.5 transition active:scale-95">
+                    <i data-lucide="receipt" class="w-4 h-4 text-white"></i>
+                    <span>Buka Rincian Pajak</span>
                 </button>
             </div>
         </div>
 
-        <!-- BARIS ATAS: GRID 2 KOLOM (FORM INPUT KASIR + LAPORAN TRANSAKSI KAS) -->
+        <!-- BARIS ATAS: GRID 2 KOLOM (FORM INPUT KASIR + 3 CARD KAS & FILTER CEPAT) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            <!-- BAGIAN 1: FORMULIR INPUT / EDIT TRANSAKSI (5 Kolom di PC) -->
+            <!-- FORMULIR INPUT / EDIT TRANSAKSI (5 Kolom di PC) -->
             <section class="lg:col-span-5 ios-glass p-6 shadow-sm space-y-4">
                 <div class="border-b border-slate-200/80 pb-3 flex justify-between items-center">
                     <div>
@@ -188,7 +195,7 @@
 
                 <input type="hidden" id="edit-tx-id" value="">
 
-                <!-- Pilihan Akun COA Oneilverse (Income & Outcome Khusus) -->
+                <!-- Pilihan Akun COA Oneilverse -->
                 <div class="space-y-3.5">
                     <div>
                         <div class="flex justify-between items-center mb-1">
@@ -239,199 +246,230 @@
                 </div>
             </section>
 
-            <!-- BAGIAN 2: LAPORAN MUTASI TRANSAKSI KAS & FILTER TANGGAL (7 Kolom di PC) -->
-            <section class="lg:col-span-7 ios-glass p-6 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 border-b border-slate-200/80 pb-3">
-                    <div>
-                        <h2 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
-                            <i data-lucide="arrow-left-right" class="w-5 h-5 text-indigo-600"></i>
-                            <span>Laporan Mutasi Buku Kas (Oneilverse)</span>
-                        </h2>
-                        <p class="text-xs text-slate-400">Format rekening koran bank dengan saldo berjalan otomatis</p>
+            <!-- CARD KONTROL & RINGKASAN KAS (7 Kolom di PC) -->
+            <section class="lg:col-span-7 space-y-4">
+                
+                <!-- 3 Card Ringkasan Mutasi Kas (Fluid Glass Cards) -->
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="ios-glass p-4 text-center shadow-xs border-emerald-200 bg-emerald-50/60">
+                        <span class="text-[10px] font-bold text-emerald-800 uppercase block">Total Masuk</span>
+                        <span id="kas-total-in" class="text-sm sm:text-xl font-black text-emerald-700">Rp 0</span>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="toggleClosingShift()" id="btn-closing-shift" class="px-3.5 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold shadow-sm flex items-center space-x-1.5 transition active:scale-95">
-                            <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-                            <span id="btn-closing-label">Closing Shift</span>
-                        </button>
+                    <div class="ios-glass p-4 text-center shadow-xs border-rose-200 bg-rose-50/60">
+                        <span class="text-[10px] font-bold text-rose-800 uppercase block">Total Keluar</span>
+                        <span id="kas-total-out" class="text-sm sm:text-xl font-black text-rose-700">Rp 0</span>
+                    </div>
+                    <div class="ios-glass p-4 text-center shadow-md bg-slate-900 text-white border-slate-800">
+                        <span class="text-[10px] font-bold text-slate-300 uppercase block">Saldo Bersih</span>
+                        <span id="kas-net" class="text-sm sm:text-xl font-black text-emerald-400">Rp 0</span>
                     </div>
                 </div>
 
-                <!-- FILTER PERIODE TANGGAL MUTASI KAS & CETAK PDF -->
-                <div class="bg-slate-50/80 border border-slate-200/80 p-4 rounded-2xl space-y-3">
-                    <div class="flex items-center justify-between">
+                <!-- FILTER TANGGAL CEPAT & KONTROL SHIFT -->
+                <div class="ios-glass p-5 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                         <span class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
-                            <i data-lucide="calendar" class="w-4 h-4 text-indigo-600"></i>
-                            <span>Filter Tanggal Mutasi Kas:</span>
+                            <i data-lucide="filter" class="w-4 h-4 text-indigo-600"></i>
+                            <span>Filter Periode Tanggal:</span>
                         </span>
-                        <span id="filter-result-count" class="text-[10px] font-bold text-indigo-800 bg-indigo-100 px-2.5 py-0.5 rounded-full">
-                            Semua Data
-                        </span>
+                        <div class="flex items-center space-x-2">
+                            <span id="filter-result-count" class="text-[10px] font-bold text-indigo-800 bg-indigo-100 px-2.5 py-0.5 rounded-full">
+                                Semua Data
+                            </span>
+                            <button onclick="toggleClosingShift()" id="btn-closing-shift" class="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold shadow-sm flex items-center space-x-1 transition active:scale-95">
+                                <i data-lucide="lock" class="w-3 h-3"></i>
+                                <span id="btn-closing-label">Closing Shift</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                        <div class="sm:col-span-4">
-                            <label class="text-[10px] font-bold text-slate-500 block">Dari Tanggal:</label>
-                            <input type="date" id="filter-date-start" class="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-500">
+                        <div class="sm:col-span-5">
+                            <label class="text-[10px] font-bold text-slate-500 block mb-0.5">Dari Tanggal:</label>
+                            <input type="date" id="filter-date-start" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
-                        <div class="sm:col-span-4">
-                            <label class="text-[10px] font-bold text-slate-500 block">Sampai Tanggal:</label>
-                            <input type="date" id="filter-date-end" class="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-500">
+                        <div class="sm:col-span-5">
+                            <label class="text-[10px] font-bold text-slate-500 block mb-0.5">Sampai Tanggal:</label>
+                            <input type="date" id="filter-date-end" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
-                        <div class="sm:col-span-4 flex space-x-1.5 pt-3.5">
-                            <button onclick="applyDateFilter()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-xl text-xs transition flex items-center justify-center space-x-1 shadow-sm">
-                                <i data-lucide="filter" class="w-3.5 h-3.5"></i>
-                                <span>Terapkan</span>
+                        <div class="sm:col-span-2 flex space-x-1 pt-3">
+                            <button onclick="applyDateFilter()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">
+                                Terapkan
                             </button>
-                            <button onclick="resetDateFilter()" class="px-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-xl text-xs transition" title="Reset">
+                            <button onclick="resetDateFilter()" class="px-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-xl text-xs transition" title="Reset">
                                 Reset
                             </button>
                         </div>
                     </div>
-                    <div class="flex justify-end pt-1">
-                        <button onclick="exportCashflowPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-md flex items-center space-x-1.5 transition active:scale-95">
-                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                            <span>Download PDF Mutasi Kas</span>
-                        </button>
+                </div>
+
+                <!-- INFO PANDUAN RINGKAS -->
+                <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 text-xs text-indigo-900 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i>
+                        <span>Semua laporan diatur rapi di dalam <b>Menu Tab di bawah ini</b> agar layar ringkas.</span>
                     </div>
                 </div>
 
-                <!-- 3 Card Ringkasan Mutasi Kas Terfilter (iOS 27 Fluid Glass Cards) -->
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="bg-emerald-50/80 border border-emerald-200 p-3 rounded-2xl text-center shadow-xs">
-                        <span class="text-[10px] font-bold text-emerald-800 uppercase block">Total Masuk</span>
-                        <span id="kas-total-in" class="text-xs sm:text-base font-black text-emerald-700">Rp 0</span>
-                    </div>
-                    <div class="bg-rose-50/80 border border-rose-200 p-3 rounded-2xl text-center shadow-xs">
-                        <span class="text-[10px] font-bold text-rose-800 uppercase block">Total Keluar</span>
-                        <span id="kas-total-out" class="text-xs sm:text-base font-black text-rose-700">Rp 0</span>
-                    </div>
-                    <div class="bg-slate-900 text-white p-3 rounded-2xl text-center shadow-md">
-                        <span class="text-[10px] font-bold text-slate-300 uppercase block">Saldo Bersih</span>
-                        <span id="kas-net" class="text-xs sm:text-base font-black text-emerald-400">Rp 0</span>
-                    </div>
-                </div>
-
-                <!-- Tabel Mutasi Kas -->
-                <div class="overflow-x-auto max-h-[340px] overflow-y-auto border border-slate-200/80 rounded-2xl">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 bg-slate-100/90 backdrop-blur-md text-[11px] font-black text-slate-600 uppercase border-b border-slate-200">
-                            <tr>
-                                <th class="py-2.5 px-3">Waktu</th>
-                                <th class="py-2.5 px-3">Uraian Transaksi</th>
-                                <th class="py-2.5 px-3 text-right">Debit (Masuk)</th>
-                                <th class="py-2.5 px-3 text-right">Kredit (Keluar)</th>
-                                <th class="py-2.5 px-3 text-right">Saldo Berjalan</th>
-                                <th class="py-2.5 px-3 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="kasir-table-body">
-                        </tbody>
-                    </table>
-                </div>
             </section>
         </div>
 
-        <!-- ================= BARIS KHUSUS: TABEL PAJAK NEGARA 12% (TERSEDIA DI SEMUA AKUN) ================= -->
-        <section id="section-tabel-pajak" class="ios-glass p-6 shadow-sm space-y-4 border-rose-200">
-            <div class="border-b border-rose-200/80 pb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                <div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-xl tax-badge text-white flex items-center justify-center shadow">
-                            <i data-lucide="receipt" class="w-4 h-4"></i>
-                        </div>
-                        <h2 class="text-base font-black text-slate-900">
-                            Tabel Bukti Kontribusi Pajak Negara 12% (PPN Outcome)
-                        </h2>
+        <!-- ================= SISTEM TAB TERPADU (SAMSUNG ONE UI x iOS SEGMENTED CONTROL) ================= -->
+        <section class="space-y-4">
+            
+            <!-- TAB BAR NAVIGASI (KLIK UNTUK PINDAH TAB TANPA SCROLL KE BAWAH) -->
+            <div class="ios-glass p-2 shadow-sm flex flex-wrap gap-1.5 border-slate-200/90">
+                <button onclick="switchTab('mutasi')" id="tab-btn-mutasi" class="tab-btn active flex-1 sm:flex-none px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center space-x-2">
+                    <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+                    <span>Tabel Mutasi Kas</span>
+                </button>
+                <button onclick="switchTab('tax')" id="tab-btn-tax" class="tab-btn flex-1 sm:flex-none px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i data-lucide="receipt" class="w-4 h-4 text-rose-500"></i>
+                    <span>Tabel Pajak 12%</span>
+                </button>
+                <button onclick="switchTab('ledger')" id="tab-btn-ledger" class="tab-btn flex-1 sm:flex-none px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i data-lucide="book-open" class="w-4 h-4 text-purple-600"></i>
+                    <span>Buku Besar Akun</span>
+                </button>
+                <button onclick="switchTab('notices')" id="tab-btn-notices" class="tab-btn flex-1 sm:flex-none px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i data-lucide="bell" class="w-4 h-4 text-amber-500"></i>
+                    <span>Pesan Internal</span>
+                </button>
+            </div>
+
+            <!-- CONTAINER ISI TAB (HANYA SATU YANG MUNCUL SESUAI TAB YANG DIKLIK) -->
+
+            <!-- 1. TAB ISI: MUTASI KAS -->
+            <div id="tab-panel-mutasi" class="ios-glass p-6 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b border-slate-200/80 pb-3">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
+                            <i data-lucide="arrow-left-right" class="w-5 h-5 text-indigo-600"></i>
+                            <span>Buku Mutasi Kas Berjalan (Rekening Koran)</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">Pencatatan saldo otomatis debit & kredit</p>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1">Transparansi fiskal: Rincian 12% pajak negara dari setiap pengeluaran Music/Video Production, Server, Grok, AI Agent, Poin+, dll.</p>
+                    <button onclick="exportCashflowPDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-md flex items-center space-x-1.5 transition active:scale-95">
+                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                        <span>Download PDF Mutasi Kas</span>
+                    </button>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button onclick="exportTaxPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs flex items-center space-x-1.5 shadow-sm transition active:scale-95">
+
+                <div class="overflow-x-auto max-h-[420px] overflow-y-auto border border-slate-200/80 rounded-2xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-slate-100/90 backdrop-blur-md text-[11px] font-black text-slate-600 uppercase border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-3">Waktu</th>
+                                <th class="py-3 px-3">Uraian Transaksi</th>
+                                <th class="py-3 px-3 text-right">Debit (Masuk)</th>
+                                <th class="py-3 px-3 text-right">Kredit (Keluar)</th>
+                                <th class="py-3 px-3 text-right">Saldo Berjalan</th>
+                                <th class="py-3 px-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kasir-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. TAB ISI: RINCIAN PAJAK NEGARA 12% -->
+            <div id="tab-panel-tax" class="ios-glass p-6 shadow-sm space-y-4 border-rose-200 hidden">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b border-rose-200/80 pb-3">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-xl tax-badge text-white flex items-center justify-center shadow">
+                                <i data-lucide="receipt" class="w-4 h-4"></i>
+                            </div>
+                            <h3 class="text-base font-black text-slate-900">
+                                Bukti Kontribusi Pajak Negara 12% (PPN Outcome)
+                            </h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Rincian potongan 12% PPN dari seluruh belanja operasional & produksi Oneilverse</p>
+                    </div>
+                    <button onclick="exportTaxPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs flex items-center space-x-1.5 shadow-md transition active:scale-95">
                         <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
                         <span>Download PDF Laporan Pajak</span>
                     </button>
                 </div>
-            </div>
 
-            <!-- Tabel Pajak 12% -->
-            <div class="overflow-x-auto border border-rose-100 rounded-2xl">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead class="bg-rose-50 text-[11px] font-black text-rose-950 uppercase border-b border-rose-200">
-                        <tr>
-                            <th class="py-3 px-3">No</th>
-                            <th class="py-3 px-3">Tanggal</th>
-                            <th class="py-3 px-3">Pos Pengeluaran (Outcome)</th>
-                            <th class="py-3 px-3">Keterangan Belanja</th>
-                            <th class="py-3 px-3 text-right">Total Transaksi</th>
-                            <th class="py-3 px-3 text-right bg-rose-100/60 font-black text-rose-900">Pajak Negara (12%)</th>
-                            <th class="py-3 px-3 text-right">Nilai Bersih (DPP)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tax-table-body">
-                    </tbody>
-                    <tfoot class="bg-rose-50/90 font-black border-t-2 border-rose-300">
-                        <tr>
-                            <td colspan="4" class="py-3 px-3 text-right uppercase text-slate-700">Total Akumulasi Pajak untuk Negara:</td>
-                            <td id="tax-foot-gross" class="py-3 px-3 text-right text-slate-900">Rp 0</td>
-                            <td id="tax-foot-tax" class="py-3 px-3 text-right text-rose-700 text-sm">Rp 0</td>
-                            <td id="tax-foot-net" class="py-3 px-3 text-right text-slate-700">Rp 0</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </section>
-
-        <!-- BARIS: KOLOM PEMBERITAHUAN & PESAN TIM -->
-        <section class="ios-glass p-6 shadow-sm space-y-4">
-            <div class="border-b border-slate-200/80 pb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                <div>
-                    <h2 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
-                        <i data-lucide="bell" class="w-5 h-5 text-amber-500"></i>
-                        <span>Pemberitahuan & Komunikasi Internal Oneilverse</span>
-                    </h2>
-                    <p class="text-xs text-slate-400">Instruksi Owner/Manager dan konfirmasi petugas</p>
+                <div class="overflow-x-auto border border-rose-100 rounded-2xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-rose-50 text-[11px] font-black text-rose-950 uppercase border-b border-rose-200">
+                            <tr>
+                                <th class="py-3 px-3">No</th>
+                                <th class="py-3 px-3">Tanggal</th>
+                                <th class="py-3 px-3">Pos Pengeluaran (Outcome)</th>
+                                <th class="py-3 px-3">Keterangan Belanja</th>
+                                <th class="py-3 px-3 text-right">Total Transaksi</th>
+                                <th class="py-3 px-3 text-right bg-rose-100/60 font-black text-rose-900">Pajak Negara (12%)</th>
+                                <th class="py-3 px-3 text-right">Nilai Bersih (DPP)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tax-table-body"></tbody>
+                        <tfoot class="bg-rose-50/90 font-black border-t-2 border-rose-300">
+                            <tr>
+                                <td colspan="4" class="py-3 px-3 text-right uppercase text-slate-700">Total Akumulasi Pajak untuk Negara:</td>
+                                <td id="tax-foot-gross" class="py-3 px-3 text-right text-slate-900">Rp 0</td>
+                                <td id="tax-foot-tax" class="py-3 px-3 text-right text-rose-700 text-sm">Rp 0</td>
+                                <td id="tax-foot-net" class="py-3 px-3 text-right text-slate-700">Rp 0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
-                <button onclick="renderKasirNotices()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center space-x-1 transition">
-                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                    <span>Segarkan Pesan</span>
-                </button>
             </div>
 
-            <div class="bg-amber-50/60 border border-amber-200/80 rounded-2xl p-4 space-y-3">
-                <input type="text" id="kasir-notice-title" placeholder="Judul Pesan (misal: Konfirmasi Pembayaran Server / Tagihan CapCut)" class="w-full bg-white border border-amber-300 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500">
-                <textarea id="kasir-notice-msg" rows="2" placeholder="Tulis catatan untuk tim produksi atau konfirmasi biaya..." class="w-full bg-white border border-amber-300 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-amber-500"></textarea>
-                <div class="flex justify-end">
-                    <button onclick="submitKasirNotice()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-xl text-xs shadow-md flex items-center space-x-1.5 transition active:scale-95">
-                        <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                        <span>Kirim Pesan</span>
+            <!-- 3. TAB ISI: BUKU BESAR PER AKUN -->
+            <div id="tab-panel-ledger" class="ios-glass p-6 shadow-sm space-y-4 hidden">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b border-slate-200/80 pb-3">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
+                            <i data-lucide="book-open" class="w-5 h-5 text-purple-700"></i>
+                            <span>Buku Besar Mutasi Per Akun (YouTube, Server, AI, dll)</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">Total akumulasi transaksi per masing-masing pos akun</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span id="total-active-accounts" class="text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full whitespace-nowrap">
+                            0 Akun Aktif
+                        </span>
+                        <select id="filter-account-target" onchange="renderPerAccountKasir()" class="bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold rounded-xl p-2 outline-none">
+                            <option value="ALL">-- Tampilkan Semua Akun --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="kasir-per-account-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- 4. TAB ISI: PESAN INTERNAL TIM -->
+            <div id="tab-panel-notices" class="ios-glass p-6 shadow-sm space-y-4 hidden">
+                <div class="border-b border-slate-200/80 pb-3 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
+                            <i data-lucide="bell" class="w-5 h-5 text-amber-500"></i>
+                            <span>Pemberitahuan & Komunikasi Internal</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">Catatan shift dan koordinasi antar tim Oneilverse</p>
+                    </div>
+                    <button onclick="renderKasirNotices()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center space-x-1 transition">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                        <span>Segarkan</span>
                     </button>
                 </div>
+
+                <div class="bg-amber-50/60 border border-amber-200/80 rounded-2xl p-4 space-y-3">
+                    <input type="text" id="kasir-notice-title" placeholder="Judul Pesan (misal: Konfirmasi Tagihan Server / CapCut Pro)" class="w-full bg-white border border-amber-300 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500">
+                    <textarea id="kasir-notice-msg" rows="2" placeholder="Tulis instruksi atau konfirmasi pengeluaran..." class="w-full bg-white border border-amber-300 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+                    <div class="flex justify-end">
+                        <button onclick="submitKasirNotice()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-xl text-xs shadow-md flex items-center space-x-1.5 transition active:scale-95">
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                            <span>Kirim Pesan</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="kasir-notices-container" class="space-y-3 pt-1"></div>
             </div>
 
-            <div id="kasir-notices-container" class="space-y-3 pt-1"></div>
-        </section>
-
-        <!-- BARIS BAWAH: BUKU BESAR PER AKUN -->
-        <section class="ios-glass p-6 shadow-sm space-y-4">
-            <div class="border-b border-slate-200/80 pb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                <div>
-                    <h2 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
-                        <i data-lucide="book-open" class="w-5 h-5 text-purple-700"></i>
-                        <span>Mutasi Buku Besar Per Akun (YouTube, Server, Grok, AI, dll)</span>
-                    </h2>
-                    <p class="text-xs text-slate-400">Rincian mutasi per masing-masing akun pemasukan & pengeluaran</p>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <span id="total-active-accounts" class="text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full whitespace-nowrap">
-                        0 Akun Aktif
-                    </span>
-                    <select id="filter-account-target" onchange="renderPerAccountKasir()" class="bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold rounded-xl p-2 outline-none">
-                        <option value="ALL">-- Tampilkan Semua Akun --</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="kasir-per-account-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
     </main>
@@ -499,6 +537,25 @@
             ? `tx_${activeTenant.id}` 
             : 'transactions_v11';
 
+        // FUNGSI SWITCH TAB (SEGMENTED CONTROL ONE UI / IOS)
+        function switchTab(tabKey) {
+            const tabs = ['mutasi', 'tax', 'ledger', 'notices'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const panel = document.getElementById(`tab-panel-${t}`);
+                if (t === tabKey) {
+                    btn.classList.add('active');
+                    btn.classList.remove('text-slate-600');
+                    panel.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('active');
+                    btn.classList.add('text-slate-600');
+                    panel.classList.add('hidden');
+                }
+            });
+            lucide.createIcons();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             if (activeTenant) {
                 document.getElementById('topbar-store-name').innerText = activeTenant.nama;
@@ -516,11 +573,6 @@
             loadKasirNotices();
         });
 
-        function scrollToTaxTable() {
-            const el = document.getElementById('section-tabel-pajak');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }
-
         function checkShiftClosingStatus() {
             const shiftKey = (activeTenant && activeTenant.id) ? `fm_shift_closed_${activeTenant.id}` : 'fm_shift_closed_date';
             const closedDate = localStorage.getItem(shiftKey);
@@ -537,13 +589,13 @@
             if (isShiftClosed) {
                 badge.className = "ios-pill px-3.5 py-1.5 text-xs font-bold bg-rose-500/20 text-rose-200 border border-rose-400/30 flex items-center";
                 badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500 mr-1.5"></span> Shift Ditutup`;
-                btn.className = "px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-sm flex items-center space-x-1.5 transition";
-                btn.innerHTML = `<i data-lucide="unlock" class="w-3.5 h-3.5"></i><span>Buka Kunci (Mgr)</span>`;
+                btn.className = "px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-sm flex items-center space-x-1 transition";
+                btn.innerHTML = `<i data-lucide="unlock" class="w-3 h-3"></i><span>Buka Kunci (Mgr)</span>`;
             } else {
                 badge.className = "ios-pill px-3.5 py-1.5 text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30 flex items-center";
                 badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 mr-1.5"></span> Shift Aktif`;
-                btn.className = "px-3.5 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold shadow-sm flex items-center space-x-1.5 transition";
-                btn.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Closing Shift</span>`;
+                btn.className = "px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold shadow-sm flex items-center space-x-1 transition";
+                btn.innerHTML = `<i data-lucide="lock" class="w-3 h-3"></i><span>Closing Shift</span>`;
             }
             lucide.createIcons();
         }
