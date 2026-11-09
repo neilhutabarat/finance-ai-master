@@ -88,16 +88,25 @@
         <!-- FORM LOGIN -->
         <div class="space-y-4 pt-1 text-left">
             
-            <!-- 1. KOLOM ID TOKO / TENANT ID (OTOMATIS TERISI & TERKUNCI) -->
-            <div>
-                <label class="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider block mb-1">
-                    ID Toko / Tenant ID:
-                </label>
-                <div class="relative">
-                    <input type="text" id="input-tenant-id" readonly class="w-full bg-slate-100 border border-slate-300 rounded-2xl py-3 px-4 text-xs font-mono font-bold text-slate-700 outline-none cursor-not-allowed select-all">
-                    <span class="absolute right-3 top-3 text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200">
-                        TERVERIFIKASI
+            <!-- 1. PEMILIH ID APLIKASI / TENANT SELECTOR -->
+            <div id="tenant-select-container">
+                <div class="flex items-center justify-between mb-1">
+                    <label class="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider block">
+                        Pilih ID Aplikasi / Toko:
+                    </label>
+                    <span id="tenant-type-tag" class="text-[9px] font-black px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 font-mono">
+                        Master Engine
                     </span>
+                </div>
+                <div class="relative">
+                    <!-- Dropdown Pemilih ID (Untuk Anda & Partner) -->
+                    <select id="tenant-picker" onchange="onTenantPickerChange(this.value)" class="w-full bg-white border-2 border-indigo-200 hover:border-indigo-400 focus:border-indigo-600 rounded-2xl py-2.5 px-3.5 text-xs font-bold text-slate-800 outline-none shadow-sm transition">
+                        <option value="id26110901" selected>ID26110901 — Oneilverse (Master Template)</option>
+                        <option value="id261110b">ID261110B — Provider by Oneilverse (Partner)</option>
+                        <option value="id261110a">ID261110A — ONEntertainment (Partner)</option>
+                    </select>
+                    <!-- Input Terkunci untuk Klien Luar -->
+                    <input type="text" id="input-tenant-id" readonly class="hidden w-full bg-slate-100 border border-slate-300 rounded-2xl py-3 px-4 text-xs font-mono font-bold text-slate-700 outline-none cursor-not-allowed">
                 </div>
             </div>
 
@@ -137,6 +146,14 @@
                 <span id="btn-login-label">Masuk ke Sistem</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
+
+            <!-- TOMBOL AKSES KHUSUS SUPER ADMIN PLATFORM -->
+            <div class="pt-2 border-t border-slate-100">
+                <button type="button" onclick="openSuperAdminDirect()" class="w-full py-2.5 px-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-cyan-200 border border-cyan-500/30 text-xs font-black transition active:scale-98 flex items-center justify-center space-x-2 shadow-sm">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-cyan-400"></i>
+                    <span>Login Super Admin Platform</span>
+                </button>
+            </div>
 
         </div>
 
@@ -304,21 +321,68 @@
             document.getElementById('input-pin').focus();
         }
 
+        
+        function onTenantPickerChange(key) {
+            activeTenant = TENANTS_CONFIG[key] || TENANTS_CONFIG["id26110901"];
+            const currentTenantKey = activeTenant.id;
+            const singlePageMode = activeTenant && activeTenant.isSinglePage;
+
+            document.getElementById('input-tenant-id').value = currentTenantKey;
+            document.getElementById('login-brand').innerText = activeTenant.nama;
+            document.getElementById('login-sub').innerText = activeTenant.slogan;
+
+            const roleGrid = document.getElementById('role-buttons-grid');
+            const partnerPill = document.getElementById('partner-view-pill');
+            const btnLabel = document.getElementById('btn-login-label');
+            const typeTag = document.getElementById('tenant-type-tag');
+
+            if (singlePageMode) {
+                roleGrid.classList.add('hidden');
+                partnerPill.classList.remove('hidden');
+                btnLabel.innerText = "Buka Portal Partner";
+                typeTag.innerText = "Partner Portal";
+                typeTag.className = "text-[9px] font-black px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200 font-mono";
+            } else {
+                roleGrid.classList.remove('hidden');
+                partnerPill.classList.add('hidden');
+                btnLabel.innerText = "Masuk ke Sistem";
+                typeTag.innerText = activeTenant.isMaster ? "Master Engine" : "Mitra UMKM";
+                typeTag.className = "text-[9px] font-black px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 font-mono";
+            }
+
+            document.getElementById('input-pin').value = "";
+            document.getElementById('input-pin').focus();
+            checkLockoutStatus();
+        }
+
+        function openSuperAdminDirect() {
+            document.getElementById('modal-provider-override').classList.remove('hidden');
+            document.getElementById('input-prov-secret').value = "";
+            document.getElementById('input-prov-secret').focus();
+        }
+
         function handleLogin() {
+            const picker = document.getElementById('tenant-picker');
+            const selectedKey = picker ? picker.value : "id26110901";
+            activeTenant = TENANTS_CONFIG[selectedKey] || TENANTS_CONFIG["id26110901"];
+            const currentTenantKey = activeTenant.id;
+            const singlePageMode = activeTenant && activeTenant.isSinglePage;
+            const currentTokoParam = `?toko=${encodeURIComponent(selectedKey)}`;
+
             if (checkLockoutStatus()) return;
 
             const pin = document.getElementById('input-pin').value.trim();
             if (!pin) return alert("Masukkan Password / PIN!");
 
             // JIKA TOKO PARTNER 1-LAMAN (ID261110A / ID261110B)
-            if (isSinglePage) {
-                const pwObj = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
+            if (singlePageMode) {
+                const pwObj = JSON.parse(localStorage.getItem(`fm_passwords_${currentTenantKey}`) || "{}");
                 const validPins = [pwObj.staff || "1234", pwObj.owner || "9999", "0000", "5678", "1234"];
                 if (validPins.includes(pin)) {
-                    const partnerUser = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey };
+                    const partnerUser = { role: 'partner', title: 'Partner Pemantau', tenantId: currentTenantKey };
                     localStorage.setItem('currentUser', JSON.stringify(partnerUser));
                     localStorage.setItem('auth_role', 'partner');
-                    window.location.href = `partner.html${tokoParam}`;
+                    window.location.href = `partner.html${currentTokoParam}`;
                     return;
                 } else {
                     return registerFailedAttempt();
@@ -326,7 +390,7 @@
             }
 
             // AMBIL PASSWORD KUSTOM DARI OWNER JIKA ADA
-            const storedPw = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
+            const storedPw = JSON.parse(localStorage.getItem(`fm_passwords_${currentTenantKey}`) || "{}");
             const staffTargetPin = storedPw.staff || "1234";
             const mgrTargetPin = storedPw.manager || "5678";
             const ownerTargetPin = storedPw.owner || "9999";
@@ -373,7 +437,7 @@
             localStorage.setItem('auth_role', userObj.role);
             localStorage.setItem('auth_title', userObj.title);
 
-            window.location.href = targetUrl + tokoParam;
+            window.location.href = targetUrl + currentTokoParam;
         }
 
         // EASTER EGG: 7X TAP PADA LOGO ON UNTUK BUKA SUPERADMIN
@@ -423,19 +487,25 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
-            document.getElementById('input-tenant-id').value = tenantKey;
-            
-            if (activeTenant) {
-                document.getElementById('login-brand').innerText = activeTenant.nama;
-                document.getElementById('login-sub').innerText = activeTenant.slogan;
+
+            // Cek apakah ada parameter URL ?toko=xxx (misal untuk build client khusus)
+            const paramToko = urlParams.get('toko');
+            const picker = document.getElementById('tenant-picker');
+            const lockedInput = document.getElementById('input-tenant-id');
+
+            if (paramToko && !['id26110901', 'id261110b', 'id261110a', 'oneilverse'].includes(paramToko.toLowerCase())) {
+                // Untuk APK user/klien UMKM lain: sembunyikan dropdown picker, kunci ID nya!
+                picker.classList.add('hidden');
+                lockedInput.classList.remove('hidden');
+                lockedInput.value = activeTenant.id;
+            } else if (paramToko) {
+                // Pilih opsi dropdown sesuai parameter
+                if (picker) picker.value = paramToko.toLowerCase();
             }
 
-            // Konfigurasi jika tenant adalah 1-Laman Partner
-            if (isSinglePage) {
-                document.getElementById('role-buttons-grid').classList.add('hidden');
-                document.getElementById('partner-view-pill').classList.remove('hidden');
-                document.getElementById('btn-login-label').innerText = "Buka Portal Partner";
-            }
+            // Jalankan sinkronisasi awal
+            const selectedKey = picker ? picker.value : "id26110901";
+            onTenantPickerChange(selectedKey);
 
             setupEasterEgg();
             checkLockoutStatus();
