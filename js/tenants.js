@@ -32,9 +32,9 @@ const TENANTS_CONFIG = {
     nama: "Oneilverse",
     slogan: "Creative Production & Software Infrastructure",
     warna: "#0f172a",
-    warnaAksen: "#6366f1",
-    logoText: "⚡",
-    isMasterEnterprise: true,
+    warnaAksen: "#38bdf8",
+    logoText: "ON",
+    tier: "pro", // 'basic' | 'plus' | 'pro'
     customCOA: ONEILVERSE_COA_LIST
   },
   "oneilverse": {
@@ -42,18 +42,19 @@ const TENANTS_CONFIG = {
     nama: "Oneilverse",
     slogan: "Creative Production & Software Infrastructure",
     warna: "#0f172a",
-    warnaAksen: "#6366f1",
-    logoText: "⚡",
-    isMasterEnterprise: true,
+    warnaAksen: "#38bdf8",
+    logoText: "ON",
+    tier: "pro",
     customCOA: ONEILVERSE_COA_LIST
   },
   "default": {
-    id: "default",
-    nama: "Terminal Kasir & Admin",
-    slogan: "Input Transaksi & Laporan Mutasi Kas / Buku Besar",
-    warna: "#059669",
-    warnaAksen: "#10b981",
-    logoText: "⚡",
+    id: "ID26110901",
+    nama: "Oneilverse",
+    slogan: "Creative Production & Software Infrastructure",
+    warna: "#0f172a",
+    warnaAksen: "#38bdf8",
+    logoText: "ON",
+    tier: "pro",
     customCOA: ONEILVERSE_COA_LIST
   }
 };
@@ -64,5 +65,5 @@ function getActiveTenant() {
   if (tenantKey && TENANTS_CONFIG[tenantKey]) {
     return TENANTS_CONFIG[tenantKey];
   }
-  return TENANTS_CONFIG["id26110901"] || TENANTS_CONFIG["default"];
+  return TENANTS_CONFIG["id26110901"];
 }

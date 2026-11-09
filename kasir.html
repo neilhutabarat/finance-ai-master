@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oneilverse - Financial Hub & Terminal</title>
+    <title>Oneilverse - Terminal Kasir</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -16,7 +16,7 @@
 
     <style>
         :root {
-            --app-bg: #f1f5f9;
+            --app-bg: #f8fafc;
             --ios-card: rgba(255, 255, 255, 0.94);
             --ios-border: rgba(226, 232, 240, 0.95);
             --oneui-squircle: 24px;
@@ -30,7 +30,7 @@
         .oneui-hero {
             border-bottom-left-radius: 36px;
             border-bottom-right-radius: 36px;
-            background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 60%, #311042 100%);
+            background: linear-gradient(145deg, #070d18 0%, #0f172a 40%, #1e1b4b 80%, #2e0854 100%);
         }
         .ios-glass {
             background: var(--ios-card);
@@ -55,7 +55,6 @@
             from { opacity: 0; transform: translateY(20px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        /* Struk Thermal Print */
         @media print {
             body * { visibility: hidden; }
             #printable-receipt, #printable-receipt * { visibility: visible; }
@@ -65,18 +64,42 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white pb-6">
 
-    <!-- HEADER TERMINAL KASIR -->
+    <!-- HEADER TERMINAL KASIR (BERSIH DARI TEKS SHIFT) -->
     <header class="oneui-hero text-white px-5 sm:px-8 pt-6 pb-7 shadow-xl relative overflow-hidden">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div class="flex items-center space-x-4">
-                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl flex items-center justify-center text-2xl shadow-inner">
-                    ⚡
-                </div>
+                <!-- LOGO EMBLEM "ON" KACA ES -->
+                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-b from-white/25 via-white/10 to-white/5 border border-white/30 backdrop-blur-xl flex items-center justify-center p-2 shadow-inner relative overflow-hidden group select-none shrink-0">
+    <div class="absolute -top-6 -left-6 w-12 h-12 bg-cyan-300/30 rounded-full blur-md pointer-events-none"></div>
+    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="hdrIce1" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#E0F2FE"/>
+                <stop offset="45%" stop-color="#38BDF8"/>
+                <stop offset="100%" stop-color="#2563EB"/>
+            </linearGradient>
+            <linearGradient id="hdrIce2" x1="90" y1="10" x2="10" y2="90" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FFFFFF"/>
+                <stop offset="45%" stop-color="#67E8F9"/>
+                <stop offset="100%" stop-color="#0284C7"/>
+            </linearGradient>
+        </defs>
+        <path d="M50 14 C29 14 14 29 14 50 C14 71 29 86 50 86 C71 86 86 71 86 50 C86 29 71 14 50 14 Z M50 25 C64.5 25 75 35.5 75 50 C75 64.5 64.5 75 50 75 C35.5 75 25 64.5 25 50 C25 35.5 35.5 25 50 25 Z" fill="url(#hdrIce1)" opacity="0.9" />
+        <path d="M34 32 L44 32 L44 68 L34 68 Z" fill="url(#hdrIce2)" />
+        <path d="M41 32 L66 64 L66 68 L56 68 L34 40 L34 32 Z" fill="#FFFFFF" />
+        <path d="M56 32 L66 32 L66 68 L56 68 Z" fill="url(#hdrIce1)" />
+        <circle cx="50" cy="20" r="2.5" fill="#FFFFFF" />
+    </svg>
+</div>
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 id="topbar-store-name" class="font-extrabold text-2xl sm:text-3xl tracking-tight text-white">Oneilverse</h1>
                         <span id="tenant-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-500/30 border border-indigo-400/40 text-indigo-200">
                             ID26110901
+                        </span>
+                        <!-- Plakat Tier Langganan -->
+                        <span id="tier-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-gradient-to-r from-amber-400/30 via-yellow-300/30 to-amber-500/30 border border-yellow-400/60 text-yellow-200 shadow-[0_0_12px_rgba(234,179,8,0.3)]">
+                            Gold • Pro
                         </span>
                     </div>
                     <p id="topbar-store-slogan" class="text-xs sm:text-sm text-slate-300 font-medium mt-1">Creative Production & Software Infrastructure</p>
@@ -86,30 +109,31 @@
             <div class="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
                 <div class="glass-capsule-dark px-3.5 py-1.5 text-xs text-white flex items-center space-x-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-300"></i>
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-300"></i>
                     <span id="realtime-clock-display" class="font-mono font-semibold tracking-wide text-[11px] sm:text-xs">Memuat Waktu...</span>
                 </div>
                 <div class="ios-pill px-3 py-1.5 text-xs font-bold bg-white/10 border border-white/15 flex items-center shadow-sm">
                     <span id="user-role-display">Role: Staf Kasir</span>
                 </div>
-                <div class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30 flex items-center">
-                    <span class="w-2 h-2 rounded-full bg-amber-400 mr-1.5"></span>
-                    <span id="current-shift-name-badge">Shift Pagi</span>
-                </div>
+                <button onclick="openReleaseNotesModal()" class="ios-pill px-3 py-1.5 bg-slate-900/40 hover:bg-slate-900/60 border border-white/15 text-[10px] font-bold flex items-center space-x-1.5 transition active:scale-95" title="Catatan Rilis & Keamanan">
+                    <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-300"></i>
+                    <span class="font-mono text-cyan-100">v1.1.2</span>
+                </button>
                 <button onclick="logoutKasirSession()" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                    <span>Keluar Shift</span>
+                    <span>Keluar</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN KASIR -->
+    <!-- MAIN KASIR CONTENT -->
     <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 flex-1 space-y-5 -mt-3">
 
         <!-- BARIS ATAS: KARTU SALDO LACI KASIR + KARTU PAJAK KECIL -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <!-- Saldo Laci Kasir -->
+            
+            <!-- 1. KARTU SALDO LACI KASIR (BERSIH DARI TEKS SHIFT) -->
             <div class="md:col-span-8 bg-white/95 border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col justify-between space-y-3">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                     <div class="flex items-center space-x-2">
@@ -117,53 +141,54 @@
                             <i data-lucide="wallet" class="w-4 h-4"></i>
                         </div>
                         <div>
-                            <span class="text-xs font-extrabold text-slate-800 uppercase block">Saldo Kas di Laci Kasir</span>
-                            <span class="text-[10px] text-slate-400">Shift Berjalan: <b id="shift-label-display" class="text-indigo-600">Shift 1 (Pagi)</b></span>
+                            <span class="text-xs font-extrabold text-slate-800 uppercase block">SALDO KAS DI LACI KASIR</span>
+                            <span class="text-[10px] text-slate-400">Saldo uang tunai di laci kasir saat ini</span>
                         </div>
                     </div>
-                    <button onclick="triggerClosingShiftCycle()" class="text-[11px] font-black text-white bg-purple-700 hover:bg-purple-800 px-3.5 py-1.5 rounded-xl shadow-sm transition active:scale-95 flex items-center space-x-1.5">
-                        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-300"></i>
-                        <span>Selesai Jam Kerja (Closing Shift)</span>
+                    <!-- TOMBOL CLOSING KASIR: MENCATAT S/D DETIK & RESET KE RP 0 -->
+                    <button onclick="triggerClosingKasirCycle()" class="text-[11px] font-black text-white bg-purple-700 hover:bg-purple-800 px-4 py-2 rounded-xl shadow-sm transition active:scale-95 flex items-center space-x-1.5">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-300"></i>
+                        <span>Closing Kasir</span>
                     </button>
                 </div>
 
                 <div class="flex items-baseline justify-between py-1">
                     <div>
                         <span class="text-xs text-slate-400 block font-medium">Uang Bersih di Laci Kasir:</span>
-                        <h2 id="shift-live-balance" class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        <h2 id="kasir-live-balance" class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                             Rp 0
                         </h2>
                     </div>
                     <div class="text-right">
                         <span class="text-[11px] text-slate-400 block">Riwayat Closing Terakhir:</span>
-                        <span id="last-closed-shift-badge" class="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl border border-slate-200 inline-block mt-0.5 font-mono">
+                        <span id="last-closed-badge" class="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl border border-slate-200 inline-block mt-0.5 font-mono">
                             Belum ada closing
                         </span>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
-                    <span>Kas Masuk: <b id="shift-in-stat" class="text-emerald-600">Rp 0</b> | Kas Keluar: <b id="shift-out-stat" class="text-rose-600">Rp 0</b></span>
-                    <button onclick="openModal('shift_history')" class="text-indigo-600 font-bold hover:underline flex items-center space-x-1">
+                    <span>Kas Masuk: <b id="kasir-in-stat" class="text-emerald-600 font-mono">Rp 0</b> | Kas Keluar: <b id="kasir-out-stat" class="text-rose-600 font-mono">Rp 0</b></span>
+                    <button onclick="openModal('closing_history')" class="text-indigo-600 font-bold hover:underline flex items-center space-x-1">
                         <i data-lucide="history" class="w-3.5 h-3.5"></i>
-                        <span>Rekap Jam Kerja</span>
+                        <span>Riwayat Closing Kasir</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Kartu Pajak Kecil -->
+            <!-- 2. KARTU PAJAK 12% KECIL (KOMPAK & ELEGAN) -->
             <div onclick="showTaxExplainer()" role="button" tabindex="0" class="md:col-span-4 cursor-pointer bg-amber-50/90 hover:bg-amber-100/90 border border-amber-300 rounded-3xl p-5 shadow-xs transition active:scale-98 flex flex-col justify-between select-none">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-black tracking-wider text-amber-900 uppercase flex items-center">
                         <i data-lucide="landmark" class="w-3.5 h-3.5 mr-1.5 text-amber-700"></i>
-                        Pajak 12% untuk Negara
+                        PAJAK 12% UNTUK NEGARA
                     </span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-200/80 border border-amber-300 text-amber-900">
                         PPN 12%
                     </span>
                 </div>
                 <div class="my-2">
-                    <h3 id="stat-total-pajak-sumbang" class="text-2xl sm:text-3xl font-black text-amber-950 tracking-tight">
+                    <h3 id="stat-total-pajak-sumbang" class="text-2xl sm:text-3xl font-black text-amber-950 tracking-tight font-mono">
                         Rp 0
                     </h3>
                 </div>
@@ -177,7 +202,7 @@
         <!-- GRID 2 KOLOM: FORM INPUT TRANSAKSI (KIRI) + DRAFT ANTREAN & DATA SAH (KANAN) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
-            <!-- FORMULIR INPUT TRANSAKSI KASIR -->
+            <!-- FORMULIR INPUT TRANSAKSI (5 Kolom di PC) -->
             <section class="lg:col-span-5 ios-glass p-5 sm:p-6 shadow-sm space-y-4">
                 <div class="border-b border-slate-200/80 pb-3 flex justify-between items-center">
                     <div>
@@ -187,7 +212,7 @@
                             </div>
                             <span>Input Transaksi Kas</span>
                         </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Format titik otomatis • Simpan ke Draft Lokal</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Format titik otomatis • Simpan ke Draft Antrean</p>
                     </div>
                     <button id="btn-cancel-edit" onclick="cancelEditMode()" class="hidden text-xs text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-xl border border-rose-200">
                         Batal
@@ -197,7 +222,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
                         <label class="text-[11px] font-bold text-slate-600 block mb-1">Tanggal Transaksi</label>
-                        <input type="date" id="tx-date-input" class="w-full bg-slate-50/80 border border-slate-200 rounded-2xl p-2.5 text-xs font-semibold focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        <input type="date" id="tx-date-input" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-xs font-semibold focus:ring-2 focus:ring-indigo-500 outline-none transition">
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-slate-600 block mb-1">Bukti Struk / Invoice</label>
@@ -224,6 +249,7 @@
 
                 <input type="hidden" id="edit-draft-id" value="">
 
+                <!-- PILIHAN AKUN MUTASI (COA SINKRON OTOMATIS DARI MANAGER) -->
                 <div class="space-y-3.5">
                     <div>
                         <div class="flex justify-between items-center mb-1">
@@ -243,28 +269,28 @@
                             <label class="text-xs font-bold text-slate-700">Nominal Transaksi (Rp)</label>
                             <span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">Titik Otomatis</span>
                         </div>
-                        <input type="text" id="tx-amount" oninput="formatInputThousand(this); calculateTaxPreview();" placeholder="0" class="w-full bg-indigo-50/30 border border-indigo-200 rounded-2xl p-3.5 text-xl font-black text-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none tracking-wide transition" required>
+                        <input type="text" id="tx-amount" oninput="formatInputThousand(this); calculateTaxPreview();" placeholder="0" class="w-full bg-indigo-50/30 border border-indigo-200 rounded-2xl p-3.5 text-xl font-black text-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none tracking-wide transition font-mono" required>
                         
                         <div id="pajak-preview-box" class="hidden mt-2 p-3 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs space-y-1">
                             <div class="flex justify-between text-slate-600">
                                 <span>Nilai Asli Bersih:</span>
-                                <span id="preview-dpp" class="font-bold">Rp 0</span>
+                                <span id="preview-dpp" class="font-bold font-mono">Rp 0</span>
                             </div>
                             <div class="flex justify-between text-amber-900 font-bold border-t border-amber-200 pt-1 cursor-pointer" onclick="showTaxExplainer()">
                                 <span>Termasuk Pajak Negara 12%:</span>
-                                <span id="preview-ppn">Rp 0 (Info)</span>
+                                <span id="preview-ppn" class="font-mono">Rp 0 (Info)</span>
                             </div>
                         </div>
                     </div>
 
                     <div>
                         <label class="text-xs font-bold text-slate-700 block mb-1">Keterangan Transaksi</label>
-                        <input type="text" id="tx-desc" placeholder="Misal: Jual Software POS / Beli Kuota Server" class="w-full bg-slate-50/80 border border-slate-200 rounded-2xl p-3 text-xs focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        <input type="text" id="tx-desc" placeholder="Misal: Jual Lisensi POS / Biaya Sewa Server" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs focus:ring-2 focus:ring-indigo-500 outline-none transition">
                     </div>
 
                     <div>
                         <label class="text-xs font-bold text-slate-700 block mb-1">Petugas / Kasir</label>
-                        <input type="text" id="tx-staff" placeholder="Nama kasir yang bertugas" class="w-full bg-slate-50/80 border border-slate-200 rounded-2xl p-3 text-xs focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        <input type="text" id="tx-staff" placeholder="Nama kasir yang bertugas" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs focus:ring-2 focus:ring-indigo-500 outline-none transition">
                     </div>
 
                     <!-- TOMBOL SIMPAN KE DRAFT LOKAL KASIR -->
@@ -275,15 +301,15 @@
                 </div>
             </section>
 
-            <!-- KANAN: TABEL DRAFT KASIR (BEBAS EDIT) & TOMBOL CETAK STRUK FINAL -->
+            <!-- KANAN: TABEL DRAFT KASIR & TOMBOL KONFIRMASI CETAK STRUK -->
             <section class="lg:col-span-7 space-y-4">
                 
-                <!-- KOTAK ANTREAN DRAFT (SEBELUM CETAK STRUK) -->
+                <!-- KOTAK ANTREAN DRAFT (BEBAS EDIT / HAPUS OLEH KASIR) -->
                 <div class="ios-glass p-5 space-y-3 border-indigo-200 bg-white">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                         <div class="flex items-center space-x-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                            <span class="text-xs font-black text-slate-900 uppercase">Draft Transaksi Berjalan (Bebas Diedit Kasir)</span>
+                            <span class="text-xs font-black text-slate-900 uppercase">Draft Transaksi Berjalan (Bebas Edit Sebelum Cetak)</span>
                         </div>
                         <span id="draft-count-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
                             0 Antrean
@@ -297,7 +323,7 @@
                     <div class="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                         <div>
                             <span class="text-[10px] text-slate-400 block font-medium">Total Nilai Pembayaran:</span>
-                            <span id="draft-total-amount" class="text-xl font-black text-slate-900">Rp 0</span>
+                            <span id="draft-total-amount" class="text-xl font-black text-slate-900 font-mono">Rp 0</span>
                         </div>
                         <button onclick="finalizeAndPrint()" id="btn-finalize" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md transition active:scale-95 flex items-center justify-center space-x-2">
                             <i data-lucide="printer" class="w-4 h-4"></i>
@@ -310,22 +336,22 @@
                 <div class="grid grid-cols-3 gap-3">
                     <div class="ios-glass p-4 text-center shadow-xs border-emerald-200 bg-emerald-50/60">
                         <span class="text-[10px] font-bold text-emerald-800 uppercase block">Total Masuk</span>
-                        <span id="kas-total-in" class="text-sm sm:text-xl font-black text-emerald-700">Rp 0</span>
+                        <span id="kas-total-in" class="text-sm sm:text-xl font-black text-emerald-700 font-mono">Rp 0</span>
                     </div>
                     <div class="ios-glass p-4 text-center shadow-xs border-rose-200 bg-rose-50/60">
                         <span class="text-[10px] font-bold text-rose-800 uppercase block">Total Keluar</span>
-                        <span id="kas-total-out" class="text-sm sm:text-xl font-black text-rose-700">Rp 0</span>
+                        <span id="kas-total-out" class="text-sm sm:text-xl font-black text-rose-700 font-mono">Rp 0</span>
                     </div>
                     <div class="ios-glass p-4 text-center shadow-md bg-slate-900 text-white border-slate-800">
                         <span class="text-[10px] font-bold text-slate-300 uppercase block">Saldo Kas Sah</span>
-                        <span id="kas-net" class="text-sm sm:text-xl font-black text-emerald-400">Rp 0</span>
+                        <span id="kas-net" class="text-sm sm:text-xl font-black text-emerald-400 font-mono">Rp 0</span>
                     </div>
                 </div>
 
                 <!-- MENU TOMBOL POP-UP RINGKAS -->
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                     <button onclick="openModal('mutasi')" class="p-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-left transition active:scale-95 shadow-sm">
-                        <i data-lucide="arrow-left-right" class="w-4 h-4 text-indigo-400 mb-1"></i>
+                        <i data-lucide="arrow-left-right" class="w-4 h-4 text-cyan-400 mb-1"></i>
                         <h4 class="font-bold text-xs">Mutasi Sah</h4>
                         <p class="text-[10px] text-slate-400">Daftar struk final</p>
                     </button>
@@ -438,20 +464,19 @@
                     <div id="kasir-per-account-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
 
-                <div id="popup-content-shift_history" class="space-y-4 hidden">
+                <div id="popup-content-closing_history" class="space-y-4 hidden">
                     <div class="overflow-x-auto border border-slate-200 rounded-2xl">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-700 border-b">
                                 <tr>
-                                    <th class="py-3 px-3">Waktu Closing</th>
-                                    <th class="py-3 px-3">Nama Shift</th>
+                                    <th class="py-3 px-3">Waktu Selesai (s/d Detik)</th>
                                     <th class="py-3 px-3 text-right">Kas Masuk</th>
                                     <th class="py-3 px-3 text-right">Kas Keluar</th>
-                                    <th class="py-3 px-3 text-right">Saldo Diserahkan</th>
-                                    <th class="py-3 px-3 text-center">Petugas</th>
+                                    <th class="py-3 px-3 text-right font-black">Saldo Diserahkan</th>
+                                    <th class="py-3 px-3 text-center">Petugas Closing</th>
                                 </tr>
                             </thead>
-                            <tbody id="shift-history-table-body"></tbody>
+                            <tbody id="closing-history-table-body"></tbody>
                         </table>
                     </div>
                 </div>
@@ -485,6 +510,32 @@
         </div>
     </div>
 
+    <!-- MODAL CATATAN RILIS & VERSI -->
+    <div id="modal-release-notes" class="hidden fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="ios-glass w-full max-w-lg p-0 shadow-2xl modal-sheet flex flex-col overflow-hidden bg-white">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+                        <i data-lucide="info" class="w-5 h-5 text-cyan-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-base leading-tight">Catatan Rilis & Versi Sistem</h3>
+                        <p class="text-[10px] text-slate-400">Pembaruan fungsional dan keamanan terbaru</p>
+                    </div>
+                </div>
+                <button onclick="closeReleaseNotesModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4" id="release-notes-container"></div>
+            <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <button onclick="closeReleaseNotesModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/tenants.js"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
@@ -509,15 +560,14 @@
             const activeSession = JSON.parse(localStorage.getItem('fm_active_cashier_session') || "null");
             const now = Date.now();
 
-            if (activeSession && activeSession.status === 'ONLINE' && (now - activeSession.lastHeartbeat) < 60000) {
+            if (activeSession && activeSession.status === 'ONLINE' && (now - activeSession.lastHeartbeat) < 45000) {
                 if (activeSession.deviceId !== MY_DEVICE_SESSION_ID) {
-                    alert("Akses Ditolak: Terminal Kasir sedang aktif digunakan di perangkat lain.\n\nSatu terminal hanya dapat dibuka oleh satu kasir demi mencegah pemalsuan dan pemfitnahan transaksi.");
+                    alert("Akses Ditolak: Terminal Kasir sedang aktif digunakan di perangkat lain.\n\nSatu terminal hanya dapat dibuka oleh satu kasir demi mencegah pemalsuan transaksi.");
                     window.location.replace("index.html");
                     return false;
                 }
             }
 
-            // Kunci sesi untuk perangkat ini
             localStorage.setItem('fm_active_cashier_session', JSON.stringify({
                 status: 'ONLINE',
                 deviceId: MY_DEVICE_SESSION_ID,
@@ -526,7 +576,6 @@
                 lastHeartbeat: now
             }));
 
-            // Heartbeat tiap 20 detik
             setInterval(() => {
                 const s = JSON.parse(localStorage.getItem('fm_active_cashier_session') || "{}");
                 if (s.deviceId === MY_DEVICE_SESSION_ID) {
@@ -543,34 +592,20 @@
             window.location.href = "index.html";
         }
 
-        const DEFAULT_ONEILVERSE_COA = [
-            { code: "101", name: "Iklan Video YouTube", category: "sales" },
-            { code: "102", name: "Adsense YouTube", category: "sales" },
-            { code: "103", name: "Beli Aplikasi", category: "sales" },
-            { code: "104", name: "Cicilan Aplikasi", category: "sales" },
-            { code: "105", name: "UMKM Server", category: "sales" },
-            { code: "106", name: "Penambahan Fitur", category: "sales" },
-            { code: "107", name: "Pro Mode", category: "sales" },
-            { code: "201", name: "Music Production", category: "cogs" },
-            { code: "202", name: "Video Production", category: "cogs" },
-            { code: "203", name: "Grok", category: "expense" },
-            { code: "204", name: "Server Internal", category: "expense" },
-            { code: "205", name: "AI Agent", category: "expense" },
-            { code: "206", name: "Poin+", category: "expense" },
-            { code: "207", name: "CapCut Pro", category: "expense" },
-            { code: "401", name: "Prive / Penarikan Owner", category: "prive" }
-        ];
-
         let activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
-        const user = { role: 'staff', title: 'Staf Kasir' };
+        const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
+        const user = { role: 'staff', title: customRoles.staff || 'Staf Kasir' };
+
+        if (document.getElementById('user-role-display')) {
+            document.getElementById('user-role-display').innerText = `Role: ${user.title}`;
+        }
 
         if (typeof initFirebase === 'function') initFirebase();
         if (window.lucide) lucide.createIcons();
 
         let txList = [];
         let draftList = JSON.parse(localStorage.getItem('fm_kasir_drafts') || "[]");
-        let shiftHistory = JSON.parse(localStorage.getItem('fm_shift_history') || "[]");
-        let currentShiftName = localStorage.getItem('fm_shift_name') || "Shift 1 (Pagi)";
+        let closingHistory = JSON.parse(localStorage.getItem('fm_closing_history') || "[]");
 
         const tenantStorageKey = (activeTenant && activeTenant.id) ? `fm_v11_tx_${activeTenant.id}` : 'fm_v11_tx';
         const tenantFirestoreCol = (activeTenant && activeTenant.id && activeTenant.id !== 'default') 
@@ -623,7 +658,7 @@
                         dateISO: dateVal,
                         dateFull: formattedDateFull
                     };
-                    alert("Draft pesanan diperbarui!");
+                    alert("Draft pesanan berhasil diperbarui!");
                 }
             } else {
                 const newDraft = {
@@ -736,16 +771,14 @@
             let total = 0;
             draftList.forEach(d => total += d.amount);
 
-            if (!confirm(`Konfirmasi pembayaran selesai dan cetak struk total Rp ${formatThousandSeparator(total)}?\n\nData akan disahkan ke buku kas besar Manager & Owner.`)) return;
+            if (!confirm(`Konfirmasi pembayaran lunas dan cetak struk total Rp ${formatThousandSeparator(total)}?\n\nTransaksi akan disahkan dan diteruskan ke pembukuan resmi.`)) return;
 
             const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const nowFull = new Date().toLocaleDateString('id-ID');
 
-            // Pindahkan seluruh draft menjadi transaksi sah di buku kas
             draftList.forEach(d => {
                 const finalTx = {
                     id: 'tx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-                    shiftName: currentShiftName,
                     accountCode: d.accountCode,
                     accountName: d.accountName,
                     category: d.category,
@@ -773,7 +806,6 @@
 
             persistData();
 
-            // Siapkan tampilan struk
             document.getElementById('receipt-date').innerText = `${nowFull} ${nowTime}`;
             document.getElementById('receipt-staff').innerText = user.title;
             document.getElementById('receipt-total').innerText = "Rp " + formatThousandSeparator(total);
@@ -787,13 +819,11 @@
                 rList.appendChild(row);
             });
 
-            // Kosongkan draft lokal
             draftList = [];
             localStorage.removeItem('fm_kasir_drafts');
             renderDraftList();
             renderAllReports();
 
-            // Buka jendela struk
             document.getElementById('modal-receipt').classList.remove('hidden');
         }
 
@@ -801,54 +831,54 @@
             document.getElementById('modal-receipt').classList.add('hidden');
         }
 
-        // CLOSING SHIFT HARIAN (PRESISI S/D DETIK)
-        function triggerClosingShiftCycle() {
+        // CLOSING KASIR: MENCATAT PRESISI S/D DETIK & RESET SALDO LACI KE RP 0
+        function triggerClosingKasirCycle() {
             const now = new Date();
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             const preciseTimestamp = `${days[now.getDay()]}, ${String(now.getDate()).padStart(2,'0')} ${months[now.getMonth()]} ${now.getFullYear()} - ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')} WIB`;
 
-            const activeShiftTx = txList.filter(t => !t.isClosed);
-            let shiftIn = 0;
-            let shiftOut = 0;
-            activeShiftTx.forEach(t => {
-                if (t.category === 'sales') shiftIn += t.amount;
-                else shiftOut += t.amount;
+            const activeTx = txList.filter(t => !t.isClosed);
+            let totalIn = 0;
+            let totalOut = 0;
+            activeTx.forEach(t => {
+                if (t.category === 'sales') totalIn += t.amount;
+                else totalOut += t.amount;
             });
-            const shiftBalance = shiftIn - shiftOut;
+            const drawerBalance = totalIn - totalOut;
 
-            if (confirm(`Selesaikan jam kerja (${currentShiftName}) sekarang?\n\nWaktu Closing: ${preciseTimestamp}\nSaldo yang diserahkan: Rp ${formatThousandSeparator(shiftBalance)}\n\nSetelah closing, saldo laci shift kasir akan di-reset kembali ke Rp 0.`)) {
+            if (confirm(`Lakukan Closing Kasir sekarang?\n\nWaktu Closing: ${preciseTimestamp}\nUang yang diserahkan: Rp ${formatThousandSeparator(drawerBalance)}\n\nSetelah closing, saldo laci kasir aktif akan di-reset kembali ke Rp 0.`)) {
                 const closingRecord = {
-                    id: 'shift_' + Date.now(),
-                    shiftName: currentShiftName,
+                    id: 'closing_' + Date.now(),
                     closedAt: preciseTimestamp,
-                    totalIn: shiftIn,
-                    totalOut: shiftOut,
-                    balance: shiftBalance,
+                    totalIn: totalIn,
+                    totalOut: totalOut,
+                    balance: drawerBalance,
                     staff: user.title,
                     timestamp: Date.now()
                 };
 
-                shiftHistory.unshift(closingRecord);
-                localStorage.setItem('fm_shift_history', JSON.stringify(shiftHistory));
+                closingHistory.unshift(closingRecord);
+                localStorage.setItem('fm_closing_history', JSON.stringify(closingHistory));
 
                 txList.forEach(t => { t.isClosed = true; });
                 persistData();
 
-                updateShiftHeaderUI();
+                // Lepaskan penguncian sesi agar perangkat lain bisa bergantian masuk
+                localStorage.removeItem('fm_active_cashier_session');
+
+                updateClosingHeaderUI();
                 renderAllReports();
-                alert(`Closing Selesai! Uang diserahkan Rp ${formatThousandSeparator(shiftBalance)}. Saldo shift laci kasir telah kembali ke Rp 0.`);
+                alert(`Closing Kasir Berhasil!\n\nWaktu: ${preciseTimestamp}\nUang Diserahkan: Rp ${formatThousandSeparator(drawerBalance)}\n\nSaldo kas laci saat ini telah kembali ke Rp 0.`);
             }
         }
 
-        function updateShiftHeaderUI() {
-            document.getElementById('current-shift-name-badge').innerText = currentShiftName;
-            document.getElementById('shift-label-display').innerText = currentShiftName;
-            const last = shiftHistory[0];
+        function updateClosingHeaderUI() {
+            const last = closingHistory[0];
             if (last) {
-                document.getElementById('last-closed-shift-badge').innerText = `${last.shiftName}: Rp ${formatThousandSeparator(last.balance)}`;
+                document.getElementById('last-closed-badge').innerText = `Rp ${formatThousandSeparator(last.balance)} (${last.closedAt})`;
             } else {
-                document.getElementById('last-closed-shift-badge').innerText = "Belum ada closing";
+                document.getElementById('last-closed-badge').innerText = "Belum ada closing";
             }
         }
 
@@ -880,29 +910,32 @@
             renderKasirTable();
             renderTaxTable();
             renderPerAccountKasir();
-            calculateShiftLiveBalance();
+            calculateKasirLiveBalance();
         }
 
-        function calculateShiftLiveBalance() {
-            const activeShiftTx = txList.filter(t => !t.isClosed);
+        // HITUNG SALDO LACI KASIR (DENGAN TAMPILAN MINUS MERAH TEBAL JIKA DEFISIT)
+        function calculateKasirLiveBalance() {
+            const activeTx = txList.filter(t => !t.isClosed);
             let shiftIn = 0;
             let shiftOut = 0;
 
-            activeShiftTx.forEach(t => {
+            activeTx.forEach(t => {
                 if (t.category === 'sales') shiftIn += t.amount;
                 else shiftOut += t.amount;
             });
 
-            const netShift = shiftIn - shiftOut;
-            const liveEl = document.getElementById('shift-live-balance');
-            liveEl.innerText = formatCurrency(netShift);
-            if (netShift < 0) {
-                liveEl.className = "text-3xl sm:text-4xl font-black text-rose-600 tracking-tight";
+            const netBalance = shiftIn - shiftOut;
+            const liveEl = document.getElementById('kasir-live-balance');
+            liveEl.innerText = formatCurrency(netBalance);
+            
+            if (netBalance < 0) {
+                liveEl.className = "text-3xl sm:text-4xl font-black text-rose-600 tracking-tight font-mono";
             } else {
-                liveEl.className = "text-3xl sm:text-4xl font-black text-slate-900 tracking-tight";
+                liveEl.className = "text-3xl sm:text-4xl font-black text-slate-900 tracking-tight font-mono";
             }
-            document.getElementById('shift-in-stat').innerText = "Rp " + formatThousandSeparator(shiftIn);
-            document.getElementById('shift-out-stat').innerText = "Rp " + formatThousandSeparator(shiftOut);
+
+            document.getElementById('kasir-in-stat').innerText = "Rp " + formatThousandSeparator(shiftIn);
+            document.getElementById('kasir-out-stat').innerText = "Rp " + formatThousandSeparator(shiftOut);
         }
 
         function renderKasirTable() {
@@ -930,8 +963,8 @@
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono">${tx.dateFull} ${tx.date}</td>
                     <td class="py-2.5 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}<br><span class="text-[10px] text-slate-400 font-normal">${tx.desc || '-'}</span></td>
-                    <td class="py-2.5 px-3 text-right font-black text-emerald-600">${tx.category === 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
-                    <td class="py-2.5 px-3 text-right font-black text-rose-600">${tx.category !== 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-emerald-600 font-mono">${tx.category === 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-rose-600 font-mono">${tx.category !== 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
                     <td class="py-2.5 px-3 text-right font-black font-mono">Rp ${formatThousandSeparator(tx.runningBalance)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-400 text-[10px]">${tx.staff}</td>
                 `;
@@ -943,7 +976,7 @@
             document.getElementById('kas-total-out').innerText = "Rp " + formatThousandSeparator(totalOut);
             const netEl = document.getElementById('kas-net');
             netEl.innerText = formatCurrency(netKumulatif);
-            netEl.className = netKumulatif < 0 ? "text-sm sm:text-xl font-black text-rose-400" : "text-sm sm:text-xl font-black text-emerald-400";
+            netEl.className = netKumulatif < 0 ? "text-sm sm:text-xl font-black text-rose-400 font-mono" : "text-sm sm:text-xl font-black text-emerald-400 font-mono";
         }
 
         function renderTaxTable() {
@@ -962,9 +995,9 @@
                     <td class="py-2.5 px-3 font-mono">${tx.dateFull}</td>
                     <td class="py-2.5 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}</td>
                     <td class="py-2.5 px-3 text-slate-500">${tx.desc || '-'}</td>
-                    <td class="py-2.5 px-3 text-right font-semibold">Rp ${formatThousandSeparator(tx.amount)}</td>
+                    <td class="py-2.5 px-3 text-right font-semibold font-mono">Rp ${formatThousandSeparator(tx.amount)}</td>
                     <td class="py-2.5 px-3 text-right font-black text-amber-900 bg-amber-100/60 font-mono">Rp ${formatThousandSeparator(tax)}</td>
-                    <td class="py-2.5 px-3 text-right text-slate-500">Rp ${formatThousandSeparator(tx.dpp || (tx.amount - tax))}</td>
+                    <td class="py-2.5 px-3 text-right text-slate-500 font-mono">Rp ${formatThousandSeparator(tx.dpp || (tx.amount - tax))}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -977,9 +1010,11 @@
             if (!container) return;
             container.innerHTML = "";
 
-            let coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0) ? activeTenant.customCOA : DEFAULT_ONEILVERSE_COA;
+            let coaList = JSON.parse(localStorage.getItem('fm_custom_coa') || "[]");
+            if (coaList.length === 0) coaList = (activeTenant && activeTenant.customCOA) ? activeTenant.customCOA : [];
+            
             const groups = {};
-            coa.forEach(c => { groups[c.code] = { code: c.code, name: c.name, category: c.category, total: 0, items: [] }; });
+            coaList.forEach(c => { groups[c.code] = { code: c.code, name: c.name, category: c.category, total: 0, items: [] }; });
 
             txList.forEach(t => {
                 if (groups[t.accountCode]) {
@@ -1006,8 +1041,12 @@
             });
         }
 
+        // COA POPULATE (OTOMATIS MEMBACA PERUBAHAN YANG DILAKUKAN MANAGER)
         function populateCOA() {
-            let coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0) ? activeTenant.customCOA : DEFAULT_ONEILVERSE_COA;
+            let coa = JSON.parse(localStorage.getItem('fm_custom_coa') || "[]");
+            if (coa.length === 0) {
+                coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0) ? activeTenant.customCOA : [];
+            }
             const select = document.getElementById('tx-account');
             select.innerHTML = '<option value="">-- Pilih Akun COA --</option>';
 
@@ -1105,7 +1144,7 @@
         };
 
         window.openModal = function(type) {
-            ['mutasi', 'tax', 'ledger', 'shift_history'].forEach(k => {
+            ['mutasi', 'tax', 'ledger', 'closing_history'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
@@ -1113,9 +1152,9 @@
             if (type === 'mutasi') document.getElementById('popup-content-mutasi').classList.remove('hidden');
             else if (type === 'tax') document.getElementById('popup-content-tax').classList.remove('hidden');
             else if (type === 'ledger') document.getElementById('popup-content-ledger').classList.remove('hidden');
-            else if (type === 'shift_history') {
-                renderShiftHistoryTable();
-                document.getElementById('popup-content-shift_history').classList.remove('hidden');
+            else if (type === 'closing_history') {
+                renderClosingHistoryTable();
+                document.getElementById('popup-content-closing_history').classList.remove('hidden');
             }
 
             document.getElementById('main-modal-container').classList.remove('hidden');
@@ -1126,17 +1165,16 @@
             document.getElementById('main-modal-container').classList.add('hidden');
         };
 
-        function renderShiftHistoryTable() {
-            const tbody = document.getElementById('shift-history-table-body');
+        function renderClosingHistoryTable() {
+            const tbody = document.getElementById('closing-history-table-body');
             tbody.innerHTML = "";
-            shiftHistory.forEach(s => {
+            closingHistory.forEach(s => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-slate-100 text-xs";
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono">${s.closedAt}</td>
-                    <td class="py-2.5 px-3 font-bold">${s.shiftName}</td>
-                    <td class="py-2.5 px-3 text-right font-black text-emerald-600">Rp ${formatThousandSeparator(s.totalIn)}</td>
-                    <td class="py-2.5 px-3 text-right font-black text-rose-600">Rp ${formatThousandSeparator(s.totalOut)}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-emerald-600 font-mono">Rp ${formatThousandSeparator(s.totalIn)}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-rose-600 font-mono">Rp ${formatThousandSeparator(s.totalOut)}</td>
                     <td class="py-2.5 px-3 text-right font-black font-mono">Rp ${formatThousandSeparator(s.balance)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-500">${s.staff}</td>
                 `;
@@ -1144,45 +1182,67 @@
             });
         }
 
+        // CATATAN RILIS LOGIKA (MAKSIMAL 10 TERBARU)
+        const RELEASE_NOTES_DB = [
+            { version: "v1.1.2", type: "App", date: "10 Nov 2026", title: "Penyederhanaan Closing Kasir", desc: "Konsep penamaan shift dihapus. Kasir kini cukup menekan Closing Kasir untuk mereset laci ke Rp 0 secara presisi." },
+            { version: "Core Shield 1.1.2", type: "Security", date: "10 Nov 2026", title: "Single-Session Lockout", desc: "Perlindungan anti-fitnah kasir aktif: akses kasir dikunci pada 1 sesi perangkat kerja." },
+            { version: "v1.1.1", type: "App", date: "09 Nov 2026", title: "Sistem Kasir 2-Langkah", desc: "Input pesanan masuk ke draft sementara bebas edit sebelum dicetak struk sah." },
+            { version: "Core Shield 1.1.1", type: "Security", date: "09 Nov 2026", title: "Audit Trail Forensik", desc: "Seluruh tindakan koreksi nota oleh Manager otomatis terekam permanen di Owner." },
+            { version: "v1.1.0", type: "App", date: "05 Nov 2026", title: "Tiket Penambahan Terminal Kasir", desc: "Penambahan menu pengajuan lisensi terminal meja kasir baru ke panel Provider." },
+            { version: "Core Shield 1.1.0", type: "Security", date: "05 Nov 2026", title: "Restriksi Waktu Transaksi", desc: "Hanya Owner yang memiliki wewenang mengoreksi tanggal nota transaksi." },
+            { version: "v1.0.5", type: "App", date: "01 Nov 2026", title: "Kapsul Waktu Realtime Glass", desc: "Desain kapsul jam dan tanggal realtime berbalut kaca es transparan." },
+            { version: "Core Shield 1.0.5", type: "Security", date: "01 Nov 2026", title: "Proteksi Sandi Bertahap", desc: "Sistem penguncian bertahap 5 menit, 10 menit, hingga pemblokiran permanen akun." },
+            { version: "v1.0.0", type: "App", date: "25 Okt 2026", title: "Rilis Perdana Oneilverse POS", desc: "Peluncuran sistem kasir dan keuangan multi-tenant jaringan UMKM." },
+            { version: "Core Shield 1.0.0", type: "Security", date: "25 Okt 2026", title: "Enkripsi Multi-Tenant", desc: "Isolasi data antar toko untuk keamanan pembukuan finansial." }
+        ];
+
+        function renderReleaseNotes() {
+            const container = document.getElementById('release-notes-container');
+            if (!container) return;
+            container.innerHTML = "";
+            RELEASE_NOTES_DB.slice(0, 10).forEach(note => {
+                const isSec = note.type === "Security";
+                const bg = isSec ? "bg-amber-50 border-amber-200" : "bg-indigo-50 border-indigo-200";
+                const icon = isSec ? '<i data-lucide="shield-check" class="w-4 h-4 text-amber-600"></i>' : '<i data-lucide="zap" class="w-4 h-4 text-indigo-600"></i>';
+                const pillBg = isSec ? "bg-amber-100 text-amber-800" : "bg-indigo-100 text-indigo-800";
+                
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl border ${bg} space-y-1.5`;
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            ${icon}
+                            <span class="font-black text-[11px] text-slate-900 font-mono">${note.version}</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[9px] font-bold ${pillBg}">${note.date}</span>
+                    </div>
+                    <h4 class="font-bold text-xs text-slate-800">${note.title}</h4>
+                    <p class="text-[11px] text-slate-600 leading-relaxed">${note.desc}</p>
+                `;
+                container.appendChild(card);
+            });
+            if (window.lucide) lucide.createIcons();
+        }
+
+        window.openReleaseNotesModal = function() {
+            renderReleaseNotes();
+            document.getElementById('modal-release-notes').classList.remove('hidden');
+        };
+
+        window.closeReleaseNotesModal = function() {
+            document.getElementById('modal-release-notes').classList.add('hidden');
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             if (!initSingleSessionKasir()) return;
             const todayISO = new Date().toISOString().split('T')[0];
             document.getElementById('tx-date-input').value = todayISO;
 
             populateCOA();
-            updateShiftHeaderUI();
+            updateClosingHeaderUI();
             renderDraftList();
             loadTransactions();
         });
     </script>
-
-    <!-- MODAL CATATAN RILIS & VERSI -->
-    <div id="modal-release-notes" class="hidden fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-lg p-0 shadow-2xl modal-sheet flex flex-col overflow-hidden bg-white">
-            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-                        <i data-lucide="info" class="w-5 h-5 text-indigo-300"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-black text-base leading-tight">Catatan Rilis & Versi Sistem</h3>
-                        <p class="text-[10px] text-slate-400">Pembaruan fungsional dan keamanan terbaru</p>
-                    </div>
-                </div>
-                <button onclick="closeReleaseNotesModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4" id="release-notes-container">
-                <!-- Diisi via JS -->
-            </div>
-            <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex justify-end">
-                <button onclick="closeReleaseNotesModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition">
-                    Tutup
-                </button>
-            </div>
-        </div>
-    </div>
-    
 </body>
 </html>

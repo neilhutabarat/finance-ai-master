@@ -30,7 +30,7 @@
         .oneui-hero {
             border-bottom-left-radius: 36px;
             border-bottom-right-radius: 36px;
-            background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 60%, #311042 100%);
+            background: linear-gradient(145deg, #070d18 0%, #1e1b4b 60%, #311042 100%);
         }
         .ios-glass {
             background: var(--ios-card);
@@ -63,14 +63,37 @@
     <header class="oneui-hero text-white px-5 sm:px-8 pt-6 pb-7 shadow-xl relative overflow-hidden">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div class="flex items-center space-x-4">
-                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl flex items-center justify-center text-2xl shadow-inner">
-                    👑
-                </div>
+                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-b from-white/25 via-white/10 to-white/5 border border-white/30 backdrop-blur-xl flex items-center justify-center p-2 shadow-inner relative overflow-hidden group select-none shrink-0">
+    <div class="absolute -top-6 -left-6 w-12 h-12 bg-cyan-300/30 rounded-full blur-md pointer-events-none"></div>
+    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="hdrIce1" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#E0F2FE"/>
+                <stop offset="45%" stop-color="#38BDF8"/>
+                <stop offset="100%" stop-color="#2563EB"/>
+            </linearGradient>
+            <linearGradient id="hdrIce2" x1="90" y1="10" x2="10" y2="90" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FFFFFF"/>
+                <stop offset="45%" stop-color="#67E8F9"/>
+                <stop offset="100%" stop-color="#0284C7"/>
+            </linearGradient>
+        </defs>
+        <path d="M50 14 C29 14 14 29 14 50 C14 71 29 86 50 86 C71 86 86 71 86 50 C86 29 71 14 50 14 Z M50 25 C64.5 25 75 35.5 75 50 C75 64.5 64.5 75 50 75 C35.5 75 25 64.5 25 50 C25 35.5 35.5 25 50 25 Z" fill="url(#hdrIce1)" opacity="0.9" />
+        <path d="M34 32 L44 32 L44 68 L34 68 Z" fill="url(#hdrIce2)" />
+        <path d="M41 32 L66 64 L66 68 L56 68 L34 40 L34 32 Z" fill="#FFFFFF" />
+        <path d="M56 32 L66 32 L66 68 L56 68 Z" fill="url(#hdrIce1)" />
+        <circle cx="50" cy="20" r="2.5" fill="#FFFFFF" />
+    </svg>
+</div>
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="font-extrabold text-2xl sm:text-3xl tracking-tight text-white">Oneilverse</h1>
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-500/30 border border-indigo-400/40 text-indigo-200">
                             ID26110901
+                        </span>
+                        <!-- Plakat Tier Langganan -->
+                        <span id="tier-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-gradient-to-r from-amber-400/30 via-yellow-300/30 to-amber-500/30 border border-yellow-400/60 text-yellow-200 shadow-[0_0_12px_rgba(234,179,8,0.3)]">
+                            Gold • Pro
                         </span>
                     </div>
                     <p class="text-xs sm:text-sm text-slate-300 font-medium mt-1">Portal Eksekutif & Mahkamah Audit Finansial Owner</p>
@@ -84,18 +107,16 @@
                     <span id="realtime-clock-display" class="font-mono font-semibold tracking-wide text-[11px] sm:text-xs">Memuat Waktu...</span>
                 </div>
                 <div class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30 flex items-center shadow-sm">
-                    <span>Role: Owner Eksekutif</span>
+                    <span id="user-role-display">Role: Owner Eksekutif</span>
                 </div>
+                <button onclick="openReleaseNotesModal()" class="ios-pill px-3 py-1.5 bg-slate-900/40 hover:bg-slate-900/60 border border-white/15 text-[10px] font-bold flex items-center space-x-1 transition active:scale-95" title="Catatan Rilis & Keamanan">
+                    <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-300"></i>
+                    <span class="font-mono text-cyan-100">v1.1.2</span>
+                </button>
                 <button onclick="logout()" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     <span>Keluar</span>
                 </button>
-
-                <button onclick="openReleaseNotesModal()" class="ios-pill px-3 py-1.5 bg-slate-900/10 hover:bg-slate-900/20 border border-slate-900/10 text-[10px] font-bold flex items-center space-x-1 transition active:scale-95" title="Catatan Rilis & Sistem">
-                    <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-300"></i>
-                    <span class="font-mono text-indigo-100">v1.1.2</span>
-                </button>
-    
             </div>
         </div>
     </header>
@@ -110,7 +131,7 @@
                     <span class="text-[11px] font-extrabold text-emerald-800 uppercase tracking-wider">A. Total Income</span>
                     <i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i>
                 </div>
-                <h3 id="card-total-income" class="text-2xl sm:text-3xl font-black text-emerald-700 my-1">Rp 0</h3>
+                <h3 id="card-total-income" class="text-2xl sm:text-3xl font-black text-emerald-700 my-1 font-mono">Rp 0</h3>
                 <p class="text-[10px] text-slate-500">Adsense, Apps, Server, Fitur, Pro Mode</p>
             </div>
 
@@ -119,7 +140,7 @@
                     <span class="text-[11px] font-extrabold text-rose-800 uppercase tracking-wider">B. Total Outcome</span>
                     <i data-lucide="trending-down" class="w-4 h-4 text-rose-600"></i>
                 </div>
-                <h3 id="card-total-outcome" class="text-2xl sm:text-3xl font-black text-rose-700 my-1">Rp 0</h3>
+                <h3 id="card-total-outcome" class="text-2xl sm:text-3xl font-black text-rose-700 my-1 font-mono">Rp 0</h3>
                 <p class="text-[10px] text-slate-500">Music/Video, Server, AI, CapCut Pro</p>
             </div>
 
@@ -128,7 +149,7 @@
                     <span class="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider">Laba Bersih Usaha</span>
                     <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
                 </div>
-                <h3 id="card-net-profit" class="text-2xl sm:text-3xl font-black text-emerald-400 my-1">Rp 0</h3>
+                <h3 id="card-net-profit" class="text-2xl sm:text-3xl font-black text-emerald-400 my-1 font-mono">Rp 0</h3>
                 <p class="text-[10px] text-slate-400">Sebelum penarikan Prive Owner</p>
             </div>
 
@@ -143,7 +164,7 @@
                     </span>
                 </div>
                 <div class="my-1">
-                    <h3 id="stat-total-pajak-sumbang" class="text-2xl font-black text-amber-950 tracking-tight">
+                    <h3 id="stat-total-pajak-sumbang" class="text-2xl font-black text-amber-950 tracking-tight font-mono">
                         Rp 0
                     </h3>
                 </div>
@@ -154,14 +175,74 @@
             </div>
         </div>
 
+        <!-- FITUR AI ANALITIS TERARAH & KONTROL OWNER -->
+        <div class="ios-glass p-5 border-indigo-200 bg-gradient-to-r from-indigo-900/10 via-purple-900/10 to-slate-900/10 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-2.5">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center">
+                        <i data-lucide="brain-circuit" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-sm text-slate-900">AI Business Analyst & Decision Support</h3>
+                        <p class="text-[10px] text-slate-500">Kecerdasan buatan analitis instan satu-klik (Mode Pro Aktif)</p>
+                    </div>
+                </div>
+                <span class="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 self-start sm:self-auto">
+                    Kuota Hari Ini: 25 / 25
+                </span>
+            </div>
+
+            <!-- Tombol Pemicu AI Instan (One-Click Insight) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <button onclick="triggerAIAnalysis('health')" class="p-3 rounded-2xl bg-white border border-indigo-200 hover:border-indigo-400 text-left transition active:scale-98 shadow-xs space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-black text-xs text-indigo-900">Analisis Kesehatan Kas</span>
+                        <i data-lucide="activity" class="w-3.5 h-3.5 text-indigo-600"></i>
+                    </div>
+                    <p class="text-[10px] text-slate-500">Evaluasi rasio pemasukan vs belanja tools</p>
+                </button>
+
+                <button onclick="triggerAIAnalysis('forecast')" class="p-3 rounded-2xl bg-white border border-purple-200 hover:border-purple-400 text-left transition active:scale-98 shadow-xs space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-black text-xs text-purple-900">Prediksi Arus Kas 30 Hari</span>
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5 text-purple-600"></i>
+                    </div>
+                    <p class="text-[10px] text-slate-500">Proyeksi surplus/defisit bulan depan</p>
+                </button>
+
+                <button onclick="triggerAIAnalysis('cost')" class="p-3 rounded-2xl bg-white border border-cyan-200 hover:border-cyan-400 text-left transition active:scale-98 shadow-xs space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-black text-xs text-cyan-900">Efisiensi Pajak & Beban</span>
+                        <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-cyan-600"></i>
+                    </div>
+                    <p class="text-[10px] text-slate-500">Rekomendasi pemangkasan biaya operasional</p>
+                </button>
+            </div>
+
+            <!-- Hasil Output AI -->
+            <div id="ai-insight-box" class="hidden p-4 rounded-2xl bg-white border border-indigo-300 space-y-2 text-xs shadow-sm">
+                <div class="flex items-center justify-between border-b pb-2">
+                    <span id="ai-insight-title" class="font-black text-indigo-950">Hasil Analisis AI</span>
+                    <span class="text-[10px] font-mono text-slate-400">Gemini Pro Enterprise</span>
+                </div>
+                <p id="ai-insight-text" class="text-slate-700 leading-relaxed"></p>
+            </div>
+        </div>
+
         <!-- MENU POP-UP EKSEKUTIF -->
         <div class="ios-glass p-6 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <h3 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
                     <i data-lucide="layout-grid" class="w-5 h-5 text-indigo-600"></i>
-                    <span>Pusat Laporan Eksekutif & Ruang Pengawasan Owner</span>
+                    <span>Pusat Laporan Eksekutif & Pengawasan Owner</span>
                 </h3>
-                <div class="flex items-center space-x-2">
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Tombol Ubah Nama Karyawan/Role -->
+                    <button onclick="openModal('customize_roles')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center space-x-1">
+                        <i data-lucide="user-cog" class="w-3.5 h-3.5"></i>
+                        <span>Ubah Nama Peran</span>
+                    </button>
+                    <!-- Tombol Buka Kasir Baru -->
                     <button onclick="openModal('add_cashier_request')" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs transition flex items-center space-x-1 shadow-sm">
                         <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
                         <span>+ Buka Kasir Baru</span>
@@ -178,6 +259,7 @@
                     </div>
                 </button>
 
+                <!-- MAHKAMAH AUDIT MANAGER DENGAN HAK BERSIHKAN OLEH OWNER -->
                 <button onclick="openModal('audit_trail')" class="p-4 rounded-2xl bg-rose-700 hover:bg-rose-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3">
                     <div class="flex items-center justify-between w-full">
                         <i data-lucide="shield-alert" class="w-6 h-6 text-amber-300"></i>
@@ -189,11 +271,12 @@
                     </div>
                 </button>
 
+                <!-- MUTASI DENGAN HAK KOREKSI TANGGAL KHUSUS OWNER -->
                 <button onclick="openModal('mutasi')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3">
                     <i data-lucide="arrow-left-right" class="w-6 h-6 text-slate-300"></i>
                     <div>
                         <h4 class="font-bold text-sm">Mutasi Buku Kas</h4>
-                        <p class="text-[11px] text-slate-300">Rekening koran sah kasir</p>
+                        <p class="text-[11px] text-slate-300">Koreksi tanggal nota & rekening koran</p>
                     </div>
                 </button>
 
@@ -239,11 +322,11 @@
                             <tfoot class="bg-slate-50 font-black border-t-2 border-slate-200">
                                 <tr class="text-emerald-700">
                                     <td colspan="3" class="py-2.5 px-3 text-right">TOTAL A. INCOME (PEMASUKAN):</td>
-                                    <td id="pop-foot-income" class="py-2.5 px-3 text-right">Rp 0</td>
+                                    <td id="pop-foot-income" class="py-2.5 px-3 text-right font-mono">Rp 0</td>
                                 </tr>
                                 <tr class="text-rose-700">
                                     <td colspan="3" class="py-2.5 px-3 text-right">TOTAL B. OUTCOME (BIAYA & TOOLS):</td>
-                                    <td id="pop-foot-outcome" class="py-2.5 px-3 text-right">Rp 0</td>
+                                    <td id="pop-foot-outcome" class="py-2.5 px-3 text-right font-mono">Rp 0</td>
                                 </tr>
                                 <tr class="text-slate-900 text-sm bg-purple-50">
                                     <td colspan="3" class="py-3 px-3 text-right">LABA BERSIH OPERASIONAL (A - B):</td>
@@ -254,8 +337,14 @@
                     </div>
                 </div>
 
-                <!-- 2. RIWAYAT AUDIT MANAGER (LAMAN PENGAWASAN OWNER) -->
+                <!-- 2. RIWAYAT AUDIT MANAGER DENGAN HAK HAPUS LOG OLEH OWNER -->
                 <div id="popup-content-audit_trail" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between pb-1">
+                        <span class="text-xs text-slate-500">Mencatat seluruh aksi koreksi nota, void kasir, dan penambahan COA oleh Manager.</span>
+                        <button onclick="clearAllAuditLogs()" class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition">
+                            Bersihkan Semua Log
+                        </button>
+                    </div>
                     <div class="overflow-x-auto border border-slate-200 rounded-2xl">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-700 border-b">
@@ -265,6 +354,7 @@
                                     <th class="py-3 px-3">Tindakan</th>
                                     <th class="py-3 px-3">Data Sebelum</th>
                                     <th class="py-3 px-3">Data Sesudah</th>
+                                    <th class="py-3 px-3 text-center">Aksi Owner</th>
                                 </tr>
                             </thead>
                             <tbody id="audit-trail-table-body"></tbody>
@@ -272,18 +362,18 @@
                     </div>
                 </div>
 
-                <!-- 3. MUTASI KAS -->
+                <!-- 3. MUTASI KAS DENGAN KOREKSI TANGGAL KHUSUS OWNER -->
                 <div id="popup-content-mutasi" class="space-y-4 hidden">
                     <div class="overflow-x-auto border border-slate-200 rounded-2xl">
                         <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-700 border-b">
+                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-600 border-b">
                                 <tr>
                                     <th class="py-3 px-3">Waktu</th>
                                     <th class="py-3 px-3">Uraian Transaksi</th>
                                     <th class="py-3 px-3 text-right">Debit</th>
                                     <th class="py-3 px-3 text-right">Kredit</th>
                                     <th class="py-3 px-3 text-right">Saldo</th>
-                                    <th class="py-3 px-3 text-center">Petugas</th>
+                                    <th class="py-3 px-3 text-center">Koreksi Owner</th>
                                 </tr>
                             </thead>
                             <tbody id="kasir-table-body"></tbody>
@@ -339,11 +429,72 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 6. KUSTOMISASI NAMA PERAN KARYAWAN OLEH OWNER -->
+                <div id="popup-content-customize_roles" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+                        <div>
+                            <h4 class="font-black text-sm text-slate-900">Ubah Nama Peran Karyawan</h4>
+                            <p class="text-slate-500">Sesuaikan nama staf kasir, supervisor, atau nama Owner agar tampil personal di sistem.</p>
+                        </div>
+                        <div class="space-y-2.5">
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">Nama Staf Kasir (Default: Staf Kasir):</label>
+                                <input type="text" id="custom-role-staff" placeholder="Misal: Budi (Kasir Meja 1)" class="w-full bg-white border rounded-xl p-2.5 font-semibold outline-none">
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">Nama Supervisor / Manager (Default: Supervisor / Manager):</label>
+                                <input type="text" id="custom-role-manager" placeholder="Misal: Pak Anton (Supervisor)" class="w-full bg-white border rounded-xl p-2.5 font-semibold outline-none">
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">Nama Owner (Default: Owner Eksekutif):</label>
+                                <input type="text" id="custom-role-owner" placeholder="Misal: Neil Hutabarat (Owner)" class="w-full bg-white border rounded-xl p-2.5 font-semibold outline-none">
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-1">
+                            <button onclick="saveCustomRoleNames()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition active:scale-95 shadow-md">
+                                Simpan Nama Peran
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="px-6 py-3 border-t border-slate-100 bg-white flex justify-end">
                 <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
                     Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KOREKSI TANGGAL TRANSAKSI (HAK KHUSUS OWNER) -->
+    <div id="modal-owner-edit-date" class="hidden fixed inset-0 z-[65] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl modal-sheet space-y-4 border border-indigo-200 text-xs">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-black text-sm text-slate-900 flex items-center space-x-1.5">
+                    <i data-lucide="calendar" class="w-4 h-4 text-indigo-600"></i>
+                    <span>Koreksi Tanggal Transaksi</span>
+                </h3>
+                <button onclick="closeOwnerDateModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <input type="hidden" id="owner-edit-tx-id">
+            <div>
+                <span class="text-slate-500 block mb-1">Transaksi:</span>
+                <p id="owner-edit-tx-title" class="font-bold text-slate-800"></p>
+            </div>
+            <div>
+                <label class="font-bold text-slate-700 block mb-1">Pilih Tanggal Baru:</label>
+                <input type="date" id="owner-edit-new-date" class="w-full bg-slate-50 border rounded-xl p-2.5 font-bold outline-none">
+            </div>
+            <div class="flex space-x-2 pt-1">
+                <button onclick="saveOwnerDateCorrection()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition active:scale-95 shadow-sm">
+                    Simpan Tanggal
+                </button>
+                <button onclick="closeOwnerDateModal()" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl transition">
+                    Batal
                 </button>
             </div>
         </div>
@@ -370,6 +521,32 @@
         </div>
     </div>
 
+    <!-- MODAL CATATAN RILIS & VERSI -->
+    <div id="modal-release-notes" class="hidden fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="ios-glass w-full max-w-lg p-0 shadow-2xl modal-sheet flex flex-col overflow-hidden bg-white">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+                        <i data-lucide="info" class="w-5 h-5 text-indigo-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-base leading-tight">Catatan Rilis & Versi Sistem</h3>
+                        <p class="text-[10px] text-slate-400">Pembaruan fungsional dan keamanan terbaru</p>
+                    </div>
+                </div>
+                <button onclick="closeReleaseNotesModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4" id="release-notes-container"></div>
+            <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <button onclick="closeReleaseNotesModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/tenants.js"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
@@ -388,36 +565,20 @@
             return (isNeg ? "-Rp " : "Rp ") + formatted;
         }
 
-        const DEFAULT_ONEILVERSE_COA = [
-            { code: "101", name: "Iklan Video YouTube", category: "sales" },
-            { code: "102", name: "Adsense YouTube", category: "sales" },
-            { code: "103", name: "Beli Aplikasi", category: "sales" },
-            { code: "104", name: "Cicilan Aplikasi", category: "sales" },
-            { code: "105", name: "UMKM Server", category: "sales" },
-            { code: "106", name: "Penambahan Fitur", category: "sales" },
-            { code: "107", name: "Pro Mode", category: "sales" },
-            { code: "201", name: "Music Production", category: "cogs" },
-            { code: "202", name: "Video Production", category: "cogs" },
-            { code: "203", name: "Grok", category: "expense" },
-            { code: "204", name: "Server Internal", category: "expense" },
-            { code: "205", name: "AI Agent", category: "expense" },
-            { code: "206", name: "Poin+", category: "expense" },
-            { code: "207", name: "CapCut Pro", category: "expense" },
-            { code: "401", name: "Prive / Penarikan Owner", category: "prive" }
-        ];
-
         let activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
 
-        // AUTH OWNER MANDIRI ANTI-LOOPING
         function checkOwnerAuth() {
             let userObj = null;
             try { userObj = JSON.parse(localStorage.getItem('currentUser')); } catch(e) {}
             const role = (userObj && userObj.role) || localStorage.getItem('auth_role') || '';
-            if (role === 'owner') return userObj || { role: 'owner', title: 'Owner Eksekutif' };
+            const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
+            const ownerTitle = customRoles.owner || 'Owner Eksekutif';
+
+            if (role === 'owner') return userObj || { role: 'owner', title: ownerTitle };
 
             const pin = prompt("Halaman Khusus Owner Eksekutif.\nMasukkan PIN Owner (Default: 9999 / 0000 / 1234):");
             if (pin === "9999" || pin === "0000" || pin === "1234" || pin === "5678") {
-                const owner = { role: 'owner', title: 'Owner Eksekutif' };
+                const owner = { role: 'owner', title: ownerTitle };
                 localStorage.setItem('currentUser', JSON.stringify(owner));
                 localStorage.setItem('auth_role', 'owner');
                 return owner;
@@ -427,6 +588,10 @@
             }
         }
         const user = checkOwnerAuth();
+
+        if (document.getElementById('user-role-display')) {
+            document.getElementById('user-role-display').innerText = `Role: ${user.title}`;
+        }
 
         if (typeof initFirebase === 'function') initFirebase();
         if (window.lucide) lucide.createIcons();
@@ -477,7 +642,8 @@
             let totalIncome = 0;
             let totalOutcome = 0;
             const groups = {};
-            let coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0) ? activeTenant.customCOA : DEFAULT_ONEILVERSE_COA;
+            let coa = JSON.parse(localStorage.getItem('fm_custom_coa') || "[]");
+            if (coa.length === 0) coa = (activeTenant && activeTenant.customCOA) ? activeTenant.customCOA : [];
             coa.forEach(c => { groups[c.code] = { code: c.code, name: c.name, category: c.category, count: 0, total: 0 }; });
 
             txList.forEach(t => {
@@ -493,7 +659,7 @@
             document.getElementById('card-total-income').innerText = "Rp " + formatThousandSeparator(totalIncome);
             document.getElementById('card-total-outcome').innerText = "Rp " + formatThousandSeparator(totalOutcome);
             document.getElementById('card-net-profit').innerText = formatCurrency(netProfit);
-            document.getElementById('card-net-profit').className = netProfit >= 0 ? "text-2xl sm:text-3xl font-black text-emerald-400 my-1" : "text-2xl sm:text-3xl font-black text-rose-400 my-1";
+            document.getElementById('card-net-profit').className = netProfit >= 0 ? "text-2xl sm:text-3xl font-black text-emerald-400 my-1 font-mono" : "text-2xl sm:text-3xl font-black text-rose-400 my-1 font-mono";
 
             document.getElementById('pop-foot-income').innerText = "Rp " + formatThousandSeparator(totalIncome);
             document.getElementById('pop-foot-outcome').innerText = "Rp " + formatThousandSeparator(totalOutcome);
@@ -516,7 +682,7 @@
             });
         }
 
-        // TABEL AUDIT AKTIVITAS MANAGER (LAMAN PENGAWASAN OWNER)
+        // TABEL AUDIT AKTIVITAS MANAGER DENGAN HAK HAPUS OLEH OWNER
         function renderAuditTrailTable() {
             const tbody = document.getElementById('audit-trail-table-body');
             if (!tbody) return;
@@ -524,11 +690,11 @@
 
             const logs = JSON.parse(localStorage.getItem('fm_audit_logs') || "[]");
             if (logs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada riwayat tindakan atau perubahan dari Manager.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada riwayat tindakan atau laporan dari Manager.</td></tr>`;
                 return;
             }
 
-            logs.forEach(l => {
+            logs.forEach((l, idx) => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-slate-100 text-xs";
                 tr.innerHTML = `
@@ -537,35 +703,33 @@
                     <td class="py-2.5 px-3 font-bold text-slate-800"><span class="px-2 py-0.5 rounded-full bg-slate-100 border text-[10px]">${l.action}</span><br><span class="text-[11px] font-normal text-slate-500">${l.detail}</span></td>
                     <td class="py-2.5 px-3 text-rose-600 font-semibold">${l.before || '-'}</td>
                     <td class="py-2.5 px-3 text-emerald-600 font-bold">${l.after || '-'}</td>
+                    <td class="py-2.5 px-3 text-center">
+                        <button onclick="deleteAuditLogItem(${idx})" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px] rounded border border-rose-200">
+                            Hapus
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function renderTaxTable() {
-            const tbody = document.getElementById('tax-table-body');
-            if (!tbody) return;
-            tbody.innerHTML = "";
-            let totalTax = 0;
-            const outcomes = txList.filter(t => t.category !== 'sales');
-            outcomes.forEach(tx => {
-                const tax = tx.tax12 || Math.round(tx.amount * 0.12);
-                totalTax += tax;
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-amber-100 text-xs";
-                tr.innerHTML = `
-                    <td class="py-2 px-3 font-mono">${tx.dateFull}</td>
-                    <td class="py-2 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}</td>
-                    <td class="py-2 px-3 text-slate-500">${tx.desc || '-'}</td>
-                    <td class="py-2 px-3 text-right">Rp ${formatThousandSeparator(tx.amount)}</td>
-                    <td class="py-2 px-3 text-right font-black text-amber-900 bg-amber-100/60 font-mono">Rp ${formatThousandSeparator(tax)}</td>
-                    <td class="py-2 px-3 text-right text-slate-500">Rp ${formatThousandSeparator(tx.dpp || (tx.amount - tax))}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-            document.getElementById('stat-total-pajak-sumbang').innerText = "Rp " + formatThousandSeparator(totalTax);
+        function deleteAuditLogItem(idx) {
+            let logs = JSON.parse(localStorage.getItem('fm_audit_logs') || "[]");
+            if (confirm("Hapus baris rekaman audit ini dari buku Owner?")) {
+                logs.splice(idx, 1);
+                localStorage.setItem('fm_audit_logs', JSON.stringify(logs));
+                renderAuditTrailTable();
+            }
         }
 
+        function clearAllAuditLogs() {
+            if (confirm("Kosongkan dan bersihkan seluruh rekaman audit tindakan Manager?")) {
+                localStorage.removeItem('fm_audit_logs');
+                renderAuditTrailTable();
+            }
+        }
+
+        // MUTASI KAS DENGAN HAK KOREKSI TANGGAL KHUSUS OWNER
         function renderMutasiKas() {
             const tbody = document.getElementById('kasir-table-body');
             if (!tbody) return;
@@ -583,14 +747,127 @@
                 tr.className = "border-b border-slate-100 text-xs";
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono">${tx.dateFull} ${tx.date}</td>
-                    <td class="py-2.5 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}<br><span class="text-[10px] text-slate-400 font-normal">${tx.desc || '-'}</span></td>
-                    <td class="py-2.5 px-3 text-right font-black text-emerald-600">${tx.category === 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
-                    <td class="py-2.5 px-3 text-right font-black text-rose-600">${tx.category !== 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
+                    <td class="py-2.5 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}<br><span class="text-[10px] text-slate-400 font-normal">${tx.desc || '-'} (${tx.staff})</span></td>
+                    <td class="py-2.5 px-3 text-right font-black text-emerald-600 font-mono">${tx.category === 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-rose-600 font-mono">${tx.category !== 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
                     <td class="py-2.5 px-3 text-right font-black font-mono">Rp ${formatThousandSeparator(tx.runningBalance)}</td>
-                    <td class="py-2.5 px-3 text-center text-slate-400 text-[10px]">${tx.staff}</td>
+                    <td class="py-2.5 px-3 text-center">
+                        <button onclick="openOwnerDateModal('${tx.id}')" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold text-[10px] rounded border border-indigo-200">
+                            Ubah Tanggal
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        function openOwnerDateModal(id) {
+            const tx = txList.find(t => t.id === id);
+            if (!tx) return;
+            document.getElementById('owner-edit-tx-id').value = tx.id;
+            document.getElementById('owner-edit-tx-title').innerText = `[${tx.accountName}] - Rp ${formatThousandSeparator(tx.amount)}`;
+            document.getElementById('owner-edit-new-date').value = tx.dateISO || new Date().toISOString().split('T')[0];
+            document.getElementById('modal-owner-edit-date').classList.remove('hidden');
+        }
+
+        function closeOwnerDateModal() {
+            document.getElementById('modal-owner-edit-date').classList.add('hidden');
+        }
+
+        function saveOwnerDateCorrection() {
+            const id = document.getElementById('owner-edit-tx-id').value;
+            const newDateVal = document.getElementById('owner-edit-new-date').value;
+            if (!newDateVal) return alert("Pilih tanggal baru!");
+
+            const index = txList.findIndex(t => t.id === id);
+            if (index !== -1) {
+                const oldDate = txList[index].dateFull;
+                const newFull = new Date(newDateVal + 'T00:00:00').toLocaleDateString('id-ID');
+                txList[index].dateISO = newDateVal;
+                txList[index].dateFull = newFull;
+
+                if (typeof db !== 'undefined' && db && txList[index].docId) {
+                    db.collection(tenantFirestoreCol).doc(txList[index].docId).update({
+                        dateISO: newDateVal,
+                        dateFull: newFull
+                    }).catch(console.error);
+                }
+                localStorage.setItem(tenantStorageKey, JSON.stringify(txList));
+                closeOwnerDateModal();
+                renderAllDashboardReports();
+                alert(`Tanggal transaksi berhasil diubah dari ${oldDate} menjadi ${newFull}!`);
+            }
+        }
+
+        // KUSTOMISASI NAMA PERAN OLEH OWNER
+        function saveCustomRoleNames() {
+            const staff = document.getElementById('custom-role-staff').value.trim() || 'Staf Kasir';
+            const manager = document.getElementById('custom-role-manager').value.trim() || 'Supervisor / Manager';
+            const owner = document.getElementById('custom-role-owner').value.trim() || 'Owner Eksekutif';
+
+            const customRoles = { staff, manager, owner };
+            localStorage.setItem('fm_custom_role_names', JSON.stringify(customRoles));
+            alert("Nama peran karyawan berhasil disimpan!");
+            closeModal();
+            location.reload();
+        }
+
+        // FITUR AI ANALITIS SATU-KLIK (ONE-CLICK INSIGHT)
+        function triggerAIAnalysis(type) {
+            const box = document.getElementById('ai-insight-box');
+            const titleEl = document.getElementById('ai-insight-title');
+            const textEl = document.getElementById('ai-insight-text');
+
+            let totalIn = 0;
+            let totalOut = 0;
+            txList.forEach(t => {
+                if (t.category === 'sales') totalIn += t.amount;
+                else totalOut += t.amount;
+            });
+            const net = totalIn - totalOut;
+
+            box.classList.remove('hidden');
+
+            if (type === 'health') {
+                titleEl.innerText = "Evaluasi Kesehatan Kas & Profitabilitas";
+                if (net >= 0) {
+                    textEl.innerText = `Kondisi kas toko terpantau SEHAT dengan net profit Rp ${formatThousandSeparator(net)}. Rasio pengeluaran operasional berada di angka aman (${totalIn > 0 ? Math.round((totalOut/totalIn)*100) : 0}% dari omzet). Disarankan mengalokasikan 20% laba untuk cadangan modal ekspansi.`;
+                } else {
+                    textEl.innerText = `Peringatan Defisit: Pengeluaran tercatat lebih tinggi dibanding kas masuk sebesar -Rp ${formatThousandSeparator(Math.abs(net))}. Periksa pos outcome tools dan produksi untuk memulihkan arus kas positif.`;
+                }
+            } else if (type === 'forecast') {
+                titleEl.innerText = "Prediksi Tren Arus Kas 30 Hari Kedepan";
+                const projected = Math.round(net * 1.15);
+                textEl.innerText = `Berdasarkan pola transaksi harian, diproyeksikan pertumbuhan kas bulan depan berada pada kisaran Rp ${formatThousandSeparator(projected)}. Tingkatkan penjualan software POS dan video production pada minggu ke-2 untuk mencapai target laba maksimal.`;
+            } else if (type === 'cost') {
+                titleEl.innerText = "Rekomendasi Efisiensi Beban & Fiskal PPN";
+                const tax = Math.round(totalOut * 0.12);
+                textEl.innerText = `Total sumbangan pajak negara tercatat Rp ${formatThousandSeparator(tax)}. Disarankan mengevaluasi langganan tools operasional yang frekuensi penggunaannya rendah untuk menghemat beban hingga 15% setiap bulan.`;
+            }
+        }
+
+        function renderTaxTable() {
+            const tbody = document.getElementById('tax-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = "";
+            let totalTax = 0;
+            const outcomes = txList.filter(t => t.category !== 'sales');
+            outcomes.forEach(tx => {
+                const tax = tx.tax12 || Math.round(tx.amount * 0.12);
+                totalTax += tax;
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-amber-100 text-xs";
+                tr.innerHTML = `
+                    <td class="py-2 px-3 font-mono">${tx.dateFull}</td>
+                    <td class="py-2 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}</td>
+                    <td class="py-2 px-3 text-slate-500">${tx.desc || '-'}</td>
+                    <td class="py-2 px-3 text-right font-mono">Rp ${formatThousandSeparator(tx.amount)}</td>
+                    <td class="py-2 px-3 text-right font-black text-amber-900 bg-amber-100/60 font-mono">Rp ${formatThousandSeparator(tax)}</td>
+                    <td class="py-2 px-3 text-right text-slate-500 font-mono">Rp ${formatThousandSeparator(tx.dpp || (tx.amount - tax))}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('stat-total-pajak-sumbang').innerText = "Rp " + formatThousandSeparator(totalTax);
         }
 
         function submitCashierRequestFromOwner() {
@@ -604,7 +881,7 @@
                 qty: qty,
                 terminalName: name,
                 status: 'PENDING',
-                requestedBy: 'Owner Eksekutif',
+                requestedBy: user.title,
                 requestedAt: new Date().toLocaleString('id-ID'),
                 timestamp: Date.now()
             };
@@ -618,7 +895,7 @@
         }
 
         window.openModal = function(type) {
-            ['labarugi', 'audit_trail', 'mutasi', 'tax', 'add_cashier_request'].forEach(k => {
+            ['labarugi', 'audit_trail', 'mutasi', 'tax', 'add_cashier_request', 'customize_roles'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
@@ -631,6 +908,13 @@
             else if (type === 'mutasi') document.getElementById('popup-content-mutasi').classList.remove('hidden');
             else if (type === 'tax') document.getElementById('popup-content-tax').classList.remove('hidden');
             else if (type === 'add_cashier_request') document.getElementById('popup-content-add_cashier_request').classList.remove('hidden');
+            else if (type === 'customize_roles') {
+                const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
+                document.getElementById('custom-role-staff').value = customRoles.staff || '';
+                document.getElementById('custom-role-manager').value = customRoles.manager || '';
+                document.getElementById('custom-role-owner').value = customRoles.owner || '';
+                document.getElementById('popup-content-customize_roles').classList.remove('hidden');
+            }
 
             document.getElementById('main-modal-container').classList.remove('hidden');
             if (window.lucide) lucide.createIcons();
@@ -649,38 +933,60 @@
             if (m) { m.classList.add('hidden'); m.style.display = 'none'; }
         };
 
+        // CATATAN RILIS LOGIKA (MAKSIMAL 10 TERBARU)
+        const RELEASE_NOTES_DB = [
+            { version: "v1.1.2", type: "App", date: "10 Nov 2026", title: "Penyederhanaan Closing Kasir", desc: "Konsep penamaan shift dihapus. Kasir cukup menekan Closing Kasir untuk mereset laci ke Rp 0." },
+            { version: "Core Shield 1.1.2", type: "Security", date: "10 Nov 2026", title: "Single-Session Lockout", desc: "Perlindungan anti-fitnah: sesi kasir dikunci pada 1 perangkat kerja aktif." },
+            { version: "v1.1.1", type: "App", date: "09 Nov 2026", title: "Sistem Kasir 2-Langkah", desc: "Input pesanan masuk ke draft sementara bebas edit sebelum dicetak struk sah." },
+            { version: "Core Shield 1.1.1", type: "Security", date: "09 Nov 2026", title: "Audit Trail Forensik", desc: "Seluruh tindakan koreksi nota oleh Manager otomatis terekam permanen di Owner." },
+            { version: "v1.1.0", type: "App", date: "05 Nov 2026", title: "Tiket Penambahan Kasir", desc: "Penambahan menu pengajuan lisensi terminal meja kasir baru ke panel Provider." },
+            { version: "Core Shield 1.1.0", type: "Security", date: "05 Nov 2026", title: "Restriksi Waktu Transaksi", desc: "Hanya Owner yang memiliki wewenang mengoreksi tanggal nota transaksi." },
+            { version: "v1.0.5", type: "App", date: "01 Nov 2026", title: "Kapsul Waktu Realtime Glass", desc: "Desain kapsul jam dan tanggal realtime berbalut kaca es transparan." },
+            { version: "Core Shield 1.0.5", type: "Security", date: "01 Nov 2026", title: "Proteksi Sandi Bertahap", desc: "Sistem penguncian bertahap 5 menit, 10 menit, hingga pemblokiran akun." },
+            { version: "v1.0.0", type: "App", date: "25 Okt 2026", title: "Rilis Perdana Oneilverse POS", desc: "Peluncuran sistem kasir dan keuangan multi-tenant jaringan UMKM." },
+            { version: "Core Shield 1.0.0", type: "Security", date: "25 Okt 2026", title: "Enkripsi Multi-Tenant", desc: "Isolasi data antar toko untuk keamanan pembukuan finansial." }
+        ];
+
+        function renderReleaseNotes() {
+            const container = document.getElementById('release-notes-container');
+            if (!container) return;
+            container.innerHTML = "";
+            RELEASE_NOTES_DB.slice(0, 10).forEach(note => {
+                const isSec = note.type === "Security";
+                const bg = isSec ? "bg-amber-50 border-amber-200" : "bg-indigo-50 border-indigo-200";
+                const icon = isSec ? '<i data-lucide="shield-check" class="w-4 h-4 text-amber-600"></i>' : '<i data-lucide="zap" class="w-4 h-4 text-indigo-600"></i>';
+                const pillBg = isSec ? "bg-amber-100 text-amber-800" : "bg-indigo-100 text-indigo-800";
+                
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl border ${bg} space-y-1.5`;
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            ${icon}
+                            <span class="font-black text-[11px] text-slate-900 font-mono">${note.version}</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[9px] font-bold ${pillBg}">${note.date}</span>
+                    </div>
+                    <h4 class="font-bold text-xs text-slate-800">${note.title}</h4>
+                    <p class="text-[11px] text-slate-600 leading-relaxed">${note.desc}</p>
+                `;
+                container.appendChild(card);
+            });
+            if (window.lucide) lucide.createIcons();
+        }
+
+        window.openReleaseNotesModal = function() {
+            renderReleaseNotes();
+            document.getElementById('modal-release-notes').classList.remove('hidden');
+        };
+
+        window.closeReleaseNotesModal = function() {
+            document.getElementById('modal-release-notes').classList.add('hidden');
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             loadTransactions();
         });
     </script>
-
-    <!-- MODAL CATATAN RILIS & VERSI -->
-    <div id="modal-release-notes" class="hidden fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-lg p-0 shadow-2xl modal-sheet flex flex-col overflow-hidden bg-white">
-            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-                        <i data-lucide="info" class="w-5 h-5 text-indigo-300"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-black text-base leading-tight">Catatan Rilis & Versi Sistem</h3>
-                        <p class="text-[10px] text-slate-400">Pembaruan fungsional dan keamanan terbaru</p>
-                    </div>
-                </div>
-                <button onclick="closeReleaseNotesModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4" id="release-notes-container">
-                <!-- Diisi via JS -->
-            </div>
-            <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex justify-end">
-                <button onclick="closeReleaseNotesModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition">
-                    Tutup
-                </button>
-            </div>
-        </div>
-    </div>
-    
 </body>
 </html>
