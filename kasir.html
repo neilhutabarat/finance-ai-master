@@ -616,6 +616,22 @@
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
     <script>
+
+        // FORMATTER AMAN (MENDUKUNG ANGKA NEGATIF / MINUS)
+        function formatThousandSeparator(num) {
+            const n = Number(num) || 0;
+            const isNeg = n < 0;
+            const formatted = new Intl.NumberFormat('id-ID').format(Math.abs(n));
+            return (isNeg ? "-" : "") + formatted;
+        }
+
+        function formatCurrency(num) {
+            const n = Number(num) || 0;
+            const isNeg = n < 0;
+            const formatted = new Intl.NumberFormat('id-ID').format(Math.abs(n));
+            return (isNeg ? "-Rp " : "Rp ") + formatted;
+        }
+
         // DAFTAR DEFAULT COA ONEILVERSE (FALLBACK LANGSUNG AGAR TIDAK KOSONG)
         const DEFAULT_ONEILVERSE_COA = [
             { code: "101", name: "Iklan Video YouTube", category: "sales" },
@@ -1228,7 +1244,13 @@
             });
 
             const netShift = shiftIn - shiftOut;
-            document.getElementById('shift-live-balance').innerText = "Rp " + formatThousandSeparator(netShift);
+            const liveEl = document.getElementById('shift-live-balance');
+            liveEl.innerText = formatCurrency(netShift);
+            if (netShift < 0) {
+                liveEl.className = "text-3xl sm:text-4xl font-black text-rose-600 tracking-tight";
+            } else {
+                liveEl.className = "text-3xl sm:text-4xl font-black text-slate-900 tracking-tight";
+            }
             document.getElementById('shift-in-stat').innerText = "Rp " + formatThousandSeparator(shiftIn);
             document.getElementById('shift-out-stat').innerText = "Rp " + formatThousandSeparator(shiftOut);
         }
@@ -1293,9 +1315,16 @@
                 tbody.appendChild(tr);
             });
 
+            const netKumulatif = totalIn - totalOut;
             document.getElementById('kas-total-in').innerText = "Rp " + formatThousandSeparator(totalIn);
             document.getElementById('kas-total-out').innerText = "Rp " + formatThousandSeparator(totalOut);
-            document.getElementById('kas-net').innerText = "Rp " + formatThousandSeparator(totalIn - totalOut);
+            const netEl = document.getElementById('kas-net');
+            netEl.innerText = formatCurrency(netKumulatif);
+            if (netKumulatif < 0) {
+                netEl.className = "text-sm sm:text-xl font-black text-rose-400";
+            } else {
+                netEl.className = "text-sm sm:text-xl font-black text-emerald-400";
+            }
             if (window.lucide) lucide.createIcons();
         }
 
