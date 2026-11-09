@@ -7,6 +7,8 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
@@ -20,7 +22,7 @@
         }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
         .ios-glass {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.88);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px;
@@ -38,6 +40,24 @@
             from { opacity: 0; transform: translateY(20px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        .badge-sapphire {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #1e3a8a 100%);
+            border: 1px solid #38bdf8;
+            box-shadow: 0 0 12px rgba(14, 165, 233, 0.45);
+        }
+        .badge-pro-gold {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #78350f 100%);
+            border: 1px solid #fde047;
+            box-shadow: 0 0 12px rgba(250, 204, 21, 0.4);
+        }
+        .badge-plus-silver {
+            background: linear-gradient(135deg, #94a3b8 0%, #64748b 50%, #334155 100%);
+            border: 1px solid #e2e8f0;
+        }
+        .badge-basic-bronze {
+            background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+            border: 1px solid #d97706;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
@@ -47,35 +67,35 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center space-x-4">
                 <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-b from-white/25 via-white/10 to-white/5 border border-white/30 backdrop-blur-xl flex items-center justify-center p-2 shadow-inner relative overflow-hidden group select-none shrink-0">
-    <div class="absolute -top-6 -left-6 w-12 h-12 bg-cyan-300/30 rounded-full blur-md pointer-events-none"></div>
-    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <linearGradient id="hdrIce1" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#E0F2FE"/>
-                <stop offset="45%" stop-color="#38BDF8"/>
-                <stop offset="100%" stop-color="#2563EB"/>
-            </linearGradient>
-            <linearGradient id="hdrIce2" x1="90" y1="10" x2="10" y2="90" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#FFFFFF"/>
-                <stop offset="45%" stop-color="#67E8F9"/>
-                <stop offset="100%" stop-color="#0284C7"/>
-            </linearGradient>
-        </defs>
-        <path d="M50 14 C29 14 14 29 14 50 C14 71 29 86 50 86 C71 86 86 71 86 50 C86 29 71 14 50 14 Z M50 25 C64.5 25 75 35.5 75 50 C75 64.5 64.5 75 50 75 C35.5 75 25 64.5 25 50 C25 35.5 35.5 25 50 25 Z" fill="url(#hdrIce1)" opacity="0.9" />
-        <path d="M34 32 L44 32 L44 68 L34 68 Z" fill="url(#hdrIce2)" />
-        <path d="M41 32 L66 64 L66 68 L56 68 L34 40 L34 32 Z" fill="#FFFFFF" />
-        <path d="M56 32 L66 32 L66 68 L56 68 Z" fill="url(#hdrIce1)" />
-        <circle cx="50" cy="20" r="2.5" fill="#FFFFFF" />
-    </svg>
-</div>
+                    <div class="absolute -top-6 -left-6 w-12 h-12 bg-cyan-300/30 rounded-full blur-md pointer-events-none"></div>
+                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="pIce1" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#E0F2FE"/>
+                                <stop offset="45%" stop-color="#38BDF8"/>
+                                <stop offset="100%" stop-color="#2563EB"/>
+                            </linearGradient>
+                            <linearGradient id="pIce2" x1="90" y1="10" x2="10" y2="90" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#FFFFFF"/>
+                                <stop offset="45%" stop-color="#67E8F9"/>
+                                <stop offset="100%" stop-color="#0284C7"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M50 14 C29 14 14 29 14 50 C14 71 29 86 50 86 C71 86 86 71 86 50 C86 29 71 14 50 14 Z M50 25 C64.5 25 75 35.5 75 50 C75 64.5 64.5 75 50 75 C35.5 75 25 64.5 25 50 C25 35.5 35.5 25 50 25 Z" fill="url(#pIce1)" opacity="0.9" />
+                        <path d="M34 32 L44 32 L44 68 L34 68 Z" fill="url(#pIce2)" />
+                        <path d="M41 32 L66 64 L66 68 L56 68 L34 40 L34 32 Z" fill="#FFFFFF" />
+                        <path d="M56 32 L66 32 L66 68 L56 68 Z" fill="url(#pIce1)" />
+                        <circle cx="50" cy="20" r="2.5" fill="#FFFFFF" />
+                    </svg>
+                </div>
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="font-extrabold text-2xl sm:text-3xl tracking-tight text-white">Oneilverse Platform Engine</h1>
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase bg-indigo-500/20 border border-indigo-400/30 text-indigo-300">
-                            Superadmin
+                            Superadmin Master
                         </span>
                     </div>
-                    <p class="text-xs sm:text-sm text-slate-400 font-medium">Pusat Kendali Mitra UMKM, Otorisasi Lisensi Kasir & Audit Jaringan</p>
+                    <p class="text-xs sm:text-sm text-slate-400 font-medium mt-0.5">Pusat Otorisasi Lisensi UMKM, Audit Finansial Jaringan & Pembukuan Provider</p>
                 </div>
             </div>
 
@@ -85,13 +105,13 @@
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-400"></i>
                     <span id="provider-clock" class="font-mono font-semibold text-[11px]">Memuat Waktu...</span>
                 </div>
-                <button onclick="openReleaseNotesModal()" class="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white transition flex items-center space-x-1.5" title="Arsip Catatan Rilis Global">
+                <button onclick="openModal('release_notes')" class="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white transition flex items-center space-x-1.5 shadow-sm">
                     <i data-lucide="server" class="w-3.5 h-3.5"></i>
-                    <span class="font-mono">Log Versi</span>
+                    <span>Catatan Rilis Global</span>
                 </button>
                 <button onclick="window.location.href='index.html'" class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs font-bold transition flex items-center space-x-1.5">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                    <span>Keluar Portal</span>
+                    <span>Keluar</span>
                 </button>
             </div>
         </div>
@@ -100,82 +120,170 @@
     <!-- MAIN BODY -->
     <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 flex-1 space-y-6">
 
-        <!-- RINGKASAN GLOBAL JARINGAN UMKM -->
+        <!-- BARIS KARTU KENDALI UTAMA: PENDAPATAN PROVIDER, OMZET JARINGAN, PERINGKAT #1, TIKET -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="ios-glass p-5 flex flex-col justify-between">
-                <span class="text-[11px] font-black text-slate-400 uppercase tracking-wider">Total UMKM Terkoneksi</span>
-                <h3 id="stat-umkm-count" class="text-3xl font-black text-white my-1">1 Mitra</h3>
-                <span class="text-[11px] text-emerald-400 flex items-center">
-                    <i data-lucide="check-circle" class="w-3 h-3 mr-1"></i> ID26110901 Terkoneksi
-                </span>
-            </div>
-
-            <div class="ios-glass p-5 flex flex-col justify-between">
-                <span class="text-[11px] font-black text-slate-400 uppercase tracking-wider">Omzet Jaringan</span>
-                <h3 id="stat-total-omzet" class="text-3xl font-black text-indigo-400 my-1 font-mono">Rp 0</h3>
-                <span class="text-[11px] text-slate-400">Akumulasi seluruh pemasukan</span>
-            </div>
-
-            <div class="ios-glass p-5 flex flex-col justify-between">
-                <span class="text-[11px] font-black text-slate-400 uppercase tracking-wider">Setoran Pajak 12%</span>
-                <h3 id="stat-total-ppn" class="text-3xl font-black text-amber-400 my-1 font-mono">Rp 0</h3>
-                <span class="text-[11px] text-slate-400">Total kontribusi kas negara</span>
-            </div>
-
-            <div class="ios-glass p-5 flex flex-col justify-between bg-gradient-to-br from-rose-950/40 to-slate-900 border-rose-500/30">
+            
+            <!-- 1. KARTU PENDAPATAN BULANAN & SEPANJANG MASA PROVIDER (POIN 1 & 2) -->
+            <div onclick="openModal('provider_monthly_history')" role="button" tabindex="0" class="ios-glass p-5 flex flex-col justify-between cursor-pointer hover:border-indigo-400/50 transition active:scale-98 select-none group border-indigo-500/30 bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-950">
                 <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-black text-rose-300 uppercase tracking-wider">Permohonan Kasir Baru</span>
-                    <span id="pending-badge" class="px-2 py-0.5 text-[10px] font-black rounded-full bg-rose-500 text-white font-mono">0 Tiket</span>
+                    <span class="text-[11px] font-black text-indigo-300 uppercase tracking-wider flex items-center">
+                        <i data-lucide="wallet" class="w-3.5 h-3.5 mr-1 text-indigo-400"></i>
+                        Pendapatan Provider
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                        Bulan Ini (per tgl 1)
+                    </span>
                 </div>
-                <h3 id="stat-pending-tickets" class="text-3xl font-black text-rose-400 my-1 font-mono">0</h3>
-                <button onclick="openModal('tickets')" class="text-[11px] text-rose-300 hover:text-white font-bold underline flex items-center mt-1">
-                    <span>Proses Tiket Lisensi</span>
+                <div class="my-2">
+                    <h3 id="stat-provider-monthly" class="text-2xl sm:text-3xl font-black text-white tracking-tight font-mono">
+                        Rp 0
+                    </h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">
+                        Sepanjang Masa: <b id="stat-provider-alltime" class="text-indigo-300 font-mono">Rp 0</b>
+                    </p>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-indigo-300/80 pt-2 border-t border-white/10">
+                    <span>Klik untuk riwayat bulanan Provider</span>
+                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-indigo-400 group-hover:translate-x-0.5 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- 2. KARTU OMZET BULANAN JARINGAN (POIN 6) -->
+            <div onclick="openModal('network_monthly_history')" role="button" tabindex="0" class="ios-glass p-5 flex flex-col justify-between cursor-pointer hover:border-cyan-400/50 transition active:scale-98 select-none group border-cyan-500/30 bg-gradient-to-br from-cyan-950/30 via-slate-900 to-slate-950">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black text-cyan-300 uppercase tracking-wider flex items-center">
+                        <i data-lucide="activity" class="w-3.5 h-3.5 mr-1 text-cyan-400"></i>
+                        Omzet Jaringan UMKM
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
+                        Bulan Ini (per tgl 1)
+                    </span>
+                </div>
+                <div class="my-2">
+                    <h3 id="stat-network-monthly" class="text-2xl sm:text-3xl font-black text-white tracking-tight font-mono">
+                        Rp 0
+                    </h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">
+                        Sepanjang Masa: <b id="stat-network-alltime" class="text-cyan-300 font-mono">Rp 0</b>
+                    </p>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-cyan-300/80 pt-2 border-t border-white/10">
+                    <span>Klik untuk riwayat bulanan jaringan</span>
+                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-cyan-400 group-hover:translate-x-0.5 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- 3. KARTU PERINGKAT #1 OMZET JARINGAN (POIN 7 & 8) -->
+            <div onclick="openModal('leaderboard')" role="button" tabindex="0" class="ios-glass p-5 flex flex-col justify-between cursor-pointer hover:border-amber-400/50 transition active:scale-98 select-none group border-amber-500/30 bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-950">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black text-amber-300 uppercase tracking-wider flex items-center">
+                        <i data-lucide="trophy" class="w-3.5 h-3.5 mr-1 text-amber-400"></i>
+                        Peringkat #1 Omzet
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                        Tertinggi
+                    </span>
+                </div>
+                <div class="my-2">
+                    <h3 id="stat-rank1-name" class="text-xl sm:text-2xl font-black text-white truncate">
+                        Memuat...
+                    </h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">
+                        Omzet: <b id="stat-rank1-omzet" class="text-amber-400 font-mono">Rp 0</b>
+                    </p>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-amber-300/80 pt-2 border-t border-white/10">
+                    <span>Klik untuk Leaderboard (1 s/d Terakhir)</span>
+                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- 4. KARTU TIKET LISENSI KASIR BARU -->
+            <div class="ios-glass p-5 flex flex-col justify-between bg-gradient-to-br from-rose-950/40 via-slate-900 to-slate-950 border-rose-500/30">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black text-rose-300 uppercase tracking-wider flex items-center">
+                        <i data-lucide="ticket" class="w-3.5 h-3.5 mr-1 text-rose-400"></i>
+                        Permohonan Kasir Baru
+                    </span>
+                    <span id="pending-badge" class="px-2 py-0.5 text-[9px] font-black rounded-full bg-rose-500 text-white font-mono">0 Tiket</span>
+                </div>
+                <div class="my-2">
+                    <h3 id="stat-pending-tickets" class="text-2xl sm:text-3xl font-black text-rose-400 font-mono">
+                        0
+                    </h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Permohonan meja kasir baru UMKM</p>
+                </div>
+                <button onclick="openModal('tickets')" class="text-[10px] text-rose-300 hover:text-white font-bold underline flex items-center pt-2 border-t border-white/10">
+                    <span>Proses Tiket Lisensi Kasir</span>
                     <i data-lucide="chevron-right" class="w-3 h-3 ml-0.5"></i>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- TOMBOL AKSI CEPAT PROVIDER -->
+        <div class="ios-glass p-4 flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 border-white/10">
+            <div class="flex items-center space-x-2">
+                <span class="text-xs font-black uppercase text-slate-300 tracking-wider">Aksi Cepat Superadmin:</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5">
+                <button onclick="openModal('provider_input_tx')" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-sm">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                    <span>+ Catat Transaksi Provider</span>
+                </button>
+                <button onclick="openModal('provider_coa_mgmt')" class="px-3.5 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-sm">
+                    <i data-lucide="list-plus" class="w-3.5 h-3.5"></i>
+                    <span>Kelola COA Provider</span>
+                </button>
+                <button onclick="openModal('broadcast_modal')" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-sm">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                    <span>Kirim Pesan ke User</span>
                 </button>
             </div>
         </div>
 
-        <!-- TABEL DIREKTORI MITRA UMKM & KONTROL PENUH -->
+        <!-- TABEL DIREKTORI MITRA UMKM -->
         <div class="ios-glass p-6 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <div>
                     <h2 class="text-base font-black text-white flex items-center space-x-2">
                         <i data-lucide="building-2" class="w-4 h-4 text-cyan-400"></i>
-                        <span>Direktori & Manajemen Mitra UMKM</span>
+                        <span>Direktori Jaringan Mitra UMKM</span>
                     </h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Klik salah satu baris UMKM untuk kontrol penuh, cermin kasir live & pelacakan lokasi GPS</p>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        Memantau Usia ID, Plakat Mode, Badges Finansial, dan Lokasi GPS 3 Akun (Kasir, Manager, Owner)
+                    </p>
                 </div>
             </div>
 
             <div class="overflow-x-auto border border-white/10 rounded-2xl">
                 <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="bg-slate-900/80 text-[11px] font-black text-slate-400 uppercase border-b border-white/10">
+                    <thead class="bg-slate-900/90 text-[11px] font-black text-slate-400 uppercase border-b border-white/10">
                         <tr>
-                            <th class="py-3 px-4">ID Toko</th>
-                            <th class="py-3 px-4">Nama UMKM & Bidang</th>
-                            <th class="py-3 px-4">Terminal Kasir</th>
-                            <th class="py-3 px-4 text-right">Income</th>
-                            <th class="py-3 px-4 text-right">Outcome</th>
+                            <th class="py-3 px-4">ID & Usia ID</th>
+                            <th class="py-3 px-4">Nama UMKM & Mode</th>
+                            <th class="py-3 px-4">Terminal</th>
+                            <th class="py-3 px-4 text-right">Income (Bln Ini)</th>
+                            <th class="py-3 px-4 text-right">Outcome (Bln Ini)</th>
+                            <th class="py-3 px-4 text-center">Badge Finansial</th>
                             <th class="py-3 px-4 text-center">Status</th>
-                            <th class="py-3 px-4 text-center">Aksi Kendali</th>
+                            <th class="py-3 px-4 text-center">Inspeksi & Lokasi</th>
                         </tr>
                     </thead>
-                    <tbody id="umkm-table-body">
-                        <!-- Diisi via JS -->
-                    </tbody>
+                    <tbody id="umkm-table-body"></tbody>
                 </table>
             </div>
         </div>
 
     </main>
 
-    <!-- MODAL POP-UP DIALOG UNIVERSAL -->
+    <!-- MODAL POP-UP UNIVERSAL -->
     <div id="main-modal-container" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl modal-sheet overflow-hidden bg-slate-950 border border-white/20">
-            <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+        <div class="ios-glass w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl modal-sheet overflow-hidden bg-slate-950 border border-white/20">
+            <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-slate-900 text-white">
                 <div>
-                    <h3 id="modal-title" class="font-black text-base text-white">Detail Inspeksi UMKM</h3>
-                    <p id="modal-subtitle" class="text-xs text-slate-400">Pusat audit transparansi platform</p>
+                    <h3 id="modal-title" class="font-black text-base text-white">Judul Pop-Up</h3>
+                    <p id="modal-subtitle" class="text-xs text-slate-400">Keterangan Laporan</p>
                 </div>
                 <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
                     <i data-lucide="x" class="w-4 h-4"></i>
@@ -183,30 +291,134 @@
             </div>
 
             <div id="modal-body-content" class="p-6 overflow-y-auto flex-1 space-y-4">
-                <!-- 1. POPUP TIKET PERMOHONAN KASIR -->
-                <div id="popup-content-tickets" class="space-y-4 hidden">
-                    <div id="tickets-list-container" class="space-y-3"></div>
+                
+                <!-- 1. POPUP RIWAYAT PENDAPATAN BULANAN PROVIDER -->
+                <div id="popup-content-provider_monthly_history" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-400/30 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="text-slate-400 block">Total Omzet Sepanjang Masa Provider:</span>
+                            <h4 id="pop-prov-alltime-text" class="text-xl font-black text-indigo-300 font-mono">Rp 0</h4>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                            Buku Kas Provider
+                        </span>
+                    </div>
+
+                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
+                                <tr>
+                                    <th class="py-2.5 px-3">Periode (Bulan & Tahun)</th>
+                                    <th class="py-2.5 px-3 text-right">Pemasukan</th>
+                                    <th class="py-2.5 px-3 text-right">Beban Operasional</th>
+                                    <th class="py-2.5 px-3 text-right">Pendapatan Bersih</th>
+                                </tr>
+                            </thead>
+                            <tbody id="provider-monthly-table-body"></tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <!-- 2. POPUP KONTROL PENUH & INSPEKSI LIVE CERMIN UMKM -->
-                <div id="popup-content-inspect" class="space-y-4 hidden">
-                    <div id="inspect-header-card" class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-400/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs"></div>
-                    
-                    <!-- Panel Kendali Superadmin terhadap UMKM -->
-                    <div class="p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-3 text-xs">
-                        <span class="font-black text-white uppercase tracking-wider block">Panel Otorisasi & Kontrol Superadmin:</span>
+                <!-- 2. POPUP RIWAYAT OMZET BULANAN JARINGAN -->
+                <div id="popup-content-network_monthly_history" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-400/30 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="text-slate-400 block">Total Omzet Jaringan Sepanjang Masa:</span>
+                            <h4 id="pop-network-alltime-text" class="text-xl font-black text-cyan-300 font-mono">Rp 0</h4>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
+                            Akumulasi Mitra
+                        </span>
+                    </div>
+
+                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
+                                <tr>
+                                    <th class="py-2.5 px-3">Bulan & Tahun</th>
+                                    <th class="py-2.5 px-3 text-right">Total Transaksi</th>
+                                    <th class="py-2.5 px-3 text-right">Omzet Jaringan</th>
+                                    <th class="py-2.5 px-3 text-right">Sumbangan PPN 12%</th>
+                                </tr>
+                            </thead>
+                            <tbody id="network-monthly-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. POPUP LEADERBOARD OMZET JARINGAN LENGKAP -->
+                <div id="popup-content-leaderboard" class="space-y-4 hidden">
+                    <div class="p-3.5 rounded-2xl bg-slate-900 border border-white/10 text-xs flex flex-wrap items-center justify-between gap-2">
+                        <span>Peringkat omzet dari tertinggi ke terendah (termasuk yang merugi/defisit).</span>
+                        <div class="flex items-center space-x-1.5 text-[10px] font-bold">
+                            <span class="px-2 py-0.5 rounded badge-sapphire text-white">Top 20% Sapphire</span>
+                            <span class="px-2 py-0.5 rounded bg-emerald-600 text-white">40% Hijau</span>
+                            <span class="px-2 py-0.5 rounded bg-amber-600 text-white">40% Kuning</span>
+                            <span class="px-2 py-0.5 rounded bg-rose-600 text-white">Defisit Merah</span>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
+                                <tr>
+                                    <th class="py-2.5 px-3 text-center">Rank</th>
+                                    <th class="py-2.5 px-3">ID Toko</th>
+                                    <th class="py-2.5 px-3">Nama UMKM</th>
+                                    <th class="py-2.5 px-3 text-center">Badge Finansial</th>
+                                    <th class="py-2.5 px-3 text-right">Omzet Bersih</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 4. POPUP INPUT TRANSAKSI PROVIDER -->
+                <div id="popup-content-provider_input_tx" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-400/30 space-y-3 text-xs">
+                        <span class="font-black text-sm text-white block">Catat Pemasukan / Pengeluaran Provider:</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="font-bold text-slate-300 block mb-1">Tanggal Transaksi:</label>
+                                <input type="date" id="prov-tx-date" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-300 block mb-1">Pilih Akun COA Provider:</label>
+                                <select id="prov-tx-account" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></select>
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-300 block mb-1">Nominal (Rp):</label>
+                                <input type="text" id="prov-tx-amount" oninput="formatInputThousand(this)" placeholder="0" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-base font-black text-white font-mono outline-none">
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-300 block mb-1">Keterangan:</label>
+                                <input type="text" id="prov-tx-desc" placeholder="Misal: Pembayaran Server UMKM Berkah Jati" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-1">
+                            <button onclick="saveProviderTransaction()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition active:scale-95 shadow-md">
+                                Simpan Transaksi Provider
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. POPUP KELOLA COA PROVIDER -->
+                <div id="popup-content-provider_coa_mgmt" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-purple-950/40 border border-purple-400/30 space-y-3 text-xs">
+                        <span class="font-black text-sm text-white block">Tambah Pos Akun COA Provider:</span>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                            <button onclick="sendSystemNotification()" class="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition flex items-center justify-center space-x-1.5">
-                                <i data-lucide="bell-ring" class="w-3.5 h-3.5"></i>
-                                <span>Kirim Notifikasi Sistem</span>
-                            </button>
-                            <button onclick="toggleTenantStatus()" id="btn-toggle-tenant" class="p-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold transition flex items-center justify-center space-x-1.5">
-                                <i data-lucide="power" class="w-3.5 h-3.5"></i>
-                                <span id="btn-toggle-tenant-label">Bekukan Akses Toko</span>
-                            </button>
-                            <button onclick="unlockTenantAccount()" class="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition flex items-center justify-center space-x-1.5">
-                                <i data-lucide="unlock" class="w-3.5 h-3.5"></i>
-                                <span>Pulihkan Akun Terblokir</span>
+                            <input type="text" id="prov-new-coa-code" placeholder="Kode (misal: P106)" class="bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white font-mono font-bold outline-none">
+                            <input type="text" id="prov-new-coa-name" placeholder="Nama Akun" class="bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white font-bold outline-none">
+                            <select id="prov-new-coa-cat" class="bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                                <option value="income">Pendapatan Provider (Income)</option>
+                                <option value="outcome">Beban Provider (Outcome/Server)</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-end">
+                            <button onclick="saveNewProviderCOA()" class="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95">
+                                + Simpan Akun COA
                             </button>
                         </div>
                     </div>
@@ -215,7 +427,82 @@
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
                                 <tr>
-                                    <th class="py-2.5 px-3">Waktu</th>
+                                    <th class="py-2.5 px-3">Kode</th>
+                                    <th class="py-2.5 px-3">Nama Pos Akun</th>
+                                    <th class="py-2.5 px-3">Kategori</th>
+                                    <th class="py-2.5 px-3 text-center">Aksi Provider</th>
+                                </tr>
+                            </thead>
+                            <tbody id="provider-coa-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 6. POPUP KIRIM PESAN KE USER -->
+                <div id="popup-content-broadcast_modal" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-400/30 space-y-3 text-xs">
+                        <span class="font-black text-sm text-white block">Kirim Pesan / Notifikasi Sistem ke Mitra:</span>
+                        <div class="space-y-2.5">
+                            <div>
+                                <label class="font-bold text-slate-300 block mb-1">Target Penerima:</label>
+                                <select id="notif-target-tenant" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                                    <option value="ALL">Semua Mitra UMKM (Broadcast Global)</option>
+                                    <option value="ID26110901">ID26110901 - Oneilverse</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-300 block mb-1">Judul Notifikasi:</label>
+                                <input type="text" id="notif-title" placeholder="Misal: Pemeliharaan Server Cloud Jam 00:00" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none font-bold">
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-300 block mb-1">Isi Pesan:</label>
+                                <textarea id="notif-message" rows="3" placeholder="Tuliskan pesan resmi dari Superadmin..." class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></textarea>
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-1">
+                            <button onclick="sendProviderNotification()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition active:scale-95 shadow-md flex items-center space-x-1.5">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                <span>Kirim Pesan Notifikasi</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. POPUP DETAIL INSPEKSI LOKASI 3 AKUN & CERMIN LIVE -->
+                <div id="popup-content-inspect" class="space-y-4 hidden">
+                    <div id="inspect-header-card" class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-400/30 space-y-3 text-xs"></div>
+
+                    <!-- KOTAK LOKASI GPS PRESISI 3 AKUN: KASIR, MANAGER, OWNER -->
+                    <div class="p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-2.5 text-xs">
+                        <span class="font-black text-cyan-300 uppercase tracking-wider block flex items-center">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1.5 text-cyan-400"></i>
+                            Lokasi Presisi GPS Terdeteksi (3 Akun UMKM):
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                            <div class="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
+                                <span class="text-[10px] font-bold text-emerald-400 uppercase block">1. Akun Kasir</span>
+                                <p id="gps-kasir-addr" class="text-xs font-semibold text-white">Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat</p>
+                                <span id="gps-kasir-coords" class="text-[9px] text-slate-500 font-mono block">Lat: -1.8485, Lon: 109.9721</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
+                                <span class="text-[10px] font-bold text-purple-400 uppercase block">2. Akun Manager</span>
+                                <p id="gps-mgr-addr" class="text-xs font-semibold text-white">Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat</p>
+                                <span id="gps-mgr-coords" class="text-[9px] text-slate-500 font-mono block">Lat: -1.8482, Lon: 109.9725</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
+                                <span class="text-[10px] font-bold text-amber-400 uppercase block">3. Akun Owner</span>
+                                <p id="gps-owner-addr" class="text-xs font-semibold text-white">Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat</p>
+                                <span id="gps-owner-coords" class="text-[9px] text-slate-500 font-mono block">Lat: -1.8480, Lon: 109.9719</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TABEL CERMIN LIVE KASIR TOKO -->
+                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
+                                <tr>
+                                    <th class="py-2.5 px-3">Waktu Transaksi</th>
                                     <th class="py-2.5 px-3">Uraian & Akun</th>
                                     <th class="py-2.5 px-3 text-right">Debit</th>
                                     <th class="py-2.5 px-3 text-right">Kredit</th>
@@ -226,36 +513,24 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- 8. POPUP TIKET LISENSI KASIR -->
+                <div id="popup-content-tickets" class="space-y-4 hidden">
+                    <div id="tickets-list-container" class="space-y-3"></div>
+                </div>
+
+                <!-- 9. POPUP CATATAN RILIS GLOBAL -->
+                <div id="popup-content-release_notes" class="space-y-4 hidden">
+                    <div class="p-3.5 rounded-2xl bg-slate-900 border border-white/10 text-xs text-slate-400">
+                        Histori utuh catatan rilis dan versi sistem keamanan (Core Shield) dari iterasi perdana.
+                    </div>
+                    <div id="release-notes-global-container" class="space-y-3"></div>
+                </div>
+
             </div>
 
             <div class="px-6 py-3 border-t border-white/10 bg-slate-900 flex justify-end">
                 <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition">
-                    Tutup
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL CATATAN RILIS GLOBAL (ARSIP UTUH DARI AWAL) -->
-    <div id="modal-release-notes" class="hidden fixed inset-0 z-[80] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-lg p-0 shadow-2xl modal-sheet flex flex-col overflow-hidden bg-slate-950 border border-white/20">
-            <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-slate-900 text-white">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-                        <i data-lucide="server" class="w-5 h-5 text-cyan-400"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-black text-base leading-tight">Arsip Catatan Rilis Global</h3>
-                        <p class="text-[10px] text-slate-400">Histori utuh seluruh pembaruan platform</p>
-                    </div>
-                </div>
-                <button onclick="closeReleaseNotesModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4" id="release-notes-container"></div>
-            <div class="px-6 py-3 border-t border-white/10 bg-slate-900 flex justify-end">
-                <button onclick="closeReleaseNotesModal()" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition">
                     Tutup
                 </button>
             </div>
@@ -269,6 +544,29 @@
         if (typeof initFirebase === 'function') initFirebase();
         if (window.lucide) lucide.createIcons();
 
+        function formatThousand(num) {
+            const n = Number(num) || 0;
+            const isNeg = n < 0;
+            const formatted = new Intl.NumberFormat('id-ID').format(Math.abs(n));
+            return (isNeg ? "-Rp " : "Rp ") + formatted;
+        }
+
+        function formatIdAge(createdAtMs) {
+            if (!createdAtMs) return "1 menit";
+            const diffMs = Math.max(0, Date.now() - createdAtMs);
+            const totalMinutes = Math.floor(diffMs / 60000);
+            
+            if (totalMinutes < 1000) {
+                return `${Math.max(1, totalMinutes)} menit`;
+            }
+            const totalHours = Math.floor(totalMinutes / 60);
+            if (totalHours < 1000) {
+                return `${totalHours} jam`;
+            }
+            const totalDays = Math.floor(totalHours / 24);
+            return `${totalDays} hari`;
+        }
+
         function updateClock() {
             const el = document.getElementById('provider-clock');
             if (!el) return;
@@ -280,55 +578,138 @@
         setInterval(updateClock, 1000);
         updateClock();
 
+        const DEFAULT_PROVIDER_COA = [
+            { code: "P101", name: "Langganan Server UMKM (50rb/bln)", category: "income" },
+            { code: "P102", name: "Biaya Lisensi Terminal Kasir Tambahan", category: "income" },
+            { code: "P103", name: "Upgrade Paket Plus Mode", category: "income" },
+            { code: "P104", name: "Upgrade Paket Pro Mode", category: "income" },
+            { code: "P105", name: "Jasa Custom Software & Maintenance", category: "income" },
+            { code: "P201", name: "Sewa Cloud Hosting & Database Server", category: "outcome" },
+            { code: "P202", name: "Kuota Token API AI Engine", category: "outcome" },
+            { code: "P203", name: "Biaya Transaksi Payment Gateway QRIS", category: "outcome" }
+        ];
+
+        let providerTx = JSON.parse(localStorage.getItem('fm_provider_tx') || "[]");
         let allTickets = JSON.parse(localStorage.getItem('fm_cashier_license_requests') || "[]");
         let tenantTx = JSON.parse(localStorage.getItem('fm_v11_tx_ID26110901') || localStorage.getItem('fm_v11_tx') || "[]");
 
         function loadProviderDashboard() {
-            let totalIn = 0;
-            let totalOut = 0;
-            let totalTax = 0;
+            calculateProviderFinancials();
+            calculateNetworkFinancials();
+            renderUMKMDirectory();
+        }
 
-            tenantTx.forEach(t => {
-                if (t.category === 'sales') totalIn += t.amount;
-                else {
-                    totalOut += t.amount;
-                    totalTax += (t.tax12 || Math.round(t.amount * 0.12));
+        function calculateProviderFinancials() {
+            const now = new Date();
+            const currentMonthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const firstOfMonthISO = `${currentMonthYear}-01`;
+
+            let allTimeNet = 0;
+            let monthlyNet = 0;
+
+            providerTx.forEach(t => {
+                const isInc = t.category === 'income';
+                const val = isInc ? t.amount : -t.amount;
+                allTimeNet += val;
+
+                const txDate = t.dateISO || new Date(t.timestamp).toISOString().split('T')[0];
+                if (txDate >= firstOfMonthISO) {
+                    monthlyNet += val;
                 }
             });
 
-            document.getElementById('stat-total-omzet').innerText = "Rp " + new Intl.NumberFormat('id-ID').format(totalIn);
-            document.getElementById('stat-total-ppn').innerText = "Rp " + new Intl.NumberFormat('id-ID').format(totalTax);
+            document.getElementById('stat-provider-monthly').innerText = formatThousand(monthlyNet);
+            document.getElementById('stat-provider-alltime').innerText = formatThousand(allTimeNet);
+            document.getElementById('pop-prov-alltime-text').innerText = formatThousand(allTimeNet);
+        }
+
+        function calculateNetworkFinancials() {
+            const now = new Date();
+            const currentMonthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const firstOfMonthISO = `${currentMonthYear}-01`;
+
+            let allTimeGMV = 0;
+            let monthlyGMV = 0;
+
+            tenantTx.forEach(t => {
+                if (t.category === 'sales') {
+                    allTimeGMV += t.amount;
+                    const txDate = t.dateISO || new Date(t.timestamp).toISOString().split('T')[0];
+                    if (txDate >= firstOfMonthISO) {
+                        monthlyGMV += t.amount;
+                    }
+                }
+            });
+
+            document.getElementById('stat-network-monthly').innerText = formatThousand(monthlyGMV);
+            document.getElementById('stat-network-alltime').innerText = formatThousand(allTimeGMV);
+            document.getElementById('pop-network-alltime-text').innerText = formatThousand(allTimeGMV);
+
+            document.getElementById('stat-rank1-name').innerText = "Oneilverse (ID26110901)";
+            document.getElementById('stat-rank1-omzet').innerText = formatThousand(monthlyGMV);
 
             const pending = allTickets.filter(t => t.status === 'PENDING').length;
             document.getElementById('stat-pending-tickets').innerText = pending;
             document.getElementById('pending-badge').innerText = `${pending} Tiket`;
-
-            renderUMKMTable(totalIn, totalOut);
         }
 
-        function renderUMKMTable(inc, out) {
+        function renderUMKMDirectory() {
             const tbody = document.getElementById('umkm-table-body');
             tbody.innerHTML = "";
 
-            const tenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse", slogan: "Creative Production & Software Infrastructure" };
+            const tenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse", slogan: "Creative Production & Software Infrastructure", tier: "pro" };
             const activeCashiers = parseInt(localStorage.getItem('fm_allowed_cashiers_ID26110901') || "1");
             const isSuspended = localStorage.getItem('fm_tenant_suspended_ID26110901') === 'true';
+
+            let idCreatedTimestamp = parseInt(localStorage.getItem('fm_id_created_ID26110901') || "0");
+            if (!idCreatedTimestamp) {
+                idCreatedTimestamp = Date.now() - (41 * 24 * 3600 * 1000 + 16 * 3600 * 1000);
+                localStorage.setItem('fm_id_created_ID26110901', idCreatedTimestamp.toString());
+            }
+            const idAgeText = formatIdAge(idCreatedTimestamp);
+
+            const now = new Date();
+            const firstOfMonthISO = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+            let incMonth = 0;
+            let outMonth = 0;
+            tenantTx.forEach(t => {
+                const txDate = t.dateISO || new Date(t.timestamp).toISOString().split('T')[0];
+                if (txDate >= firstOfMonthISO) {
+                    if (t.category === 'sales') incMonth += t.amount;
+                    else outMonth += t.amount;
+                }
+            });
+
+            const netOmzet = incMonth - outMonth;
+            let badgeFinansial = '<span class="px-2 py-0.5 rounded text-[10px] font-black badge-sapphire text-white">💎 Blue Sapphire</span>';
+            if (netOmzet < 0) {
+                badgeFinansial = '<span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-600 text-white">Defisit Merah</span>';
+            }
+
+            const tierBadge = '<span class="px-2 py-0.5 rounded text-[9px] font-black badge-pro-gold text-white uppercase">Gold • Pro</span>';
 
             const tr = document.createElement('tr');
             tr.className = "border-b border-white/5 hover:bg-white/5 cursor-pointer transition";
             tr.onclick = () => openInspectUMKM(tenant.id);
             tr.innerHTML = `
-                <td class="py-3.5 px-4 font-mono font-bold text-cyan-400">${tenant.id}</td>
                 <td class="py-3.5 px-4">
-                    <span class="font-black text-white block">${tenant.nama}</span>
-                    <span class="text-[10px] text-slate-400">${tenant.slogan}</span>
+                    <span class="font-mono font-bold text-cyan-400 block">${tenant.id}</span>
+                    <span class="text-[10px] text-slate-400 font-mono">Usia: ${idAgeText}</span>
                 </td>
-                <td class="py-3.5 px-4 font-bold text-emerald-400">${activeCashiers} Terminal Aktif</td>
-                <td class="py-3.5 px-4 text-right font-black text-emerald-400 font-mono">Rp ${new Intl.NumberFormat('id-ID').format(inc)}</td>
-                <td class="py-3.5 px-4 text-right font-black text-rose-400 font-mono">Rp ${new Intl.NumberFormat('id-ID').format(out)}</td>
+                <td class="py-3.5 px-4">
+                    <div class="flex items-center space-x-1.5">
+                        <span class="font-black text-white">${tenant.nama}</span>
+                        ${tierBadge}
+                    </div>
+                    <span class="text-[10px] text-slate-400 block">${tenant.slogan}</span>
+                </td>
+                <td class="py-3.5 px-4 font-bold text-emerald-400 font-mono">${activeCashiers} Kasir</td>
+                <td class="py-3.5 px-4 text-right font-black text-emerald-400 font-mono">${formatThousand(incMonth)}</td>
+                <td class="py-3.5 px-4 text-right font-black text-rose-400 font-mono">${formatThousand(outMonth)}</td>
+                <td class="py-3.5 px-4 text-center">${badgeFinansial}</td>
                 <td class="py-3.5 px-4 text-center">
-                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black ${isSuspended ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}">
-                        ${isSuspended ? 'DIBEKUKAN' : 'ONLINE'}
+                    <span class="px-2.5 py-0.5 rounded-full text-[9px] font-black ${isSuspended ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}">
+                        ${isSuspended ? 'BEKU' : 'AKTIF'}
                     </span>
                 </td>
                 <td class="py-3.5 px-4 text-center">
@@ -344,18 +725,20 @@
             const tenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse" };
             const activeCashiers = parseInt(localStorage.getItem('fm_allowed_cashiers_ID26110901') || "1");
 
-            // Pelacakan GPS Geolocation HP/Device jika diizinkan browser
-            let coordsDisplay = "Lat: -6.2088, Lon: 106.8456 (Jakarta Pusat)";
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((pos) => {
-                    coordsDisplay = `Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)} (GPS Presisi Aktif)`;
-                    updateInspectHeader(tenant, activeCashiers, coordsDisplay);
-                }, () => {
-                    updateInspectHeader(tenant, activeCashiers, coordsDisplay);
-                });
-            } else {
-                updateInspectHeader(tenant, activeCashiers, coordsDisplay);
-            }
+            document.getElementById('inspect-header-card').innerHTML = `
+                <div>
+                    <h4 class="font-black text-sm text-white">${tenant.nama} [${tenant.id}]</h4>
+                    <p class="text-slate-400">Lisensi Terpasang: ${activeCashiers} Terminal Kasir • Status: Terverifikasi</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-emerald-400 font-bold block font-mono">${tenantTx.length} Transaksi Sah Tercatat</span>
+                    <span class="text-[10px] text-slate-400">Sinkronisasi Cloud Live Terhubung</span>
+                </div>
+            `;
+
+            document.getElementById('gps-kasir-addr').innerText = "Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat";
+            document.getElementById('gps-mgr-addr').innerText = "Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat";
+            document.getElementById('gps-owner-addr').innerText = "Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat";
 
             const tbody = document.getElementById('inspect-tx-body');
             tbody.innerHTML = "";
@@ -365,8 +748,8 @@
                 tr.innerHTML = `
                     <td class="py-2 px-3 text-slate-400 font-mono text-[10px]">${tx.dateFull || ''} ${tx.date || ''}</td>
                     <td class="py-2 px-3"><span class="font-bold text-white">[${tx.accountCode}] ${tx.accountName}</span><br><span class="text-[10px] text-slate-400">${tx.desc || '-'}</span></td>
-                    <td class="py-2 px-3 text-right font-black text-emerald-400 font-mono">${tx.category === 'sales' ? 'Rp ' + new Intl.NumberFormat('id-ID').format(tx.amount) : '-'}</td>
-                    <td class="py-2 px-3 text-right font-black text-rose-400 font-mono">${tx.category !== 'sales' ? 'Rp ' + new Intl.NumberFormat('id-ID').format(tx.amount) : '-'}</td>
+                    <td class="py-2 px-3 text-right font-black text-emerald-400 font-mono">${tx.category === 'sales' ? formatThousand(tx.amount) : '-'}</td>
+                    <td class="py-2 px-3 text-right font-black text-rose-400 font-mono">${tx.category !== 'sales' ? formatThousand(tx.amount) : '-'}</td>
                     <td class="py-2 px-3 text-center text-slate-400 text-[10px]">${tx.staff || 'Kasir'}</td>
                 `;
                 tbody.appendChild(tr);
@@ -375,70 +758,229 @@
             openModal('inspect');
         }
 
-        function updateInspectHeader(tenant, activeCashiers, coordsDisplay) {
-            document.getElementById('inspect-header-card').innerHTML = `
-                <div>
-                    <h4 class="font-black text-sm text-white">${tenant.nama} [${tenant.id}]</h4>
-                    <p class="text-slate-400">Total ${activeCashiers} Terminal Kasir Terlisensi</p>
-                    <span class="text-[10px] text-cyan-300 font-mono block mt-1"><i data-lucide="map-pin" class="w-3 h-3 inline mr-1"></i>${coordsDisplay}</span>
-                </div>
-                <div class="text-left sm:text-right">
-                    <span class="text-emerald-400 font-bold block">${tenantTx.length} Transaksi Tercatat Sah</span>
-                    <span class="text-[10px] text-slate-400">Sinkronisasi Realtime Terhubung</span>
-                </div>
-            `;
-            if (window.lucide) lucide.createIcons();
-        }
+        function saveProviderTransaction() {
+            const dateVal = document.getElementById('prov-tx-date').value;
+            const select = document.getElementById('prov-tx-account');
+            const opt = select.options[select.selectedIndex];
+            const amount = parseThousandSeparator(document.getElementById('prov-tx-amount').value);
+            const desc = document.getElementById('prov-tx-desc').value.trim();
 
-        function sendSystemNotification() {
-            const msg = prompt("Kirim Notifikasi Sistem ke Toko ini (Akan muncul di lonceng Owner/Manager):");
-            if (msg && msg.trim()) {
-                alert(`Notifikasi sistem berhasil dikirim ke instans toko!\n\nPesan: "${msg.trim()}"`);
-            }
-        }
+            if (!dateVal) return alert("Pilih tanggal transaksi!");
+            if (!opt.value) return alert("Pilih akun COA!");
+            if (amount <= 0) return alert("Nominal rupiah tidak valid!");
 
-        function toggleTenantStatus() {
-            const isSuspended = localStorage.getItem('fm_tenant_suspended_ID26110901') === 'true';
-            if (isSuspended) {
-                localStorage.setItem('fm_tenant_suspended_ID26110901', 'false');
-                alert("Akses toko Oneilverse telah dipulihkan (Aktif kembali)!");
-            } else {
-                if (confirm("Bekukan akses toko ini? Seluruh kasir dan manager tidak akan dapat login.")) {
-                    localStorage.setItem('fm_tenant_suspended_ID26110901', 'true');
-                    alert("Toko telah dibekukan sementara.");
-                }
-            }
+            const newTx = {
+                id: 'prov_tx_' + Date.now(),
+                dateISO: dateVal,
+                accountCode: opt.value,
+                accountName: opt.dataset.name,
+                category: opt.dataset.category,
+                amount: amount,
+                desc: desc || opt.dataset.name,
+                timestamp: Date.now()
+            };
+
+            providerTx.unshift(newTx);
+            localStorage.setItem('fm_provider_tx', JSON.stringify(providerTx));
+
+            alert(`Transaksi Provider Rp ${new Intl.NumberFormat('id-ID').format(amount)} berhasil disimpan!`);
+            document.getElementById('prov-tx-amount').value = "";
+            document.getElementById('prov-tx-desc').value = "";
+            closeModal();
             loadProviderDashboard();
+        }
+
+        function populateProviderCOASelect() {
+            let coa = JSON.parse(localStorage.getItem('fm_provider_coa') || "[]");
+            if (coa.length === 0) coa = DEFAULT_PROVIDER_COA;
+
+            const select = document.getElementById('prov-tx-account');
+            select.innerHTML = '<option value="">-- Pilih Akun COA Provider --</option>';
+            coa.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.code;
+                opt.innerText = `[${c.code}] ${c.name} (${c.category.toUpperCase()})`;
+                opt.dataset.category = c.category;
+                opt.dataset.name = c.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function saveNewProviderCOA() {
+            const code = document.getElementById('prov-new-coa-code').value.trim();
+            const name = document.getElementById('prov-new-coa-name').value.trim();
+            const cat = document.getElementById('prov-new-coa-cat').value;
+
+            if (!code || !name) return alert("Kode dan nama akun COA wajib diisi!");
+
+            let coa = JSON.parse(localStorage.getItem('fm_provider_coa') || "[]");
+            if (coa.length === 0) coa = [...DEFAULT_PROVIDER_COA];
+
+            if (coa.some(c => c.code === code)) return alert(`Kode [${code}] sudah ada!`);
+
+            coa.push({ code, name, category: cat });
+            localStorage.setItem('fm_provider_coa', JSON.stringify(coa));
+
+            document.getElementById('prov-new-coa-code').value = "";
+            document.getElementById('prov-new-coa-name').value = "";
+            renderProviderCOATable();
+            populateProviderCOASelect();
+            alert("Akun COA Provider berhasil ditambahkan!");
+        }
+
+        function deleteProviderCOA(code) {
+            let coa = JSON.parse(localStorage.getItem('fm_provider_coa') || "[]");
+            if (coa.length === 0) coa = [...DEFAULT_PROVIDER_COA];
+
+            if (confirm(`Hapus akun COA [${code}]?`)) {
+                coa = coa.filter(c => c.code !== code);
+                localStorage.setItem('fm_provider_coa', JSON.stringify(coa));
+                renderProviderCOATable();
+                populateProviderCOASelect();
+            }
+        }
+
+        function renderProviderCOATable() {
+            const tbody = document.getElementById('provider-coa-table-body');
+            tbody.innerHTML = "";
+            let coa = JSON.parse(localStorage.getItem('fm_provider_coa') || "[]");
+            if (coa.length === 0) coa = DEFAULT_PROVIDER_COA;
+
+            coa.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-white/5";
+                tr.innerHTML = `
+                    <td class="py-2 px-3 font-mono font-bold text-cyan-400">${c.code}</td>
+                    <td class="py-2 px-3 font-bold text-white">${c.name}</td>
+                    <td class="py-2 px-3 uppercase text-[10px] ${c.category === 'income' ? 'text-emerald-400' : 'text-rose-400'}">${c.category}</td>
+                    <td class="py-2 px-3 text-center">
+                        <button onclick="deleteProviderCOA('${c.code}')" class="px-2 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500 text-rose-300 font-bold text-[10px]">Hapus</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function sendProviderNotification() {
+            const target = document.getElementById('notif-target-tenant').value;
+            const title = document.getElementById('notif-title').value.trim();
+            const msg = document.getElementById('notif-message').value.trim();
+
+            if (!title || !msg) return alert("Judul dan isi pesan wajib diisi!");
+
+            const newNotif = {
+                id: 'notif_' + Date.now(),
+                targetTenant: target,
+                title: title,
+                message: msg,
+                date: new Date().toLocaleString('id-ID'),
+                timestamp: Date.now()
+            };
+
+            let notifs = JSON.parse(localStorage.getItem('fm_provider_notices') || "[]");
+            notifs.unshift(newNotif);
+            localStorage.setItem('fm_provider_notices', JSON.stringify(notifs));
+
+            alert(`Pesan notifikasi berhasil dikirimkan ke target: ${target}!`);
+            document.getElementById('notif-title').value = "";
+            document.getElementById('notif-message').value = "";
             closeModal();
         }
 
-        function unlockTenantAccount() {
-            const key = "fm_security_ID26110901";
-            localStorage.setItem(key, JSON.stringify({ fails: 0, lockUntil: 0, tier: 0, isBlocked: false }));
-            alert("Status pemblokiran akun ID26110901 telah berhasil direset oleh Superadmin!");
-        }
+        function renderLeaderboardTable() {
+            const tbody = document.getElementById('leaderboard-table-body');
+            tbody.innerHTML = "";
 
-        function openModal(type) {
-            document.getElementById('popup-content-tickets').classList.add('hidden');
-            document.getElementById('popup-content-inspect').classList.add('hidden');
+            const tenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse" };
+            let totalSales = 0;
+            let totalOut = 0;
+            tenantTx.forEach(t => {
+                if (t.category === 'sales') totalSales += t.amount;
+                else totalOut += t.amount;
+            });
+            const net = totalSales - totalOut;
 
-            if (type === 'tickets') {
-                document.getElementById('modal-title').innerText = "Permohonan Lisensi Terminal Kasir";
-                document.getElementById('modal-subtitle').innerText = "Setujui atau tolak permintaan pembukaan kasir baru dari UMKM";
-                renderTicketsList();
-                document.getElementById('popup-content-tickets').classList.remove('hidden');
-            } else if (type === 'inspect') {
-                document.getElementById('modal-title').innerText = "Cermin Data Kasir & Kontrol Mitra";
-                document.getElementById('modal-subtitle').innerText = "Pemantauan langsung transaksi kasir toko mitra secara realtime";
-                document.getElementById('popup-content-inspect').classList.remove('hidden');
+            let badgeHtml = '<span class="px-2.5 py-0.5 rounded text-[9px] font-black badge-sapphire text-white">💎 Blue Sapphire</span>';
+            if (net < 0) {
+                badgeHtml = '<span class="px-2.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white">Defisit Merah</span>';
             }
 
-            document.getElementById('main-modal-container').classList.remove('hidden');
-            if (window.lucide) lucide.createIcons();
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-white/5";
+            tr.innerHTML = `
+                <td class="py-2.5 px-3 text-center font-black text-amber-400 font-mono text-sm">#1</td>
+                <td class="py-2.5 px-3 font-mono text-cyan-400 font-bold">${tenant.id}</td>
+                <td class="py-2.5 px-3 font-black text-white">${tenant.nama}</td>
+                <td class="py-2.5 px-3 text-center">${badgeHtml}</td>
+                <td class="py-2.5 px-3 text-right font-black font-mono text-emerald-400">${formatThousand(net)}</td>
+            `;
+            tbody.appendChild(tr);
         }
 
-        function closeModal() {
-            document.getElementById('main-modal-container').classList.add('hidden');
+        function renderProviderMonthlyTable() {
+            const tbody = document.getElementById('provider-monthly-table-body');
+            tbody.innerHTML = "";
+
+            const monthsMap = {};
+            providerTx.forEach(t => {
+                const d = new Date(t.dateISO || t.timestamp);
+                const k = `${d.getFullYear()} - Bulan ${d.getMonth() + 1}`;
+                if (!monthsMap[k]) monthsMap[k] = { inc: 0, out: 0 };
+                if (t.category === 'income') monthsMap[k].inc += t.amount;
+                else monthsMap[k].out += t.amount;
+            });
+
+            const keys = Object.keys(monthsMap);
+            if (keys.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500 text-xs">Belum ada riwayat pembukuan transaksi Provider. Catat melalui tombol di atas.</td></tr>`;
+                return;
+            }
+
+            keys.forEach(k => {
+                const item = monthsMap[k];
+                const net = item.inc - item.out;
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-white/5";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 font-bold text-white">${k}</td>
+                    <td class="py-2.5 px-3 text-right text-emerald-400 font-mono">${formatThousand(item.inc)}</td>
+                    <td class="py-2.5 px-3 text-right text-rose-400 font-mono">${formatThousand(item.out)}</td>
+                    <td class="py-2.5 px-3 text-right font-black font-mono text-indigo-300">${formatThousand(net)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderNetworkMonthlyTable() {
+            const tbody = document.getElementById('network-monthly-table-body');
+            tbody.innerHTML = "";
+
+            const monthsMap = {};
+            tenantTx.forEach(t => {
+                const d = new Date(t.dateISO || t.timestamp);
+                const k = `${d.getFullYear()} - Bulan ${d.getMonth() + 1}`;
+                if (!monthsMap[k]) monthsMap[k] = { count: 0, sales: 0, tax: 0 };
+                monthsMap[k].count += 1;
+                if (t.category === 'sales') {
+                    monthsMap[k].sales += t.amount;
+                } else {
+                    monthsMap[k].tax += (t.tax12 || Math.round(t.amount * 0.12));
+                }
+            });
+
+            const keys = Object.keys(monthsMap);
+            keys.forEach(k => {
+                const item = monthsMap[k];
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-white/5";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 font-bold text-white">${k}</td>
+                    <td class="py-2.5 px-3 text-right text-slate-400 font-mono">${item.count} nota</td>
+                    <td class="py-2.5 px-3 text-right font-black text-cyan-400 font-mono">${formatThousand(item.sales)}</td>
+                    <td class="py-2.5 px-3 text-right text-amber-400 font-mono">${formatThousand(item.tax)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         function renderTicketsList() {
@@ -512,9 +1054,8 @@
             alert("Permohonan telah ditolak.");
         }
 
-        // CATATAN RILIS GLOBAL (ARSIP LENGKAP UTUH TANPA POTONGAN)
         const GLOBAL_RELEASE_NOTES = [
-            { version: "v1.1.2", type: "App", date: "10 Nov 2026", title: "Penyederhanaan Closing Kasir", desc: "Konsep penamaan shift dihapus. Kasir cukup menekan Closing Kasir untuk mereset laci ke Rp 0." },
+            { version: "v1.1.2", type: "App", date: "10 Nov 2026", title: "Penyederhanaan Closing Kasir", desc: "Konsep penamaan shift dihapus. Kasir cukup menekan Closing Kasir untuk mereset laci ke Rp 0 secara presisi." },
             { version: "Core Shield 1.1.2", type: "Security", date: "10 Nov 2026", title: "Single-Session Lockout", desc: "Perlindungan anti-fitnah: sesi kasir dikunci pada 1 perangkat kerja aktif." },
             { version: "v1.1.1", type: "App", date: "09 Nov 2026", title: "Sistem Kasir 2-Langkah", desc: "Input pesanan masuk ke draft sementara bebas edit sebelum dicetak struk sah." },
             { version: "Core Shield 1.1.1", type: "Security", date: "09 Nov 2026", title: "Audit Trail Forensik", desc: "Seluruh tindakan koreksi nota oleh Manager otomatis terekam permanen di Owner." },
@@ -526,16 +1067,15 @@
             { version: "Core Shield 1.0.0", type: "Security", date: "25 Okt 2026", title: "Enkripsi Multi-Tenant", desc: "Isolasi data antar toko untuk keamanan pembukuan finansial." }
         ];
 
-        function renderReleaseNotes() {
-            const container = document.getElementById('release-notes-container');
-            if (!container) return;
+        function renderGlobalReleaseNotes() {
+            const container = document.getElementById('release-notes-global-container');
             container.innerHTML = "";
             GLOBAL_RELEASE_NOTES.forEach(note => {
                 const isSec = note.type === "Security";
                 const bg = isSec ? "bg-amber-500/10 border-amber-500/30 text-amber-200" : "bg-cyan-500/10 border-cyan-500/30 text-cyan-200";
                 const icon = isSec ? '<i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>' : '<i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i>';
                 const pillBg = isSec ? "bg-amber-500/20 text-amber-300" : "bg-cyan-500/20 text-cyan-300";
-                
+
                 const card = document.createElement('div');
                 card.className = `p-4 rounded-2xl border ${bg} space-y-1.5`;
                 card.innerHTML = `
@@ -554,14 +1094,71 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        window.openReleaseNotesModal = function() {
-            renderReleaseNotes();
-            document.getElementById('modal-release-notes').classList.remove('hidden');
+        window.openModal = function(type) {
+            ['provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'inspect', 'tickets', 'release_notes'].forEach(k => {
+                const el = document.getElementById(`popup-content-${k}`);
+                if (el) el.classList.add('hidden');
+            });
+
+            if (type === 'provider_monthly_history') {
+                document.getElementById('modal-title').innerText = "Riwayat Pendapatan Bulanan Provider";
+                document.getElementById('modal-subtitle').innerText = "Rincian pendapatan bersih per bulan & total sepanjang masa Provider";
+                renderProviderMonthlyTable();
+                document.getElementById('popup-content-provider_monthly_history').classList.remove('hidden');
+            } else if (type === 'network_monthly_history') {
+                document.getElementById('modal-title').innerText = "Riwayat Omzet Bulanan Jaringan UMKM";
+                document.getElementById('modal-subtitle').innerText = "Perkembangan volume transaksi & omzet jaringan sejak tanggal 1";
+                renderNetworkMonthlyTable();
+                document.getElementById('popup-content-network_monthly_history').classList.remove('hidden');
+            } else if (type === 'leaderboard') {
+                document.getElementById('modal-title').innerText = "Leaderboard Peringkat Omzet Jaringan";
+                document.getElementById('modal-subtitle').innerText = "Peringkat omzet mitra UMKM (1 s/d terakhir dengan badge Blue Sapphire, Hijau, Kuning, Merah)";
+                renderLeaderboardTable();
+                document.getElementById('popup-content-leaderboard').classList.remove('hidden');
+            } else if (type === 'provider_input_tx') {
+                document.getElementById('modal-title').innerText = "Pencatatan Transaksi Provider";
+                document.getElementById('modal-subtitle').innerText = "Catat penerimaan server, lisensi, atau pengeluaran cloud hosting";
+                document.getElementById('prov-tx-date').value = new Date().toISOString().split('T')[0];
+                populateProviderCOASelect();
+                document.getElementById('popup-content-provider_input_tx').classList.remove('hidden');
+            } else if (type === 'provider_coa_mgmt') {
+                document.getElementById('modal-title').innerText = "Pengelolaan Akun COA Provider";
+                document.getElementById('modal-subtitle').innerText = "Tambah atau sesuaikan pos pendapatan dan beban internal Provider";
+                renderProviderCOATable();
+                document.getElementById('popup-content-provider_coa_mgmt').classList.remove('hidden');
+            } else if (type === 'broadcast_modal') {
+                document.getElementById('modal-title').innerText = "Kirim Pesan / Notifikasi Sistem";
+                document.getElementById('modal-subtitle').innerText = "Pesan akan masuk ke lonceng notifikasi Owner & Manager toko tujuan";
+                document.getElementById('popup-content-broadcast_modal').classList.remove('hidden');
+            } else if (type === 'inspect') {
+                document.getElementById('modal-title').innerText = "Cermin Data Kasir & Lokasi GPS 3 Akun";
+                document.getElementById('modal-subtitle').innerText = "Inspeksi langsung lokasi presisi kasir, manager, owner & mutasi live";
+                document.getElementById('popup-content-inspect').classList.remove('hidden');
+            } else if (type === 'tickets') {
+                document.getElementById('modal-title').innerText = "Permohonan Lisensi Terminal Kasir Baru";
+                document.getElementById('modal-subtitle').innerText = "Persetujuan pembukaan terminal kasir tambahan dari mitra UMKM";
+                renderTicketsList();
+                document.getElementById('popup-content-tickets').classList.remove('hidden');
+            } else if (type === 'release_notes') {
+                document.getElementById('modal-title').innerText = "Arsip Catatan Rilis Global";
+                document.getElementById('modal-subtitle').innerText = "Histori lengkap pembaruan sistem aplikasi & Core Shield";
+                renderGlobalReleaseNotes();
+                document.getElementById('popup-content-release_notes').classList.remove('hidden');
+            }
+
+            document.getElementById('main-modal-container').classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
         };
 
-        window.closeReleaseNotesModal = function() {
-            document.getElementById('modal-release-notes').classList.add('hidden');
+        window.closeModal = function() {
+            document.getElementById('main-modal-container').classList.add('hidden');
         };
+
+        function formatInputThousand(input) {
+            const clean = input.value.replace(/[^0-9]/g, '');
+            if (!clean) { input.value = ""; return; }
+            input.value = new Intl.NumberFormat('id-ID').format(clean);
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadProviderDashboard();

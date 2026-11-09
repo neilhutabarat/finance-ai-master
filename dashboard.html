@@ -30,7 +30,7 @@
         .oneui-hero {
             border-bottom-left-radius: 36px;
             border-bottom-right-radius: 36px;
-            background: linear-gradient(145deg, #070d18 0%, #1e1b4b 60%, #311042 100%);
+            background: linear-gradient(145deg, #070d18 0%, #0f172a 40%, #1e1b4b 60%, #311042 100%);
         }
         .ios-glass {
             background: var(--ios-card);
@@ -64,34 +64,33 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div class="flex items-center space-x-4">
                 <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-b from-white/25 via-white/10 to-white/5 border border-white/30 backdrop-blur-xl flex items-center justify-center p-2 shadow-inner relative overflow-hidden group select-none shrink-0">
-    <div class="absolute -top-6 -left-6 w-12 h-12 bg-cyan-300/30 rounded-full blur-md pointer-events-none"></div>
-    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <linearGradient id="hdrIce1" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#E0F2FE"/>
-                <stop offset="45%" stop-color="#38BDF8"/>
-                <stop offset="100%" stop-color="#2563EB"/>
-            </linearGradient>
-            <linearGradient id="hdrIce2" x1="90" y1="10" x2="10" y2="90" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#FFFFFF"/>
-                <stop offset="45%" stop-color="#67E8F9"/>
-                <stop offset="100%" stop-color="#0284C7"/>
-            </linearGradient>
-        </defs>
-        <path d="M50 14 C29 14 14 29 14 50 C14 71 29 86 50 86 C71 86 86 71 86 50 C86 29 71 14 50 14 Z M50 25 C64.5 25 75 35.5 75 50 C75 64.5 64.5 75 50 75 C35.5 75 25 64.5 25 50 C25 35.5 35.5 25 50 25 Z" fill="url(#hdrIce1)" opacity="0.9" />
-        <path d="M34 32 L44 32 L44 68 L34 68 Z" fill="url(#hdrIce2)" />
-        <path d="M41 32 L66 64 L66 68 L56 68 L34 40 L34 32 Z" fill="#FFFFFF" />
-        <path d="M56 32 L66 32 L66 68 L56 68 Z" fill="url(#hdrIce1)" />
-        <circle cx="50" cy="20" r="2.5" fill="#FFFFFF" />
-    </svg>
-</div>
+                    <div class="absolute -top-6 -left-6 w-12 h-12 bg-cyan-300/30 rounded-full blur-md pointer-events-none"></div>
+                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="dIce1" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#E0F2FE"/>
+                                <stop offset="45%" stop-color="#38BDF8"/>
+                                <stop offset="100%" stop-color="#2563EB"/>
+                            </linearGradient>
+                            <linearGradient id="dIce2" x1="90" y1="10" x2="10" y2="90" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#FFFFFF"/>
+                                <stop offset="45%" stop-color="#67E8F9"/>
+                                <stop offset="100%" stop-color="#0284C7"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M50 14 C29 14 14 29 14 50 C14 71 29 86 50 86 C71 86 86 71 86 50 C86 29 71 14 50 14 Z M50 25 C64.5 25 75 35.5 75 50 C75 64.5 64.5 75 50 75 C35.5 75 25 64.5 25 50 C25 35.5 35.5 25 50 25 Z" fill="url(#dIce1)" opacity="0.9" />
+                        <path d="M34 32 L44 32 L44 68 L34 68 Z" fill="url(#dIce2)" />
+                        <path d="M41 32 L66 64 L66 68 L56 68 L34 40 L34 32 Z" fill="#FFFFFF" />
+                        <path d="M56 32 L66 32 L66 68 L56 68 Z" fill="url(#dIce1)" />
+                        <circle cx="50" cy="20" r="2.5" fill="#FFFFFF" />
+                    </svg>
+                </div>
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="font-extrabold text-2xl sm:text-3xl tracking-tight text-white">Oneilverse</h1>
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-500/30 border border-indigo-400/40 text-indigo-200">
                             ID26110901
                         </span>
-                        <!-- Plakat Tier Langganan -->
                         <span id="tier-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-gradient-to-r from-amber-400/30 via-yellow-300/30 to-amber-500/30 border border-yellow-400/60 text-yellow-200 shadow-[0_0_12px_rgba(234,179,8,0.3)]">
                             Gold • Pro
                         </span>
@@ -237,6 +236,11 @@
                     <span>Pusat Laporan Eksekutif & Pengawasan Owner</span>
                 </h3>
                 <div class="flex flex-wrap items-center gap-2">
+                    <!-- Tombol Kelola Password Staf Kasir & Manager (POIN TAMBAHAN) -->
+                    <button onclick="openModal('manage_passwords')" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 transition flex items-center space-x-1 shadow-sm">
+                        <i data-lucide="key" class="w-3.5 h-3.5"></i>
+                        <span>Kelola Password Staf</span>
+                    </button>
                     <!-- Tombol Ubah Nama Karyawan/Role -->
                     <button onclick="openModal('customize_roles')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center space-x-1">
                         <i data-lucide="user-cog" class="w-3.5 h-3.5"></i>
@@ -454,6 +458,32 @@
                         <div class="flex justify-end pt-1">
                             <button onclick="saveCustomRoleNames()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition active:scale-95 shadow-md">
                                 Simpan Nama Peran
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. KELOLA PASSWORD STAF OLEH OWNER (POIN TAMBAHAN) -->
+                <div id="popup-content-manage_passwords" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-3 text-xs">
+                        <div>
+                            <h4 class="font-black text-sm text-purple-950">Ganti Password / PIN Staf</h4>
+                            <p class="text-purple-800/80">Owner memiliki wewenang eksklusif untuk mengubah PIN login kasir dan manager toko ini.</p>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">Password / PIN Baru Kasir (Default: 1234):</label>
+                                <input type="password" id="owner-set-pin-kasir" maxlength="8" placeholder="Masukkan PIN baru kasir" class="w-full bg-white border border-purple-300 rounded-xl p-2.5 font-mono font-bold tracking-widest outline-none">
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">Password / PIN Baru Manager (Default: 5678):</label>
+                                <input type="password" id="owner-set-pin-mgr" maxlength="8" placeholder="Masukkan PIN baru manager" class="w-full bg-white border border-purple-300 rounded-xl p-2.5 font-mono font-bold tracking-widest outline-none">
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-1">
+                            <button onclick="saveStaffPasswordsByOwner()" class="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition active:scale-95 shadow-md flex items-center space-x-1.5">
+                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                                <span>Simpan Password Baru</span>
                             </button>
                         </div>
                     </div>
@@ -812,6 +842,22 @@
             location.reload();
         }
 
+        // POIN TAMBAHAN: GANTI PASSWORD KASIR & MANAGER OLEH OWNER
+        function saveStaffPasswordsByOwner() {
+            const kasirPin = document.getElementById('owner-set-pin-kasir').value.trim();
+            const mgrPin = document.getElementById('owner-set-pin-mgr').value.trim();
+
+            const pwObj = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
+            if (kasirPin) pwObj.staff = kasirPin;
+            if (mgrPin) pwObj.manager = mgrPin;
+
+            localStorage.setItem(`fm_passwords_${tenantKey}`, JSON.stringify(pwObj));
+            alert("Password baru Kasir dan Manager berhasil disimpan!");
+            document.getElementById('owner-set-pin-kasir').value = "";
+            document.getElementById('owner-set-pin-mgr').value = "";
+            closeModal();
+        }
+
         // FITUR AI ANALITIS SATU-KLIK (ONE-CLICK INSIGHT)
         function triggerAIAnalysis(type) {
             const box = document.getElementById('ai-insight-box');
@@ -895,7 +941,7 @@
         }
 
         window.openModal = function(type) {
-            ['labarugi', 'audit_trail', 'mutasi', 'tax', 'add_cashier_request', 'customize_roles'].forEach(k => {
+            ['labarugi', 'audit_trail', 'mutasi', 'tax', 'add_cashier_request', 'customize_roles', 'manage_passwords'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
@@ -914,6 +960,9 @@
                 document.getElementById('custom-role-manager').value = customRoles.manager || '';
                 document.getElementById('custom-role-owner').value = customRoles.owner || '';
                 document.getElementById('popup-content-customize_roles').classList.remove('hidden');
+            }
+            else if (type === 'manage_passwords') {
+                document.getElementById('popup-content-manage_passwords').classList.remove('hidden');
             }
 
             document.getElementById('main-modal-container').classList.remove('hidden');
