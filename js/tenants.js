@@ -83,6 +83,5 @@ function getActiveTenant() {
   if (tenantKey && TENANTS_CONFIG[tenantKey]) {
     return TENANTS_CONFIG[tenantKey];
   }
-  // Jika tidak diisi parameter, default ke ID26110901 (Oneilverse) atau profil default
   return TENANTS_CONFIG["id26110901"] || TENANTS_CONFIG["default"];
 }

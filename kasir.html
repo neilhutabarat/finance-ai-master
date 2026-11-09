@@ -15,13 +15,13 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --app-bg: #f2f4f8;
-            --ios-card: rgba(255, 255, 255, 0.82);
-            --ios-border: rgba(226, 232, 240, 0.85);
+            --ios-card: rgba(255, 255, 255, 0.85);
+            --ios-border: rgba(226, 232, 240, 0.9);
             --oneui-radius: 28px;
             --oneui-squircle: 22px;
         }
@@ -58,7 +58,6 @@
             background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
         }
 
-        /* Custom scrollbar subtle */
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -73,7 +72,6 @@
 
     <!-- HERO HEADER: SAMSUNG ONE UI STYLE (EXPANDED LARGE TITLE WITH PILL NAVIGATION) -->
     <header class="oneui-hero text-white px-5 sm:px-8 pt-7 pb-8 shadow-xl relative overflow-hidden">
-        <!-- iOS Ambient light glow -->
         <div class="absolute -top-24 -right-24 w-72 h-72 bg-indigo-500/25 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -370,7 +368,6 @@
                         </tr>
                     </thead>
                     <tbody id="tax-table-body">
-                        <!-- Terisi otomatis oleh JS -->
                     </tbody>
                     <tfoot class="bg-rose-50/90 font-black border-t-2 border-rose-300">
                         <tr>
@@ -380,43 +377,6 @@
                             <td id="tax-foot-net" class="py-3 px-3 text-right text-slate-700">Rp 0</td>
                         </tr>
                     </tfoot>
-                </table>
-            </div>
-        </section>
-
-        <!-- BARIS: LAPORAN STOK / ASET PERLENGKAPAN PRODUKSI -->
-        <section class="ios-glass p-6 shadow-sm space-y-4">
-            <div class="border-b border-slate-200/80 pb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                <div>
-                    <h2 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
-                        <i data-lucide="package-check" class="w-5 h-5 text-indigo-600"></i>
-                        <span>Laporan Aset Digital & Persediaan Operasional</span>
-                    </h2>
-                    <p class="text-xs text-slate-400">Pantauan lisensi, kredit server, alat musik/kamera & aset perlengkapan produksi</p>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button onclick="exportStockPDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs flex items-center space-x-1.5 shadow-sm transition active:scale-95">
-                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                        <span>Download PDF Aset</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="overflow-x-auto border border-slate-200/80 rounded-2xl">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead class="bg-slate-100 text-[11px] font-black text-slate-600 uppercase border-b border-slate-200">
-                        <tr>
-                            <th class="py-2.5 px-3">No</th>
-                            <th class="py-2.5 px-3">Kode & Nama Aset/Bahan</th>
-                            <th class="py-2.5 px-3">Jenis / Tipe</th>
-                            <th class="py-2.5 px-3 text-center bg-indigo-50/50">Stok Awal</th>
-                            <th class="py-2.5 px-3 text-center bg-indigo-100/50">Stok Akhir</th>
-                            <th class="py-2.5 px-3 text-center font-bold text-indigo-800">Terpakai</th>
-                            <th class="py-2.5 px-3 text-right">Biaya Satuan</th>
-                            <th class="py-2.5 px-3 text-right font-black">Nilai Beban</th>
-                        </tr>
-                    </thead>
-                    <tbody id="kasir-stock-table-body"></tbody>
                 </table>
             </div>
         </section>
@@ -554,7 +514,6 @@
             checkShiftClosingStatus();
             loadTransactions();
             loadKasirNotices();
-            renderKasirStockTable();
         });
 
         function scrollToTaxTable() {
@@ -740,7 +699,6 @@
             localStorage.setItem(tenantStorageKey, JSON.stringify(txList));
         }
 
-        // SIMPAN / UPDATE TRANSAKSI DENGAN PERHITUNGAN PAJAK 12% OTOMATIS
         function saveTransactionKasir() {
             const select = document.getElementById('tx-account');
             const opt = select.options[select.selectedIndex];
@@ -962,7 +920,6 @@
             renderKasirTable();
             renderTaxTable();
             renderPerAccountKasir();
-            renderKasirStockTable();
         }
 
         // 1. RENDER MUTASI KAS
@@ -1303,46 +1260,6 @@
             doc.text(`Sisa Saldo Kas Akhir: Rp ${formatThousandSeparator(runningBalance)}`, 14, finalY + 10);
 
             doc.save(`Mutasi_Buku_Kas_${start}_sd_${end}.pdf`);
-        }
-
-        // Laporan Stok Aset
-        function renderKasirStockTable() {
-            const tbody = document.getElementById('kasir-stock-table-body');
-            if (!tbody) return;
-            tbody.innerHTML = "";
-
-            const raw = typeof getMaterials === 'function' ? getMaterials() : [];
-            if (raw.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-slate-400">Tidak ada persediaan aset perlengkapan produksi.</td></tr>`;
-                return;
-            }
-
-            raw.forEach((m, idx) => {
-                const initial = m.initialQty || 0;
-                const final = m.finalQty || 0;
-                const used = Math.max(0, initial - final);
-                const cost = m.costPerUnit || 0;
-                const valHpp = used * cost;
-
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-100 hover:bg-slate-50";
-                tr.innerHTML = `
-                    <td class="py-2 px-3 text-slate-400 font-mono">${idx + 1}</td>
-                    <td class="py-2 px-3 font-bold text-slate-900">${m.name} <span class="text-[10px] text-slate-400 font-mono block">${m.code}</span></td>
-                    <td class="py-2 px-3 text-slate-600">${m.type || '-'}</td>
-                    <td class="py-2 px-3 text-center bg-indigo-50 font-bold">${initial} ${m.unit}</td>
-                    <td class="py-2 px-3 text-center bg-indigo-100 font-bold">${final} ${m.unit}</td>
-                    <td class="py-2 px-3 text-center font-black text-indigo-800">${used} ${m.unit}</td>
-                    <td class="py-2 px-3 text-right">Rp ${formatThousandSeparator(cost)}</td>
-                    <td class="py-2 px-3 text-right font-black text-indigo-950">Rp ${formatThousandSeparator(valHpp)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-            lucide.createIcons();
-        }
-
-        function exportStockPDF() {
-            alert("Fitur ekspor PDF aset siap digunakan.");
         }
 
         // Pesan Tim
