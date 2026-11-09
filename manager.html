@@ -53,6 +53,17 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
+        
+        /* Capsule kecil hitam berbalut glass untuk jam & tanggal */
+        .glass-capsule-dark {
+            background: rgba(10, 15, 29, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            border-radius: 9999px;
+        }
+
         .tax-badge {
             background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
         }
@@ -114,7 +125,17 @@
             </div>
 
             <!-- Action Badges & Role Status -->
-            <div class="flex items-center space-x-2.5 self-start md:self-auto">
+            <div class="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
+
+                <!-- Capsule Kecil Hitam Berbalut Glass (Hari, Tanggal, Bulan, Tahun, Jam:Menit) -->
+                <div class="glass-capsule-dark px-3.5 py-1.5 text-xs text-white flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-300"></i>
+                    <span id="realtime-clock-display" class="font-mono font-semibold tracking-wide text-[11px] sm:text-xs">
+                        Memuat Waktu...
+                    </span>
+                </div>
+
                 <div class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-purple-500/25 border border-purple-300/30 flex items-center shadow-sm text-purple-100">
                     <span class="w-2 h-2 rounded-full bg-purple-400 mr-2 animate-ping"></span>
                     <span>Role: Supervisor / Manager</span>

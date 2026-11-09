@@ -15,7 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -29,6 +29,10 @@
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--app-bg);
             -webkit-tap-highlight-color: transparent;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .oneui-hero {
@@ -49,6 +53,16 @@
             border-radius: 9999px;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Capsule kecil hitam berbalut glass untuk jam & tanggal */
+        .glass-capsule-dark {
+            background: rgba(10, 15, 29, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            border-radius: 9999px;
         }
 
         .modal-backdrop {
@@ -78,6 +92,7 @@
         <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <!-- Brand & App Identity -->
             <div class="flex items-center space-x-4">
                 <div id="topbar-logo-box" class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl flex items-center justify-center text-2xl shadow-inner shadow-white/20">
                     <span id="topbar-emoji-icon">⚡</span>
@@ -93,13 +108,23 @@
                 </div>
             </div>
 
-            <div class="flex items-center space-x-2.5 self-start md:self-auto">
-                <div class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-white/10 border border-white/15 flex items-center shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-ping"></span>
-                    <span id="user-role-display">Role: Staf Kasir / Admin</span>
+            <!-- KAPSUL WAKTU REALTIME & USER STATUS -->
+            <div class="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
+                <!-- Capsule Kecil Hitam Berbalut Glass (Hari, Tanggal, Bulan, Tahun, Jam:Menit) -->
+                <div class="glass-capsule-dark px-3.5 py-1.5 text-xs text-white flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-300"></i>
+                    <span id="realtime-clock-display" class="font-mono font-semibold tracking-wide text-[11px] sm:text-xs">
+                        Memuat Waktu...
+                    </span>
                 </div>
-                <div id="shift-status-badge" class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30 flex items-center">
-                    <span class="w-2 h-2 rounded-full bg-amber-400 mr-1.5"></span> <span id="current-shift-name-badge">Shift Pagi</span>
+
+                <div class="ios-pill px-3 py-1.5 text-xs font-bold bg-white/10 border border-white/15 flex items-center shadow-sm">
+                    <span id="user-role-display">Role: Staf Kasir</span>
+                </div>
+                <div id="shift-status-badge" class="ios-pill px-3 py-1.5 text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 mr-1.5"></span>
+                    <span id="current-shift-name-badge">Shift Pagi</span>
                 </div>
                 <button onclick="logout()" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
@@ -112,14 +137,14 @@
     <!-- MAIN DASHBOARD CONTENT -->
     <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 flex-1 space-y-5 -mt-3">
 
-        <!-- BARIS ATAS: KARTU SALDO SHIFT LACI KASIR + KARTU PAJAK KECIL (KOMPAK & ELEGAN) -->
+        <!-- BARIS ATAS: KARTU SALDO SHIFT LACI KASIR + KARTU PAJAK KECIL -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
             
-            <!-- 1. KARTU SALDO SHIFT BERJALAN KASIR (7 Kolom di Tablet/PC) -->
-            <div class="md:col-span-7 bg-white/95 border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col justify-between space-y-3">
+            <!-- 1. KARTU SALDO SHIFT BERJALAN KASIR (8 Kolom) -->
+            <div class="md:col-span-8 bg-white/95 border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col justify-between space-y-3">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                     <div class="flex items-center space-x-2">
-                        <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">
+                        <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
                             <i data-lucide="wallet" class="w-4 h-4"></i>
                         </div>
                         <div>
@@ -127,26 +152,23 @@
                             <span class="text-[10px] text-slate-400">Shift Berjalan: <b id="shift-label-display" class="text-indigo-600">Shift 1 (Pagi)</b></span>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-1.5">
-                        <button onclick="renameShiftPrompt()" class="text-[10px] font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-xl transition" title="Ganti Nama Shift">
-                            Ubah Shift
-                        </button>
-                        <button onclick="triggerClosingShiftCycle()" id="btn-shift-action" class="text-[10px] font-black text-white bg-purple-700 hover:bg-purple-800 px-3 py-1 rounded-xl shadow-xs transition active:scale-95">
-                            Closing Shift (Reset ke Rp 0)
-                        </button>
-                    </div>
+                    <!-- Tombol Selesai Jam Kerja / Closing Shift Presisi Detik -->
+                    <button onclick="triggerClosingShiftCycle()" id="btn-shift-action" class="text-[11px] font-black text-white bg-purple-700 hover:bg-purple-800 px-3.5 py-1.5 rounded-xl shadow-sm transition active:scale-95 flex items-center space-x-1.5">
+                        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-300"></i>
+                        <span>Selesai Jam Kerja (Closing Shift)</span>
+                    </button>
                 </div>
 
                 <div class="flex items-baseline justify-between py-1">
                     <div>
-                        <span class="text-xs text-slate-400 block font-medium">Uang Bersih Shift Ini:</span>
+                        <span class="text-xs text-slate-400 block font-medium">Uang Bersih di Laci Kasir:</span>
                         <h2 id="shift-live-balance" class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                             Rp 0
                         </h2>
                     </div>
                     <div class="text-right">
-                        <span class="text-[11px] text-slate-400 block">Riwayat Shift Terakhir:</span>
-                        <span id="last-closed-shift-badge" class="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl border border-slate-200 inline-block mt-0.5">
+                        <span class="text-[11px] text-slate-400 block">Riwayat Closing Terakhir:</span>
+                        <span id="last-closed-shift-badge" class="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl border border-slate-200 inline-block mt-0.5 font-mono">
                             Belum ada closing
                         </span>
                     </div>
@@ -154,12 +176,15 @@
 
                 <div class="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
                     <span>Kas Masuk: <b id="shift-in-stat" class="text-emerald-600">Rp 0</b> | Kas Keluar: <b id="shift-out-stat" class="text-rose-600">Rp 0</b></span>
-                    <button onclick="openModal('shift_history')" class="text-indigo-600 font-bold hover:underline">Lihat Rekap Shift</button>
+                    <button onclick="openModal('shift_history')" class="text-indigo-600 font-bold hover:underline flex items-center space-x-1">
+                        <i data-lucide="history" class="w-3.5 h-3.5"></i>
+                        <span>Rekap Jam Kerja</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- 2. KARTU PAJAK 12% KECIL / COMPACT (5 Kolom di Tablet/PC) -->
-            <div onclick="showTaxExplainer()" role="button" tabindex="0" class="md:col-span-5 cursor-pointer bg-amber-50/90 hover:bg-amber-100/90 border border-amber-300 rounded-3xl p-5 shadow-xs transition active:scale-98 flex flex-col justify-between select-none">
+            <!-- 2. KARTU PAJAK 12% KECIL / COMPACT (4 Kolom) -->
+            <div onclick="showTaxExplainer()" role="button" tabindex="0" class="md:col-span-4 cursor-pointer bg-amber-50/90 hover:bg-amber-100/90 border border-amber-300 rounded-3xl p-5 shadow-xs transition active:scale-98 flex flex-col justify-between select-none">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-black tracking-wider text-amber-900 uppercase flex items-center">
                         <i data-lucide="landmark" class="w-3.5 h-3.5 mr-1.5 text-amber-700"></i>
@@ -232,7 +257,7 @@
 
                 <input type="hidden" id="edit-tx-id" value="">
 
-                <!-- PILIHAN AKUN COA ONEILVERSE (DILENGKAPI FALLBACK AGAR TIDAK KOSONG) -->
+                <!-- PILIHAN AKUN COA ONEILVERSE -->
                 <div class="space-y-3.5">
                     <div>
                         <div class="flex justify-between items-center mb-1">
@@ -298,7 +323,7 @@
                         <span id="kas-total-out" class="text-sm sm:text-xl font-black text-rose-700">Rp 0</span>
                     </div>
                     <div class="ios-glass p-4 text-center shadow-md bg-slate-900 text-white border-slate-800">
-                        <span class="text-[10px] font-bold text-slate-300 uppercase block">Saldo Total Kumulatif</span>
+                        <span class="text-[10px] font-bold text-slate-300 uppercase block">Saldo Kumulatif</span>
                         <span id="kas-net" class="text-sm sm:text-xl font-black text-emerald-400">Rp 0</span>
                     </div>
                 </div>
@@ -334,7 +359,7 @@
                     </div>
                 </div>
 
-                <!-- MENU TOMBOL POP-UP (TIDAK MEMANJANG KE BAWAH) -->
+                <!-- MENU TOMBOL POP-UP -->
                 <div class="ios-glass p-5 shadow-sm space-y-3">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                         <span class="text-xs font-extrabold text-slate-900 flex items-center space-x-1.5">
@@ -345,7 +370,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                        <!-- Pop-up Mutasi Kas -->
                         <button onclick="openModal('mutasi')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
                             <div class="flex items-center space-x-3 text-left">
                                 <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-indigo-300 group-hover:scale-105 transition-transform">
@@ -359,7 +383,6 @@
                             <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-400 group-hover:text-white transition-colors"></i>
                         </button>
 
-                        <!-- Pop-up Pajak 12% -->
                         <button onclick="openModal('tax')" class="p-4 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
                             <div class="flex items-center space-x-3 text-left">
                                 <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
@@ -373,7 +396,6 @@
                             <i data-lucide="arrow-up-right" class="w-4 h-4 text-amber-200 group-hover:text-white transition-colors"></i>
                         </button>
 
-                        <!-- Pop-up Buku Besar Akun -->
                         <button onclick="openModal('ledger')" class="p-4 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
                             <div class="flex items-center space-x-3 text-left">
                                 <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-purple-200 group-hover:scale-105 transition-transform">
@@ -387,7 +409,6 @@
                             <i data-lucide="arrow-up-right" class="w-4 h-4 text-purple-300 group-hover:text-white transition-colors"></i>
                         </button>
 
-                        <!-- Pop-up Pesan Tim -->
                         <button onclick="openModal('notices')" class="p-4 rounded-2xl bg-slate-700 hover:bg-slate-800 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
                             <div class="flex items-center space-x-3 text-left">
                                 <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
@@ -412,7 +433,6 @@
     <div id="main-modal-container" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-3 sm:p-5">
         <div class="ios-glass w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl modal-sheet overflow-hidden border border-white/40">
             
-            <!-- POP-UP HEADER -->
             <div class="px-6 py-4 border-b border-slate-200/90 flex items-center justify-between bg-white/70">
                 <div class="flex items-center space-x-3">
                     <div id="modal-icon-badge" class="w-9 h-9 rounded-xl flex items-center justify-center text-white">
@@ -432,10 +452,9 @@
                 </div>
             </div>
 
-            <!-- POP-UP BODY -->
             <div id="modal-body-content" class="p-6 overflow-y-auto flex-1 space-y-4">
                 
-                <!-- 1. ISI POP-UP: MUTASI KAS -->
+                <!-- 1. MUTASI KAS -->
                 <div id="popup-content-mutasi" class="space-y-4 hidden">
                     <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
                         <table class="w-full text-left border-collapse text-xs">
@@ -454,7 +473,7 @@
                     </div>
                 </div>
 
-                <!-- 2. ISI POP-UP: PAJAK 12% -->
+                <!-- 2. PAJAK 12% -->
                 <div id="popup-content-tax" class="space-y-4 hidden">
                     <div class="overflow-x-auto border border-amber-200 rounded-2xl">
                         <table class="w-full text-left border-collapse text-xs">
@@ -482,7 +501,7 @@
                     </div>
                 </div>
 
-                <!-- 3. ISI POP-UP: BUKU BESAR AKUN -->
+                <!-- 3. BUKU BESAR -->
                 <div id="popup-content-ledger" class="space-y-4 hidden">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <span id="total-active-accounts" class="text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full">
@@ -495,18 +514,18 @@
                     <div id="kasir-per-account-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
 
-                <!-- 4. ISI POP-UP: REKAP RIWAYAT SHIFT CLOSING -->
+                <!-- 4. REKAP RIWAYAT SHIFT CLOSING (DETAIL DETIK) -->
                 <div id="popup-content-shift_history" class="space-y-4 hidden">
                     <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead class="bg-slate-100 text-[11px] font-black text-slate-700 uppercase border-b border-slate-200">
                                 <tr>
-                                    <th class="py-3 px-3">Waktu Closing</th>
+                                    <th class="py-3 px-3">Waktu Selesai (Detail s/d Detik)</th>
                                     <th class="py-3 px-3">Nama Shift</th>
-                                    <th class="py-3 px-3 text-right">Total Kas Masuk</th>
-                                    <th class="py-3 px-3 text-right">Total Kas Keluar</th>
-                                    <th class="py-3 px-3 text-right font-black text-indigo-900">Saldo Diserahkan</th>
-                                    <th class="py-3 px-3 text-center">Petugas Closing</th>
+                                    <th class="py-3 px-3 text-right">Kas Masuk</th>
+                                    <th class="py-3 px-3 text-right">Kas Keluar</th>
+                                    <th class="py-3 px-3 text-right font-black text-indigo-950">Uang Diserahkan</th>
+                                    <th class="py-3 px-3 text-center">Petugas Kasir</th>
                                 </tr>
                             </thead>
                             <tbody id="shift-history-table-body"></tbody>
@@ -514,7 +533,7 @@
                     </div>
                 </div>
 
-                <!-- 5. ISI POP-UP: PESAN TIM -->
+                <!-- 5. PESAN TIM -->
                 <div id="popup-content-notices" class="space-y-4 hidden">
                     <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
                         <span class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
@@ -535,7 +554,6 @@
 
             </div>
 
-            <!-- POP-UP FOOTER -->
             <div class="px-6 py-3 border-t border-slate-200/90 bg-white/70 flex justify-end">
                 <button onclick="closeModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs transition active:scale-95">
                     Tutup Pop-Up
@@ -632,7 +650,7 @@
         if (document.getElementById('user-role-display')) {
             if (user.role === 'owner') document.getElementById('user-role-display').innerText = "Role: Owner (Read-Only)";
             else if (user.role === 'manager') document.getElementById('user-role-display').innerText = "Role: Supervisor / Manager";
-            else document.getElementById('user-role-display').innerText = "Role: Staf Kasir / Admin";
+            else document.getElementById('user-role-display').innerText = "Role: Staf Kasir";
         }
 
         if (typeof initFirebase === 'function') initFirebase();
@@ -647,6 +665,26 @@
             ? `tx_${activeTenant.id}` 
             : 'transactions_v11';
 
+        // ================= KAPSUL WAKTU REALTIME =================
+        function updateRealtimeClock() {
+            const clockEl = document.getElementById('realtime-clock-display');
+            if (!clockEl) return;
+            const now = new Date();
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+            const dayName = days[now.getDay()];
+            const dateNum = String(now.getDate()).padStart(2, '0');
+            const monthName = months[now.getMonth()];
+            const yearNum = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+
+            clockEl.innerText = `${dayName}, ${dateNum} ${monthName} ${yearNum} • ${hours}:${minutes}`;
+        }
+        setInterval(updateRealtimeClock, 1000);
+        updateRealtimeClock();
+
         // SISTEM SHIFT CLOSING HARIAN
         let currentShiftName = localStorage.getItem('fm_shift_name') || "Shift 1 (Pagi)";
         let shiftHistory = JSON.parse(localStorage.getItem('fm_shift_history') || "[]");
@@ -656,23 +694,29 @@
             document.getElementById('shift-label-display').innerText = currentShiftName;
             const last = shiftHistory[0];
             if (last) {
-                document.getElementById('last-closed-shift-badge').innerText = `${last.shiftName}: Rp ${formatThousandSeparator(last.balance)}`;
+                document.getElementById('last-closed-shift-badge').innerText = `${last.shiftName}: Rp ${formatThousandSeparator(last.balance)} (${last.closedAt})`;
             } else {
                 document.getElementById('last-closed-shift-badge').innerText = "Belum ada closing";
             }
         }
 
-        function renameShiftPrompt() {
-            const newName = prompt("Ubah Nama / Keterangan Shift Berjalan:", currentShiftName);
-            if (newName && newName.trim()) {
-                currentShiftName = newName.trim();
-                localStorage.setItem('fm_shift_name', currentShiftName);
-                updateShiftHeaderUI();
-            }
-        }
-
+        // FUNGSI CLOSING SHIFT KASIR DENGAN WAKTU PRESISI SAMPAI DETIK
         function triggerClosingShiftCycle() {
-            // Hitung saldo shift berjalan saat ini
+            const now = new Date();
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+            const dayName = days[now.getDay()];
+            const dateNum = String(now.getDate()).padStart(2, '0');
+            const monthName = months[now.getMonth()];
+            const yearNum = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            // Format presisi lengkap hari, tanggal, bulan, tahun, jam, menit, detik
+            const preciseTimestamp = `${dayName}, ${dateNum} ${monthName} ${yearNum} - ${hours}:${minutes}:${seconds} WIB`;
+
             const activeShiftTx = txList.filter(t => !t.isClosed);
             let shiftIn = 0;
             let shiftOut = 0;
@@ -682,17 +726,18 @@
             });
             const shiftBalance = shiftIn - shiftOut;
 
-            if (confirm(`Lakukan Closing ${currentShiftName} sekarang?\n\nSaldo Laci yang diserahkan: Rp ${formatThousandSeparator(shiftBalance)}\n\nSetelah closing, saldo laci shift kasir akan di-reset kembali ke Rp 0 untuk shift berikutnya.`)) {
-                // Catat ke riwayat shift
+            if (confirm(`Selesaikan jam kerja (${currentShiftName}) sekarang?\n\nWaktu Closing: ${preciseTimestamp}\nSaldo yang diserahkan: Rp ${formatThousandSeparator(shiftBalance)}\n\nSetelah closing, saldo kasir aktif akan di-reset kembali ke Rp 0.`)) {
                 const closingRecord = {
                     id: 'shift_' + Date.now(),
                     shiftName: currentShiftName,
-                    closedAt: new Date().toLocaleDateString('id-ID') + " " + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    closedAt: preciseTimestamp,
                     totalIn: shiftIn,
                     totalOut: shiftOut,
                     balance: shiftBalance,
-                    staff: user.title
+                    staff: user.title,
+                    timestamp: Date.now()
                 };
+
                 shiftHistory.unshift(closingRecord);
                 localStorage.setItem('fm_shift_history', JSON.stringify(shiftHistory));
 
@@ -700,17 +745,18 @@
                 txList.forEach(t => { t.isClosed = true; });
                 persistData();
 
-                // Ganti ke nama shift berikutnya otomatis
-                if (currentShiftName.includes("Pagi") || currentShiftName.includes("1")) {
-                    currentShiftName = "Shift 2 (Siang/Malam)";
-                } else {
-                    currentShiftName = "Shift 1 (Pagi)";
+                // Simpan juga audit ke firestore jika online
+                if (typeof db !== 'undefined' && db) {
+                    db.collection('shift_logs_v11').add({
+                        tenantId: activeTenant ? activeTenant.id : 'default',
+                        ...closingRecord,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).catch(console.error);
                 }
-                localStorage.setItem('fm_shift_name', currentShiftName);
 
                 updateShiftHeaderUI();
                 renderAllReports();
-                alert(`Closing ${closingRecord.shiftName} berhasil! Uang diserahkan Rp ${formatThousandSeparator(shiftBalance)}. Saldo laci shift aktif sekarang Rp 0.`);
+                alert(`Closing Selesai!\n\nPetugas: ${user.title}\nWaktu: ${preciseTimestamp}\nSaldo Diserahkan: Rp ${formatThousandSeparator(shiftBalance)}\n\nSaldo shift laci kasir telah kembali ke Rp 0.`);
             }
         }
 
@@ -762,7 +808,7 @@
                 document.getElementById('popup-content-ledger').classList.remove('hidden');
             } else if (type === 'shift_history') {
                 titleEl.innerText = "Riwayat Closing Shift Kasir";
-                subEl.innerText = "Daftar penyerahan uang kas fisik per shift";
+                subEl.innerText = "Daftar penyerahan uang kas fisik per shift tercatat sampai detik";
                 iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-indigo-700";
                 iconEl.setAttribute('data-lucide', 'history');
                 renderShiftHistoryTable();
@@ -1171,9 +1217,7 @@
             calculateShiftLiveBalance();
         }
 
-        // HITUNG SALDO SHIFT LACI KASIR BERJALAN REALTIME
         function calculateShiftLiveBalance() {
-            // Hanya menghitung transaksi shift aktif (belum di-closing)
             const activeShiftTx = txList.filter(t => !t.isClosed);
             let shiftIn = 0;
             let shiftOut = 0;
@@ -1189,7 +1233,7 @@
             document.getElementById('shift-out-stat').innerText = "Rp " + formatThousandSeparator(shiftOut);
         }
 
-        // 1. RENDER MUTASI KAS
+        // 1. MUTASI KAS
         function renderKasirTable() {
             const tbody = document.getElementById('kasir-table-body');
             tbody.innerHTML = "";
@@ -1255,7 +1299,7 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        // 2. RENDER TABEL PAJAK NEGARA 12%
+        // 2. PAJAK 12%
         function renderTaxTable() {
             const tbody = document.getElementById('tax-table-body');
             tbody.innerHTML = "";
@@ -1304,7 +1348,7 @@
             document.getElementById('tax-foot-net').innerText = "Rp " + formatThousandSeparator(totalNet);
         }
 
-        // 3. RENDER MUTASI BUKU BESAR PER ACCOUNT
+        // 3. BUKU BESAR
         function renderPerAccountKasir() {
             const container = document.getElementById('kasir-per-account-grid');
             container.innerHTML = "";
@@ -1385,7 +1429,7 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        // 4. RENDER RIWAYAT SHIFT CLOSING
+        // 4. RIWAYAT SHIFT CLOSING (DETAIL DETIK)
         function renderShiftHistoryTable() {
             const tbody = document.getElementById('shift-history-table-body');
             tbody.innerHTML = "";
