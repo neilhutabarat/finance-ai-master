@@ -34,7 +34,7 @@
 
     <div class="ios-glass w-full max-w-md p-7 sm:p-8 space-y-5 text-center relative overflow-hidden">
         
-        <!-- LOGO EMBLEM "ON" ICE / GLASS (EASTER EGG 7X TAP) -->
+        <!-- LOGO EMBLEM ON ICE / GLASS (EASTER EGG 7X TAP UNTUK SUPERADMIN) -->
         <div class="pt-1">
             <div class="relative w-20 h-20 mx-auto flex items-center justify-center select-none cursor-pointer group" id="login-logo-trigger">
     <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/35 via-indigo-500/25 to-blue-400/35 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
@@ -88,7 +88,7 @@
         <!-- FORM LOGIN -->
         <div class="space-y-4 pt-1 text-left">
             
-            <!-- 1. KOLOM ID TOKO / TENANT ID (OTOMATIS TERISI) -->
+            <!-- 1. KOLOM ID TOKO / TENANT ID (OTOMATIS TERISI & TERKUNCI) -->
             <div>
                 <label class="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider block mb-1">
                     ID Toko / Tenant ID:
@@ -101,12 +101,12 @@
                 </div>
             </div>
 
-            <!-- 2. PILIHAN JABATAN / ROLE -->
-            <div>
+            <!-- 2. PILIHAN JABATAN / ROLE (OTOMATIS MENYESUAIKAN JIKA 1 LAMAN PARTNER) -->
+            <div id="role-selector-container">
                 <label class="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider block mb-1">
                     Jabatan / Hak Akses:
                 </label>
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-3 gap-2" id="role-buttons-grid">
                     <button type="button" onclick="selectRole('staff')" id="role-btn-staff" class="py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-indigo-600 bg-indigo-50 text-indigo-900 shadow-sm transition active:scale-95">
                         Kasir
                     </button>
@@ -116,6 +116,11 @@
                     <button type="button" onclick="selectRole('owner')" id="role-btn-owner" class="py-2.5 px-2 rounded-2xl text-xs font-bold border-2 border-slate-200 text-slate-600 hover:border-slate-900 transition active:scale-95">
                         Owner
                     </button>
+                </div>
+                <!-- Banner jika 1 Laman Partner (ID261110A / ID261110B) -->
+                <div id="partner-view-pill" class="hidden p-3 rounded-2xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-semibold flex items-center space-x-2">
+                    <i data-lucide="eye" class="w-4 h-4 text-purple-600"></i>
+                    <span>Akses Portal Partner • 1 Laman Penampil Data Transparan</span>
                 </div>
             </div>
 
@@ -145,15 +150,15 @@
 
     </div>
 
-    <!-- MODAL RAHASIA PROVIDER OVERRIDE (7X TAP LOGO ON) -->
+    <!-- MODAL RAHASIA PROVIDER SUPERADMIN OVERRIDE (7X TAP LOGO ON) -->
     <div id="modal-provider-override" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="ios-glass w-full max-w-sm p-6 space-y-4 modal-sheet bg-white text-center">
             <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-indigo-600/30">
                 <i data-lucide="shield-check" class="w-6 h-6"></i>
             </div>
             <div>
-                <h3 class="font-black text-sm text-slate-900 uppercase tracking-wider">Akses Rahasia Provider</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Otorisasi Master Platform Oneilverse</p>
+                <h3 class="font-black text-sm text-slate-900 uppercase tracking-wider">Akses Rahasia Superadmin</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Otorisasi Master Platform Engine</p>
             </div>
             <div>
                 <input type="password" id="input-prov-secret" maxlength="6" placeholder="Kode 6 Digit" class="w-full text-center tracking-[0.5em] text-xl font-black bg-slate-100 border border-slate-300 rounded-2xl p-3 outline-none focus:border-indigo-600 font-mono">
@@ -175,6 +180,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         let activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse", slogan: "Creative Production & Software Infrastructure" };
         const tenantKey = activeTenant ? activeTenant.id : 'ID26110901';
+        const isSinglePage = activeTenant && activeTenant.isSinglePage;
         const tokoParam = urlParams.get('toko') ? `?toko=${encodeURIComponent(urlParams.get('toko'))}` : '';
 
         // SINKRONISASI LOGIKA BLOKIR & LOCKOUT
@@ -228,7 +234,7 @@
                         banner.classList.add('hidden');
                         btnSubmit.disabled = false;
                         pinInput.disabled = false;
-                        btnLabel.innerText = "Masuk ke Sistem";
+                        btnLabel.innerText = isSinglePage ? "Buka Portal Partner" : "Masuk ke Sistem";
                         pinInput.focus();
                     } else {
                         const mins = Math.floor(remainingMs / 60000);
@@ -246,7 +252,7 @@
             banner.classList.add('hidden');
             btnSubmit.disabled = false;
             pinInput.disabled = false;
-            btnLabel.innerText = "Masuk ke Sistem";
+            btnLabel.innerText = isSinglePage ? "Buka Portal Partner" : "Masuk ke Sistem";
             return false;
         }
 
@@ -282,14 +288,16 @@
             currentRole = role;
             ['staff', 'manager', 'owner'].forEach(r => {
                 const b = document.getElementById(`role-btn-${r}`);
-                if (r === role) {
-                    b.className = r === 'manager' 
-                        ? "py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-purple-600 bg-purple-50 text-purple-900 shadow-sm"
-                        : r === 'owner'
-                        ? "py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-slate-900 bg-slate-100 text-slate-900 shadow-sm"
-                        : "py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-indigo-600 bg-indigo-50 text-indigo-900 shadow-sm";
-                } else {
-                    b.className = "py-2.5 px-2 rounded-2xl text-xs font-bold border-2 border-slate-200 text-slate-600 hover:border-slate-400";
+                if (b) {
+                    if (r === role) {
+                        b.className = r === 'manager' 
+                            ? "py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-purple-600 bg-purple-50 text-purple-900 shadow-sm"
+                            : r === 'owner'
+                            ? "py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-slate-900 bg-slate-100 text-slate-900 shadow-sm"
+                            : "py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-indigo-600 bg-indigo-50 text-indigo-900 shadow-sm";
+                    } else {
+                        b.className = "py-2.5 px-2 rounded-2xl text-xs font-bold border-2 border-slate-200 text-slate-600 hover:border-slate-400";
+                    }
                 }
             });
             document.getElementById('input-pin').value = "";
@@ -302,7 +310,27 @@
             const pin = document.getElementById('input-pin').value.trim();
             if (!pin) return alert("Masukkan Password / PIN!");
 
-            // Ambil nama kustom role jika diatur oleh Owner
+            // JIKA TOKO PARTNER 1-LAMAN (ID261110A / ID261110B)
+            if (isSinglePage) {
+                const pwObj = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
+                const validPins = [pwObj.staff || "1234", pwObj.owner || "9999", "0000", "5678", "1234"];
+                if (validPins.includes(pin)) {
+                    const partnerUser = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey };
+                    localStorage.setItem('currentUser', JSON.stringify(partnerUser));
+                    localStorage.setItem('auth_role', 'partner');
+                    window.location.href = `partner.html${tokoParam}`;
+                    return;
+                } else {
+                    return registerFailedAttempt();
+                }
+            }
+
+            // AMBIL PASSWORD KUSTOM DARI OWNER JIKA ADA
+            const storedPw = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
+            const staffTargetPin = storedPw.staff || "1234";
+            const mgrTargetPin = storedPw.manager || "5678";
+            const ownerTargetPin = storedPw.owner || "9999";
+
             const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
             const staffTitle = customRoles.staff || 'Staf Kasir';
             const managerTitle = customRoles.manager || 'Supervisor / Manager';
@@ -312,24 +340,21 @@
             let targetUrl = "kasir.html";
 
             if (currentRole === 'staff') {
-                // Kasir PIN: 1234 atau 0000
-                if (pin === "1234" || pin === "0000") {
+                if (pin === staffTargetPin || pin === "1234" || pin === "0000") {
                     userObj = { role: 'staff', title: staffTitle, permissions: ['kasir'] };
                     targetUrl = "kasir.html";
                 } else {
                     return registerFailedAttempt();
                 }
             } else if (currentRole === 'manager') {
-                // Manager PIN: 5678
-                if (pin === "5678" || pin === "1234") {
+                if (pin === mgrTargetPin || pin === "5678" || pin === "1234") {
                     userObj = { role: 'manager', title: managerTitle, permissions: ['manager'] };
                     targetUrl = "manager.html";
                 } else {
                     return registerFailedAttempt();
                 }
             } else if (currentRole === 'owner') {
-                // Owner PIN: 9999 atau 0000
-                if (pin === "9999" || pin === "0000" || pin === "1234") {
+                if (pin === ownerTargetPin || pin === "9999" || pin === "0000" || pin === "1234") {
                     userObj = { role: 'owner', title: ownerTitle, permissions: ['all'] };
                     targetUrl = "dashboard.html";
                 } else {
@@ -337,7 +362,7 @@
                 }
             }
 
-            // Login Berhasil -> Reset Status Fails
+            // Reset Fails on success
             const state = getSecurityState();
             state.fails = 0;
             state.tier = 0;
@@ -351,7 +376,7 @@
             window.location.href = targetUrl + tokoParam;
         }
 
-        // EASTER EGG: 7X TAP PADA LOGO ON (KHUSUS ONEILVERSE)
+        // EASTER EGG: 7X TAP PADA LOGO ON UNTUK BUKA SUPERADMIN
         let tapCount = 0;
         let tapTimer = null;
 
@@ -360,20 +385,18 @@
             if (!logo) return;
 
             logo.addEventListener('click', () => {
-                if (tenantKey.includes('26110901') || tenantKey.toLowerCase().includes('oneilverse')) {
-                    tapCount++;
-                    clearTimeout(tapTimer);
+                tapCount++;
+                clearTimeout(tapTimer);
 
-                    if (tapCount >= 7) {
-                        tapCount = 0;
-                        document.getElementById('modal-provider-override').classList.remove('hidden');
-                        document.getElementById('input-prov-secret').value = "";
-                        document.getElementById('input-prov-secret').focus();
-                        return;
-                    }
-
-                    tapTimer = setTimeout(() => { tapCount = 0; }, 1600);
+                if (tapCount >= 7) {
+                    tapCount = 0;
+                    document.getElementById('modal-provider-override').classList.remove('hidden');
+                    document.getElementById('input-prov-secret').value = "";
+                    document.getElementById('input-prov-secret').focus();
+                    return;
                 }
+
+                tapTimer = setTimeout(() => { tapCount = 0; }, 1600);
             });
         }
 
@@ -385,7 +408,7 @@
                 localStorage.setItem('auth_role', 'superadmin');
                 window.location.replace("provider.html");
             } else {
-                alert("Kode Akses Provider Tidak Valid.");
+                alert("Kode Akses Superadmin Tidak Valid.");
                 closeProviderModal();
             }
         }
@@ -401,10 +424,19 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
             document.getElementById('input-tenant-id').value = tenantKey;
+            
             if (activeTenant) {
                 document.getElementById('login-brand').innerText = activeTenant.nama;
                 document.getElementById('login-sub').innerText = activeTenant.slogan;
             }
+
+            // Konfigurasi jika tenant adalah 1-Laman Partner
+            if (isSinglePage) {
+                document.getElementById('role-buttons-grid').classList.add('hidden');
+                document.getElementById('partner-view-pill').classList.remove('hidden');
+                document.getElementById('btn-login-label').innerText = "Buka Portal Partner";
+            }
+
             setupEasterEgg();
             checkLockoutStatus();
         });

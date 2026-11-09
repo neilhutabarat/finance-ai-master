@@ -883,7 +883,13 @@
         }
 
         function loadTransactions() {
+            // Jika ID26110901 (Master Template), pastikan kondisi awal bersih Rp 0
+            if (activeTenant && activeTenant.id === 'ID26110901' && !localStorage.getItem('fm_master_cleared')) {
+                localStorage.setItem(tenantStorageKey, JSON.stringify([]));
+                localStorage.setItem('fm_master_cleared', 'true');
+            }
             const raw = localStorage.getItem(tenantStorageKey);
+            txList = raw ? JSON.parse(raw) : [];
             txList = raw ? JSON.parse(raw) : [];
 
             if (typeof db !== 'undefined' && db) {
