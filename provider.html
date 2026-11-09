@@ -70,6 +70,12 @@
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     <span>Keluar Portal</span>
                 </button>
+
+                <button onclick="openReleaseNotesModal()" class="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-[10px] font-bold text-white transition flex items-center space-x-1.5" title="Arsip Catatan Rilis Global">
+                    <i data-lucide="server" class="w-3.5 h-3.5"></i>
+                    <span class="font-mono">Log Versi</span>
+                </button>
+    
             </div>
         </div>
     </header>
@@ -406,5 +412,34 @@
             loadProviderDashboard();
         });
     </script>
+
+    <!-- MODAL CATATAN RILIS & VERSI -->
+    <div id="modal-release-notes" class="hidden fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="ios-glass w-full max-w-lg p-0 shadow-2xl modal-sheet flex flex-col overflow-hidden bg-white">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+                        <i data-lucide="info" class="w-5 h-5 text-indigo-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-base leading-tight">Catatan Rilis & Versi Sistem</h3>
+                        <p class="text-[10px] text-slate-400">Pembaruan fungsional dan keamanan terbaru</p>
+                    </div>
+                </div>
+                <button onclick="closeReleaseNotesModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4" id="release-notes-container">
+                <!-- Diisi via JS -->
+            </div>
+            <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <button onclick="closeReleaseNotesModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+    
 </body>
 </html>

