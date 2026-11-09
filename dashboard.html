@@ -2,1476 +2,857 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Eksekutif & Manager - Finance Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Oneilverse - Portal Pengawasan Manager & Eksekutif</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- jsPDF & AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body class="bg-slate-100 text-slate-800 font-sans pb-24 sm:pb-8 min-h-screen">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- TOPBAR KHUSUS MANAGER & OWNER -->
-    <header class="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 shadow-sm sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div id="topbar-icon-bg" class="w-10 h-10 rounded-xl bg-purple-700 flex items-center justify-center text-white font-bold shadow">
-                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+    <style>
+        :root {
+            --app-bg: #f8fafc;
+            --ios-card: rgba(255, 255, 255, 0.94);
+            --ios-border: rgba(226, 232, 240, 0.95);
+            --oneui-squircle: 24px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--app-bg);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Samsung One UI Header Gradient */
+        .oneui-hero {
+            border-bottom-left-radius: 36px;
+            border-bottom-right-radius: 36px;
+            background: linear-gradient(145deg, #1e1b4b 0%, #311042 50%, #0f172a 100%);
+        }
+
+        /* iOS Ultra Glassmorphism */
+        .ios-glass {
+            background: var(--ios-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--ios-border);
+            border-radius: var(--oneui-squircle);
+        }
+
+        .ios-pill {
+            border-radius: 9999px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .tax-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+        }
+
+        .modal-backdrop {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease-out;
+        }
+
+        .modal-sheet {
+            animation: sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes sheetUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white pb-8">
+
+    <!-- HERO HEADER: SAMSUNG ONE UI STYLE -->
+    <header class="oneui-hero text-white px-5 sm:px-8 pt-7 pb-8 shadow-xl relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-72 h-72 bg-purple-500/25 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <div class="flex items-center space-x-4">
+                <div id="topbar-logo-box" class="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl flex items-center justify-center text-2xl shadow-inner shadow-white/20 transition-transform active:scale-95">
+                    <span id="topbar-emoji-icon">📊</span>
                 </div>
                 <div>
                     <div class="flex items-center space-x-2">
-                        <h1 id="topbar-title" class="font-black text-sm sm:text-base text-gray-900 leading-tight">Portal Laporan & Pengawasan</h1>
-                        <span id="role-badge-pill" class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
-                            Role
+                        <h1 id="topbar-store-name" class="font-extrabold text-2xl sm:text-3xl tracking-tight leading-none text-white">Oneilverse</h1>
+                        <span id="tenant-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase bg-purple-500/30 border border-purple-400/40 text-purple-200">
+                            ID26110901
                         </span>
                     </div>
-                    <p id="top-user-info" class="text-xs text-gray-500">Laporan & Pengawasan Usaha</p>
+                    <p id="topbar-store-slogan" class="text-xs sm:text-sm text-slate-300 font-medium mt-1">Portal Laporan Eksekutif & Pengawasan Manager</p>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-2">
-                <!-- Navigasi ke Kasir (Hanya jika bukan Owner, atau menampilkan info) -->
-                <div id="kasir-nav-wrapper"></div>
-                <button onclick="logout()" class="px-3 py-1.5 bg-gray-100 hover:bg-rose-50 hover:text-rose-600 rounded-xl text-xs font-bold text-gray-600 flex items-center space-x-1">
-                    <i data-lucide="log-out" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Ganti Jabatan</span>
+            <div class="flex items-center space-x-2.5 self-start md:self-auto">
+                <a href="kasir.html" class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/20 flex items-center space-x-1.5 transition active:scale-95">
+                    <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+                    <span>Terminal Kasir</span>
+                </a>
+                <div class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-purple-500/25 border border-purple-300/30 flex items-center shadow-sm text-purple-100">
+                    <span class="w-2 h-2 rounded-full bg-purple-400 mr-2 animate-ping"></span>
+                    <span id="user-role-badge">Manager / Supervisor</span>
+                </div>
+                <button onclick="logout()" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    <span>Keluar</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- BANNER KHUSUS OWNER: HANYA BACA (READ-ONLY) -->
-    <div id="owner-readonly-banner" class="hidden bg-slate-900 text-white px-4 py-2.5 text-xs border-b border-slate-700">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1.5">
-            <div class="flex items-center space-x-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="font-bold text-emerald-400">Mode Owner (Akses Penuh - Read Only):</span>
-                <span class="text-slate-300">Anda dapat memantau semua laporan keuangan secara langsung. Untuk melakukan penginputan kasir atau perubahan COA, gunakan PIN Kasir (1111) atau PIN Manager (5678).</span>
-            </div>
-            <span class="text-[11px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Akses Pantau Aman</span>
-        </div>
-    </div>
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 flex-1 space-y-6 -mt-3">
 
-    <!-- MAIN CONTAINER -->
-    <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
-
-        <!-- HEADER NAVIGATION TABS -->
-        <div class="flex space-x-2 border-b border-gray-200 pb-2 overflow-x-auto">
-            <button onclick="switchView('labarugi')" id="tab-btn-labarugi" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-purple-700 text-white shadow-sm whitespace-nowrap">
-                1. Laporan Laba Rugi
-            </button>
-            <button onclick="switchView('stok')" id="tab-btn-stok" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 whitespace-nowrap">
-                2. Stok Bahan Baku (HPP)
-            </button>
-            <button onclick="switchView('pos4')" id="tab-btn-pos4" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 whitespace-nowrap">
-                3. Laporan 4 Pos Induk
-            </button>
-            <button onclick="switchView('mutasi-kas')" id="tab-btn-mutasi-kas" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 whitespace-nowrap">
-                4. Laporan Transaksi Kas
-            </button>
-            <button onclick="switchView('buku-besar')" id="tab-btn-buku-besar" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 whitespace-nowrap">
-                5. Laporan Buku Besar
-            </button>
-            <button onclick="switchView('notices')" id="tab-btn-notices" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 whitespace-nowrap flex items-center space-x-1.5">
-                <i data-lucide="bell" class="w-3.5 h-3.5 text-amber-500"></i>
-                <span>6. Kolom Pemberitahuan</span>
-                <span id="nav-notice-count" class="bg-amber-100 text-amber-800 text-[10px] font-black px-1.5 py-0.2 rounded-full ml-1">0</span>
-            </button>
-            <button onclick="switchView('ai')" id="tab-btn-ai" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 whitespace-nowrap">
-                7. Analisa AI Keuangan
-            </button>
-            <button onclick="switchView('coa')" id="tab-btn-coa" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 whitespace-nowrap">
-                8. Master COA
-            </button>
-        </div>
-
-        <!-- ================= 1. LAPORAN LABA RUGI USAHA ================= -->
-        <section id="view-labarugi" class="space-y-4">
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b pb-3">
-                    <div>
-                        <h2 class="text-base font-extrabold text-gray-900 flex items-center space-x-2">
-                            <i data-lucide="calculator" class="w-5 h-5 text-purple-700"></i>
-                            <span>Laporan Laba Rugi Operasional Usaha</span>
-                        </h2>
-                        <p class="text-xs text-gray-500">Murni aktivitas operasional usaha dagang (Prive tidak dimasukkan ke dalam beban operasional)</p>
-                    </div>
-                    <button onclick="exportLabaRugiCOA_PDF()" class="bg-purple-700 hover:bg-purple-800 text-white font-bold px-3.5 py-2 rounded-xl text-xs flex items-center space-x-1.5 shadow-sm transition">
-                        <i data-lucide="file-text" class="w-4 h-4"></i>
-                        <span>Cetak Laba Rugi PDF (Rinci Per COA)</span>
-                    </button>
+        <!-- HIGHLIGHT BAR: TOTAL PAJAK NEGARA 12% DISUMBANGKAN -->
+        <div class="ios-glass p-5 shadow-lg border-purple-100 bg-gradient-to-r from-red-50/90 via-white/80 to-purple-50/90 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-2xl tax-badge text-white flex items-center justify-center shadow-lg shadow-red-500/30">
+                    <i data-lucide="landmark" class="w-6 h-6"></i>
                 </div>
-
-                <!-- FILTER PERIODE TANGGAL LABA RUGI -->
-                <div class="bg-purple-50/60 border border-purple-200 p-3.5 rounded-xl space-y-2.5">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-purple-950 flex items-center space-x-1.5">
-                            <i data-lucide="calendar-range" class="w-4 h-4 text-purple-700"></i>
-                            <span>Periode Laba Rugi Berdasarkan Tanggal:</span>
-                        </span>
-                        <span id="lr-filter-status" class="text-[10px] font-bold text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full border border-purple-200">
-                            Semua Tanggal
-                        </span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                        <div class="sm:col-span-4">
-                            <label class="text-[10px] font-bold text-gray-500 block">Dari Tanggal:</label>
-                            <input type="date" id="lr-date-start" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-purple-500">
-                        </div>
-                        <div class="sm:col-span-4">
-                            <label class="text-[10px] font-bold text-gray-500 block">Sampai Tanggal:</label>
-                            <input type="date" id="lr-date-end" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-purple-500">
-                        </div>
-                        <div class="sm:col-span-4 flex space-x-1.5 pt-3.5">
-                            <button onclick="applyLabaRugiDateFilter()" class="flex-1 bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center space-x-1 shadow-sm">
-                                <i data-lucide="filter" class="w-3.5 h-3.5"></i>
-                                <span>Terapkan</span>
-                            </button>
-                            <button onclick="resetLabaRugiDateFilter()" class="px-3 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-2 rounded-lg text-xs transition" title="Reset Semua">
-                                Reset
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Format Laba Rugi Standar Akuntansi -->
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-6 space-y-4 text-xs sm:text-sm">
-                    <!-- A. PENJUALAN -->
-                    <div class="space-y-1.5">
-                        <div class="flex justify-between font-extrabold text-slate-900 border-b pb-1 text-sm">
-                            <span>A. PENJUALAN</span>
-                            <span id="lr-total-sales" class="text-emerald-700">Rp 0</span>
-                        </div>
-                        <div id="lr-sales-breakdown" class="pl-4 space-y-1 text-xs text-slate-600"></div>
-                    </div>
-
-                    <!-- B. HARGA POKOK PENJUALAN (HPP) -->
-                    <div class="space-y-1.5">
-                        <div class="flex justify-between font-extrabold text-slate-900 border-b pb-1 text-sm">
-                            <span>B. HARGA POKOK PENJUALAN (HPP)</span>
-                            <span id="lr-total-cogs" class="text-amber-700">(Rp 0)</span>
-                        </div>
-                        <div id="lr-cogs-breakdown" class="pl-4 space-y-1 text-xs text-slate-600"></div>
-                        <div class="pl-4 text-[11px] text-amber-800 font-bold italic" id="lr-stock-used-note">
-                            * Termasuk Pemakaian Bahan Baku (Stok Awal - Akhir): Rp 0
-                        </div>
-                    </div>
-
-                    <!-- LABA KOTOR -->
-                    <div class="flex justify-between py-2 bg-emerald-100/70 px-3 rounded-lg font-black text-emerald-950 text-sm">
-                        <span>LABA KOTOR (A - B)</span>
-                        <span id="lr-gross-profit">Rp 0</span>
-                    </div>
-
-                    <!-- C. BIAYA OPERASIONAL -->
-                    <div class="space-y-1.5">
-                        <div class="flex justify-between font-extrabold text-slate-900 border-b pb-1 text-sm">
-                            <span>C. BIAYA OPERASIONAL USAHA</span>
-                            <span id="lr-total-expense" class="text-rose-700">(Rp 0)</span>
-                        </div>
-                        <div id="lr-expense-breakdown" class="pl-4 space-y-1 text-xs text-slate-600"></div>
-                    </div>
-
-                    <!-- LABA KOTOR SEBELUM PAJAK -->
-                    <div class="flex justify-between py-3 bg-slate-900 text-white px-4 rounded-xl mt-3 shadow-md">
-                        <div>
-                            <span class="font-black text-emerald-400 sm:text-base block">LABA KOTOR SEBELUM PAJAK</span>
-                            <span class="text-[10px] text-slate-400 font-normal">Laba Bersih Operasional Usaha Murni (Sebelum potongan pajak)</span>
-                        </div>
-                        <span id="lr-ebt" class="font-black text-emerald-400 sm:text-lg self-center">Rp 0</span>
-                    </div>
-
-                    <!-- INFO CATATAN PRIVE (DI LUAR LABA RUGI OPERASIONAL) -->
-                    <div class="bg-purple-50 border border-purple-200 p-3 rounded-xl flex justify-between items-center text-xs">
-                        <div>
-                            <span class="font-bold text-purple-900 block">Informasi Penarikan Modal / Prive Pemilik (Equity):</span>
-                            <span class="text-[11px] text-purple-700">Prive dicatat di laporan ekuitas modal pemilik dan tidak mengurangi laba operasional usaha.</span>
-                        </div>
-                        <span id="lr-prive-info" class="font-black text-purple-900 text-xs sm:text-sm">Rp 0</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= 2. STOK BAHAN BAKU (HPP) ================= -->
-        <section id="view-stok" class="hidden space-y-4">
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-5">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 border-b pb-3">
-                    <div>
-                        <h2 class="text-base font-extrabold text-gray-900 flex items-center space-x-2">
-                            <i data-lucide="boxes" class="w-5 h-5 text-amber-600"></i>
-                            <span>Manajemen Stok Bahan Baku & Komponen HPP</span>
-                        </h2>
-                        <p class="text-xs text-gray-500">
-                            Rumus Akuntansi: <strong class="text-amber-800">Stok Awal - Stok Akhir = Stok Terpakai</strong>. Nilai ini otomatis dimasukkan ke beban HPP.
-                        </p>
-                    </div>
+                <div>
                     <div class="flex items-center space-x-2">
-                        <div class="bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl text-right">
-                            <span class="text-[10px] font-bold text-amber-800 uppercase block">Total Nilai Bahan Terpakai:</span>
-                            <span id="stok-total-used-val" class="font-black text-amber-900 text-sm">Rp 0</span>
-                        </div>
-                        <button onclick="exportStockPDF()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs flex items-center space-x-1.5 shadow-sm transition">
-                            <i data-lucide="file-text" class="w-4 h-4"></i>
-                            <span>Cetak PDF Laporan Stok</span>
-                        </button>
+                        <span class="text-xs font-black tracking-wider text-rose-800 uppercase">Kontribusi Fiskal Negara 12%</span>
+                        <span class="bg-rose-100 text-rose-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-rose-300">Resmi 12%</span>
                     </div>
-                </div>
-
-                <!-- FILTER PER TANGGAL & PER JENIS AKUN STOK BAHAN BAKU -->
-                <div class="bg-amber-50/70 border border-amber-200 p-3.5 rounded-xl space-y-2.5">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-amber-950 flex items-center space-x-1.5">
-                            <i data-lucide="filter" class="w-4 h-4 text-amber-700"></i>
-                            <span>Panggil Stok Berdasarkan Tanggal & Jenis Akun:</span>
-                        </span>
-                        <span id="stok-filter-status" class="text-[10px] font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
-                            Semua Data
-                        </span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                        <div class="sm:col-span-3">
-                            <label class="text-[10px] font-bold text-gray-500 block mb-0.5">Dari Tanggal:</label>
-                            <input type="date" id="stok-filter-start" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-amber-500">
-                        </div>
-                        <div class="sm:col-span-3">
-                            <label class="text-[10px] font-bold text-gray-500 block mb-0.5">Sampai Tanggal:</label>
-                            <input type="date" id="stok-filter-end" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-amber-500">
-                        </div>
-                        <div class="sm:col-span-3">
-                            <label class="text-[10px] font-bold text-gray-500 block mb-0.5">Jenis / Akun Stok:</label>
-                            <select id="stok-filter-type" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-amber-500">
-                                <option value="ALL">-- Semua Jenis Stok --</option>
-                                <option value="Bahan Pokok">Bahan Pokok</option>
-                                <option value="Daging / Protein">Daging / Protein</option>
-                                <option value="Bumbu & Sayur">Bumbu & Sayur</option>
-                                <option value="Packaging">Packaging / Kemasan</option>
-                                <option value="Lain-lain">Lain-lain</option>
-                            </select>
-                        </div>
-                        <div class="sm:col-span-3 flex space-x-1.5 pt-3.5">
-                            <button onclick="applyStockFilter()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center space-x-1 shadow-sm">
-                                <i data-lucide="filter" class="w-3.5 h-3.5"></i>
-                                <span>Terapkan</span>
-                            </button>
-                            <button onclick="resetStockFilter()" class="px-3 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-2 rounded-lg text-xs transition" title="Reset Filter">
-                                Reset
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Info Banner jika yang login adalah Owner -->
-                <div id="stok-owner-info" class="hidden bg-blue-50 border border-blue-200 text-blue-900 p-3 rounded-xl text-xs flex items-center space-x-2">
-                    <i data-lucide="info" class="w-4 h-4 text-blue-700 flex-shrink-0"></i>
-                    <span>Mode Pantau Owner (Read-Only). Input stok fisik awal dan akhir dikelola oleh Manager / Supervisor (PIN 5678).</span>
-                </div>
-
-                <!-- Form Tambah Jenis Bahan Baku Baru (Hanya tampil untuk Manager) -->
-                <form id="form-add-material" onsubmit="addNewMaterial(event)" class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
-                    <h3 class="text-xs font-bold text-slate-800">Tambah Item Bahan Baku Baru (Input Supervisor / Manager)</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-5 gap-2.5">
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-500 block mb-1">Kode Bahan</label>
-                            <input type="text" id="mat-code" placeholder="Misal: BB-006" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-mono font-bold outline-none focus:ring-2 focus:ring-amber-500" required>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-500 block mb-1">Nama Bahan Baku</label>
-                            <input type="text" id="mat-name" placeholder="Misal: Daging Sapi Lulur" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-amber-500" required>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-500 block mb-1">Jenis / Type Bahan</label>
-                            <select id="mat-type" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-amber-500">
-                                <option value="Bahan Pokok">Bahan Pokok</option>
-                                <option value="Daging / Protein">Daging / Protein</option>
-                                <option value="Bumbu & Sayur">Bumbu & Sayur</option>
-                                <option value="Packaging">Packaging / Kemasan</option>
-                                <option value="Lain-lain">Lain-lain</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-500 block mb-1">Satuan (Unit)</label>
-                            <input type="text" id="mat-unit" placeholder="Kg, Liter, Pcs" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-amber-500" required>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-500 block mb-1">Harga Beli / Unit (Rp)</label>
-                            <input type="number" id="mat-cost" placeholder="35000" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-amber-500" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg text-xs shadow-sm transition flex items-center space-x-1">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        <span>Tambahkan Bahan Baku</span>
-                    </button>
-                </form>
-
-                <!-- Tabel Input Stok Awal & Stok Akhir -->
-                <div class="overflow-x-auto border border-gray-100 rounded-xl">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead class="bg-gray-100 text-[11px] font-black text-gray-600 uppercase border-b border-gray-200">
-                            <tr>
-                                <th class="py-2.5 px-3">Kode & Nama Bahan</th>
-                                <th class="py-2.5 px-3">Tipe / Jenis</th>
-                                <th class="py-2.5 px-3 text-right">Harga / Satuan</th>
-                                <th class="py-2.5 px-3 text-center bg-amber-50">Stok Awal</th>
-                                <th class="py-2.5 px-3 text-center bg-amber-100">Stok Akhir</th>
-                                <th class="py-2.5 px-3 text-center">Terpakai</th>
-                                <th class="py-2.5 px-3 text-right font-black">Nilai HPP Bahan</th>
-                                <th id="th-mat-action" class="py-2.5 px-3 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="materials-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= 3. LAPORAN BERDASARKAN 4 POS INDUK ================= -->
-        <section id="view-pos4" class="hidden space-y-4">
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-                <div class="border-b pb-3">
-                    <h2 class="text-base font-extrabold text-gray-900 flex items-center space-x-2">
-                        <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-600"></i>
-                        <span>Laporan Terpilah 4 Pos Induk Akuntansi</span>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+                        Total Nyumbang Pajak ke Negara: <span id="stat-total-pajak-sumbang" class="text-rose-600">Rp 0</span>
                     </h2>
-                    <p class="text-xs text-gray-500">Ringkasan transaksi yang dikelompokkan ke dalam 4 pilar utama</p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl space-y-2">
-                        <div class="flex justify-between items-center text-emerald-800">
-                            <span class="text-xs font-black uppercase">1. Penjualan</span>
-                            <i data-lucide="trending-up" class="w-4 h-4"></i>
-                        </div>
-                        <span id="pos4-val-sales" class="text-xl font-black text-emerald-950 block">Rp 0</span>
-                        <p class="text-[11px] text-emerald-700" id="pos4-count-sales">0 transaksi masuk</p>
-                    </div>
-
-                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-2">
-                        <div class="flex justify-between items-center text-amber-800">
-                            <span class="text-xs font-black uppercase">2. HPP (Stok & Bahan)</span>
-                            <i data-lucide="package" class="w-4 h-4"></i>
-                        </div>
-                        <span id="pos4-val-cogs" class="text-xl font-black text-amber-950 block">Rp 0</span>
-                        <p class="text-[11px] text-amber-700" id="pos4-count-cogs">0 transaksi belanja stok</p>
-                    </div>
-
-                    <div class="bg-rose-50 border border-rose-200 p-4 rounded-2xl space-y-2">
-                        <div class="flex justify-between items-center text-rose-800">
-                            <span class="text-xs font-black uppercase">3. Biaya Operasional</span>
-                            <i data-lucide="activity" class="w-4 h-4"></i>
-                        </div>
-                        <span id="pos4-val-expense" class="text-xl font-black text-rose-950 block">Rp 0</span>
-                        <p class="text-[11px] text-rose-700" id="pos4-count-expense">0 transaksi beban</p>
-                    </div>
-
-                    <div class="bg-purple-50 border border-purple-200 p-4 rounded-2xl space-y-2">
-                        <div class="flex justify-between items-center text-purple-800">
-                            <span class="text-xs font-black uppercase">4. Prive (Owner)</span>
-                            <i data-lucide="wallet-cards" class="w-4 h-4"></i>
-                        </div>
-                        <span id="pos4-val-prive" class="text-xl font-black text-purple-950 block">Rp 0</span>
-                        <p class="text-[11px] text-purple-700" id="pos4-count-prive">0 transaksi penarikan</p>
-                    </div>
-                </div>
-
-                <div id="pos4-breakdown-container" class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2"></div>
-            </div>
-        </section>
-
-        <!-- ================= 4. LAPORAN TRANSAKSI KAS ================= -->
-        <section id="view-mutasi-kas" class="hidden space-y-4">
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b pb-3">
-                    <div>
-                        <h2 class="text-base font-extrabold text-gray-900 flex items-center space-x-2">
-                            <i data-lucide="arrow-left-right" class="w-5 h-5 text-emerald-600"></i>
-                            <span>Laporan Transaksi Kas Masuk & Keluar</span>
-                        </h2>
-                        <p class="text-xs text-gray-500">Mutasi kas berjalan dari inputan seluruh petugas/kasir</p>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <input type="date" id="mgr-cashflow-start" class="border border-gray-300 rounded-lg p-1.5 text-xs">
-                        <span class="text-xs text-gray-400">s/d</span>
-                        <input type="date" id="mgr-cashflow-end" class="border border-gray-300 rounded-lg p-1.5 text-xs">
-                        <button onclick="renderManagerCashflow()" class="bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Filter</button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto max-h-[420px] overflow-y-auto border border-gray-100 rounded-xl">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead class="sticky top-0 bg-gray-100 text-[11px] font-black text-gray-600 uppercase border-b border-gray-200">
-                            <tr>
-                                <th class="py-2.5 px-3">No</th>
-                                <th class="py-2.5 px-3">Waktu</th>
-                                <th class="py-2.5 px-3">Akun & Keterangan</th>
-                                <th class="py-2.5 px-3 text-right">Debit (Masuk)</th>
-                                <th class="py-2.5 px-3 text-right">Kredit (Keluar)</th>
-                                <th class="py-2.5 px-3 text-right">Saldo Kas</th>
-                                <th class="py-2.5 px-3 text-center">Petugas</th>
-                            </tr>
-                        </thead>
-                        <tbody id="mgr-cashflow-tbody"></tbody>
-                    </table>
+                    <p class="text-xs text-slate-500">12% otomatis dari pos belanja produksi & operasional Oneilverse (Music, Video, Server, AI, CapCut, Grok)</p>
                 </div>
             </div>
-        </section>
-
-        <!-- ================= 5. LAPORAN BUKU BESAR ================= -->
-        <section id="view-buku-besar" class="hidden space-y-4">
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-                <div class="border-b pb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                    <div>
-                        <h2 class="text-base font-extrabold text-gray-900 flex items-center space-x-2">
-                            <i data-lucide="book-open" class="w-5 h-5 text-purple-700"></i>
-                            <span>Laporan Buku Besar Per Kode Account</span>
-                        </h2>
-                        <p class="text-xs text-gray-500">Mutasi rekening terpisah per akun (BBM, Listrik, Stok, dll)</p>
-                    </div>
-                </div>
-                <div id="mgr-buku-besar-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div class="flex items-center space-x-2">
+                <button onclick="openModal('tax')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center space-x-1.5 transition active:scale-95">
+                    <i data-lucide="receipt" class="w-4 h-4 text-white"></i>
+                    <span>Lihat Pop-up Pajak 12%</span>
+                </button>
             </div>
-        </section>
+        </div>
 
-        <!-- ================= 6. KOLOM PEMBERITAHUAN & PESAN DUA ARAH ================= -->
-        <section id="view-notices" class="hidden space-y-4">
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-5">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 border-b pb-3">
-                    <div>
-                        <h2 class="text-base font-extrabold text-gray-900 flex items-center space-x-2">
-                            <i data-lucide="message-square" class="w-5 h-5 text-amber-500"></i>
-                            <span>Kolom Pemberitahuan & Pesan Komunikasi Tim</span>
-                        </h2>
-                        <p class="text-xs text-gray-500">
-                            Pemberitahuan, instruksi shift, dan konfirmasi yang dapat dibaca serta dibalas oleh Admin/Kasir dan Manager/Supervisor. Owner dapat memantau seluruh komunikasi tim secara transparan.
-                        </p>
-                    </div>
-                    <button onclick="refreshNoticesUI()" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 flex items-center space-x-1">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                        <span>Segarkan Pesan</span>
-                    </button>
+        <!-- 3 KARTU UTAMA LABA RUGI OPERASIONAL ONEILVERSE -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="ios-glass p-5 shadow-xs border-emerald-200 bg-emerald-50/50">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-emerald-800 uppercase tracking-wider">A. Total Income (Pemasukan)</span>
+                    <i data-lucide="trending-up" class="w-5 h-5 text-emerald-600"></i>
                 </div>
+                <h3 id="card-total-income" class="text-2xl sm:text-3xl font-black text-emerald-700 mt-2">Rp 0</h3>
+                <p class="text-[11px] text-slate-500 mt-1">YouTube Adsense, Beli & Cicilan Aplikasi, Server, Fitur, Pro Mode</p>
+            </div>
 
-                <!-- Formulir Buat Pemberitahuan Baru (Manager & Kasir) -->
-                <div id="notice-create-box" class="bg-amber-50/60 border border-amber-200 rounded-xl p-4 space-y-3">
-                    <h3 class="text-xs font-bold text-amber-950 flex items-center space-x-1.5">
-                        <i data-lucide="send" class="w-4 h-4 text-amber-700"></i>
-                        <span>Kirim Pemberitahuan / Instruksi Baru</span>
+            <div class="ios-glass p-5 shadow-xs border-rose-200 bg-rose-50/50">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-rose-800 uppercase tracking-wider">B. Total Outcome (Biaya & Tools)</span>
+                    <i data-lucide="trending-down" class="w-5 h-5 text-rose-600"></i>
+                </div>
+                <h3 id="card-total-outcome" class="text-2xl sm:text-3xl font-black text-rose-700 mt-2">Rp 0</h3>
+                <p class="text-[11px] text-slate-500 mt-1">Music/Video Production, Grok, Server, AI Agent, Poin+, CapCut Pro</p>
+            </div>
+
+            <div class="ios-glass p-5 shadow-md bg-slate-900 text-white border-slate-800">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Laba Bersih Operasional</span>
+                    <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i>
+                </div>
+                <h3 id="card-net-profit" class="text-2xl sm:text-3xl font-black text-emerald-400 mt-2">Rp 0</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Hasil bersih laba usaha Oneilverse sebelum prive modal owner</p>
+            </div>
+        </div>
+
+        <!-- FILTER TANGGAL PERIODE LABA RUGI & CETAK DOKUMEN -->
+        <div class="ios-glass p-5 shadow-sm space-y-3">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
+                <div>
+                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center space-x-2">
+                        <i data-lucide="calendar" class="w-4 h-4 text-purple-600"></i>
+                        <span>Filter Periode Pemeriksaan / Laporan Laba Rugi:</span>
                     </h3>
-                    <div class="space-y-2">
-                        <input type="text" id="new-notice-title" placeholder="Judul Pemberitahuan (misal: Cek Sisa Stok Minyak Goreng)" class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500">
-                        <textarea id="new-notice-msg" rows="2" placeholder="Tuliskan isi pesan, instruksi shift, atau informasi penting di sini..." class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-amber-500"></textarea>
-                    </div>
-                    <div class="flex justify-between items-center pt-1">
-                        <span class="text-[11px] text-amber-800">Pengirim: <strong id="sender-display-name">Manager / Supervisor</strong></span>
-                        <button onclick="submitNewNotice()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-1.5 px-4 rounded-lg text-xs shadow-sm flex items-center space-x-1 transition">
-                            <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                            <span>Kirim Pemberitahuan</span>
-                        </button>
-                    </div>
+                    <p class="text-xs text-slate-400">Pilih rentang tanggal untuk mengkalkulasi mutasi dan laba secara otomatis</p>
                 </div>
+                <span id="filter-result-count" class="text-[10px] font-bold text-purple-800 bg-purple-100 px-3 py-1 rounded-full self-start sm:self-auto">
+                    Semua Data
+                </span>
+            </div>
 
-                <!-- Banner untuk Owner jika sedang membaca -->
-                <div id="notice-owner-info" class="hidden bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs text-slate-700 flex items-center space-x-2">
-                    <i data-lucide="eye" class="w-4 h-4 text-slate-500 flex-shrink-0"></i>
-                    <span>Sebagai Owner, Anda dapat membaca seluruh histori pemberitahuan dan balasan antara Kasir dan Supervisor di bawah ini.</span>
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                <div class="sm:col-span-5">
+                    <label class="text-[10px] font-bold text-slate-500 block mb-0.5">Dari Tanggal:</label>
+                    <input type="date" id="filter-date-start" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-purple-500">
                 </div>
-
-                <!-- DAFTAR PEMBERITAHUAN DENGAN THREAD BALASAN -->
-                <div id="notices-list-container" class="space-y-3 pt-2">
-                    <!-- Dinamis terisi oleh JavaScript -->
+                <div class="sm:col-span-5">
+                    <label class="text-[10px] font-bold text-slate-500 block mb-0.5">Sampai Tanggal:</label>
+                    <input type="date" id="filter-date-end" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div class="sm:col-span-2 flex space-x-1 pt-3">
+                    <button onclick="applyDateFilter()" class="flex-1 bg-purple-900 hover:bg-purple-950 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">
+                        Terapkan
+                    </button>
+                    <button onclick="resetDateFilter()" class="px-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-xl text-xs transition" title="Reset">
+                        Reset
+                    </button>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- ================= 7. LAPORAN ANALISA AI ================= -->
-        <section id="view-ai" class="hidden space-y-4">
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-                <div class="border-b pb-3 flex justify-between items-center">
+        <!-- PUSAT MENU POP-UP: BUKA SEMUA TABEL TANPA MEMANJANG KE BAWAH -->
+        <div class="ios-glass p-6 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
+                        <i data-lucide="layout-grid" class="w-5 h-5 text-purple-600"></i>
+                        <span>Pusat Pop-Up Laporan & Audit Keuangan:</span>
+                    </h3>
+                    <p class="text-xs text-slate-500">Semua tabel kini dibuka melalui Pop-up Dialog agar layar tetap ringkas & elegan</p>
+                </div>
+                <span class="text-xs font-bold text-purple-700 bg-purple-50 px-3 py-1 rounded-full border border-purple-200">
+                    Sistem Pop-Up Aktif
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
+                <!-- 1. Pop-Up Laba Rugi -->
+                <button onclick="openModal('labarugi')" class="p-4 rounded-2xl bg-indigo-700 hover:bg-indigo-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3 group">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
+                            <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                        </div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-indigo-200 group-hover:text-white transition-colors"></i>
+                    </div>
                     <div>
-                        <h2 class="text-base font-extrabold text-gray-900 flex items-center space-x-2">
-                            <i data-lucide="sparkles" class="w-5 h-5 text-amber-500"></i>
-                            <span>Analisa AI Keuangan & Efisiensi Operasional</span>
-                        </h2>
-                        <p class="text-xs text-gray-500">Evaluasi otomatis rasio margin laba kotor, efisiensi bahan baku, dan pengeluaran terbesar</p>
+                        <h4 class="font-bold text-sm">Pop-Up Laba Rugi</h4>
+                        <p class="text-[11px] text-indigo-100 mt-0.5">Rincian Laba Income vs Outcome</p>
                     </div>
-                    <button onclick="generateAIAnalysis()" class="bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-800 hover:to-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center space-x-1.5 shadow-sm">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                        <span>Jalankan Analisa AI</span>
-                    </button>
-                </div>
-                <div id="ai-analysis-container" class="space-y-4 text-xs sm:text-sm"></div>
-            </div>
-        </section>
+                </button>
 
-        <!-- ================= 8. MASTER COA ================= -->
-        <section id="view-coa" class="hidden space-y-4">
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-5">
-                <div class="border-b pb-3">
-                    <span class="text-[10px] font-black bg-purple-100 text-purple-800 px-2 py-0.5 rounded uppercase">Master Keuangan</span>
-                    <h2 class="text-base font-extrabold text-gray-900 mt-1">Master Chart of Accounts (COA)</h2>
-                    <p class="text-xs text-gray-500">Kelola akun transaksi dagang dan operasional</p>
-                </div>
-
-                <!-- Info Banner jika Owner melihat COA -->
-                <div id="coa-owner-info" class="hidden bg-blue-50 border border-blue-200 text-blue-900 p-3 rounded-xl text-xs flex items-center space-x-2">
-                    <i data-lucide="info" class="w-4 h-4 text-blue-700 flex-shrink-0"></i>
-                    <span>Mode Pantau Owner (Read-Only). Penambahan dan perubahan Chart of Accounts (COA) dikelola oleh Manager / Supervisor (PIN 5678).</span>
-                </div>
-
-                <form id="form-add-coa" onsubmit="addCOA(event)" class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
-                    <h3 class="text-xs font-bold text-slate-800">Tambah Akun Transaksi Baru (Input Manager)</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-500 block mb-1">Kode Account</label>
-                            <input type="text" id="new-coa-code" placeholder="Misal: 6-1007" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-mono font-bold outline-none focus:ring-2 focus:ring-purple-500" required>
+                <!-- 2. Pop-Up Pajak 12% -->
+                <button onclick="openModal('tax')" class="p-4 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3 group">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
+                            <i data-lucide="receipt" class="w-5 h-5"></i>
                         </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-500 block mb-1">Account / Keterangan (Nama Transaksi)</label>
-                            <input type="text" id="new-coa-name" placeholder="Misal: Biaya Sewa Tempat" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-purple-500" required>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-500 block mb-1">Pos Induk</label>
-                            <select id="new-coa-cat" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-purple-500">
-                                <option value="sales">Penjualan</option>
-                                <option value="cogs">HPP</option>
-                                <option value="expense">Biaya Operasional</option>
-                                <option value="prive">Prive (Penarikan Pemilik)</option>
-                            </select>
-                        </div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-rose-200 group-hover:text-white transition-colors"></i>
                     </div>
-                    <button type="submit" class="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-lg text-xs transition flex items-center space-x-1">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        <span>Tambahkan Akun COA</span>
-                    </button>
-                </form>
+                    <div>
+                        <h4 class="font-bold text-sm">Pop-Up Pajak 12%</h4>
+                        <p class="text-[11px] text-rose-100 mt-0.5">Tabel setoran pajak ke negara</p>
+                    </div>
+                </button>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead class="bg-gray-100 text-[11px] font-black text-gray-600 uppercase border-b border-gray-200">
-                            <tr>
-                                <th class="py-2.5 px-3">Nomor</th>
-                                <th class="py-2.5 px-3">Kode Account</th>
-                                <th class="py-2.5 px-3">Account / Keterangan</th>
-                                <th class="py-2.5 px-3">Pos Induk</th>
-                                <th id="th-coa-action" class="py-2.5 px-3 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dashboard-coa-body"></tbody>
-                    </table>
-                </div>
+                <!-- 3. Pop-Up Mutasi Kas -->
+                <button onclick="openModal('mutasi')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3 group">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-purple-300 group-hover:scale-105 transition-transform">
+                            <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                        </div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-400 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">Pop-Up Mutasi Kas</h4>
+                        <p class="text-[11px] text-slate-300 mt-0.5">Rekening koran & saldo kas berjalan</p>
+                    </div>
+                </button>
+
+                <!-- 4. Pop-Up Buku Besar Akun -->
+                <button onclick="openModal('ledger')" class="p-4 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white flex flex-col justify-between shadow-md transition active:scale-98 text-left space-y-3 group">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-purple-200 group-hover:scale-105 transition-transform">
+                            <i data-lucide="book-open" class="w-5 h-5"></i>
+                        </div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-purple-200 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">Pop-Up Buku Besar</h4>
+                        <p class="text-[11px] text-purple-100 mt-0.5">Akun YouTube, Server, AI, CapCut</p>
+                    </div>
+                </button>
             </div>
-        </section>
+        </div>
 
     </main>
 
+    <!-- ================= MODAL POP-UP DIALOG UNTUK SEMUA LAPORAN DASHBOARD ================= -->
+    <div id="main-modal-container" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-3 sm:p-5">
+        <div class="ios-glass w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl modal-sheet overflow-hidden border border-white/40">
+            
+            <!-- POP-UP HEADER -->
+            <div class="px-6 py-4 border-b border-slate-200/90 flex items-center justify-between bg-white/70">
+                <div class="flex items-center space-x-3">
+                    <div id="modal-icon-badge" class="w-9 h-9 rounded-xl flex items-center justify-center text-white">
+                        <i id="modal-icon" data-lucide="table" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 id="modal-title" class="font-extrabold text-base text-slate-900 leading-tight">Judul Pop-Up</h3>
+                        <p id="modal-subtitle" class="text-xs text-slate-500">Keterangan Laporan Eksekutif</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <div id="modal-header-actions"></div>
+                    <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition active:scale-95">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- POP-UP BODY (SCROLL HANYA DI DALAM KOTAK POP-UP) -->
+            <div id="modal-body-content" class="p-6 overflow-y-auto flex-1 space-y-4">
+                
+                <!-- 1. POP-UP: TABEL RINCIAN LABA RUGI ONEILVERSE (TANPA SEMBAKO) -->
+                <div id="popup-content-labarugi" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex items-center justify-between text-xs text-indigo-900">
+                        <span>Pencatatan resmi laba rugi digital & produksi software Oneilverse</span>
+                        <span id="pop-labarugi-status" class="font-bold">Periode: Semua Data</span>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-100 text-[11px] font-black text-slate-700 uppercase border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3">Kode & Kategori Akun</th>
+                                    <th class="py-3 px-3">Nama Pos Akun Transaksi</th>
+                                    <th class="py-3 px-3 text-center">Jumlah Transaksi</th>
+                                    <th class="py-3 px-3 text-right">Nominal Akumulasi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="labarugi-table-body"></tbody>
+                            <tfoot class="bg-slate-50 font-black border-t-2 border-slate-300">
+                                <tr class="text-emerald-700">
+                                    <td colspan="3" class="py-2.5 px-3 text-right uppercase">TOTAL A. INCOME (PEMASUKAN):</td>
+                                    <td id="pop-foot-income" class="py-2.5 px-3 text-right">Rp 0</td>
+                                </tr>
+                                <tr class="text-rose-700">
+                                    <td colspan="3" class="py-2.5 px-3 text-right uppercase">TOTAL B. OUTCOME (BIAYA PRODUKSI & TOOLS):</td>
+                                    <td id="pop-foot-outcome" class="py-2.5 px-3 text-right">Rp 0</td>
+                                </tr>
+                                <tr class="text-slate-900 text-sm bg-purple-50">
+                                    <td colspan="3" class="py-3 px-3 text-right uppercase">LABA BERSIH OPERASIONAL (A - B):</td>
+                                    <td id="pop-foot-net" class="py-3 px-3 text-right text-purple-900">Rp 0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. POP-UP: BUKTI KONTRIBUSI PAJAK NEGARA 12% -->
+                <div id="popup-content-tax" class="space-y-4 hidden">
+                    <div class="overflow-x-auto border border-rose-100 rounded-2xl">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-rose-50 text-[11px] font-black text-rose-950 uppercase border-b border-rose-200">
+                                <tr>
+                                    <th class="py-3 px-3">No</th>
+                                    <th class="py-3 px-3">Tanggal</th>
+                                    <th class="py-3 px-3">Pos Pengeluaran (Outcome)</th>
+                                    <th class="py-3 px-3">Keterangan Belanja</th>
+                                    <th class="py-3 px-3 text-right">Total Transaksi</th>
+                                    <th class="py-3 px-3 text-right bg-rose-100/60 font-black text-rose-900">Pajak Negara (12%)</th>
+                                    <th class="py-3 px-3 text-right">Nilai Bersih (DPP)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tax-table-body"></tbody>
+                            <tfoot class="bg-rose-50/90 font-black border-t-2 border-rose-300">
+                                <tr>
+                                    <td colspan="4" class="py-3 px-3 text-right uppercase text-slate-700">Total Akumulasi Pajak untuk Negara:</td>
+                                    <td id="tax-foot-gross" class="py-3 px-3 text-right text-slate-900">Rp 0</td>
+                                    <td id="tax-foot-tax" class="py-3 px-3 text-right text-rose-700 text-sm">Rp 0</td>
+                                    <td id="tax-foot-net" class="py-3 px-3 text-right text-slate-700">Rp 0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. POP-UP: MUTASI KAS BERJALAN -->
+                <div id="popup-content-mutasi" class="space-y-4 hidden">
+                    <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="sticky top-0 bg-slate-100/90 backdrop-blur-md text-[11px] font-black text-slate-600 uppercase border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3">Waktu</th>
+                                    <th class="py-3 px-3">Uraian Transaksi</th>
+                                    <th class="py-3 px-3 text-right">Debit (Masuk)</th>
+                                    <th class="py-3 px-3 text-right">Kredit (Keluar)</th>
+                                    <th class="py-3 px-3 text-right">Saldo Berjalan</th>
+                                    <th class="py-3 px-3 text-center">Petugas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kasir-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 4. POP-UP: BUKU BESAR AKUN -->
+                <div id="popup-content-ledger" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <span id="total-active-accounts" class="text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full">
+                            0 Akun Aktif
+                        </span>
+                        <select id="filter-account-target" onchange="renderPerAccountDashboard()" class="bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold rounded-xl p-2 outline-none">
+                            <option value="ALL">-- Tampilkan Semua Akun --</option>
+                        </select>
+                    </div>
+                    <div id="dashboard-per-account-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+
+            </div>
+
+            <!-- POP-UP FOOTER -->
+            <div class="px-6 py-3 border-t border-slate-200/90 bg-white/70 flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs transition active:scale-95">
+                    Tutup Pop-Up
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="js/tenants.js"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
     <script>
-        const user = requireAuth(['owner', 'manager']);
+        let activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
+
+        if (activeTenant && typeof APP_CONFIG !== 'undefined') {
+            APP_CONFIG.businessName = activeTenant.nama;
+            APP_CONFIG.businessSlogan = activeTenant.slogan;
+            document.title = activeTenant.nama + " - Portal Eksekutif";
+        }
+
+        const user = requireAuth(['manager', 'owner']);
+
+        if (user.role === 'owner') {
+            document.getElementById('user-role-badge').innerText = "Owner Eksekutif";
+        } else {
+            document.getElementById('user-role-badge').innerText = "Manager / Supervisor";
+        }
+
         initFirebase();
         lucide.createIcons();
 
-        // PENGECEKAN HAK AKSES OWNER (HANYA BACA / READ-ONLY)
-        const isOwner = (user.role === 'owner');
+        let txList = [];
+        let filteredTxList = [];
 
-        document.getElementById('top-user-info').innerText = `${user.title} • ${APP_CONFIG.businessName}`;
-        document.getElementById('role-badge-pill').innerText = user.title;
+        const tenantStorageKey = (activeTenant && activeTenant.id) ? `fm_v11_tx_${activeTenant.id}` : 'fm_v11_tx';
+        const tenantFirestoreCol = (activeTenant && activeTenant.id && activeTenant.id !== 'default') 
+            ? `tx_${activeTenant.id}` 
+            : 'transactions_v11';
 
-        if (isOwner) {
-            // Tampilkan Banner Read-Only Owner
-            document.getElementById('owner-readonly-banner').classList.remove('hidden');
-            document.getElementById('role-badge-pill').className = "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300";
-            document.getElementById('role-badge-pill').innerText = "Owner (Read Only)";
-            
-            // Di topbar: Tampilkan status terminal kasir terkunci untuk Owner (harus login PIN 1111)
-            document.getElementById('kasir-nav-wrapper').innerHTML = `
-                <span class="hidden md:inline-flex items-center space-x-1 px-3 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-xs font-semibold border border-slate-200" title="Untuk input kasir, masuk dengan PIN Kasir (1111)">
-                    <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-                    <span>Terminal Kasir (Login PIN 1111)</span>
-                </span>
-            `;
+        // ================= KONTROL MODAL POP-UP =================
+        function openModal(type) {
+            const container = document.getElementById('main-modal-container');
+            const titleEl = document.getElementById('modal-title');
+            const subEl = document.getElementById('modal-subtitle');
+            const iconBadge = document.getElementById('modal-icon-badge');
+            const iconEl = document.getElementById('modal-icon');
+            const actionsEl = document.getElementById('modal-header-actions');
 
-            // Di tab Stok: Sembunyikan form tambah dan kolom hapus
-            document.getElementById('stok-owner-info').classList.remove('hidden');
-            document.getElementById('form-add-material').classList.add('hidden');
-            document.getElementById('th-mat-action').classList.add('hidden');
+            ['labarugi', 'tax', 'mutasi', 'ledger'].forEach(k => {
+                document.getElementById(`popup-content-${k}`).classList.add('hidden');
+            });
 
-            // Di tab COA: Sembunyikan form tambah dan kolom aksi hapus
-            document.getElementById('coa-owner-info').classList.remove('hidden');
-            document.getElementById('form-add-coa').classList.add('hidden');
-            document.getElementById('th-coa-action').classList.add('hidden');
+            actionsEl.innerHTML = "";
 
-            // Di tab Pemberitahuan
-            document.getElementById('notice-owner-info').classList.remove('hidden');
-            document.getElementById('sender-display-name').innerText = "Owner";
-        } else {
-            // Manager / Supervisor: Akses Penuh Kelola Stok & COA
-            document.getElementById('kasir-nav-wrapper').innerHTML = `
-                <a href="kasir.html" class="hidden md:flex items-center space-x-1 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold border border-emerald-200">
-                    <i data-lucide="monitor" class="w-4 h-4"></i>
-                    <span>Buka Terminal Kasir</span>
-                </a>
-            `;
-            document.getElementById('sender-display-name').innerText = "Manager / Supervisor";
+            if (type === 'labarugi') {
+                titleEl.innerText = "Laporan Laba Rugi Operasional Usaha";
+                subEl.innerText = "Kalkulasi pemasukan software/YouTube vs belanja operasional tools Oneilverse";
+                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-indigo-700";
+                iconEl.setAttribute('data-lucide', 'pie-chart');
+                actionsEl.innerHTML = `
+                    <button onclick="exportLabaRugiPDF()" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 shadow-sm transition active:scale-95">
+                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                        <span>Download PDF Laba Rugi</span>
+                    </button>
+                `;
+                document.getElementById('popup-content-labarugi').classList.remove('hidden');
+            } else if (type === 'tax') {
+                titleEl.innerText = "Bukti Kontribusi Pajak Negara 12% (PPN)";
+                subEl.innerText = "Transparansi potongan resmi 12% dari seluruh pengeluaran outcome Oneilverse";
+                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-rose-600";
+                iconEl.setAttribute('data-lucide', 'receipt');
+                actionsEl.innerHTML = `
+                    <button onclick="exportTaxPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 shadow-sm transition active:scale-95">
+                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                        <span>Download PDF Pajak</span>
+                    </button>
+                `;
+                document.getElementById('popup-content-tax').classList.remove('hidden');
+            } else if (type === 'mutasi') {
+                titleEl.innerText = "Buku Mutasi Kas Berjalan (Rekening Koran)";
+                subEl.innerText = "Arus kas debit, kredit, dan saldo berjalan realtime";
+                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-slate-900";
+                iconEl.setAttribute('data-lucide', 'arrow-left-right');
+                actionsEl.innerHTML = `
+                    <button onclick="exportCashflowPDF()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 shadow-sm transition active:scale-95">
+                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                        <span>Download PDF Mutasi</span>
+                    </button>
+                `;
+                document.getElementById('popup-content-mutasi').classList.remove('hidden');
+            } else if (type === 'ledger') {
+                titleEl.innerText = "Buku Besar Mutasi Per Akun COA";
+                subEl.innerText = "Rincian dan total per masing-masing akun YouTube, Server, AI, CapCut, dll";
+                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-purple-700";
+                iconEl.setAttribute('data-lucide', 'book-open');
+                document.getElementById('popup-content-ledger').classList.remove('hidden');
+            }
+
+            container.classList.remove('hidden');
+            lucide.createIcons();
         }
 
-        let allTx = [];
-        let materialsList = [];
-        let noticesList = [];
+        function closeModal() {
+            document.getElementById('main-modal-container').classList.add('hidden');
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadMaterials();
-            loadTransactions();
-            loadNotices();
-            renderCOATable();
+        document.getElementById('main-modal-container').addEventListener('click', (e) => {
+            if (e.target.id === 'main-modal-container') closeModal();
         });
 
-        function switchView(viewName) {
-            ['labarugi', 'stok', 'pos4', 'mutasi-kas', 'buku-besar', 'notices', 'ai', 'coa'].forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                const btn = document.getElementById(`tab-btn-${v}`);
-                if (el) el.classList.add('hidden');
-                if (btn) {
-                    btn.className = "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 whitespace-nowrap flex items-center space-x-1";
-                }
-            });
-
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            document.getElementById(`tab-btn-${viewName}`).className = "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-purple-700 text-white shadow-sm whitespace-nowrap flex items-center space-x-1";
-            lucide.createIcons();
-        }
-
-        // ================= SISTEM PEMBERITAHUAN DUA ARAH =================
-        function loadNotices() {
-            noticesList = getNotices();
-            renderNoticesUI();
-
-            if (db) {
-                db.collection("notices_v16").orderBy("timestamp", "desc")
-                    .onSnapshot(snap => {
-                        const cloudNotices = [];
-                        snap.forEach(d => {
-                            const data = d.data();
-                            data.docId = d.id;
-                            cloudNotices.push(data);
-                        });
-                        if (cloudNotices.length > 0) {
-                            noticesList = cloudNotices;
-                            saveNotices(noticesList);
-                            renderNoticesUI();
-                        }
-                    }, err => console.log("Firestore notices listen fallback:", err));
-            }
-        }
-
-        function refreshNoticesUI() {
-            loadNotices();
-            alert("Pemberitahuan telah diperbarui.");
-        }
-
-        function renderNoticesUI() {
-            const container = document.getElementById('notices-list-container');
-            const navBadge = document.getElementById('nav-notice-count');
-            if (navBadge) navBadge.innerText = noticesList.length;
-
-            if (!container) return;
-            container.innerHTML = "";
-
-            if (noticesList.length === 0) {
-                container.innerHTML = `<div class="p-6 text-center text-xs text-gray-400 bg-gray-50 rounded-xl">Belum ada pemberitahuan atau pesan aktif saat ini.</div>`;
-                return;
+        document.addEventListener('DOMContentLoaded', () => {
+            if (activeTenant) {
+                document.getElementById('topbar-store-name').innerText = activeTenant.nama;
+                document.getElementById('topbar-store-slogan').innerText = activeTenant.slogan;
+                document.getElementById('tenant-badge-indicator').innerText = activeTenant.id;
             }
 
-            noticesList.forEach((n, nIdx) => {
-                const card = document.createElement('div');
-                card.className = "bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3";
-                
-                const roleBadge = n.senderRole === 'manager' 
-                    ? `<span class="px-2 py-0.5 rounded text-[10px] font-black bg-purple-100 text-purple-800 border border-purple-200">Manager</span>`
-                    : (n.senderRole === 'owner' 
-                        ? `<span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">Owner</span>`
-                        : `<span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">Kasir / Admin</span>`);
+            loadTransactions();
+        });
 
-                const replies = n.replies || [];
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-start border-b pb-2">
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                ${roleBadge}
-                                <span class="text-xs font-bold text-gray-900">${n.senderName}</span>
-                                <span class="text-[10px] text-gray-400 font-mono">• ${n.date}</span>
-                            </div>
-                            <h4 class="font-extrabold text-sm text-gray-900 mt-1">${n.title}</h4>
-                        </div>
-                        <span class="text-[10px] font-bold text-purple-700 bg-white border border-purple-200 px-2 py-0.5 rounded-full">
-                            ${replies.length} Balasan
-                        </span>
-                    </div>
-
-                    <p class="text-xs text-gray-700 leading-relaxed bg-white p-2.5 rounded-lg border border-gray-100">${n.message}</p>
-
-                    <!-- DAFTAR BALASAN DARI KASIR / MANAGER -->
-                    <div class="space-y-2 pl-4 border-l-2 border-purple-300">
-                        ${replies.map(r => `
-                            <div class="bg-white p-2.5 rounded-lg border border-gray-100 text-xs space-y-1">
-                                <div class="flex justify-between items-center">
-                                    <div class="flex items-center space-x-1.5">
-                                        <span class="font-bold text-gray-800">${r.senderName}</span>
-                                        <span class="text-[10px] text-gray-400 font-mono">• ${r.date}</span>
-                                    </div>
-                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${r.senderRole === 'staff' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'}">
-                                        ${r.senderRole === 'staff' ? 'Kasir' : (r.senderRole === 'owner' ? 'Owner' : 'Manager')}
-                                    </span>
-                                </div>
-                                <p class="text-gray-600">${r.message}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    <!-- FORM BALAS CEPAT -->
-                    <div class="flex space-x-2 pt-1">
-                        <input type="text" id="reply-input-${nIdx}" placeholder="Tulis balasan pesan untuk ${n.senderName}..." class="flex-1 bg-white border border-gray-300 rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-purple-500">
-                        <button onclick="submitReply(${nIdx})" class="bg-purple-700 hover:bg-purple-800 text-white font-bold px-3 py-2 rounded-lg text-xs flex items-center space-x-1 transition shadow-sm">
-                            <i data-lucide="corner-down-right" class="w-3.5 h-3.5"></i>
-                            <span>Balas</span>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-            lucide.createIcons();
-        }
-
-        function submitNewNotice() {
-            const title = document.getElementById('new-notice-title').value.trim();
-            const msg = document.getElementById('new-notice-msg').value.trim();
-
-            if (!title || !msg) {
-                return alert("Judul dan isi pesan pemberitahuan wajib diisi!");
-            }
-
-            const senderName = isOwner ? "Owner Usaha" : "Supervisor / Manager";
-            const newNotice = {
-                id: "notif_" + Date.now(),
-                senderRole: user.role,
-                senderName: senderName,
-                title: title,
-                message: msg,
-                date: new Date().toLocaleDateString('id-ID') + " " + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                timestamp: Date.now(),
-                replies: []
-            };
-
-            noticesList.unshift(newNotice);
-            saveNotices(noticesList);
-
-            if (db) {
-                db.collection("notices_v16").add(newNotice).catch(console.error);
-            }
-
-            document.getElementById('new-notice-title').value = "";
-            document.getElementById('new-notice-msg').value = "";
-            renderNoticesUI();
-            alert("Pemberitahuan berhasil dipublikasikan ke seluruh tim (Kasir & Manager)!");
-        }
-
-        function submitReply(nIdx) {
-            const input = document.getElementById(`reply-input-${nIdx}`);
-            const text = input.value.trim();
-            if (!text) return alert("Ketik balasan pesan terlebih dahulu!");
-
-            const senderName = isOwner ? "Owner Usaha" : "Supervisor / Manager";
-            const reply = {
-                id: "rep_" + Date.now(),
-                senderRole: user.role,
-                senderName: senderName,
-                message: text,
-                date: new Date().toLocaleDateString('id-ID') + " " + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                timestamp: Date.now()
-            };
-
-            if (!noticesList[nIdx].replies) noticesList[nIdx].replies = [];
-            noticesList[nIdx].replies.push(reply);
-            saveNotices(noticesList);
-
-            if (db && noticesList[nIdx].docId) {
-                db.collection("notices_v16").doc(noticesList[nIdx].docId).update({
-                    replies: noticesList[nIdx].replies
-                }).catch(console.error);
-            }
-
-            input.value = "";
-            renderNoticesUI();
-            alert("Balasan pesan berhasil terkirim!");
-        }
-
-        // ================= MANAJEMEN BAHAN BAKU & STOK =================
-        function loadMaterials() {
-            materialsList = getMaterials();
-            renderMaterialsTable();
-        }
-
-        // ================= FILTER & RENDER STOK BAHAN BAKU (DASHBOARD) =================
-        function getFilteredStockMaterials() {
-            const start = document.getElementById('stok-filter-start') ? document.getElementById('stok-filter-start').value : "";
-            const end = document.getElementById('stok-filter-end') ? document.getElementById('stok-filter-end').value : "";
-            const selType = document.getElementById('stok-filter-type') ? document.getElementById('stok-filter-type').value : "ALL";
-
-            let filtered = [...materialsList];
-
-            if (selType && selType !== "ALL") {
-                filtered = filtered.filter(m => m.type === selType);
-            }
-
-            if (start || end) {
-                filtered = filtered.filter(m => {
-                    const mDate = m.dateISO || "2026-11-01";
-                    if (start && end) return mDate >= start && mDate <= end;
-                    if (start) return mDate >= start;
-                    if (end) return mDate <= end;
-                    return true;
-                });
-            }
-
-            const badge = document.getElementById('stok-filter-status');
-            if (badge) {
-                let txt = `${filtered.length} Item`;
-                if (selType !== "ALL") txt += ` • [${selType}]`;
-                if (start || end) txt += ` • (${start || 'Awal'} s/d ${end || 'Kini'})`;
-                badge.innerText = txt;
-            }
-
-            return filtered;
-        }
-
-        function applyStockFilter() {
-            renderMaterialsTable();
-        }
-
-        function resetStockFilter() {
-            if (document.getElementById('stok-filter-start')) document.getElementById('stok-filter-start').value = "";
-            if (document.getElementById('stok-filter-end')) document.getElementById('stok-filter-end').value = "";
-            if (document.getElementById('stok-filter-type')) document.getElementById('stok-filter-type').value = "ALL";
-            renderMaterialsTable();
-        }
-
-        function renderMaterialsTable() {
-            const tbody = document.getElementById('materials-table-body');
-            if (!tbody) return;
-            tbody.innerHTML = "";
-
-            const displayList = getFilteredStockMaterials();
-            let totalUsedValue = 0;
-
-            if (displayList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-xs text-gray-400">Tidak ada item stok untuk kriteria tanggal & jenis akun yang dipilih.</td></tr>`;
-                document.getElementById('stok-total-used-val').innerText = "Rp 0";
-                return;
-            }
-
-            displayList.forEach((m) => {
-                const idx = materialsList.findIndex(orig => orig.code === m.code);
-                const usedQty = Math.max(0, (m.initialQty || 0) - (m.finalQty || 0));
-                const usedValue = usedQty * (m.costPerUnit || 0);
-                totalUsedValue += usedValue;
-
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-100 hover:bg-gray-50";
-
-                const stokAwalCol = isOwner 
-                    ? `<span class="font-bold text-gray-900">${m.initialQty} ${m.unit}</span>`
-                    : `<input type="number" value="${m.initialQty}" onchange="updateStockQty(${idx}, 'initialQty', this.value)" class="w-16 bg-white border border-amber-300 rounded text-center py-1 font-bold"> ${m.unit}`;
-
-                const stokAkhirCol = isOwner 
-                    ? `<span class="font-bold text-gray-900">${m.finalQty} ${m.unit}</span>`
-                    : `<input type="number" value="${m.finalQty}" onchange="updateStockQty(${idx}, 'finalQty', this.value)" class="w-16 bg-white border border-amber-300 rounded text-center py-1 font-bold"> ${m.unit}`;
-
-                const aksiCol = isOwner 
-                    ? ``
-                    : `<td class="py-2.5 px-3 text-center"><button onclick="deleteMaterial(${idx})" class="text-rose-500 hover:underline font-bold text-[10px]">Hapus</button></td>`;
-
-                tr.innerHTML = `
-                    <td class="py-2.5 px-3">
-                        <span class="font-bold text-gray-900 block">${m.name}</span>
-                        <span class="text-[10px] text-gray-400 font-mono">${m.code}</span>
-                    </td>
-                    <td class="py-2.5 px-3 text-gray-600 font-semibold">${m.type}</td>
-                    <td class="py-2.5 px-3 text-right font-medium">Rp ${formatThousandSeparator(m.costPerUnit)} / ${m.unit}</td>
-                    <td class="py-2.5 px-3 text-center bg-amber-50/50">${stokAwalCol}</td>
-                    <td class="py-2.5 px-3 text-center bg-amber-100/50">${stokAkhirCol}</td>
-                    <td class="py-2.5 px-3 text-center font-bold text-amber-800">${usedQty} ${m.unit}</td>
-                    <td class="py-2.5 px-3 text-right font-black text-amber-900">Rp ${formatThousandSeparator(usedValue)}</td>
-                    ${aksiCol}
-                `;
-                tbody.appendChild(tr);
-            });
-
-            document.getElementById('stok-total-used-val').innerText = "Rp " + formatThousandSeparator(totalUsedValue);
-            document.getElementById('lr-stock-used-note').innerText = `* Termasuk Pemakaian Bahan Baku (Stok Awal - Akhir): Rp ${formatThousandSeparator(totalUsedValue)}`;
-            
-            renderLabaRugi();
-        }
-
-        function updateStockQty(idx, field, value) {
-            if (isOwner) {
-                alert("Akses Ditolak: Akun Owner berada dalam mode Pantau (Read-Only). Masuk dengan PIN Manager (5678) untuk memperbarui stok.");
-                return;
-            }
-            materialsList[idx][field] = parseFloat(value) || 0;
-            saveMaterials(materialsList);
-            renderMaterialsTable();
-        }
-
-        function addNewMaterial(e) {
-            e.preventDefault();
-            if (isOwner) {
-                alert("Akses Ditolak: Owner hanya memiliki hak akses pantau (Read-Only).");
-                return;
-            }
-            const code = document.getElementById('mat-code').value.trim();
-            const name = document.getElementById('mat-name').value.trim();
-            const type = document.getElementById('mat-type').value;
-            const unit = document.getElementById('mat-unit').value.trim();
-            const cost = parseFloat(document.getElementById('mat-cost').value) || 0;
-
-            if (materialsList.some(m => m.code.toLowerCase() === code.toLowerCase())) {
-                return alert("Kode Bahan Baku sudah terdaftar!");
-            }
-
-            materialsList.push({ code, name, type, unit, costPerUnit: cost, initialQty: 0, finalQty: 0 });
-            saveMaterials(materialsList);
-            renderMaterialsTable();
-            document.getElementById('mat-code').value = "";
-            document.getElementById('mat-name').value = "";
-            document.getElementById('mat-unit').value = "";
-            document.getElementById('mat-cost').value = "";
-            alert("Bahan baku baru berhasil ditambahkan!");
-        }
-
-        function deleteMaterial(idx) {
-            if (isOwner) {
-                alert("Akses Ditolak: Owner hanya memiliki hak akses pantau (Read-Only).");
-                return;
-            }
-            if (confirm("Hapus item bahan baku ini?")) {
-                materialsList.splice(idx, 1);
-                saveMaterials(materialsList);
-                renderMaterialsTable();
-            }
-        }
-
-        // ================= TRANSAKSI & PERHITUNGAN =================
         function loadTransactions() {
-            const raw = localStorage.getItem('fm_v11_tx');
-            allTx = raw ? JSON.parse(raw) : [];
+            const raw = localStorage.getItem(tenantStorageKey);
+            txList = raw ? JSON.parse(raw) : [];
 
             if (db) {
-                db.collection("transactions_v11").orderBy("timestamp", "desc")
+                db.collection(tenantFirestoreCol).orderBy("timestamp", "desc")
                     .onSnapshot(snap => {
-                        allTx = [];
-                        snap.forEach(d => allTx.push(d.data()));
-                        refreshAllDashboardViews();
-                    }, () => refreshAllDashboardViews());
+                        txList = [];
+                        snap.forEach(doc => {
+                            const d = doc.data();
+                            d.docId = doc.id;
+                            txList.push(d);
+                        });
+                        applyDateFilter();
+                    }, () => applyDateFilter());
             } else {
-                refreshAllDashboardViews();
+                applyDateFilter();
             }
         }
 
-        function refreshAllDashboardViews() {
-            renderLabaRugi();
-            render4PosInduk();
-            renderManagerCashflow();
-            renderBukuBesarManager();
-            generateAIAnalysis();
-        }
-
-        function calculateStockUsedTotal() {
-            return materialsList.reduce((acc, m) => {
-                const used = Math.max(0, (m.initialQty || 0) - (m.finalQty || 0));
-                return acc + (used * (m.costPerUnit || 0));
-            }, 0);
-        }
-
-        function getFilteredLabaRugiTx() {
-            const start = document.getElementById('lr-date-start') ? document.getElementById('lr-date-start').value : "";
-            const end = document.getElementById('lr-date-end') ? document.getElementById('lr-date-end').value : "";
+        function applyDateFilter() {
+            const start = document.getElementById('filter-date-start').value;
+            const end = document.getElementById('filter-date-end').value;
 
             if (!start && !end) {
-                if (document.getElementById('lr-filter-status')) {
-                    document.getElementById('lr-filter-status').innerText = "Semua Tanggal (" + allTx.length + " Transaksi)";
-                }
-                return allTx;
+                filteredTxList = [...txList];
+                document.getElementById('filter-result-count').innerText = `${filteredTxList.length} Transaksi (Semua Data)`;
+                document.getElementById('pop-labarugi-status').innerText = `Periode: Semua Data (${filteredTxList.length} Transaksi)`;
+            } else {
+                filteredTxList = txList.filter(t => {
+                    const txDate = t.dateISO || (new Date(t.timestamp).toISOString().split('T')[0]);
+                    if (start && end) return txDate >= start && txDate <= end;
+                    if (start) return txDate >= start;
+                    if (end) return txDate <= end;
+                    return true;
+                });
+                document.getElementById('filter-result-count').innerText = `${filteredTxList.length} Transaksi Ditemukan`;
+                document.getElementById('pop-labarugi-status').innerText = `Periode: ${start || 'Awal'} s/d ${end || 'Kini'} (${filteredTxList.length} Transaksi)`;
             }
-
-            const filtered = allTx.filter(t => {
-                const txDate = t.dateISO || (t.timestamp ? new Date(t.timestamp).toISOString().split('T')[0] : "");
-                if (start && end) return txDate >= start && txDate <= end;
-                if (start) return txDate >= start;
-                if (end) return txDate <= end;
-                return true;
-            });
-
-            if (document.getElementById('lr-filter-status')) {
-                const sText = start || "Awal";
-                const eText = end || "Sekarang";
-                document.getElementById('lr-filter-status').innerText = `${sText} s/d ${eText} (${filtered.length} Transaksi)`;
-            }
-            return filtered;
+            renderAllDashboardReports();
         }
 
-        function applyLabaRugiDateFilter() {
+        function resetDateFilter() {
+            document.getElementById('filter-date-start').value = "";
+            document.getElementById('filter-date-end').value = "";
+            applyDateFilter();
+        }
+
+        function renderAllDashboardReports() {
             renderLabaRugi();
-            generateAIAnalysis();
+            renderTaxTable();
+            renderMutasiKas();
+            renderPerAccountDashboard();
         }
 
-        function resetLabaRugiDateFilter() {
-            if (document.getElementById('lr-date-start')) document.getElementById('lr-date-start').value = "";
-            if (document.getElementById('lr-date-end')) document.getElementById('lr-date-end').value = "";
-            renderLabaRugi();
-            generateAIAnalysis();
-        }
-
+        // 1. RENDER LABA RUGI OPERASIONAL ONEILVERSE
         function renderLabaRugi() {
-            const coa = getCOA();
-            const stockUsed = calculateStockUsedTotal();
-            const targetTx = getFilteredLabaRugiTx();
+            let totalIncome = 0;
+            let totalOutcome = 0;
 
-            const coaMap = {};
+            const groups = {};
+            let coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0)
+                ? activeTenant.customCOA 
+                : getCOA();
+
             coa.forEach(c => {
-                coaMap[c.code] = { code: c.code, name: c.name, category: c.category, total: 0 };
+                groups[c.code] = { code: c.code, name: c.name, category: c.category, count: 0, total: 0 };
             });
 
-            let priveTotal = 0;
-
-            targetTx.forEach(t => {
-                if (coaMap[t.accountCode]) {
-                    coaMap[t.accountCode].total += t.amount;
+            filteredTxList.forEach(t => {
+                if (groups[t.accountCode]) {
+                    groups[t.accountCode].count += 1;
+                    groups[t.accountCode].total += t.amount;
                 }
-                if (t.category === 'prive') {
-                    priveTotal += t.amount;
-                }
-            });
-
-            const salesList = Object.values(coaMap).filter(c => c.category === 'sales' && c.total > 0);
-            const totalSales = salesList.reduce((acc, c) => acc + c.total, 0);
-            document.getElementById('lr-total-sales').innerText = "Rp " + formatThousandSeparator(totalSales);
-            document.getElementById('lr-sales-breakdown').innerHTML = salesList.map(c => `
-                <div class="flex justify-between">
-                    <span>[${c.code}] ${c.name}</span>
-                    <span class="font-bold">Rp ${formatThousandSeparator(c.total)}</span>
-                </div>
-            `).join('') || '<div class="italic text-gray-400">Belum ada penjualan tercatat.</div>';
-
-            const cogsList = Object.values(coaMap).filter(c => c.category === 'cogs' && c.total > 0);
-            const totalCogsTx = cogsList.reduce((acc, c) => acc + c.total, 0);
-            const totalHPP = totalCogsTx + stockUsed;
-
-            document.getElementById('lr-total-cogs').innerText = "(Rp " + formatThousandSeparator(totalHPP) + ")";
-            document.getElementById('lr-cogs-breakdown').innerHTML = `
-                ${cogsList.map(c => `
-                    <div class="flex justify-between">
-                        <span>[${c.code}] ${c.name}</span>
-                        <span class="font-bold">Rp ${formatThousandSeparator(c.total)}</span>
-                    </div>
-                `).join('')}
-                <div class="flex justify-between text-amber-800 font-bold">
-                    <span>Pemakaian Bahan Baku (Stok Awal - Akhir)</span>
-                    <span>Rp ${formatThousandSeparator(stockUsed)}</span>
-                </div>
-            `;
-
-            const grossProfit = totalSales - totalHPP;
-            document.getElementById('lr-gross-profit').innerText = "Rp " + formatThousandSeparator(grossProfit);
-
-            const expenseList = Object.values(coaMap).filter(c => c.category === 'expense' && c.total > 0);
-            const totalExpense = expenseList.reduce((acc, c) => acc + c.total, 0);
-            document.getElementById('lr-total-expense').innerText = "(Rp " + formatThousandSeparator(totalExpense) + ")";
-            document.getElementById('lr-expense-breakdown').innerHTML = expenseList.map(c => `
-                <div class="flex justify-between">
-                    <span>[${c.code}] ${c.name}</span>
-                    <span class="font-bold">Rp ${formatThousandSeparator(c.total)}</span>
-                </div>
-            `).join('') || '<div class="italic text-gray-400">Belum ada beban operasional tercatat.</div>';
-
-            const ebt = grossProfit - totalExpense;
-            document.getElementById('lr-ebt').innerText = "Rp " + formatThousandSeparator(ebt);
-            document.getElementById('lr-prive-info').innerText = "Rp " + formatThousandSeparator(priveTotal);
-        }
-
-        function exportLabaRugiCOA_PDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const coa = getCOA();
-            const stockUsed = calculateStockUsedTotal();
-            const targetTx = getFilteredLabaRugiTx();
-
-            const start = document.getElementById('lr-date-start') ? document.getElementById('lr-date-start').value : "";
-            const end = document.getElementById('lr-date-end') ? document.getElementById('lr-date-end').value : "";
-            const periodeStr = (start || end) ? `${start || 'Awal'} s/d ${end || 'Hari Ini'}` : APP_CONFIG.periodName;
-
-            const coaMap = {};
-            coa.forEach(c => { coaMap[c.code] = { code: c.code, name: c.name, category: c.category, total: 0 }; });
-            targetTx.forEach(t => { if (coaMap[t.accountCode]) coaMap[t.accountCode].total += t.amount; });
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(16);
-            doc.setTextColor(15, 23, 42);
-            doc.text(APP_CONFIG.businessName.toUpperCase(), 14, 18);
-
-            doc.setFontSize(11);
-            doc.setTextColor(126, 34, 206);
-            doc.text("LAPORAN LABA RUGI OPERASIONAL (RINCIAN PER COA)", 14, 25);
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(100, 116, 139);
-            doc.text(`Periode Mutasi: ${periodeStr} • Dicetak: ${new Date().toLocaleString('id-ID')} oleh ${user.title}`, 14, 31);
-            doc.line(14, 35, 196, 35);
-
-            const tableRows = [];
-            let totalSales = 0, totalCogs = stockUsed, totalExpense = 0;
-
-            tableRows.push([{ content: 'A. PENJUALAN', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [240, 253, 244] } }]);
-            Object.values(coaMap).filter(c => c.category === 'sales').forEach(c => {
-                totalSales += c.total;
-                tableRows.push([c.code, c.name, "Rp " + formatThousandSeparator(c.total)]);
-            });
-            tableRows.push([{ content: 'TOTAL PENJUALAN', colSpan: 2, styles: { fontStyle: 'bold' } }, { content: "Rp " + formatThousandSeparator(totalSales), styles: { fontStyle: 'bold', halign: 'right' } }]);
-
-            tableRows.push([{ content: 'B. HARGA POKOK PENJUALAN (HPP)', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [254, 243, 199] } }]);
-            Object.values(coaMap).filter(c => c.category === 'cogs').forEach(c => {
-                totalCogs += c.total;
-                tableRows.push([c.code, c.name, "Rp " + formatThousandSeparator(c.total)]);
-            });
-            tableRows.push(['STK-01', 'Pemakaian Bahan Baku (Stok Awal - Akhir)', "Rp " + formatThousandSeparator(stockUsed)]);
-            tableRows.push([{ content: 'TOTAL HARGA POKOK PENJUALAN', colSpan: 2, styles: { fontStyle: 'bold' } }, { content: "(Rp " + formatThousandSeparator(totalCogs) + ")", styles: { fontStyle: 'bold', halign: 'right' } }]);
-
-            const gross = totalSales - totalCogs;
-            tableRows.push([{ content: 'LABA KOTOR', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [220, 252, 231] } }, { content: "Rp " + formatThousandSeparator(gross), styles: { fontStyle: 'bold', halign: 'right', fillColor: [220, 252, 231] } }]);
-
-            tableRows.push([{ content: 'C. BIAYA OPERASIONAL', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [255, 228, 230] } }]);
-            Object.values(coaMap).filter(c => c.category === 'expense').forEach(c => {
-                totalExpense += c.total;
-                tableRows.push([c.code, c.name, "Rp " + formatThousandSeparator(c.total)]);
-            });
-            tableRows.push([{ content: 'TOTAL BIAYA OPERASIONAL', colSpan: 2, styles: { fontStyle: 'bold' } }, { content: "(Rp " + formatThousandSeparator(totalExpense) + ")", styles: { fontStyle: 'bold', halign: 'right' } }]);
-
-            const ebt = gross - totalExpense;
-            tableRows.push([{ content: 'LABA KOTOR SEBELUM PAJAK', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [15, 23, 42], textColor: [52, 211, 153] } }, { content: "Rp " + formatThousandSeparator(ebt), styles: { fontStyle: 'bold', halign: 'right', fillColor: [15, 23, 42], textColor: [52, 211, 153] } }]);
-
-            doc.autoTable({
-                startY: 38,
-                head: [['Kode Akun', 'Nama Akun / Rincian Pos', 'Nominal (Rp)']],
-                body: tableRows,
-                theme: 'grid',
-                styles: { fontSize: 8.5, cellPadding: 2.5 },
-                headStyles: { fillColor: [88, 28, 135], textColor: [255, 255, 255], fontStyle: 'bold' },
-                columnStyles: {
-                    0: { cellWidth: 26, fontStyle: 'bold' },
-                    1: { cellWidth: 110 },
-                    2: { cellWidth: 46, halign: 'right' }
+                if (t.category === 'sales') {
+                    totalIncome += t.amount;
+                } else if (t.category === 'cogs' || t.category === 'expense') {
+                    totalOutcome += t.amount;
                 }
             });
 
-            doc.save(`Laba_Rugi_COA_${(start || end ? (start + '_sd_' + end) : APP_CONFIG.periodName).replace(/\s+/g, '_')}.pdf`);
-        }
+            const netProfit = totalIncome - totalOutcome;
 
-        // ================= 3. LAPORAN 4 POS INDUK =================
-        function render4PosInduk() {
-            let sales = 0, cogs = calculateStockUsedTotal(), expense = 0, prive = 0;
-            let salesCnt = 0, cogsCnt = 0, expenseCnt = 0, priveCnt = 0;
-            const breakdown = { sales: [], cogs: [], expense: [], prive: [] };
+            document.getElementById('card-total-income').innerText = "Rp " + formatThousandSeparator(totalIncome);
+            document.getElementById('card-total-outcome').innerText = "Rp " + formatThousandSeparator(totalOutcome);
+            document.getElementById('card-net-profit').innerText = "Rp " + formatThousandSeparator(netProfit);
+            document.getElementById('card-net-profit').className = netProfit >= 0 
+                ? "text-2xl sm:text-3xl font-black text-emerald-400 mt-2" 
+                : "text-2xl sm:text-3xl font-black text-rose-400 mt-2";
 
-            allTx.forEach(t => {
-                if (t.category === 'sales') { sales += t.amount; salesCnt++; breakdown.sales.push(t); }
-                if (t.category === 'cogs') { cogs += t.amount; cogsCnt++; breakdown.cogs.push(t); }
-                if (t.category === 'expense') { expense += t.amount; expenseCnt++; breakdown.expense.push(t); }
-                if (t.category === 'prive') { prive += t.amount; priveCnt++; breakdown.prive.push(t); }
-            });
+            document.getElementById('pop-foot-income').innerText = "Rp " + formatThousandSeparator(totalIncome);
+            document.getElementById('pop-foot-outcome').innerText = "Rp " + formatThousandSeparator(totalOutcome);
+            document.getElementById('pop-foot-net').innerText = "Rp " + formatThousandSeparator(netProfit);
 
-            document.getElementById('pos4-val-sales').innerText = "Rp " + formatThousandSeparator(sales);
-            document.getElementById('pos4-count-sales').innerText = `${salesCnt} transaksi`;
-
-            document.getElementById('pos4-val-cogs').innerText = "Rp " + formatThousandSeparator(cogs);
-            document.getElementById('pos4-count-cogs').innerText = `${cogsCnt} transaksi belanja stok`;
-
-            document.getElementById('pos4-val-expense').innerText = "Rp " + formatThousandSeparator(expense);
-            document.getElementById('pos4-count-expense').innerText = `${expenseCnt} transaksi beban`;
-
-            document.getElementById('pos4-val-prive').innerText = "Rp " + formatThousandSeparator(prive);
-            document.getElementById('pos4-count-prive').innerText = `${priveCnt} penarikan`;
-
-            const container = document.getElementById('pos4-breakdown-container');
-            container.innerHTML = `
-                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
-                    <h4 class="font-bold text-xs text-slate-800 border-b pb-1">Aktivitas Penjualan</h4>
-                    <div class="max-h-40 overflow-y-auto space-y-1">
-                        ${breakdown.sales.map(s => `
-                            <div class="flex justify-between text-[11px] bg-white p-1.5 rounded border border-gray-100">
-                                <span>${s.dateFull} • ${s.desc}</span>
-                                <span class="font-bold text-emerald-700">+ Rp ${formatThousandSeparator(s.amount)}</span>
-                            </div>
-                        `).join('') || '<div class="text-[11px] text-gray-400">Kosong</div>'}
-                    </div>
-                </div>
-                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
-                    <h4 class="font-bold text-xs text-slate-800 border-b pb-1">Aktivitas Beban Operasional</h4>
-                    <div class="max-h-40 overflow-y-auto space-y-1">
-                        ${breakdown.expense.map(e => `
-                            <div class="flex justify-between text-[11px] bg-white p-1.5 rounded border border-gray-100">
-                                <span>${e.dateFull} • ${e.desc}</span>
-                                <span class="font-bold text-rose-700">- Rp ${formatThousandSeparator(e.amount)}</span>
-                            </div>
-                        `).join('') || '<div class="text-[11px] text-gray-400">Kosong</div>'}
-                    </div>
-                </div>
-            `;
-        }
-
-        // ================= 4. LAPORAN TRANSAKSI KAS =================
-        function renderManagerCashflow() {
-            const tbody = document.getElementById('mgr-cashflow-tbody');
+            const tbody = document.getElementById('labarugi-table-body');
             tbody.innerHTML = "";
 
-            const start = document.getElementById('mgr-cashflow-start').value;
-            const end = document.getElementById('mgr-cashflow-end').value;
+            const activeItems = Object.values(groups).filter(g => g.total > 0 && g.category !== 'prive');
 
-            let list = [...allTx];
-            if (start && end) {
-                list = list.filter(t => (t.dateISO >= start && t.dateISO <= end));
+            if (activeItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Belum ada transaksi operasional pada periode yang dipilih.</td></tr>`;
+                return;
             }
 
-            const chrono = [...list].reverse();
-            let bal = 0;
-            const withBal = chrono.map(t => {
-                if (t.category === 'sales') bal += t.amount;
-                else bal -= t.amount;
-                return { ...t, bal };
-            }).reverse();
-
-            withBal.forEach((tx, idx) => {
-                const isSales = tx.category === 'sales';
+            activeItems.forEach(item => {
+                const isInc = item.category === 'sales';
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-100 hover:bg-gray-50";
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3 text-gray-400 font-mono">${idx + 1}</td>
-                    <td class="py-2.5 px-3 whitespace-nowrap font-medium">${tx.dateFull} <span class="text-[10px] text-gray-400 block">${tx.date}</span></td>
                     <td class="py-2.5 px-3">
-                        <span class="font-bold block">[${tx.accountCode}] ${tx.accountName}</span>
-                        <span class="text-[10px] text-gray-500">${tx.desc}</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono ${isInc ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                            ${isInc ? 'INCOME' : 'OUTCOME'} [${item.code}]
+                        </span>
                     </td>
-                    <td class="py-2.5 px-3 text-right font-bold text-emerald-700">${isSales ? "Rp " + formatThousandSeparator(tx.amount) : "-"}</td>
-                    <td class="py-2.5 px-3 text-right font-bold text-rose-700">${!isSales ? "Rp " + formatThousandSeparator(tx.amount) : "-"}</td>
-                    <td class="py-2.5 px-3 text-right font-black font-mono bg-slate-50">Rp ${formatThousandSeparator(tx.bal)}</td>
-                    <td class="py-2.5 px-3 text-center text-gray-500">${tx.staff}</td>
+                    <td class="py-2.5 px-3 font-bold text-slate-900">${item.name}</td>
+                    <td class="py-2.5 px-3 text-center text-slate-500">${item.count} transaksi</td>
+                    <td class="py-2.5 px-3 text-right font-black ${isInc ? 'text-emerald-700' : 'text-rose-700'}">
+                        Rp ${formatThousandSeparator(item.total)}
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // ================= 5. LAPORAN BUKU BESAR =================
-        function renderBukuBesarManager() {
-            const container = document.getElementById('mgr-buku-besar-grid');
+        // 2. RENDER TABEL PAJAK 12%
+        function renderTaxTable() {
+            const tbody = document.getElementById('tax-table-body');
+            tbody.innerHTML = "";
+
+            let totalGross = 0;
+            let totalTax = 0;
+            let totalNet = 0;
+
+            const outcomeTx = filteredTxList.filter(t => (t.category === 'cogs' || t.category === 'expense'));
+
+            if (outcomeTx.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Belum ada pengeluaran belanja/outcome untuk menghitung pajak negara.</td></tr>`;
+                document.getElementById('stat-total-pajak-sumbang').innerText = "Rp 0";
+                document.getElementById('tax-foot-gross').innerText = "Rp 0";
+                document.getElementById('tax-foot-tax').innerText = "Rp 0";
+                document.getElementById('tax-foot-net').innerText = "Rp 0";
+                return;
+            }
+
+            outcomeTx.forEach((tx, idx) => {
+                const gross = tx.amount;
+                const tax = tx.tax12 || Math.round(gross * 0.12);
+                const net = tx.dpp || (gross - tax);
+
+                totalGross += gross;
+                totalTax += tax;
+                totalNet += net;
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-rose-100 hover:bg-rose-50/50 text-xs transition";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 text-slate-400 font-mono">${idx + 1}</td>
+                    <td class="py-2.5 px-3 text-slate-700 font-medium whitespace-nowrap">${tx.dateFull}</td>
+                    <td class="py-2.5 px-3 font-bold text-slate-900">[${tx.accountCode}] ${tx.accountName}</td>
+                    <td class="py-2.5 px-3 text-slate-500">${tx.desc || '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-semibold text-slate-900 whitespace-nowrap">Rp ${formatThousandSeparator(gross)}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-rose-700 bg-rose-50/70 whitespace-nowrap">Rp ${formatThousandSeparator(tax)}</td>
+                    <td class="py-2.5 px-3 text-right text-slate-600 whitespace-nowrap">Rp ${formatThousandSeparator(net)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('stat-total-pajak-sumbang').innerText = "Rp " + formatThousandSeparator(totalTax);
+            document.getElementById('tax-foot-gross').innerText = "Rp " + formatThousandSeparator(totalGross);
+            document.getElementById('tax-foot-tax').innerText = "Rp " + formatThousandSeparator(totalTax);
+            document.getElementById('tax-foot-net').innerText = "Rp " + formatThousandSeparator(totalNet);
+        }
+
+        // 3. RENDER MUTASI KAS
+        function renderMutasiKas() {
+            const tbody = document.getElementById('kasir-table-body');
+            tbody.innerHTML = "";
+
+            const chronoList = [...filteredTxList].reverse();
+            let runningBalance = 0;
+            const withBalance = chronoList.map(tx => {
+                const isSales = tx.category === 'sales';
+                if (isSales) runningBalance += tx.amount;
+                else runningBalance -= tx.amount;
+                return { ...tx, runningBalance };
+            });
+
+            const displayList = withBalance.reverse();
+
+            if (displayList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada transaksi kas tercatat.</td></tr>`;
+                return;
+            }
+
+            displayList.forEach((tx) => {
+                const isSales = tx.category === 'sales';
+                const inVal = isSales ? tx.amount : 0;
+                const outVal = !isSales ? tx.amount : 0;
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50/80 text-xs transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-3 text-slate-700 whitespace-nowrap">
+                        <span class="font-bold text-slate-900">${tx.dateFull}</span>
+                        <span class="text-[10px] text-slate-400 block font-mono">${tx.date}</span>
+                    </td>
+                    <td class="py-3 px-3">
+                        <span class="font-bold text-slate-900 block">[${tx.accountCode}] ${tx.accountName}</span>
+                        <span class="text-[10px] text-slate-500">${tx.desc}</span>
+                    </td>
+                    <td class="py-3 px-3 text-right font-black text-emerald-600 whitespace-nowrap">${inVal > 0 ? formatThousandSeparator(inVal) : '-'}</td>
+                    <td class="py-3 px-3 text-right font-black text-rose-600 whitespace-nowrap">${outVal > 0 ? formatThousandSeparator(outVal) : '-'}</td>
+                    <td class="py-3 px-3 text-right font-black text-slate-900 whitespace-nowrap bg-slate-50/60 font-mono">Rp ${formatThousandSeparator(tx.runningBalance)}</td>
+                    <td class="py-3 px-3 text-center text-slate-500 whitespace-nowrap font-medium">${tx.staff}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 4. RENDER BUKU BESAR AKUN
+        function renderPerAccountDashboard() {
+            const container = document.getElementById('dashboard-per-account-grid');
             container.innerHTML = "";
 
-            const coa = getCOA();
-            const groups = {};
-            coa.forEach(c => { groups[c.code] = { ...c, total: 0, items: [] }; });
+            const targetCode = document.getElementById('filter-account-target').value;
+            let coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0)
+                ? activeTenant.customCOA 
+                : getCOA();
 
-            allTx.forEach(t => {
+            const groups = {};
+
+            coa.forEach(c => {
+                groups[c.code] = { code: c.code, name: c.name, category: c.category, total: 0, items: [] };
+            });
+
+            filteredTxList.forEach(t => {
                 if (groups[t.accountCode]) {
                     groups[t.accountCode].total += t.amount;
                     groups[t.accountCode].items.push(t);
                 }
             });
 
-            const active = Object.values(groups).filter(g => g.items.length > 0);
-            active.forEach(acc => {
+            let activeList = Object.values(groups).filter(a => a.items.length > 0);
+            if (targetCode !== "ALL") {
+                activeList = activeList.filter(a => a.code === targetCode);
+            }
+
+            const badgeEl = document.getElementById('total-active-accounts'); 
+            if (badgeEl) badgeEl.innerText = `${activeList.length} Akun Aktif`;
+
+            if (activeList.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-6 text-center text-xs text-slate-400">Tidak ada transaksi pada akun ini pada periode yang dipilih.</div>`;
+                return;
+            }
+
+            activeList.forEach(acc => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 shadow-sm text-xs";
+                card.className = "bg-white/90 border border-slate-200/90 rounded-2xl p-4 space-y-2.5 shadow-sm";
+                
+                let badgeColor = "bg-slate-100 text-slate-800";
+                let prefix = "- ";
+                if (acc.category === 'sales') {
+                    badgeColor = "bg-emerald-100 text-emerald-800";
+                    prefix = "+ ";
+                } else if (acc.category === 'cogs') {
+                    badgeColor = "bg-amber-100 text-amber-800";
+                } else if (acc.category === 'expense') {
+                    badgeColor = "bg-rose-100 text-rose-800";
+                } else if (acc.category === 'prive') {
+                    badgeColor = "bg-purple-100 text-purple-800";
+                }
+
                 card.innerHTML = `
-                    <div class="flex justify-between items-start border-b pb-2">
+                    <div class="flex justify-between items-start border-b border-slate-100 pb-2">
                         <div>
-                            <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-purple-100 text-purple-800">[${acc.code}]</span>
-                            <h4 class="font-extrabold text-gray-900 mt-1">${acc.name}</h4>
+                            <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full ${badgeColor}">Kode: ${acc.code}</span>
+                            <h4 class="font-extrabold text-xs text-slate-900 mt-1">${acc.name}</h4>
+                            <span class="text-[10px] text-slate-400">${acc.items.length} kali mutasi</span>
                         </div>
-                        <span class="font-black text-gray-900">Rp ${formatThousandSeparator(acc.total)}</span>
+                        <div class="text-right space-y-1">
+                            <span class="font-black text-xs text-slate-900 block">${prefix}Rp ${formatThousandSeparator(acc.total)}</span>
+                        </div>
                     </div>
-                    <div class="space-y-1 max-h-36 overflow-y-auto">
+                    <div class="space-y-1.5 max-h-40 overflow-y-auto pt-1">
                         ${acc.items.map(it => `
-                            <div class="flex justify-between text-[11px] bg-white p-1.5 rounded border border-gray-100">
-                                <span>${it.dateFull} • ${it.desc} (${it.staff})</span>
-                                <span class="font-bold">Rp ${formatThousandSeparator(it.amount)}</span>
+                            <div class="flex justify-between items-center text-[11px] text-slate-600 bg-slate-50/80 px-2.5 py-1.5 rounded-xl border border-slate-100">
+                                <div>
+                                    <span class="font-bold text-slate-800">${it.desc}</span>
+                                    <span class="text-[10px] text-slate-400 block">${it.dateFull} ${it.date} • ${it.staff}</span>
+                                </div>
+                                <span class="font-black text-slate-900">Rp ${formatThousandSeparator(it.amount)}</span>
                             </div>
                         `).join('')}
                     </div>
                 `;
                 container.appendChild(card);
             });
-        }
-
-        // ================= 7. ANALISA AI KEUANGAN =================
-        function generateAIAnalysis() {
-            const container = document.getElementById('ai-analysis-container');
-            const coa = getCOA();
-            const stockUsed = calculateStockUsedTotal();
-
-            let sales = 0, cogsTx = 0, expense = 0;
-            const expenseMap = {};
-
-            allTx.forEach(t => {
-                if (t.category === 'sales') sales += t.amount;
-                if (t.category === 'cogs') cogsTx += t.amount;
-                if (t.category === 'expense') {
-                    expense += t.amount;
-                    expenseMap[t.accountName] = (expenseMap[t.accountName] || 0) + t.amount;
-                }
-            });
-
-            const totalHPP = cogsTx + stockUsed;
-            const grossProfit = sales - totalHPP;
-            const netBeforeTax = grossProfit - expense;
-
-            const marginGross = sales > 0 ? ((grossProfit / sales) * 100).toFixed(1) : 0;
-            const marginNet = sales > 0 ? ((netBeforeTax / sales) * 100).toFixed(1) : 0;
-
-            let highestExpenseName = "-";
-            let highestExpenseVal = 0;
-            Object.keys(expenseMap).forEach(k => {
-                if (expenseMap[k] > highestExpenseVal) {
-                    highestExpenseVal = expenseMap[k];
-                    highestExpenseName = k;
-                }
-            });
-
-            container.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div class="bg-gradient-to-br from-emerald-500 to-teal-700 text-white p-4 rounded-2xl shadow-sm">
-                        <span class="text-xs font-semibold block text-emerald-100">Margin Laba Kotor Usaha</span>
-                        <div class="text-2xl font-black mt-1">${marginGross}%</div>
-                        <p class="text-[11px] text-emerald-100 mt-1">Efisiensi HPP & Bahan Baku</p>
-                    </div>
-                    <div class="bg-gradient-to-br from-purple-600 to-indigo-800 text-white p-4 rounded-2xl shadow-sm">
-                        <span class="text-xs font-semibold block text-purple-200">Margin Bersih Sebelum Pajak</span>
-                        <div class="text-2xl font-black mt-1">${marginNet}%</div>
-                        <p class="text-[11px] text-purple-200 mt-1">Laba Operasional dari Omzet</p>
-                    </div>
-                    <div class="bg-gradient-to-br from-rose-500 to-pink-700 text-white p-4 rounded-2xl shadow-sm">
-                        <span class="text-xs font-semibold block text-rose-100">Beban Operasional Tertinggi</span>
-                        <div class="text-lg font-black mt-1 truncate">${highestExpenseName}</div>
-                        <p class="text-[11px] text-rose-100 mt-1">Rp ${formatThousandSeparator(highestExpenseVal)}</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
-                    <h3 class="font-extrabold text-sm text-slate-900 flex items-center space-x-2">
-                        <i data-lucide="bot" class="w-4 h-4 text-purple-700"></i>
-                        <span>Rekomendasi Strategis AI untuk Manager & Owner</span>
-                    </h3>
-                    <div class="space-y-2 text-xs text-slate-700 leading-relaxed">
-                        <div class="p-3 bg-white rounded-xl border border-slate-200 flex items-start space-x-2">
-                            <span class="text-emerald-600 font-bold text-sm">✓</span>
-                            <div>
-                                <strong class="text-slate-900">Efisiensi Bahan Baku:</strong> 
-                                Nilai bahan baku terpakai tercatat sebesar <strong>Rp ${formatThousandSeparator(stockUsed)}</strong>. Pastikan fisik sisa stok di gudang sesuai dengan angka stok akhir pada sistem untuk menghindari kehilangan atau kebocoran bahan.
-                            </div>
-                        </div>
-                        <div class="p-3 bg-white rounded-xl border border-slate-200 flex items-start space-x-2">
-                            <span class="text-amber-600 font-bold text-sm">!</span>
-                            <div>
-                                <strong class="text-slate-900">Pengendalian Biaya (${highestExpenseName}):</strong> 
-                                Pos biaya ini menyerap porsi terbesar dari total beban operasional (Rp ${formatThousandSeparator(highestExpenseVal)}). Dianjurkan meninjau kembali rincian nota belanja terkait efisiensi pengeluaran.
-                            </div>
-                        </div>
-                        <div class="p-3 bg-white rounded-xl border border-slate-200 flex items-start space-x-2">
-                            <span class="text-purple-600 font-bold text-sm">★</span>
-                            <div>
-                                <strong class="text-slate-900">Performa Laba Bersih:</strong> 
-                                Laba Kotor Sebelum Pajak saat ini adalah <strong>Rp ${formatThousandSeparator(netBeforeTax)}</strong>. Prive pemilik sebesar <strong>Rp ${formatThousandSeparator(allTx.filter(t=>t.category==='prive').reduce((a,b)=>a+b.amount,0))}</strong> sudah dipisahkan dengan tepat sehingga tidak mendistorsi margin usaha.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
             lucide.createIcons();
         }
 
-        // ================= 8. MASTER COA =================
-        function renderCOATable() {
-            const tbody = document.getElementById('dashboard-coa-body');
-            tbody.innerHTML = "";
-            const list = getCOA();
-            const catMap = { sales: "Penjualan", cogs: "HPP", expense: "Biaya Operasional", prive: "Prive Pemilik" };
-
-            list.forEach((c, idx) => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-100 hover:bg-gray-50";
-
-                const aksiCol = isOwner 
-                    ? ``
-                    : `<td class="py-2 px-3 text-right"><button onclick="removeCOA(${idx})" class="text-[10px] text-rose-500 font-bold hover:underline">Hapus</button></td>`;
-
-                tr.innerHTML = `
-                    <td class="py-2 px-3 text-gray-400 font-mono">${idx + 1}</td>
-                    <td class="py-2 px-3 font-bold font-mono text-purple-800">${c.code}</td>
-                    <td class="py-2 px-3 font-bold text-gray-800">${c.name}</td>
-                    <td class="py-2 px-3 text-gray-600">${catMap[c.category] || c.category}</td>
-                    ${aksiCol}
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function addCOA(e) {
-            e.preventDefault();
-            if (isOwner) {
-                alert("Akses Ditolak: Owner hanya memiliki hak akses pantau (Read-Only).");
-                return;
-            }
-            const code = document.getElementById('new-coa-code').value.trim();
-            const name = document.getElementById('new-coa-name').value.trim();
-            const cat = document.getElementById('new-coa-cat').value;
-
-            const list = getCOA();
-            if (list.some(c => c.code.toLowerCase() === code.toLowerCase())) return alert("Kode Akun sudah ada!");
-
-            list.push({ code, name, category: cat });
-            saveCOA(list);
-            renderCOATable();
-            document.getElementById('new-coa-code').value = "";
-            document.getElementById('new-coa-name').value = "";
-            alert("Akun COA baru berhasil disimpan!");
-        }
-
-        function removeCOA(idx) {
-            if (isOwner) {
-                alert("Akses Ditolak: Owner hanya memiliki hak akses pantau (Read-Only).");
-                return;
-            }
-            if (confirm("Hapus akun COA ini?")) {
-                const list = getCOA();
-                list.splice(idx, 1);
-                saveCOA(list);
-                renderCOATable();
-            }
-        }
-
-        // ================= CETAK PDF LAPORAN STOK FILTER TANGGAL & JENIS AKUN =================
-        function exportStockPDF() {
+        // CETAK PDF LABA RUGI RESMI
+        function exportLabaRugiPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
-            const displayMaterials = getFilteredStockMaterials();
 
-            const start = document.getElementById('stok-filter-start') ? document.getElementById('stok-filter-start').value : "";
-            const end = document.getElementById('stok-filter-end') ? document.getElementById('stok-filter-end').value : "";
-            const selType = document.getElementById('stok-filter-type') ? document.getElementById('stok-filter-type').value : "ALL";
-
-            const periodeStr = (start || end) ? `${start || 'Awal'} s/d ${end || 'Hari Ini'}` : APP_CONFIG.periodName;
-            const typeStr = selType === "ALL" ? "Semua Jenis / Akun Stok" : `Jenis Akun: ${selType}`;
+            const start = document.getElementById('filter-date-start').value || "Awal";
+            const end = document.getElementById('filter-date-end').value || "Hari Ini";
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(16);
@@ -1479,65 +860,191 @@
             doc.text(APP_CONFIG.businessName.toUpperCase(), 14, 18);
 
             doc.setFontSize(11);
-            doc.setTextColor(217, 119, 6);
-            doc.text("LAPORAN MUTASI & NILAI STOK BAHAN BAKU (HPP)", 14, 25);
+            doc.setTextColor(67, 56, 202);
+            doc.text("LAPORAN LABA RUGI OPERASIONAL & AUDIT FINANSIAL", 14, 25);
 
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
             doc.setTextColor(100, 116, 139);
-            doc.text(`Periode Mutasi: ${periodeStr} • ${typeStr}`, 14, 31);
-            doc.text(`Dicetak Pada: ${new Date().toLocaleString('id-ID')} oleh ${user.title}`, 14, 36);
+            doc.text(`Periode: ${start} s/d ${end}`, 14, 31);
+            doc.text(`Dicetak Oleh: ${user.title} pada ${new Date().toLocaleString('id-ID')}`, 14, 36);
+
+            doc.setDrawColor(203, 213, 225);
             doc.line(14, 39, 196, 39);
 
-            let totalHppBahan = 0;
-            const tableRows = displayMaterials.map((m, idx) => {
-                const initial = m.initialQty || 0;
-                const final = m.finalQty || 0;
-                const used = Math.max(0, initial - final);
-                const cost = m.costPerUnit || 0;
-                const valHpp = used * cost;
-                totalHppBahan += valHpp;
+            let totalInc = 0;
+            let totalOut = 0;
+
+            const groups = {};
+            let coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0) ? activeTenant.customCOA : getCOA();
+            coa.forEach(c => { groups[c.code] = { code: c.code, name: c.name, category: c.category, total: 0 }; });
+
+            filteredTxList.forEach(t => {
+                if (groups[t.accountCode]) groups[t.accountCode].total += t.amount;
+                if (t.category === 'sales') totalInc += t.amount;
+                else if (t.category === 'cogs' || t.category === 'expense') totalOut += t.amount;
+            });
+
+            const rows = Object.values(groups).filter(g => g.total > 0 && g.category !== 'prive').map((g, idx) => [
+                idx + 1,
+                `[${g.code}] ${g.name}`,
+                g.category === 'sales' ? 'INCOME (Pemasukan)' : 'OUTCOME (Biaya Operasional)',
+                "Rp " + formatThousandSeparator(g.total)
+            ]);
+
+            doc.autoTable({
+                startY: 43,
+                head: [['No', 'Pos Akun COA', 'Kategori', 'Total Nominal']],
+                body: rows,
+                theme: 'grid',
+                styles: { fontSize: 8.5, cellPadding: 2.5, textColor: [30, 41, 59] },
+                headStyles: { fillColor: [30, 27, 75], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 6;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9.5);
+            doc.setTextColor(15, 23, 42);
+            doc.text(`Total Pemasukan (Income): Rp ${formatThousandSeparator(totalInc)}`, 14, finalY);
+            doc.text(`Total Pengeluaran (Outcome): Rp ${formatThousandSeparator(totalOut)}`, 14, finalY + 5);
+            doc.text(`Laba Bersih Operasional: Rp ${formatThousandSeparator(totalInc - totalOut)}`, 14, finalY + 10);
+
+            doc.save(`Laba_Rugi_Oneilverse_${start}_sd_${end}.pdf`);
+        }
+
+        // CETAK PDF PAJAK 12%
+        function exportTaxPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            const start = document.getElementById('filter-date-start').value || "Awal";
+            const end = document.getElementById('filter-date-end').value || "Hari Ini";
+            const outcomeTx = filteredTxList.filter(t => (t.category === 'cogs' || t.category === 'expense'));
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.setTextColor(15, 23, 42);
+            doc.text(APP_CONFIG.businessName.toUpperCase(), 14, 18);
+
+            doc.setFontSize(11);
+            doc.setTextColor(225, 29, 72);
+            doc.text("BUKTI RESMI SUMBANGAN PAJAK NEGARA 12% (PPN OPERASIONAL)", 14, 25);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Periode Pajak: ${start} s/d ${end}`, 14, 31);
+            doc.text(`Dicetak Pada: ${new Date().toLocaleString('id-ID')} oleh ${user.title}`, 14, 36);
+
+            doc.setDrawColor(203, 213, 225);
+            doc.line(14, 39, 196, 39);
+
+            let totalTax = 0;
+            let totalGross = 0;
+
+            const tableRows = outcomeTx.map((tx, idx) => {
+                const tax = tx.tax12 || Math.round(tx.amount * 0.12);
+                const net = tx.dpp || (tx.amount - tax);
+                totalTax += tax;
+                totalGross += tx.amount;
 
                 return [
                     idx + 1,
-                    `${m.code}\n${m.name}`,
-                    m.type || "-",
-                    `Rp ${formatThousandSeparator(cost)} / ${m.unit}`,
-                    `${initial} ${m.unit}`,
-                    `${final} ${m.unit}`,
-                    `${used} ${m.unit}`,
-                    `Rp ${formatThousandSeparator(valHpp)}`
+                    tx.dateFull,
+                    `[${tx.accountCode}] ${tx.accountName}`,
+                    tx.desc || "-",
+                    "Rp " + formatThousandSeparator(tx.amount),
+                    "Rp " + formatThousandSeparator(tax),
+                    "Rp " + formatThousandSeparator(net)
                 ];
             });
 
             doc.autoTable({
                 startY: 43,
-                head: [['No', 'Kode & Nama Bahan', 'Jenis/Tipe', 'Harga/Unit', 'Stok Awal', 'Stok Akhir', 'Terpakai', 'Nilai HPP']],
+                head: [['No', 'Tanggal', 'Pos Outcome', 'Keterangan Belanja', 'Nilai Belanja', 'Pajak 12%', 'Nilai Bersih']],
                 body: tableRows,
                 theme: 'grid',
                 styles: { fontSize: 8, cellPadding: 2.5, textColor: [30, 41, 59] },
-                headStyles: { fillColor: [180, 83, 9], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
-                columnStyles: {
-                    0: { halign: 'center', cellWidth: 8 },
-                    1: { cellWidth: 42 },
-                    2: { cellWidth: 26 },
-                    3: { halign: 'right', cellWidth: 26 },
-                    4: { halign: 'center', cellWidth: 20 },
-                    5: { halign: 'center', cellWidth: 20 },
-                    6: { halign: 'center', fontStyle: 'bold', textColor: [180, 83, 9], cellWidth: 18 },
-                    7: { halign: 'right', fontStyle: 'bold', cellWidth: 26 }
-                }
+                headStyles: { fillColor: [190, 18, 60], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' }
             });
 
             const finalY = doc.lastAutoTable.finalY + 6;
             doc.setFont("helvetica", "bold");
             doc.setFontSize(10);
             doc.setTextColor(15, 23, 42);
-            doc.text(`TOTAL NILAI PEMAKAIAN BAHAN BAKU (HPP): Rp ${formatThousandSeparator(totalHppBahan)}`, 14, finalY);
+            doc.text(`TOTAL PENGELUARAN BRUTO: Rp ${formatThousandSeparator(totalGross)}`, 14, finalY);
+            doc.text(`TOTAL KONTRIBUSI PAJAK NEGARA 12%: Rp ${formatThousandSeparator(totalTax)}`, 14, finalY + 5);
 
-            const safeType = selType.replace(/[^a-zA-Z0-9]/g, '_');
-            const safeDates = (start || end ? `${start}_sd_${end}` : APP_CONFIG.periodName).replace(/[^a-zA-Z0-9]/g, '_');
-            doc.save(`Laporan_Stok_${safeType}_${safeDates}.pdf`);
+            doc.save(`Laporan_Pajak_Negara_12%_${start}_sd_${end}.pdf`);
+        }
+
+        // CETAK MUTASI KAS PDF
+        function exportCashflowPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            const start = document.getElementById('filter-date-start').value || "Awal";
+            const end = document.getElementById('filter-date-end').value || "Hari Ini";
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.setTextColor(15, 23, 42);
+            doc.text(APP_CONFIG.businessName.toUpperCase(), 14, 18);
+
+            doc.setFontSize(11);
+            doc.setTextColor(15, 23, 42);
+            doc.text("LAPORAN REKENING MUTASI KAS (CASHFLOW)", 14, 25);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Periode: ${start} s/d ${end}`, 14, 31);
+            doc.text(`Dicetak Pada: ${new Date().toLocaleString('id-ID')} oleh ${user.title}`, 14, 36);
+
+            doc.setDrawColor(203, 213, 225);
+            doc.line(14, 39, 196, 39);
+
+            const chronoList = [...filteredTxList].reverse();
+            let runningBalance = 0;
+            let totalDebit = 0;
+            let totalKredit = 0;
+
+            const tableRows = chronoList.map((tx, idx) => {
+                const isSales = tx.category === 'sales';
+                const debit = isSales ? tx.amount : 0;
+                const kredit = !isSales ? tx.amount : 0;
+                totalDebit += debit;
+                totalKredit += kredit;
+                runningBalance += (debit - kredit);
+
+                return [
+                    idx + 1,
+                    `${tx.dateFull}\n${tx.date}`,
+                    `[${tx.accountCode}] ${tx.accountName}\n${tx.desc}`,
+                    debit > 0 ? "Rp " + formatThousandSeparator(debit) : "-",
+                    kredit > 0 ? "Rp " + formatThousandSeparator(kredit) : "-",
+                    "Rp " + formatThousandSeparator(runningBalance)
+                ];
+            });
+
+            doc.autoTable({
+                startY: 43,
+                head: [['No', 'Waktu', 'Uraian Transaksi & Akun', 'Masuk (Debit)', 'Keluar (Kredit)', 'Saldo Berjalan']],
+                body: tableRows,
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 2.5, textColor: [30, 41, 59] },
+                headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 6;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.setTextColor(15, 23, 42);
+            doc.text(`Total Kas Masuk: Rp ${formatThousandSeparator(totalDebit)}`, 14, finalY);
+            doc.text(`Total Kas Keluar: Rp ${formatThousandSeparator(totalKredit)}`, 14, finalY + 5);
+            doc.text(`Sisa Saldo Kas Akhir: Rp ${formatThousandSeparator(runningBalance)}`, 14, finalY + 10);
+
+            doc.save(`Mutasi_Buku_Kas_${start}_sd_${end}.pdf`);
         }
     </script>
 </body>
