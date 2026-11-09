@@ -20,7 +20,7 @@
     <style>
         :root {
             --app-bg: #f1f5f9;
-            --ios-card: rgba(255, 255, 255, 0.92);
+            --ios-card: rgba(255, 255, 255, 0.94);
             --ios-border: rgba(226, 232, 240, 0.95);
             --oneui-squircle: 24px;
         }
@@ -57,14 +57,27 @@
             background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
         }
 
-        /* Segmented Control / Tab Switcher ala iOS & One UI */
-        .tab-btn {
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Pop-up Modal Transition */
+        .modal-backdrop {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease-out;
         }
-        .tab-btn.active {
-            background-color: #0f172a;
-            color: #ffffff;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+
+        .modal-sheet {
+            animation: sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes sheetUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         ::-webkit-scrollbar {
@@ -77,7 +90,7 @@
         }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white pb-10">
+<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white pb-6">
 
     <!-- HERO HEADER: SAMSUNG ONE UI STYLE -->
     <header class="oneui-hero text-white px-5 sm:px-8 pt-7 pb-8 shadow-xl relative overflow-hidden">
@@ -116,7 +129,7 @@
         </div>
     </header>
 
-    <!-- MAIN DASHBOARD CONTENT -->
+    <!-- MAIN DASHBOARD CONTENT (RINGKAS & TIDAK PANJANG KE BAWAH) -->
     <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 flex-1 space-y-6 -mt-3">
 
         <!-- HIGHLIGHT BAR: TOTAL PAJAK NEGARA 12% DISUMBANGKAN -->
@@ -137,14 +150,14 @@
                 </div>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="switchTab('tax')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center space-x-1.5 transition active:scale-95">
+                <button onclick="openModal('tax')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center space-x-1.5 transition active:scale-95">
                     <i data-lucide="receipt" class="w-4 h-4 text-white"></i>
-                    <span>Buka Rincian Pajak</span>
+                    <span>Lihat Pop-up Pajak 12%</span>
                 </button>
             </div>
         </div>
 
-        <!-- BARIS ATAS: GRID 2 KOLOM (FORM INPUT KASIR + 3 CARD KAS & FILTER CEPAT) -->
+        <!-- GRID 2 KOLOM (FORM INPUT KASIR + CARD RINGKASAN & TOMBOL POP-UP) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
             <!-- FORMULIR INPUT / EDIT TRANSAKSI (5 Kolom di PC) -->
@@ -246,7 +259,7 @@
                 </div>
             </section>
 
-            <!-- CARD KONTROL & RINGKASAN KAS (7 Kolom di PC) -->
+            <!-- CARD KONTROL & PUSAT TOMBOL POP-UP MENU (7 Kolom di PC) -->
             <section class="lg:col-span-7 space-y-4">
                 
                 <!-- 3 Card Ringkasan Mutasi Kas (Fluid Glass Cards) -->
@@ -270,7 +283,7 @@
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                         <span class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
                             <i data-lucide="filter" class="w-4 h-4 text-indigo-600"></i>
-                            <span>Filter Periode Tanggal:</span>
+                            <span>Filter Periode Tanggal Laporan:</span>
                         </span>
                         <div class="flex items-center space-x-2">
                             <span id="filter-result-count" class="text-[10px] font-bold text-indigo-800 bg-indigo-100 px-2.5 py-0.5 rounded-full">
@@ -302,177 +315,197 @@
                     </div>
                 </div>
 
-                <!-- INFO PANDUAN RINGKAS -->
-                <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 text-xs text-indigo-900 flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i>
-                        <span>Semua laporan diatur rapi di dalam <b>Menu Tab di bawah ini</b> agar layar ringkas.</span>
+                <!-- MENU TOMBOL POP-UP (SEMUA TABEL DIBUKA LEWAT POP-UP DISINI) -->
+                <div class="ios-glass p-5 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <span class="text-xs font-extrabold text-slate-900 flex items-center space-x-1.5">
+                            <i data-lucide="layout-grid" class="w-4 h-4 text-indigo-600"></i>
+                            <span>Menu Pop-Up Laporan & Tabel Keuangan:</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-medium">Klik untuk buka Pop-up</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <!-- Tombol Pop-up Mutasi Kas -->
+                        <button onclick="openModal('mutasi')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
+                            <div class="flex items-center space-x-3 text-left">
+                                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-indigo-300 group-hover:scale-105 transition-transform">
+                                    <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-xs">Pop-Up Mutasi Kas</h4>
+                                    <p class="text-[10px] text-slate-300">Rekening koran bank & saldo</p>
+                                </div>
+                            </div>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-400 group-hover:text-white transition-colors"></i>
+                        </button>
+
+                        <!-- Tombol Pop-up Pajak 12% -->
+                        <button onclick="openModal('tax')" class="p-4 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
+                            <div class="flex items-center space-x-3 text-left">
+                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
+                                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-xs">Pop-Up Pajak 12%</h4>
+                                    <p class="text-[10px] text-rose-100">Bukti sumbang kas ke negara</p>
+                                </div>
+                            </div>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-rose-200 group-hover:text-white transition-colors"></i>
+                        </button>
+
+                        <!-- Tombol Pop-up Buku Besar Akun -->
+                        <button onclick="openModal('ledger')" class="p-4 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
+                            <div class="flex items-center space-x-3 text-left">
+                                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-purple-200 group-hover:scale-105 transition-transform">
+                                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-xs">Pop-Up Buku Besar</h4>
+                                    <p class="text-[10px] text-purple-200">Rincian YouTube, Server, AI, dll</p>
+                                </div>
+                            </div>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-purple-300 group-hover:text-white transition-colors"></i>
+                        </button>
+
+                        <!-- Tombol Pop-up Pesan Tim -->
+                        <button onclick="openModal('notices')" class="p-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-between shadow-md transition active:scale-98 group">
+                            <div class="flex items-center space-x-3 text-left">
+                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
+                                    <i data-lucide="bell" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-xs">Pesan Tim Internal</h4>
+                                    <p class="text-[10px] text-amber-100">Koordinasi & catatan shift</p>
+                                </div>
+                            </div>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-amber-200 group-hover:text-white transition-colors"></i>
+                        </button>
                     </div>
                 </div>
 
             </section>
         </div>
 
-        <!-- ================= SISTEM TAB TERPADU (SAMSUNG ONE UI x iOS SEGMENTED CONTROL) ================= -->
-        <section class="space-y-4">
+    </main>
+
+    <!-- ================= MODAL POP-UP DIALOG UNTUK SEMUA TABEL ================= -->
+    <div id="main-modal-container" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-3 sm:p-5">
+        <div class="ios-glass w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl modal-sheet overflow-hidden border border-white/40">
             
-            <!-- TAB BAR NAVIGASI (KLIK UNTUK PINDAH TAB TANPA SCROLL KE BAWAH) -->
-            <div class="ios-glass p-2 shadow-sm flex flex-wrap gap-1.5 border-slate-200/90">
-                <button onclick="switchTab('mutasi')" id="tab-btn-mutasi" class="tab-btn active flex-1 sm:flex-none px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center space-x-2">
-                    <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
-                    <span>Tabel Mutasi Kas</span>
-                </button>
-                <button onclick="switchTab('tax')" id="tab-btn-tax" class="tab-btn flex-1 sm:flex-none px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                    <i data-lucide="receipt" class="w-4 h-4 text-rose-500"></i>
-                    <span>Tabel Pajak 12%</span>
-                </button>
-                <button onclick="switchTab('ledger')" id="tab-btn-ledger" class="tab-btn flex-1 sm:flex-none px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                    <i data-lucide="book-open" class="w-4 h-4 text-purple-600"></i>
-                    <span>Buku Besar Akun</span>
-                </button>
-                <button onclick="switchTab('notices')" id="tab-btn-notices" class="tab-btn flex-1 sm:flex-none px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                    <i data-lucide="bell" class="w-4 h-4 text-amber-500"></i>
-                    <span>Pesan Internal</span>
-                </button>
-            </div>
-
-            <!-- CONTAINER ISI TAB (HANYA SATU YANG MUNCUL SESUAI TAB YANG DIKLIK) -->
-
-            <!-- 1. TAB ISI: MUTASI KAS -->
-            <div id="tab-panel-mutasi" class="ios-glass p-6 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b border-slate-200/80 pb-3">
-                    <div>
-                        <h3 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
-                            <i data-lucide="arrow-left-right" class="w-5 h-5 text-indigo-600"></i>
-                            <span>Buku Mutasi Kas Berjalan (Rekening Koran)</span>
-                        </h3>
-                        <p class="text-xs text-slate-400">Pencatatan saldo otomatis debit & kredit</p>
+            <!-- POP-UP HEADER -->
+            <div class="px-6 py-4 border-b border-slate-200/90 flex items-center justify-between bg-white/60">
+                <div class="flex items-center space-x-3">
+                    <div id="modal-icon-badge" class="w-9 h-9 rounded-xl flex items-center justify-center text-white">
+                        <i id="modal-icon" data-lucide="table" class="w-5 h-5"></i>
                     </div>
-                    <button onclick="exportCashflowPDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-md flex items-center space-x-1.5 transition active:scale-95">
-                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                        <span>Download PDF Mutasi Kas</span>
+                    <div>
+                        <h3 id="modal-title" class="font-extrabold text-base text-slate-900 leading-tight">Judul Pop-Up</h3>
+                        <p id="modal-subtitle" class="text-xs text-slate-500">Keterangan Laporan</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <div id="modal-header-actions"></div>
+                    <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition active:scale-95">
+                        <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
-
-                <div class="overflow-x-auto max-h-[420px] overflow-y-auto border border-slate-200/80 rounded-2xl">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 bg-slate-100/90 backdrop-blur-md text-[11px] font-black text-slate-600 uppercase border-b border-slate-200">
-                            <tr>
-                                <th class="py-3 px-3">Waktu</th>
-                                <th class="py-3 px-3">Uraian Transaksi</th>
-                                <th class="py-3 px-3 text-right">Debit (Masuk)</th>
-                                <th class="py-3 px-3 text-right">Kredit (Keluar)</th>
-                                <th class="py-3 px-3 text-right">Saldo Berjalan</th>
-                                <th class="py-3 px-3 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="kasir-table-body"></tbody>
-                    </table>
-                </div>
             </div>
 
-            <!-- 2. TAB ISI: RINCIAN PAJAK NEGARA 12% -->
-            <div id="tab-panel-tax" class="ios-glass p-6 shadow-sm space-y-4 border-rose-200 hidden">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b border-rose-200/80 pb-3">
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-xl tax-badge text-white flex items-center justify-center shadow">
-                                <i data-lucide="receipt" class="w-4 h-4"></i>
-                            </div>
-                            <h3 class="text-base font-black text-slate-900">
-                                Bukti Kontribusi Pajak Negara 12% (PPN Outcome)
-                            </h3>
-                        </div>
-                        <p class="text-xs text-slate-500 mt-1">Rincian potongan 12% PPN dari seluruh belanja operasional & produksi Oneilverse</p>
+            <!-- POP-UP BODY (SCROLLABLE INSIDE POPUP ONLY) -->
+            <div id="modal-body-content" class="p-6 overflow-y-auto flex-1 space-y-4">
+                
+                <!-- 1. ISI POP-UP: MUTASI KAS -->
+                <div id="popup-content-mutasi" class="space-y-4 hidden">
+                    <div class="overflow-x-auto border border-slate-200/90 rounded-2xl">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="sticky top-0 bg-slate-100/90 backdrop-blur-md text-[11px] font-black text-slate-600 uppercase border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3">Waktu</th>
+                                    <th class="py-3 px-3">Uraian Transaksi</th>
+                                    <th class="py-3 px-3 text-right">Debit (Masuk)</th>
+                                    <th class="py-3 px-3 text-right">Kredit (Keluar)</th>
+                                    <th class="py-3 px-3 text-right">Saldo Berjalan</th>
+                                    <th class="py-3 px-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kasir-table-body"></tbody>
+                        </table>
                     </div>
-                    <button onclick="exportTaxPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs flex items-center space-x-1.5 shadow-md transition active:scale-95">
-                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                        <span>Download PDF Laporan Pajak</span>
-                    </button>
                 </div>
 
-                <div class="overflow-x-auto border border-rose-100 rounded-2xl">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead class="bg-rose-50 text-[11px] font-black text-rose-950 uppercase border-b border-rose-200">
-                            <tr>
-                                <th class="py-3 px-3">No</th>
-                                <th class="py-3 px-3">Tanggal</th>
-                                <th class="py-3 px-3">Pos Pengeluaran (Outcome)</th>
-                                <th class="py-3 px-3">Keterangan Belanja</th>
-                                <th class="py-3 px-3 text-right">Total Transaksi</th>
-                                <th class="py-3 px-3 text-right bg-rose-100/60 font-black text-rose-900">Pajak Negara (12%)</th>
-                                <th class="py-3 px-3 text-right">Nilai Bersih (DPP)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tax-table-body"></tbody>
-                        <tfoot class="bg-rose-50/90 font-black border-t-2 border-rose-300">
-                            <tr>
-                                <td colspan="4" class="py-3 px-3 text-right uppercase text-slate-700">Total Akumulasi Pajak untuk Negara:</td>
-                                <td id="tax-foot-gross" class="py-3 px-3 text-right text-slate-900">Rp 0</td>
-                                <td id="tax-foot-tax" class="py-3 px-3 text-right text-rose-700 text-sm">Rp 0</td>
-                                <td id="tax-foot-net" class="py-3 px-3 text-right text-slate-700">Rp 0</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 3. TAB ISI: BUKU BESAR PER AKUN -->
-            <div id="tab-panel-ledger" class="ios-glass p-6 shadow-sm space-y-4 hidden">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b border-slate-200/80 pb-3">
-                    <div>
-                        <h3 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
-                            <i data-lucide="book-open" class="w-5 h-5 text-purple-700"></i>
-                            <span>Buku Besar Mutasi Per Akun (YouTube, Server, AI, dll)</span>
-                        </h3>
-                        <p class="text-xs text-slate-400">Total akumulasi transaksi per masing-masing pos akun</p>
+                <!-- 2. ISI POP-UP: PAJAK 12% -->
+                <div id="popup-content-tax" class="space-y-4 hidden">
+                    <div class="overflow-x-auto border border-rose-100 rounded-2xl">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-rose-50 text-[11px] font-black text-rose-950 uppercase border-b border-rose-200">
+                                <tr>
+                                    <th class="py-3 px-3">No</th>
+                                    <th class="py-3 px-3">Tanggal</th>
+                                    <th class="py-3 px-3">Pos Pengeluaran (Outcome)</th>
+                                    <th class="py-3 px-3">Keterangan Belanja</th>
+                                    <th class="py-3 px-3 text-right">Total Transaksi</th>
+                                    <th class="py-3 px-3 text-right bg-rose-100/60 font-black text-rose-900">Pajak Negara (12%)</th>
+                                    <th class="py-3 px-3 text-right">Nilai Bersih (DPP)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tax-table-body"></tbody>
+                            <tfoot class="bg-rose-50/90 font-black border-t-2 border-rose-300">
+                                <tr>
+                                    <td colspan="4" class="py-3 px-3 text-right uppercase text-slate-700">Total Akumulasi Pajak untuk Negara:</td>
+                                    <td id="tax-foot-gross" class="py-3 px-3 text-right text-slate-900">Rp 0</td>
+                                    <td id="tax-foot-tax" class="py-3 px-3 text-right text-rose-700 text-sm">Rp 0</td>
+                                    <td id="tax-foot-net" class="py-3 px-3 text-right text-slate-700">Rp 0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <span id="total-active-accounts" class="text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full whitespace-nowrap">
+                </div>
+
+                <!-- 3. ISI POP-UP: BUKU BESAR AKUN -->
+                <div id="popup-content-ledger" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <span id="total-active-accounts" class="text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full">
                             0 Akun Aktif
                         </span>
                         <select id="filter-account-target" onchange="renderPerAccountKasir()" class="bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold rounded-xl p-2 outline-none">
                             <option value="ALL">-- Tampilkan Semua Akun --</option>
                         </select>
                     </div>
+                    <div id="kasir-per-account-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
 
-                <div id="kasir-per-account-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <!-- 4. ISI POP-UP: PESAN TIM -->
+                <div id="popup-content-notices" class="space-y-4 hidden">
+                    <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 space-y-3">
+                        <span class="text-xs font-bold text-amber-950 flex items-center space-x-1.5">
+                            <i data-lucide="message-square-plus" class="w-4 h-4 text-amber-700"></i>
+                            <span>Tulis Pesan Internal / Laporan Shift:</span>
+                        </span>
+                        <input type="text" id="kasir-notice-title" placeholder="Judul Pesan (misal: Konfirmasi Tagihan Server / CapCut Pro)" class="w-full bg-white border border-amber-300 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500">
+                        <textarea id="kasir-notice-msg" rows="2" placeholder="Tulis instruksi atau konfirmasi pengeluaran..." class="w-full bg-white border border-amber-300 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+                        <div class="flex justify-end">
+                            <button onclick="submitKasirNotice()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-xl text-xs shadow-md flex items-center space-x-1.5 transition active:scale-95">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                <span>Kirim Pesan</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="kasir-notices-container" class="space-y-3 pt-1"></div>
+                </div>
+
             </div>
 
-            <!-- 4. TAB ISI: PESAN INTERNAL TIM -->
-            <div id="tab-panel-notices" class="ios-glass p-6 shadow-sm space-y-4 hidden">
-                <div class="border-b border-slate-200/80 pb-3 flex justify-between items-center">
-                    <div>
-                        <h3 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
-                            <i data-lucide="bell" class="w-5 h-5 text-amber-500"></i>
-                            <span>Pemberitahuan & Komunikasi Internal</span>
-                        </h3>
-                        <p class="text-xs text-slate-400">Catatan shift dan koordinasi antar tim Oneilverse</p>
-                    </div>
-                    <button onclick="renderKasirNotices()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center space-x-1 transition">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                        <span>Segarkan</span>
-                    </button>
-                </div>
-
-                <div class="bg-amber-50/60 border border-amber-200/80 rounded-2xl p-4 space-y-3">
-                    <input type="text" id="kasir-notice-title" placeholder="Judul Pesan (misal: Konfirmasi Tagihan Server / CapCut Pro)" class="w-full bg-white border border-amber-300 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500">
-                    <textarea id="kasir-notice-msg" rows="2" placeholder="Tulis instruksi atau konfirmasi pengeluaran..." class="w-full bg-white border border-amber-300 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-amber-500"></textarea>
-                    <div class="flex justify-end">
-                        <button onclick="submitKasirNotice()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-xl text-xs shadow-md flex items-center space-x-1.5 transition active:scale-95">
-                            <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                            <span>Kirim Pesan</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="kasir-notices-container" class="space-y-3 pt-1"></div>
+            <!-- POP-UP FOOTER -->
+            <div class="px-6 py-3 border-t border-slate-200/90 bg-white/70 flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs transition active:scale-95">
+                    Tutup Pop-Up
+                </button>
             </div>
 
-        </section>
-
-    </main>
+        </div>
+    </div>
 
     <!-- MODAL PERSETUJUAN MANAGER -->
     <div id="modal-mgr-auth" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -537,24 +570,74 @@
             ? `tx_${activeTenant.id}` 
             : 'transactions_v11';
 
-        // FUNGSI SWITCH TAB (SEGMENTED CONTROL ONE UI / IOS)
-        function switchTab(tabKey) {
-            const tabs = ['mutasi', 'tax', 'ledger', 'notices'];
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab-btn-${t}`);
-                const panel = document.getElementById(`tab-panel-${t}`);
-                if (t === tabKey) {
-                    btn.classList.add('active');
-                    btn.classList.remove('text-slate-600');
-                    panel.classList.remove('hidden');
-                } else {
-                    btn.classList.remove('active');
-                    btn.classList.add('text-slate-600');
-                    panel.classList.add('hidden');
-                }
+        // ================= SISTEM MODAL POP-UP =================
+        function openModal(type) {
+            const container = document.getElementById('main-modal-container');
+            const titleEl = document.getElementById('modal-title');
+            const subEl = document.getElementById('modal-subtitle');
+            const iconBadge = document.getElementById('modal-icon-badge');
+            const iconEl = document.getElementById('modal-icon');
+            const actionsEl = document.getElementById('modal-header-actions');
+
+            // Sembunyikan semua sub-konten modal
+            ['mutasi', 'tax', 'ledger', 'notices'].forEach(k => {
+                document.getElementById(`popup-content-${k}`).classList.add('hidden');
             });
+
+            actionsEl.innerHTML = "";
+
+            if (type === 'mutasi') {
+                titleEl.innerText = "Laporan Rekening Mutasi Kas";
+                subEl.innerText = "Daftar uang masuk, keluar, dan saldo berjalan (Rekening Koran)";
+                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-slate-900";
+                iconEl.setAttribute('data-lucide', 'arrow-left-right');
+                actionsEl.innerHTML = `
+                    <button onclick="exportCashflowPDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 shadow-sm transition active:scale-95">
+                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                        <span>Download PDF</span>
+                    </button>
+                `;
+                document.getElementById('popup-content-mutasi').classList.remove('hidden');
+            } else if (type === 'tax') {
+                titleEl.innerText = "Bukti Kontribusi Pajak Negara 12% (PPN)";
+                subEl.innerText = "Rincian potongan resmi 12% dari seluruh pos outcome Oneilverse";
+                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-rose-600";
+                iconEl.setAttribute('data-lucide', 'receipt');
+                actionsEl.innerHTML = `
+                    <button onclick="exportTaxPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 shadow-sm transition active:scale-95">
+                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                        <span>Download PDF Pajak</span>
+                    </button>
+                `;
+                document.getElementById('popup-content-tax').classList.remove('hidden');
+            } else if (type === 'ledger') {
+                titleEl.innerText = "Buku Besar Mutasi Per Akun COA";
+                subEl.innerText = "Akumulasi dan rincian transaksi akun YouTube, Server, AI, dll";
+                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-purple-700";
+                iconEl.setAttribute('data-lucide', 'book-open');
+                document.getElementById('popup-content-ledger').classList.remove('hidden');
+            } else if (type === 'notices') {
+                titleEl.innerText = "Pesan & Pemberitahuan Internal";
+                subEl.innerText = "Komunikasi shift, konfirmasi pembayaran server, dan instruksi owner";
+                iconBadge.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white bg-amber-500";
+                iconEl.setAttribute('data-lucide', 'bell');
+                document.getElementById('popup-content-notices').classList.remove('hidden');
+            }
+
+            container.classList.remove('hidden');
             lucide.createIcons();
         }
+
+        function closeModal() {
+            document.getElementById('main-modal-container').classList.add('hidden');
+        }
+
+        // Tutup jika klik area luar modal
+        document.getElementById('main-modal-container').addEventListener('click', (e) => {
+            if (e.target.id === 'main-modal-container') {
+                closeModal();
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             if (activeTenant) {
@@ -855,6 +938,7 @@
                 openManagerAuthModal();
                 return;
             }
+            closeModal();
             applyEditForm(tx);
         }
 
@@ -930,6 +1014,7 @@
                     const tx = txList.find(t => t.id === action.id);
                     if (tx) {
                         alert("Persetujuan Diterima! Silakan ubah angka pada formulir.");
+                        closeModal();
                         applyEditForm(tx);
                     }
                 } else if (action.action === 'delete') {
@@ -974,7 +1059,7 @@
             renderPerAccountKasir();
         }
 
-        // 1. RENDER MUTASI KAS
+        // 1. RENDER MUTASI KAS DI POP-UP
         function renderKasirTable() {
             const tbody = document.getElementById('kasir-table-body');
             tbody.innerHTML = "";
@@ -992,6 +1077,14 @@
             });
 
             const displayList = withBalance.reverse();
+
+            if (displayList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada transaksi mutasi kas.</td></tr>`;
+                document.getElementById('kas-total-in').innerText = "Rp 0";
+                document.getElementById('kas-total-out').innerText = "Rp 0";
+                document.getElementById('kas-net').innerText = "Rp 0";
+                return;
+            }
 
             displayList.forEach((tx, idx) => {
                 const isSales = tx.category === 'sales';
@@ -1032,7 +1125,7 @@
             lucide.createIcons();
         }
 
-        // 2. RENDER TABEL PAJAK NEGARA 12%
+        // 2. RENDER TABEL PAJAK NEGARA 12% DI POP-UP
         function renderTaxTable() {
             const tbody = document.getElementById('tax-table-body');
             tbody.innerHTML = "";
@@ -1081,7 +1174,7 @@
             document.getElementById('tax-foot-net').innerText = "Rp " + formatThousandSeparator(totalNet);
         }
 
-        // 3. RENDER MUTASI BUKU BESAR PER ACCOUNT
+        // 3. RENDER MUTASI BUKU BESAR PER ACCOUNT DI POP-UP
         function renderPerAccountKasir() {
             const container = document.getElementById('kasir-per-account-grid');
             container.innerHTML = "";
@@ -1162,7 +1255,7 @@
             lucide.createIcons();
         }
 
-        // 4. CETAK LAPORAN PAJAK PDF
+        // 4. CETAK LAPORAN PAJAK PDF DARI POP-UP
         function exportTaxPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
@@ -1237,7 +1330,7 @@
             doc.save(`Laporan_Pajak_Negara_12%_${start}_sd_${end}.pdf`);
         }
 
-        // Cetak Mutasi Kas Lengkap
+        // Cetak Mutasi Kas Lengkap dari Pop-Up
         function exportCashflowPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
@@ -1314,7 +1407,7 @@
             doc.save(`Mutasi_Buku_Kas_${start}_sd_${end}.pdf`);
         }
 
-        // Pesan Tim
+        // Pesan Tim di Pop-Up
         let kasirNotices = [];
         const tenantNoticeCol = (activeTenant && activeTenant.id && activeTenant.id !== 'default')
             ? `notices_${activeTenant.id}`
