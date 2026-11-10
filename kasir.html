@@ -471,6 +471,14 @@
                             <span class="text-[10px] text-slate-500 block font-bold">Total Nilai Pembayaran:</span>
                             <span id="draft-total-amount" class="text-xl font-black text-slate-900 font-mono">Rp 0</span>
                         </div>
+                        <div class="w-full sm:w-auto">
+                            <label class="text-[10px] text-slate-500 block font-bold mb-1">Metode Bayar</label>
+                            <select id="pay-method" class="w-full sm:w-36 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold bg-white text-slate-800">
+                                <option value="tunai">Tunai</option>
+                                <option value="qris">QRIS</option>
+                                <option value="transfer">Transfer</option>
+                            </select>
+                        </div>
                         <button onclick="finalizeAndPrint()" id="btn-finalize" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm shadow-md transition active:scale-95 flex items-center justify-center space-x-2">
                             <i data-lucide="printer" class="w-4 h-4"></i>
                             <span>Konfirmasi & Cetak Struk Sah (Potong Stok)</span>
@@ -488,7 +496,7 @@
                         <span class="text-[10px] font-black text-rose-800 uppercase block tracking-wider relative z-10">Total Keluar</span>
                         <span id="kas-total-out" class="text-sm sm:text-xl font-black text-rose-600 font-mono relative z-10">Rp 0</span>
                     </div>
-                    <div class="white-ice-glass-card p-4 text-center bg-slate-900 border-slate-800">
+                    <div class="white-ice-glass-card p-4 text-center border-slate-800" style="background:#0f172a!important">
                         <span class="text-[10px] font-black text-slate-300 uppercase block tracking-wider relative z-10">Saldo Kas Sah</span>
                         <span id="kas-net" class="text-sm sm:text-xl font-black text-emerald-400 font-mono relative z-10">Rp 0</span>
                     </div>
@@ -535,6 +543,10 @@
                         <span id="receipt-total" class="font-black">Rp 0</span>
                     </div>
                     <div class="flex justify-between text-[10px] text-slate-500 font-normal">
+                        <span>Metode Bayar:</span>
+                        <span id="receipt-pay">Tunai</span>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-slate-500 font-normal">
                         <span>Kasir:</span>
                         <span id="receipt-staff">PIC Kasir</span>
                     </div>
@@ -548,6 +560,9 @@
                 <button onclick="window.print()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black py-2.5 rounded-xl text-xs transition active:scale-95 flex items-center justify-center space-x-1 shadow-md">
                     <i data-lucide="printer" class="w-3.5 h-3.5"></i>
                     <span>Cetak Sekarang</span>
+                </button>
+                <button onclick="sendReceiptWA()" class="px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 rounded-xl text-xs transition active:scale-95 flex items-center justify-center space-x-1" id="btn-wa-receipt">
+                    <span>💬 WhatsApp</span>
                 </button>
                 <button onclick="closeReceiptModal()" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
                     Tutup
@@ -740,6 +755,7 @@
 
 
     <script src="js/tenants.js"></script>
+    <script src="js/plans.js?v=1.0"></script>
     <script src="js/widgets.js?v=1.1"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
@@ -1139,6 +1155,10 @@
             renderDraftList();
         }
 
+        function localISO() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+        let lastReceipt = null;
+        function currentPay() { const el = document.getElementById('pay-method'); return el ? el.value : 'tunai'; }
+
         function resetDraftForm() {
             document.getElementById('edit-draft-id').value = "";
             document.getElementById('tx-qty-wrap').classList.add('hidden');
@@ -1149,6 +1169,16 @@
             document.getElementById('pajak-preview-box').classList.add('hidden');
             document.getElementById('btn-save-text').innerText = "Simpan ke Antrean Draft Kasir";
             document.getElementById('btn-cancel-edit').classList.add('hidden');
+        }
+
+        function sendReceiptWA() {
+            if (!(window.FM_PLANS && FM_PLANS.has('wa_receipt'))) return alert('Struk lewat WhatsApp tersedia di paket Plus. Hubungi penyedia aplikasi untuk mengaktifkan.');
+            if (!lastReceipt) return;
+            let phone = prompt('Nomor WhatsApp pelanggan (contoh 08123456789). Kosongkan untuk memilih kontak sendiri di WhatsApp:', '') || '';
+            phone = phone.replace(/[^0-9]/g, '');
+            if (phone.startsWith('0')) phone = '62' + phone.slice(1);
+            const txt = lastReceipt.store + '\n' + lastReceipt.when + '\n------------------\n' + lastReceipt.items.join('\n') + '\n------------------\nTOTAL: Rp ' + formatThousandSeparator(lastReceipt.total) + '\nBayar: ' + lastReceipt.pay + '\nTerima kasih!';
+            window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(txt), '_blank');
         }
 
         function cancelEditMode() { resetDraftForm(); }
@@ -1169,6 +1199,7 @@
 
             if (!confirm(`Konfirmasi pembayaran lunas dan cetak struk total Rp ${formatThousandSeparator(total)}?\n\nTransaksi akan disahkan, stok produk akan dipotong otomatis, dan diteruskan ke pembukuan resmi.`)) return;
 
+            const payNow = currentPay();
             const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const nowFull = new Date().toLocaleDateString('id-ID');
 
@@ -1193,6 +1224,7 @@
                     desc: d.desc,
                     staff: d.staff,
                     isClosed: false,
+                    pay: payNow,
                     dateISO: d.dateISO,
                     date: nowTime,
                     dateFull: nowFull,
@@ -1215,6 +1247,13 @@
             document.getElementById('receipt-staff').innerText = user.title;
             document.getElementById('receipt-total').innerText = "Rp " + formatThousandSeparator(total);
 
+            const PAYLBL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer' };
+            document.getElementById('receipt-pay').innerText = PAYLBL[payNow] || payNow;
+            lastReceipt = {
+                store: (document.getElementById('receipt-store-name') || {}).innerText || '',
+                when: nowFull + ' ' + nowTime, total: total, pay: PAYLBL[payNow] || payNow,
+                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) : '') + ' = Rp ' + formatThousandSeparator(d.amount)))
+            };
             const rList = document.getElementById('receipt-items-list');
             rList.innerHTML = "";
             draftList.forEach(d => {
@@ -1588,7 +1627,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!initSingleSessionKasir()) return;
-            const todayISO = new Date().toISOString().split('T')[0];
+            const todayISO = localISO();
             document.getElementById('tx-date-input').value = todayISO;
 
             populateCOA();
@@ -1672,7 +1711,7 @@
             if (availableStock(p.code, '') <= 0) { bcStatus(`Stok ${p.name} habis.`, false); return false; }
 
             const existing = draftList.find(d => d.isProduct && d.accountCode === p.code);
-            const dateVal = document.getElementById('tx-date-input').value || new Date().toISOString().split('T')[0];
+            const dateVal = document.getElementById('tx-date-input').value || localISO();
             if (existing) {
                 existing.qty = (existing.qty || 1) + 1;
                 existing.unitPrice = p.sellPrice;

@@ -65,8 +65,8 @@
     <!-- HEADER OWNER EKSEKUTIF -->
     <header class="oneui-hero text-white px-5 sm:px-8 pt-6 pb-7 shadow-xl relative overflow-hidden">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-            <div class="flex items-center space-x-4">
-                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-b from-white/25 via-white/10 to-white/5 border border-white/30 backdrop-blur-xl flex items-center justify-center p-2 shadow-inner relative overflow-hidden group select-none shrink-0">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-b from-white/25 via-white/10 to-white/5 border border-white/30 backdrop-blur-xl flex items-center justify-center p-2 shadow-inner relative overflow-hidden group select-none shrink-0">
                     <div class="absolute -top-6 -left-6 w-12 h-12 bg-cyan-300/30 rounded-full blur-md pointer-events-none"></div>
                     <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
@@ -89,7 +89,7 @@
                     </svg>
                 </div>
                 <div>
-                    <div class="flex items-center space-x-2">
+                    <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
                         <h1 id="topbar-store-name" class="font-extrabold text-2xl sm:text-3xl tracking-tight text-white">Oneilverse</h1>
                         <span id="tenant-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-500/30 border border-indigo-400/40 text-indigo-200">
                             ID26110901
@@ -167,7 +167,7 @@
                 <p class="text-[10px] text-slate-400">Sebelum penarikan Prive Owner</p>
             </div>
 
-            <div onclick="showTaxExplainer()" role="button" tabindex="0" class="cursor-pointer bg-amber-50/90 hover:bg-amber-100/90 border border-amber-300 rounded-3xl p-5 shadow-xs transition active:scale-98 flex flex-col justify-between select-none">
+            <div onclick="showTaxExplainer()" role="button" tabindex="0" class="cursor-pointer bg-amber-500/10 hover:bg-amber-500/15 border border-amber-400/40 rounded-3xl p-5 shadow-xs transition active:scale-98 flex flex-col justify-between select-none">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-black tracking-wider text-amber-300 uppercase flex items-center">
                         <i data-lucide="landmark" class="w-3.5 h-3.5 mr-1 text-amber-700"></i>
@@ -188,6 +188,8 @@
                 </div>
             </div>
         </div>
+
+        <div id="fm-insights" class="space-y-4"></div>
 
         <!-- FITUR AI ANALITIS TERARAH & KONTROL OWNER -->
         <div class="ios-glass p-5 border-indigo-200 bg-gradient-to-r from-indigo-900/10 via-purple-900/10 to-slate-900/10 space-y-3">
@@ -606,6 +608,7 @@
     </div>
 
     <script src="js/tenants.js"></script>
+    <script src="js/plans.js?v=1.0"></script>
     <script src="js/widgets.js?v=1.1"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
@@ -698,10 +701,102 @@
         }
 
         function renderAllDashboardReports() {
+            try { renderInsights(); } catch (e) { console.warn('insights', e); }
             renderLabaRugi();
             renderTaxTable();
             renderMutasiKas();
             renderAuditTrailTable();
+        }
+
+
+        // ===== INSIGHT PAKET (dihitung dari data yang sudah dimuat, tanpa baca Firestore tambahan) =====
+        function localISOd(d) { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+        const rp = n => 'Rp ' + formatThousandSeparator(Math.round(n || 0));
+        const tgtKey = 'fm_targets_' + ((activeTenant && activeTenant.id) || 'master');
+        let targets = (function () { try { return JSON.parse(localStorage.getItem(tgtKey) || '{}') || {}; } catch (e) { return {}; } })();
+        let tgtSynced = false;
+        function syncTargets() {
+            if (tgtSynced || typeof db === 'undefined' || !db) return; tgtSynced = true;
+            const tid = (activeTenant && activeTenant.id) ? String(activeTenant.id).toUpperCase() : 'ID26110901';
+            db.collection('tenant_settings').doc(tid).get().then(d => {
+                const t = d.exists && d.data().targets; if (t) { targets = t; try { localStorage.setItem(tgtKey, JSON.stringify(t)); } catch (e) {} renderInsights(); }
+            }).catch(() => {});
+        }
+        function saveTargets() {
+            const d = Number(parseThousandSeparator(document.getElementById('tg-day').value)) || 0;
+            const m = Number(parseThousandSeparator(document.getElementById('tg-month').value)) || 0;
+            targets = { day: d, month: m };
+            try { localStorage.setItem(tgtKey, JSON.stringify(targets)); } catch (e) {}
+            if (typeof db !== 'undefined' && db) {
+                const tid = (activeTenant && activeTenant.id) ? String(activeTenant.id).toUpperCase() : 'ID26110901';
+                db.collection('tenant_settings').doc(tid).set({ targets: targets }, { merge: true }).catch(console.error);
+            }
+            renderInsights();
+        }
+        function txHour(t) {
+            const m = /(\d{1,2})[.:](\d{2})/.exec(t.date || ''); return m ? parseInt(m[1], 10) : null;
+        }
+        function exportCSV() {
+            const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+            const head = ['Tanggal', 'Jam', 'Kode Akun', 'Nama', 'Kategori', 'Qty', 'Harga Satuan', 'Jumlah', 'PPN', 'Metode Bayar', 'Petugas', 'Keterangan'];
+            const rows = txList.map(t => [t.dateISO || t.dateFull, t.date, t.accountCode, t.accountName, t.category, t.qty || '', t.unitPrice || '', t.amount, t.tax12 || 0, t.pay || '', t.staff || '', t.desc || ''].map(q).join(','));
+            const blob = new Blob(['﻿' + head.map(q).join(',') + '\n' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = 'transaksi_' + ((activeTenant && activeTenant.id) || 'toko') + '_' + localISOd() + '.csv';
+            document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+        }
+        function renderInsights() {
+            const box = document.getElementById('fm-insights'); if (!box) return;
+            const P = window.FM_PLANS; if (!P) return;
+            syncTargets();
+            const prods = STORE.getProducts(); const pm = {}; prods.forEach(p => pm[p.code] = p);
+            const today = localISOd(); const month = today.slice(0, 7);
+            const sales = txList.filter(t => t.category === 'sales');
+            const sToday = sales.filter(t => t.dateISO === today);
+            const sMonth = sales.filter(t => (t.dateISO || '').slice(0, 7) === month);
+            const sum = a => a.reduce((x, t) => x + (t.amount || 0), 0);
+            const profitOf = t => { const p = pm[t.accountCode]; return (t.isProduct && p) ? (t.amount - (p.hpp || 0) * (t.qty || 1)) : (t.amount || 0); };
+            const omToday = sum(sToday), omMonth = sum(sMonth);
+            // produk
+            const agg = {};
+            sales.filter(t => t.isProduct).forEach(t => {
+                const a = agg[t.accountCode] = agg[t.accountCode] || { name: t.accountName, qty: 0, rev: 0, profit: 0 };
+                a.qty += (t.qty || 1); a.rev += t.amount; a.profit += profitOf(t);
+            });
+            const aggArr = Object.values(agg).sort((x, y) => y.profit - x.profit);
+            const aggToday = {}; sToday.filter(t => t.isProduct).forEach(t => { aggToday[t.accountName] = (aggToday[t.accountName] || 0) + (t.qty || 1); });
+            const top = Object.entries(aggToday).sort((a, b) => b[1] - a[1])[0];
+            const hrs = {}; sToday.forEach(t => { const h = txHour(t); if (h != null) hrs[h] = (hrs[h] || 0) + 1; });
+            const peak = Object.entries(hrs).sort((a, b) => b[1] - a[1])[0];
+            const gross = sToday.reduce((x, t) => x + profitOf(t), 0);
+            const low = prods.filter(p => p.stock <= (typeof p.minStock === 'number' ? p.minStock : 5)).sort((a, b) => a.stock - b.stock);
+            const pay = { tunai: 0, qris: 0, transfer: 0 }; sToday.forEach(t => { const k = t.pay || 'tunai'; pay[k] = (pay[k] || 0) + t.amount; });
+            const card = (inner) => '<div class="ios-glass p-5 space-y-2">' + inner + '</div>';
+            const h4 = (t) => '<h4 class="font-black text-sm text-white">' + t + '</h4>';
+            const line = (l, r) => '<div class="flex justify-between text-xs gap-3"><span class="text-slate-300">' + l + '</span><b class="font-mono text-white">' + r + '</b></div>';
+            const esc = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+            const bar = (v, t) => { const pct = t > 0 ? Math.min(100, Math.round(v / t * 100)) : 0; return '<div style="height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:4px 0"><div style="height:100%;width:' + pct + '%;background:#34d399"></div></div><div class="text-[11px] text-slate-400">' + (t > 0 ? pct + '% dari target ' + rp(t) : 'Target belum diisi') + '</div>'; };
+            let h = '';
+            // BASIC: ekspor
+            h += card(h4('📤 Ekspor Data') + '<p class="text-xs text-slate-400">Unduh seluruh transaksi (' + txList.length + ' baris) sebagai file CSV yang bisa dibuka di Excel.</p><button onclick="exportCSV()" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-black text-xs">Unduh CSV</button>');
+            const plus = P.has('today_summary');
+            if (plus) {
+                h += '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+                h += card(h4('📊 Ringkasan Hari Ini') + line('Omzet', rp(omToday)) + line('Laba kotor', rp(gross)) + line('Jumlah nota', sToday.length) + line('Terlaris', top ? esc(top[0]) + ' (' + top[1] + ' pcs)' : '-') + line('Jam ramai', peak ? peak[0] + ':00–' + peak[0] + ':59' : '-'));
+                h += card(h4('💳 Rekap Metode Bayar (hari ini)') + line('Tunai', rp(pay.tunai)) + line('QRIS', rp(pay.qris)) + line('Transfer', rp(pay.transfer)) + '<p class="text-[11px] text-slate-500">Cocokkan uang tunai di laci dengan baris Tunai.</p>');
+                h += card(h4('🎯 Target Omzet') + '<div class="text-xs text-slate-300">Hari ini: <b>' + rp(omToday) + '</b></div>' + bar(omToday, targets.day || 0) + '<div class="text-xs text-slate-300 mt-2">Bulan ini: <b>' + rp(omMonth) + '</b></div>' + bar(omMonth, targets.month || 0) +
+                    '<div class="grid grid-cols-2 gap-2 pt-2"><input id="tg-day" inputmode="numeric" placeholder="Target harian" value="' + (targets.day ? formatThousandSeparator(targets.day) : '') + '" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs font-bold text-white outline-none"><input id="tg-month" inputmode="numeric" placeholder="Target bulanan" value="' + (targets.month ? formatThousandSeparator(targets.month) : '') + '" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs font-bold text-white outline-none"></div><button onclick="saveTargets()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-black text-xs">Simpan Target</button>');
+                h += card(h4('📦 Stok Menipis') + (low.length ? low.slice(0, 8).map(p => line(esc(p.name), p.stock + ' / batas ' + (typeof p.minStock === 'number' ? p.minStock : 5))).join('') : '<p class="text-xs text-emerald-400">Semua stok aman.</p>'));
+                h += '</div>';
+                h += card(h4('💹 Laba & Margin per Produk') + (aggArr.length ? '<div class="overflow-x-auto"><table class="w-full text-xs"><thead><tr class="text-slate-400 text-left"><th class="py-1">Produk</th><th class="text-right">Terjual</th><th class="text-right">Omzet</th><th class="text-right">Laba</th><th class="text-right">Margin</th></tr></thead><tbody>' +
+                    aggArr.slice(0, 15).map(a => '<tr class="border-t border-white/5"><td class="py-1.5 font-bold text-white">' + esc(a.name) + '</td><td class="text-right font-mono">' + a.qty + '</td><td class="text-right font-mono">' + rp(a.rev) + '</td><td class="text-right font-mono ' + (a.profit >= 0 ? 'text-emerald-400' : 'text-rose-400') + '">' + rp(a.profit) + '</td><td class="text-right font-mono">' + (a.rev ? Math.round(a.profit / a.rev * 100) : 0) + '%</td></tr>').join('') +
+                    '</tbody></table></div>' : '<p class="text-xs text-slate-400">Belum ada penjualan produk.</p>'));
+            } else {
+                const teaser = 'Hari ini omzet Anda <b>' + rp(omToday) + '</b> dari ' + sToday.length + ' nota' + (low.length ? ', dan <b>' + low.length + ' produk</b> hampir habis.' : '.') + ' Buka laba per produk, jam ramai, rekap metode bayar, dan target dengan paket Plus.';
+                h += P.lockedHtml('today_summary', teaser);
+            }
+            h += '<details class="ios-glass p-5"><summary class="cursor-pointer font-black text-sm text-white">Fitur yang akan datang</summary>' + P.renderSections(true) + '</details>';
+            box.innerHTML = h;
         }
 
         function renderLabaRugi() {

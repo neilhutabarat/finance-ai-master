@@ -2,12 +2,10 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.9.0';
+  var APP_VERSION = '1.0.0';
+  var BETA = 'BETA 1.1';
   var RELEASE_NOTES = [
-    ['1.9.0', '11 Nov 2026', ['Kurs diperbarui otomatis tiap pukul 00.00 dan 12.00 WIB; Tower dapat menyegarkan kapan saja', 'Logo usaha dapat diunggah owner dan manager, tampil juga di daftar klien Tower', 'Kartu Produk Cepat di kasir, tema untuk halaman login dan partner']],
-    ['1.8.0', '11 Nov 2026', ['Tema Terang dan Gelap Pekat, warna halaman bebas dipilih tiap pengguna', 'Menu Pengaturan: tema, warna, logo usaha, versi, catatan rilis', 'Logo usaha dapat diunggah owner (maks. 100 KB, otomatis diperkecil)', 'Cuaca memakai lokasi GPS atau jaringan; kurs & emas dari Tower', 'Scan barcode, pilihan jumlah (pcs), harga produk terkunci, urutan COA & produk dapat dipindah']],
-    ['1.7.0', '10 Nov 2026', ['Pengumuman dari penyedia, kuota terminal per peran, Pengaturan Toko di Tower', 'COA dan produk tersimpan di server dan sinkron antar perangkat']],
-    ['1.6.0', '09 Nov 2026', ['Portal login per toko, paket Basic/Plus/Pro, siklus bulanan dan tahunan']]
+    ['1.0.0 (BETA 1.1)', '11 Nov 2026', ['Tampilan baru yang lebih tenang dan rapi di desktop, tablet, dan HP: satu warna aksen, permukaan netral','Rilis uji awal: kasir, manager, owner, dan portal login per toko', 'Fitur & Paket: lihat fitur Basic, Plus, Pro (yang terkunci tetap terlihat)', 'Dashboard owner: ringkasan hari ini, laba per produk, stok menipis, metode bayar, target omzet, ekspor CSV', 'Kasir: scan barcode, jumlah (pcs), metode bayar, struk WhatsApp (Plus)', 'Tema terang/gelap pekat, warna halaman, logo usaha']]
   ];
   var ACCENTS = ['#2563eb', '#4f46e5', '#7c3aed', '#db2777', '#e11d48', '#ea580c', '#ca8a04', '#059669', '#0d9488', '#475569'];
 
@@ -26,6 +24,8 @@
   var CSS = [
     'html,body,button,input,select,textarea{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",Inter,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif!important}',
     '.font-mono{font-family:ui-monospace,"SF Mono",Menlo,"JetBrains Mono",Consolas,monospace!important}',
+    'html{-webkit-text-size-adjust:100%}',
+    '@media(max-width:640px){input,select,textarea{font-size:16px!important}button,select,input:not([type=checkbox]):not([type=radio]):not([type=color]){min-height:40px}body{padding-bottom:env(safe-area-inset-bottom)}table{font-size:12px}}',
     'body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:-.011em}',
     // gerakan halus
     'button,[onclick],a,select,input,.ios-glass,.white-ice-glass-card{transition:transform .18s cubic-bezier(.2,.8,.2,1),background-color .22s ease,border-color .22s ease,box-shadow .22s ease,opacity .22s ease,color .22s ease}',
@@ -46,10 +46,30 @@
     'html[data-fm-invert="1"] body{background-color:#fff!important;background-image:none!important}',
     'html[data-fm-invert="1"] img,html[data-fm-invert="1"] video,html[data-fm-invert="1"] canvas,html[data-fm-invert="1"] .oneui-hero,html[data-fm-invert="1"] header.bg-gradient-to-r,html[data-fm-invert="1"] .fm-keep{filter:invert(1) hue-rotate(180deg)}',
     '@media print{html[data-fm-invert="1"]{filter:none!important;background:#fff!important}html[data-fm-invert="1"] img,html[data-fm-invert="1"] .oneui-hero,html[data-fm-invert="1"] header.bg-gradient-to-r{filter:none!important}}',
+    // ===== kulit tenang: satu warna aksen, permukaan netral, bayangan lembut =====
+    '.oneui-hero{background:linear-gradient(160deg,#0b0e13 0%,#121722 100%)!important;border-bottom-left-radius:28px!important;border-bottom-right-radius:28px!important;box-shadow:0 14px 30px -18px rgba(0,0,0,.5)!important}',
+    'html[data-fm-native="light"]:not([data-fm-black]):not([data-fm-invert]) body{background:#f3f4f7!important;background-image:none!important}',
+    '.shadow-xl,.shadow-lg,.shadow-2xl,.shadow-md{box-shadow:0 1px 2px rgba(15,23,42,.06),0 10px 28px -14px rgba(15,23,42,.28)!important}',
+    '[class*="shadow-\\[0_0"]{box-shadow:none!important}',
+    '.oneui-hero #tier-badge-indicator,.oneui-hero [class*="from-amber"]{background:rgba(255,255,255,.08)!important;border-color:rgba(255,255,255,.22)!important;color:#e5e7eb!important}',
+    // warna menyolok -> satu aksen (tombol) atau permukaan netral (ubin)
+    '[class*="bg-purple-6"],[class*="bg-purple-7"],[class*="bg-purple-8"],[class*="bg-indigo-6"],[class*="bg-indigo-7"],[class*="bg-indigo-8"],[class*="bg-violet-6"],[class*="bg-violet-7"]{background-color:var(--fm-accent,#4f6bd8)!important;border-color:transparent!important}',
+    '[class*="bg-amber-5"],[class*="bg-amber-6"],[class*="bg-amber-7"],[class*="bg-orange-5"],[class*="bg-orange-6"],[class*="bg-rose-6"],[class*="bg-rose-7"],[class*="bg-red-6"],[class*="bg-red-7"],[class*="bg-pink-6"]{background-color:#1d222c!important;border-color:rgba(255,255,255,.08)!important;color:#f3f4f6!important}',
+    '[class*="bg-emerald-6"],[class*="bg-emerald-7"],[class*="bg-teal-6"]{background-color:#1f8f6b!important}',
+    '[class*="from-purple"]:not(.oneui-hero *),[class*="from-indigo"]:not(.oneui-hero *),[class*="from-violet"]:not(.oneui-hero *){background-image:none!important;background-color:var(--fm-accent,#4f6bd8)!important}',
+    '[class*="from-emerald"]:not(.oneui-hero *),[class*="from-teal"]:not(.oneui-hero *){background-image:none!important;background-color:#1f8f6b!important}',
+    '[class*="from-amber"]:not(.oneui-hero *),[class*="from-orange"]:not(.oneui-hero *),[class*="from-rose"]:not(.oneui-hero *){background-image:none!important;background-color:#1d222c!important}',
+    'button.rounded-2xl,button.rounded-xl{font-weight:700}',
+    'html[data-fm-black] button:has(h4)[class*="bg-slate-9"]{background:#1d222c!important}',
+    'button:has(h4)[class*="bg-purple"],button:has(h4)[class*="bg-indigo"],button:has(h4)[class*="bg-amber"],button:has(h4)[class*="bg-rose"],button:has(h4)[class*="bg-orange"],button:has(h4)[class*="bg-emerald"],button:has(h4)[class*="bg-slate-9"]{background:#1d222c!important;color:#f3f4f6!important;border:1px solid rgba(255,255,255,.07)!important}',
+    'button:has(h4)[class*="bg-purple"]:hover,button:has(h4)[class*="bg-indigo"]:hover,button:has(h4)[class*="bg-amber"]:hover,button:has(h4)[class*="bg-rose"]:hover,button:has(h4)[class*="bg-orange"]:hover,button:has(h4)[class*="bg-emerald"]:hover,button:has(h4)[class*="bg-slate-9"]:hover{background:#272d3a!important}',
+    'button:has(h4) p,button:has(h4) i,button:has(h4) svg{color:#9aa3b2!important}',
+    '.white-ice-glass-card[class*="border-amber"]{background:#fff!important;border-color:#e5e7eb!important}',
+    '[class*="bg-amber-50"],[class*="bg-amber-100/9"]{background:#fff!important;border-color:#e5e7eb!important}',
     // warna pilihan pengguna
-    'html[data-fm-accent] .oneui-hero{background:linear-gradient(145deg,#000 0%,color-mix(in srgb,var(--fm-accent) 42%,#000) 55%,var(--fm-accent) 135%)!important}',
+    'html[data-fm-accent] .oneui-hero{background:linear-gradient(160deg,#0b0e13 0%,color-mix(in srgb,var(--fm-accent) 30%,#0b0e13) 100%)!important}',
     'html[data-fm-accent] header.bg-gradient-to-r{background:linear-gradient(90deg,#000 0%,color-mix(in srgb,var(--fm-accent) 45%,#000) 55%,#000 100%)!important}',
-    'html[data-fm-accent]:not([data-fm-black]):not([data-fm-invert]) body{background-image:radial-gradient(at 8% 8%,color-mix(in srgb,var(--fm-accent) 22%,transparent) 0,transparent 50%),radial-gradient(at 92% 92%,color-mix(in srgb,var(--fm-accent) 16%,transparent) 0,transparent 55%)!important}',
+    'html[data-fm-accent]:not([data-fm-black]):not([data-fm-invert]) body{background-image:radial-gradient(at 8% 8%,color-mix(in srgb,var(--fm-accent) 9%,transparent) 0,transparent 45%),radial-gradient(at 92% 92%,color-mix(in srgb,var(--fm-accent) 6%,transparent) 0,transparent 50%)!important}',
     'html[data-fm-accent] input:focus,html[data-fm-accent] select:focus,html[data-fm-accent] textarea:focus{border-color:var(--fm-accent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--fm-accent) 25%,transparent)!important}',
     'html[data-fm-accent] ::selection{background:var(--fm-accent);color:#fff}',
     // tombol & panel pengaturan
@@ -84,6 +104,7 @@
   function apply() {
     var h = document.documentElement;
     var mode = pref.mode || NATIVE;           // 'light' | 'dark'
+    h.setAttribute('data-fm-native', NATIVE);
     ['data-fm-black', 'data-fm-invert', 'data-fm-accent'].forEach(function (a) { h.removeAttribute(a); });
     if (!LITE && ROLE !== 'lain') {
       if (mode !== NATIVE) h.setAttribute('data-fm-invert', '1');
@@ -135,13 +156,15 @@
         '<div style="display:flex;gap:8px;margin-top:10px"><label class="fm-btn pri" style="cursor:pointer">Pilih Gambar<input type="file" id="fm-logo-file" accept="image/*" style="display:none"></label>' + (logoData ? '<button class="fm-btn" data-logodel>Hapus Logo</button>' : '') + '</div>' +
         '<p id="fm-logo-msg" style="font-size:12px;margin:8px 0 0;color:#fca5a5"></p></div></div>';
     }
-    h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>v' + APP_VERSION + '</b></div></div>';
+    if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur &amp; Paket</button></div>';
+    h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>v' + APP_VERSION + ' · ' + BETA + '</b></div></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.map(function (n, i) {
       return '<details ' + (i === 0 ? 'open' : '') + '><summary>v' + n[0] + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></details>';
     }).join('') + '</div>';
     h += '<p style="font-size:11px;color:#8e96a8;margin-top:14px;line-height:1.5">Tema dan warna tersimpan di perangkat ini, terpisah untuk tiap peran.</p>';
     box.innerHTML = h;
 
+    var pb = box.querySelector('[data-plans]'); if (pb) pb.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_PLANS) FM_PLANS.openModal(); };
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
     box.querySelectorAll('[data-mode]').forEach(function (b) { b.onclick = function () { pref.mode = b.getAttribute('data-mode'); savePref(pref); apply(); render(); }; });
     box.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { pref.accent = b.getAttribute('data-acc'); savePref(pref); apply(); render(); }; });

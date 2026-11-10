@@ -74,6 +74,7 @@
                 var x = {
                     code: code, name: String(p.name).trim(), sellPrice: num(p.sellPrice), hpp: num(p.hpp),
                     stock: Math.max(0, Math.floor(num(p.stock))), barcode: p.barcode ? String(p.barcode).trim() : '',
+                    minStock: (p.minStock === '' || p.minStock == null) ? 5 : Math.max(0, Math.floor(num(p.minStock))),
                     order: (old && typeof old.order === 'number') ? old.order : maxOrd + 1
                 };
                 var i = st.products.findIndex(function (q) { return q.code === x.code; });
