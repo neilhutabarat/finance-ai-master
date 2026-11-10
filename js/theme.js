@@ -2,8 +2,9 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.8.0';
+  var APP_VERSION = '1.9.0';
   var RELEASE_NOTES = [
+    ['1.9.0', '11 Nov 2026', ['Kurs diperbarui otomatis tiap pukul 00.00 dan 12.00 WIB; Tower dapat menyegarkan kapan saja', 'Logo usaha dapat diunggah owner dan manager, tampil juga di daftar klien Tower', 'Kartu Produk Cepat di kasir, tema untuk halaman login dan partner']],
     ['1.8.0', '11 Nov 2026', ['Tema Terang dan Gelap Pekat, warna halaman bebas dipilih tiap pengguna', 'Menu Pengaturan: tema, warna, logo usaha, versi, catatan rilis', 'Logo usaha dapat diunggah owner (maks. 100 KB, otomatis diperkecil)', 'Cuaca memakai lokasi GPS atau jaringan; kurs & emas dari Tower', 'Scan barcode, pilihan jumlah (pcs), harga produk terkunci, urutan COA & produk dapat dipindah']],
     ['1.7.0', '10 Nov 2026', ['Pengumuman dari penyedia, kuota terminal per peran, Pengaturan Toko di Tower', 'COA dan produk tersimpan di server dan sinkron antar perangkat']],
     ['1.6.0', '09 Nov 2026', ['Portal login per toko, paket Basic/Plus/Pro, siklus bulanan dan tahunan']]
@@ -13,8 +14,8 @@
   var script = document.currentScript;
   var LITE = !!(script && script.hasAttribute('data-lite'));
   var path = (location.pathname || '').toLowerCase();
-  var ROLE = path.indexOf('kasir') >= 0 ? 'kasir' : path.indexOf('manager') >= 0 ? 'manager' : path.indexOf('dashboard') >= 0 ? 'owner' : path.indexOf('provider') >= 0 ? 'tower' : 'lain';
-  var NATIVE = ROLE === 'kasir' ? 'light' : 'dark';
+  var ROLE = path.indexOf('kasir') >= 0 ? 'kasir' : path.indexOf('manager') >= 0 ? 'manager' : path.indexOf('dashboard') >= 0 ? 'owner' : path.indexOf('provider') >= 0 ? 'tower' : path.indexOf('partner') >= 0 ? 'partner' : (path.indexOf('index') >= 0 || /\/$/.test(path)) ? 'login' : 'lain';
+  var NATIVE = (ROLE === 'kasir' || ROLE === 'login') ? 'light' : 'dark';
   var TOKO = ''; try { TOKO = (new URLSearchParams(location.search).get('toko') || '').toLowerCase().trim(); } catch (e) {}
   var KEY = 'fm_theme_' + (TOKO || 'master') + '_' + ROLE;
 
@@ -93,10 +94,11 @@
   }
   apply();
   if (LITE || ROLE === 'lain') return;
+  if (ROLE === 'login' || ROLE === 'partner') { /* tema & gerigi tersedia; logo/pengaturan toko tidak */ }
 
   // ---------- menu Pengaturan ----------
   var TENANT_ID = (TOKO && TOKO !== 'oneilverse') ? TOKO.toUpperCase() : 'ID26110901';
-  var CAN_LOGO = ROLE === 'owner';
+  var CAN_LOGO = (ROLE === 'owner' || ROLE === 'manager');
   var logoData = null;
 
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
@@ -184,6 +186,21 @@
       fr.readAsDataURL(file);
     });
   }
+  // gambar mini (untuk daftar klien di Tower) disimpan terpisah agar Tower tidak perlu mengunduh logo penuh
+  function makeThumb(dataUrl) {
+    return new Promise(function (res) {
+      var im = new Image();
+      im.onload = function () {
+        var c = document.createElement('canvas'); c.width = 64; c.height = 64;
+        var r = Math.min(64 / im.width, 64 / im.height), w = im.width * r, h = im.height * r;
+        c.getContext('2d').drawImage(im, (64 - w) / 2, (64 - h) / 2, w, h);
+        var u = c.toDataURL('image/webp', 0.75); if (u.indexOf('data:image/webp') !== 0) u = c.toDataURL('image/png');
+        res(u);
+      };
+      im.onerror = function () { res(''); };
+      im.src = dataUrl;
+    });
+  }
   function uploadLogo(file) {
     logoMsg('Memproses...', true);
     compress(file).then(saveLogo).catch(function (e) { logoMsg(e.message, false); });
@@ -191,7 +208,11 @@
   function saveLogo(data) {
     if (!(typeof db !== 'undefined' && db)) { logoMsg('Belum terhubung ke server. Coba lagi sebentar.', false); return; }
     var upd = data ? { logo: data, logoUpdatedAt: Date.now() } : { logo: firebase.firestore.FieldValue.delete(), logoUpdatedAt: Date.now() };
-    db.collection('tenant_settings').doc(TENANT_ID).set(upd, { merge: true }).then(function () {
+    var thumbP = data ? makeThumb(data) : Promise.resolve('');
+    thumbP.then(function (thumb) {
+      var w = db.collection('tenant_logos').doc(TENANT_ID);
+      return Promise.all([db.collection('tenant_settings').doc(TENANT_ID).set(upd, { merge: true }), data ? w.set({ thumb: thumb, updatedAt: Date.now() }) : w.delete()]);
+    }).then(function () {
       logoData = data || null; applyLogo(); render();
       logoMsg(data ? 'Logo tersimpan (' + Math.round((data.length - data.indexOf(',') - 1) * 0.75 / 1024) + ' KB).' : 'Logo dihapus.', true);
     }).catch(function (e) { logoMsg('Gagal menyimpan: ' + e.message, false); });
@@ -207,7 +228,9 @@
       if (logoData) {
         if (!img) { img = document.createElement('img'); img.id = 'fm-logo-img'; img.alt = 'Logo'; img.style.cssText = 'width:100%;height:100%;min-height:40px;object-fit:contain;border-radius:14px'; holder.appendChild(img); }
         img.src = logoData; svg.style.display = 'none'; if (badge) badge.style.display = 'none';
+        var ri = document.getElementById('receipt-logo-img'); if (ri) { ri.src = logoData; ri.classList.remove('hidden'); }
       } else {
+        var ri2 = document.getElementById('receipt-logo-img'); if (ri2) ri2.classList.add('hidden');
         if (img) img.remove();
         if (badge) badge.style.display = 'flex'; else svg.style.display = '';
       }
@@ -227,7 +250,35 @@
     }, 100);
   }
 
-  function init() { build(); if (ROLE !== 'tower') startLogo(); }
+  // logo di halaman login (belum ada koneksi Firebase di sana: baca lewat REST)
+  function loginLogo() {
+    if (ROLE !== 'login' || !TOKO || TOKO === 'oneilverse') return;
+    try {
+      var x = new XMLHttpRequest();
+      x.open('GET', 'https://firestore.googleapis.com/v1/projects/finance-ai-master-byneilverse/databases/(default)/documents/tenant_settings/' + encodeURIComponent(TENANT_ID) + '?key=AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI', true);
+      x.onload = function () {
+        if (x.status !== 200) return;
+        try { var f = JSON.parse(x.responseText).fields || {}; logoData = (f.logo && f.logo.stringValue) || null; applyLoginLogo(); } catch (e) {}
+      };
+      x.send();
+    } catch (e) {}
+  }
+  function applyLoginLogo() {
+    var trig = document.getElementById('login-logo-trigger'); if (!trig) return;
+    var img = document.getElementById('fm-login-logo'), svg = trig.querySelector('svg'), badge = document.getElementById('login-logo-badge');
+    if (logoData) {
+      if (!img) { img = document.createElement('img'); img.id = 'fm-login-logo'; img.alt = 'Logo'; img.style.cssText = 'width:80px;height:80px;object-fit:contain;border-radius:24px'; trig.appendChild(img); }
+      img.src = logoData; if (svg) svg.style.display = 'none'; if (badge) badge.style.display = 'none';
+    } else if (img) img.remove();
+  }
+  function init() {
+    build();
+    if (ROLE === 'login') {
+      var o = window.applyTenantBranding;
+      if (typeof o === 'function') window.applyTenantBranding = function (tn) { o(tn); applyLoginLogo(); };
+      loginLogo();
+    } else if (ROLE !== 'tower' && ROLE !== 'partner') startLogo();
+  }
   window.FM_THEME = { version: APP_VERSION, open: function () { document.getElementById('fm-gear').click(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

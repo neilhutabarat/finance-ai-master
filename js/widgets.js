@@ -6,6 +6,43 @@
     ['SAR', 'Riyal Arab Saudi', 'SR'], ['SGD', 'Dolar Singapura', 'S$'], ['CNY', 'Yuan China', 'CN¥']
   ];
   var rates = null;
+  var SLOT_MS = 12 * 3600 * 1000, WIB = 7 * 3600 * 1000;
+  function slotOf(ms) { return Math.floor((ms + WIB) / SLOT_MS); }          // berganti tiap 00.00 dan 12.00 WIB
+  function slotStartMs(slot) { return slot * SLOT_MS - WIB; }
+
+  // Ambil kurs dari internet dan simpan untuk semua toko. force=true (tombol Tower) mengabaikan kunci jadwal.
+  function refreshRates(force) {
+    if (!(typeof db !== 'undefined' && db)) return Promise.reject(new Error('Belum terhubung ke server.'));
+    var ref = db.collection('provider_settings').doc('rates'), slot = slotOf(Date.now());
+    var claim = force ? Promise.resolve(true) : db.runTransaction(function (tx) {
+      return tx.get(ref).then(function (s) {
+        var d = s.exists ? s.data() : null;
+        if (d && d.slot >= slot) return false;                                     // slot ini sudah dikerjakan
+        if (d && d.lock && d.lock.slot === slot && Date.now() - d.lock.at < 120000) return false;   // perangkat lain sedang mengerjakan
+        tx.set(ref, { lock: { slot: slot, at: Date.now() } }, { merge: true });
+        return true;
+      });
+    });
+    return claim.then(function (ok) {
+      if (!ok) return false;
+      return fetch('https://open.er-api.com/v6/latest/USD').then(function (r) { return r.json(); }).then(function (j) {
+        if (!j || !j.rates || !j.rates.IDR) throw new Error('data sumber kosong');
+        var out = {};
+        CURS.forEach(function (c) { var k = c[0]; if (k === 'USD') out[k] = j.rates.IDR; else if (j.rates[k]) out[k] = j.rates.IDR / j.rates[k]; });
+        Object.keys(out).forEach(function (k) { out[k] = Math.round(out[k] * 100) / 100; });
+        return ref.set({ rates: out, updatedAt: Date.now(), slot: slot, source: 'open.er-api.com', sourceUpdatedAt: (j.time_last_update_unix || 0) * 1000, lock: firebase.firestore.FieldValue.delete() }, { merge: true }).then(function () { return true; });
+      }).catch(function (e) {
+        if (!force) ref.set({ lock: firebase.firestore.FieldValue.delete() }, { merge: true }).catch(function () {});
+        throw e;
+      });
+    });
+  }
+  function maybeRefreshRates(doc) {
+    if (maybeRefreshRates._busy) return;
+    if (doc && doc.slot >= slotOf(Date.now())) return;
+    maybeRefreshRates._busy = true;
+    refreshRates(false).catch(function () {}).then(function () { setTimeout(function () { maybeRefreshRates._busy = false; }, 60000); });
+  }
 
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
   function idr(n, dec) { return Number(n).toLocaleString('id-ID', { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 }); }
@@ -55,7 +92,8 @@
       var v = rates.rates[c[0]];
       if (v) h += row(c[0] + ' · ' + c[1], 'per 1 ' + c[0], 'Rp ' + idr(v, v < 1000 ? 2 : 0));
     });
-    h += '<p style="font-size:10px;color:#64748b;margin-top:10px;line-height:1.5">Diperbarui: ' + when(rates.updatedAt) + '. Data disegarkan oleh penyedia aplikasi (maksimal sekali per 12 jam) agar hemat kuota. Gunakan sebagai acuan; harga transaksi mengikuti penyedia masing-masing.</p>';
+    var nextMs = slotStartMs(slotOf(Date.now()) + 1);
+    h += '<p style="font-size:10px;color:#64748b;margin-top:10px;line-height:1.55">Kurs disegarkan ' + when(rates.updatedAt) + (rates.sourceUpdatedAt ? ' · data sumber per ' + when(rates.sourceUpdatedAt) : '') + '. Pembaruan otomatis berikutnya sekitar ' + when(nextMs) + ' WIB (tiap 00.00 dan 12.00). Sebagai acuan; harga transaksi mengikuti penyedia masing-masing.</p>';
     b.innerHTML = h;
   }
 
@@ -68,9 +106,28 @@
         db.collection('provider_settings').doc('rates').onSnapshot(function (snap) {
           rates = snap.exists ? snap.data() : null;
           renderKurs();
+          maybeRefreshRates(rates);
         }, function () {});
-      } else if (tries > 100) clearInterval(t);
+      } else if (tries > 30) { clearInterval(t); ratesViaRest(); }   // halaman tanpa Firebase (mis. partner): baca lewat REST
     }, 100);
+  }
+  function ratesViaRest() {
+    try {
+      var x = new XMLHttpRequest();
+      x.open('GET', 'https://firestore.googleapis.com/v1/projects/finance-ai-master-byneilverse/databases/(default)/documents/provider_settings/rates?key=AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI', true);
+      x.onload = function () {
+        if (x.status !== 200) return;
+        try {
+          var f = JSON.parse(x.responseText).fields || {};
+          var n = function (v) { return v ? Number(v.doubleValue !== undefined ? v.doubleValue : v.integerValue) : 0; };
+          var r = {}, mf = (f.rates && f.rates.mapValue && f.rates.mapValue.fields) || {};
+          Object.keys(mf).forEach(function (k) { r[k] = n(mf[k]); });
+          rates = { rates: r, gold: n(f.gold), updatedAt: n(f.updatedAt) };
+          renderKurs();
+        } catch (e) {}
+      };
+      x.send();
+    } catch (e) {}
   }
 
   // ---------- CUACA ----------
@@ -200,6 +257,6 @@
     if (kt) startRates();
   }
 
-  window.FM_WIDGETS = { loadWeather: loadWeather, CURS: CURS };
+  window.FM_WIDGETS = { loadWeather: loadWeather, CURS: CURS, refreshRates: refreshRates, maybeRefreshRates: maybeRefreshRates, slotOf: slotOf, slotStartMs: slotStartMs };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else wire();
 })();

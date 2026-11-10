@@ -60,7 +60,7 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/theme.js?v=1.0"></script>
+    <script src="js/theme.js?v=1.3"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
@@ -531,12 +531,12 @@
                 <div id="popup-content-rates" class="space-y-4 hidden">
                     <div class="p-4 rounded-2xl bg-yellow-950/40 border border-yellow-400/30 space-y-3 text-xs">
                         <span class="font-black text-sm text-white block">Kurs & Emas (dibaca semua toko)</span>
-                        <p class="text-slate-400">Disegarkan otomatis saat Tower dibuka bila data lebih tua dari 12 jam, dan bisa disegarkan manual kapan saja. Toko klien hanya membaca data ini, sehingga hemat kuota.</p>
+                        <p class="text-slate-400">Kurs diperbarui otomatis tiap pukul 00.00 dan 12.00 WIB oleh perangkat pertama yang membuka aplikasi setelah jam itu (tidak perlu Tower aktif). Tombol di bawah menarik kurs saat itu juga untuk semua toko, dan jadwal 00.00/12.00 tetap berjalan sesudahnya.</p>
                         <p id="rt-updated" class="text-amber-300 font-bold"></p>
                         <div><label class="font-bold text-slate-300 block mb-1">Emas Antam (Rp per gram) — isi manual dari logammulia.com</label><input id="rt-gold" type="number" min="0" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                         <div id="rt-grid" class="grid grid-cols-2 gap-2"></div>
                         <div class="flex gap-2">
-                            <button onclick="fetchRatesOnline(true)" class="flex-1 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-black text-xs">Segarkan Kurs dari Internet</button>
+                            <button onclick="fetchRatesOnline()" class="flex-1 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-black text-xs">Segarkan Kurs dari Internet</button>
                             <button onclick="saveRates()" class="flex-1 py-2.5 rounded-xl bg-yellow-600 hover:bg-yellow-700 text-white font-black text-xs">Simpan</button>
                         </div>
                         <p id="rt-msg" class="text-slate-400"></p>
@@ -693,6 +693,7 @@
     </div>
 
     <script src="js/tenants.js"></script>
+    <script src="js/widgets.js?v=1.1"></script>
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
@@ -977,7 +978,7 @@
                 ratesDoc = snap.exists ? snap.data() : null;
                 const m = document.getElementById('popup-content-rates');
                 if (m && !m.classList.contains('hidden') && document.activeElement && !m.contains(document.activeElement)) fillRatesForm();
-                if (!ratesDoc || Date.now() - (ratesDoc.updatedAt || 0) > 12 * 3600 * 1000) { if (!ratesListen._auto) { ratesListen._auto = true; fetchRatesOnline(false); } }
+                if (window.FM_WIDGETS) FM_WIDGETS.maybeRefreshRates(ratesDoc);   // otomatis tiap 00.00 dan 12.00 WIB
             }, function () {});
         }
         function fillRatesForm() {
@@ -988,7 +989,7 @@
             }).join('');
             document.getElementById('rt-gold').value = (ratesDoc && ratesDoc.gold) || '';
             const u = ratesDoc && ratesDoc.updatedAt;
-            document.getElementById('rt-updated').innerText = u ? 'Terakhir diperbarui: ' + new Date(u).toLocaleString('id-ID') : 'Belum ada data.';
+            document.getElementById('rt-updated').innerText = u ? 'Terakhir disegarkan: ' + new Date(u).toLocaleString('id-ID') + (ratesDoc.sourceUpdatedAt ? ' · data sumber per ' + new Date(ratesDoc.sourceUpdatedAt).toLocaleString('id-ID') : '') : 'Belum ada data.';
             document.getElementById('rt-msg').innerText = '';
         }
         function saveRates() {
@@ -996,22 +997,15 @@
             const rates = {};
             RATE_CURS.forEach(function (c) { const v = Number(document.getElementById('rt-' + c[0]).value); if (v > 0) rates[c[0]] = v; });
             const gold = Number(document.getElementById('rt-gold').value) || 0;
-            db.collection('provider_settings').doc('rates').set({ rates: rates, gold: gold, updatedAt: Date.now(), source: 'Tower' }).then(function () {
+            db.collection('provider_settings').doc('rates').set({ rates: rates, gold: gold, updatedAt: Date.now(), source: 'Tower (manual)' }, { merge: true }).then(function () {
                 document.getElementById('rt-msg').innerText = 'Tersimpan.';
             }).catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
-        function fetchRatesOnline(manual) {
+        function fetchRatesOnline() {
             const msg = document.getElementById('rt-msg');
-            if (msg) msg.innerText = 'Mengambil kurs...';
-            fetch('https://open.er-api.com/v6/latest/USD').then(function (r) { return r.json(); }).then(function (j) {
-                if (!j || !j.rates || !j.rates.IDR) throw new Error('data kosong');
-                const rates = {};
-                RATE_CURS.forEach(function (c) { const k = c[0]; if (k === 'USD') rates[k] = j.rates.IDR; else if (j.rates[k]) rates[k] = j.rates.IDR / j.rates[k]; });
-                Object.keys(rates).forEach(function (k) { rates[k] = Math.round(rates[k] * 100) / 100; });
-                const gold = (ratesDoc && ratesDoc.gold) || 0;
-                return db.collection('provider_settings').doc('rates').set({ rates: rates, gold: gold, updatedAt: Date.now(), source: 'open.er-api.com' }).then(function () {
-                    if (msg) msg.innerText = 'Kurs berhasil disegarkan. Emas Antam tetap isi manual.';
-                });
+            if (msg) msg.innerText = 'Mengambil kurs hari ini...';
+            FM_WIDGETS.refreshRates(true).then(function () {
+                if (msg) msg.innerText = 'Kurs berhasil disegarkan untuk semua toko. Jadwal otomatis 00.00 dan 12.00 WIB tetap berjalan.';
             }).catch(function (e) { if (msg) msg.innerText = 'Gagal mengambil kurs dari internet: ' + e.message + '. Isi manual lalu Simpan.'; });
         }
 
@@ -1604,6 +1598,7 @@
             startControlListeners();
             startRegistryListener();
             ratesListen();
+            logosListen();
             formerListen();
             startPricingListener();
             startNoticesListener();
@@ -1648,6 +1643,14 @@
         }
 
         let dirFilter = '';
+        let logoMap = {};
+        function logosListen() {
+            if (!(typeof db !== 'undefined' && db)) return;
+            db.collection('tenant_logos').onSnapshot(function (snap) {
+                logoMap = {}; snap.forEach(function (d) { const x = d.data(); if (x && x.thumb) logoMap[d.id] = x.thumb; });
+                if (typeof renderUMKMDirectory === 'function') { try { renderUMKMDirectory(); } catch (e) {} }
+            }, function () {});
+        }
         function setDirFilter(v) { dirFilter = v || ''; renderUMKMDirectory(); }
 
         function renderUMKMDirectory() {
@@ -1692,7 +1695,7 @@
                     </td>
                     <td class="py-3.5 px-4">
                         <div class="flex items-center flex-wrap gap-1.5">
-                            <span class="font-black text-white">${escHtml(tenant.nama)}</span>
+                            ${logoMap[tenant.id] ? '<img src="' + logoMap[tenant.id] + '" alt="" class="w-7 h-7 rounded-lg object-contain bg-white/10">' : ''}<span class="font-black text-white">${escHtml(tenant.nama)}</span>
                             ${tierBadgeHtml(tenant.tier)}
                             ${(getCtrl(tenant.id).billingCycle === 'yearly') ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">TAHUNAN</span>' : ''}
                             ${masterTag}
