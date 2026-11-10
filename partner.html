@@ -429,6 +429,122 @@
             renderPartnerDashboard();
             checkNotifs();
         });
-    </script>
+    
+
+// 10. KURS & EMAS (PLUS & PRO)
+function updatePremiumWidgets() {
+    if (!activeTenant) return;
+    const tier = activeTenant.tier || 'basic';
+    if (tier === 'plus' || tier === 'pro') {
+        const el = document.getElementById('premium-widgets-container');
+        if (el) el.classList.remove('hidden');
+        
+        // Simulasi Kurs & Emas Live
+        const kursEl = document.getElementById('kurs-text');
+        if (kursEl) kursEl.innerText = "USD: 15.650 | Antam: Rp 1.485.000/g";
+        
+        // Simulasi Cuaca
+        const weatherEl = document.getElementById('weather-text');
+        if (weatherEl) weatherEl.innerText = "28°C Hujan Ringan";
+    }
+    
+    // 9. LIVE NEWS TICKER (PRO ONLY)
+    if (tier === 'pro') {
+        const tickerEl = document.getElementById('live-news-ticker');
+        if (tickerEl) {
+            tickerEl.classList.remove('hidden');
+            startNewsTicker();
+        }
+    }
+}
+
+// Simulasi Data Berita 20 Item (Update tiap 15 menit)
+const newsDatabase = [
+    "IHSG Ditutup Menguat 1.2%, Sektor Teknologi Memimpin",
+    "Bank Indonesia Pertahankan Suku Bunga Acuan di Level 6.00%",
+    "Harga Minyak Dunia Melonjak Akibat Ketegangan Geopolitik",
+    "Rilis Fitur AI Baru, Saham Tech Global Naik Tajam",
+    "Pemerintah Siapkan Insentif Pajak Baru untuk UMKM Digital",
+    "Nilai Tukar Rupiah Stabil di Kisaran Rp 15.600 / USD",
+    "Investasi Asing Kuartal III Meningkat 25%",
+    "Harga Emas Antam Sentuh Rekor Tertinggi Baru",
+    "Pembangunan Infrastruktur Cloud di Indonesia Makin Pesat",
+    "Startup Lokal Terima Pendanaan Seri B Senilai 500 Miliar",
+    "Bursa Asia Kompak Menghijau Mengikuti Wall Street",
+    "Penerimaan Pajak Negara Melampaui Target Tahun Ini",
+    "Adopsi Pembayaran QRIS Tembus 45 Juta Pengguna",
+    "Sektor Pariwisata Kembali Pulih 100% Pasca Pandemi",
+    "Ekspor Manufaktur Naik, Neraca Perdagangan Surplus",
+    "Fenomena El Nino Diprediksi Berakhir Bulan Depan",
+    "KTT Ekonomi ASEAN Hasilkan Kesepakatan Perdagangan Bebas Baru",
+    "Tren Belanja Online Konsumen Meningkat Jelang Akhir Tahun",
+    "Raksasa Teknologi Resmikan Data Center Terbesar di Jawa Barat",
+    "Bank Digital Lokal Catat Pertumbuhan Laba 200%"
+];
+
+let currentNews = [...newsDatabase];
+function startNewsTicker() {
+    renderNews();
+    // Update tiap 15 menit (900.000 ms) dengan simulasi geser berita baru
+    setInterval(() => {
+        const newNews = `Berita Terbaru Terupdate Jam ${new Date().toLocaleTimeString('id-ID')}`;
+        currentNews.unshift(newNews);
+        if (currentNews.length > 20) currentNews.pop();
+        renderNews();
+    }, 900000);
+}
+
+function renderNews() {
+    const container = document.getElementById('news-content');
+    if (container) {
+        container.innerHTML = currentNews.map(n => `<span class="mx-6 text-emerald-300 font-bold">•</span><span>${n}</span>`).join('');
+    }
+}
+
+function openWeatherModal() {
+    const m = document.getElementById('modal-weather');
+    if (m) {
+        m.classList.remove('hidden');
+        document.getElementById('modal-main').classList.remove('hidden');
+    }
+}
+function closeWeatherModal() {
+    const m = document.getElementById('modal-weather');
+    if (m) m.classList.add('hidden');
+    document.getElementById('modal-main').classList.add('hidden');
+}
+
+</script>
+
+    <!-- LIVE NEWS TICKER (PRO) -->
+    <div id="live-news-ticker" class="hidden fixed bottom-0 left-0 right-0 h-9 bg-slate-950/90 backdrop-blur-md border-t border-white/20 z-40 flex items-center overflow-hidden text-[11px] text-slate-200">
+        <div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-slate-950 to-transparent w-8 z-10"></div>
+        <div class="flex items-center bg-rose-600 px-3 h-full font-black text-white shrink-0 z-20">LIVE NEWS</div>
+        <div class="animate-marquee flex items-center h-full" id="news-content">
+            <!-- News here -->
+        </div>
+    </div>
+
+<div id='modal-main' class='hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-start justify-center'>
+    <!-- WIDGET CUACA MODAL -->
+    <div id="modal-weather" class="hidden ios-glass w-full max-w-sm p-6 modal-sheet mx-auto mt-20 relative text-center">
+        <button onclick="closeWeatherModal()" class="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+        <i data-lucide="cloud-lightning" class="w-12 h-12 text-cyan-400 mx-auto mb-3"></i>
+        <h3 class="text-xl font-black text-white">28°C Hujan Ringan</h3>
+        <p class="text-[11px] text-cyan-200 font-mono mt-1" id="weather-loc">Kalinilam, Ketapang</p>
+        <div class="grid grid-cols-2 gap-3 mt-5 text-left text-xs">
+            <div class="bg-black/30 p-3 rounded-xl border border-white/10">
+                <span class="text-slate-400 block mb-1">Kelembapan</span>
+                <b class="text-white">85%</b>
+            </div>
+            <div class="bg-black/30 p-3 rounded-xl border border-white/10">
+                <span class="text-slate-400 block mb-1">Angin</span>
+                <b class="text-white">12 km/h NW</b>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
