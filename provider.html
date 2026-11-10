@@ -76,9 +76,9 @@
             { label: 'Catatan Rilis', icon: 'book', run: "openModal('release_notes')" }
         ];
     </script>
-    <script src="js/theme.js?v=1.5"></script>
-    <script src="js/logo.js?v=1.5"></script>
-    <script src="js/skin.js?v=1.5"></script>
+    <script src="js/theme.js?v=1.5.1"></script>
+    <script src="js/logo.js?v=1.5.1"></script>
+    <script src="js/skin.js?v=1.5.1"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
@@ -622,23 +622,23 @@
                     <div class="p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-2.5 text-xs">
                         <span class="font-black text-cyan-300 uppercase tracking-wider block flex items-center">
                             <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1.5 text-cyan-400"></i>
-                            Lokasi Presisi GPS Terdeteksi (3 Akun UMKM):
+                            Lokasi Terminal (GPS live bila tersedia):
                         </span>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
                             <div class="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
                                 <span class="text-[10px] font-bold text-emerald-400 uppercase block">1. Akun Kasir</span>
-                                <p id="gps-kasir-addr" class="text-xs font-semibold text-white">Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat</p>
-                                <span id="gps-kasir-coords" class="text-[9px] text-slate-500 font-mono block">Lat: -1.8485, Lon: 109.9721</span>
+                                <p id="gps-kasir-addr" class="text-xs font-semibold text-white">Memuat...</p>
+                                <span id="gps-kasir-coords" class="text-[9px] text-slate-500 font-mono block"></span>
                             </div>
                             <div class="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
                                 <span class="text-[10px] font-bold text-purple-400 uppercase block">2. Akun Manager</span>
-                                <p id="gps-mgr-addr" class="text-xs font-semibold text-white">Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat</p>
-                                <span id="gps-mgr-coords" class="text-[9px] text-slate-500 font-mono block">Lat: -1.8482, Lon: 109.9725</span>
+                                <p id="gps-mgr-addr" class="text-xs font-semibold text-white">Memuat...</p>
+                                <span id="gps-mgr-coords" class="text-[9px] text-slate-500 font-mono block"></span>
                             </div>
                             <div class="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
                                 <span class="text-[10px] font-bold text-amber-400 uppercase block">3. Akun Owner</span>
-                                <p id="gps-owner-addr" class="text-xs font-semibold text-white">Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat</p>
-                                <span id="gps-owner-coords" class="text-[9px] text-slate-500 font-mono block">Lat: -1.8480, Lon: 109.9719</span>
+                                <p id="gps-owner-addr" class="text-xs font-semibold text-white">Memuat...</p>
+                                <span id="gps-owner-coords" class="text-[9px] text-slate-500 font-mono block"></span>
                             </div>
                         </div>
                     </div>
@@ -907,7 +907,7 @@
                 snap.forEach(function (doc) {
                     const d = doc.data();
                     const ms = tsMs(d.lastSeen);
-                    m[doc.id] = { tenantId: d.tenantId, role: d.role, who: d.who, startedAt: d.startedAt || 0, ms: ms };
+                    m[doc.id] = { tenantId: d.tenantId, role: d.role, who: d.who, startedAt: d.startedAt || 0, ms: ms, geo: d.geo || null };
                     if (ms && now - ms > 24 * 3600 * 1000) stale.push(doc.id);
                 });
                 presenceMap = m;
@@ -1852,10 +1852,23 @@
             if (sb) sb.onclick = function () { setTenantSuspended(tenant.id, !isTenantSuspended(tenant.id)); };
 
             const loc = tenant.locations || {};
-            const def = "Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat";
-            document.getElementById('gps-kasir-addr').innerText = (loc.kasir && loc.kasir.name) || def;
-            document.getElementById('gps-mgr-addr').innerText = (loc.manager && loc.manager.name) || def;
-            document.getElementById('gps-owner-addr').innerText = (loc.owner && loc.owner.name) || def;
+            const liveGeo = function (role) {
+                let best = null;
+                Object.keys(presenceMap).forEach(function (k) { const x = presenceMap[k]; if (x.tenantId === tenant.id && x.role === role && x.geo && (!best || x.ms > best.ms)) best = x; });
+                return best;
+            };
+            [['kasir', 'gps-kasir'], ['manager', 'gps-mgr'], ['owner', 'gps-owner']].forEach(function (r) {
+                const g = liveGeo(r[0]), reg = loc[r[0]] && loc[r[0]].name;
+                const a = document.getElementById(r[1] + '-addr'), c = document.getElementById(r[1] + '-coords');
+                if (g) {
+                    const mnt = Math.max(0, Math.round((Date.now() - g.ms) / 60000));
+                    a.innerText = g.geo.name || 'Lokasi GPS';
+                    c.innerText = 'GPS live · ' + g.geo.lat.toFixed(4) + ', ' + g.geo.lon.toFixed(4) + ' · ' + (mnt < 1 ? 'baru saja' : mnt + ' mnt lalu');
+                } else {
+                    a.innerText = reg && reg !== '-' ? reg : 'Belum ada data lokasi';
+                    c.innerText = reg && reg !== '-' ? 'Alamat terdaftar (belum ada GPS live dari terminal ini)' : 'Menunggu terminal login dengan izin lokasi';
+                }
+            });
 
             const tbody = document.getElementById('inspect-tx-body');
             tbody.innerHTML = "";

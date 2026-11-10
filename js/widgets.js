@@ -153,7 +153,7 @@
     } catch (e) {}
     return null;
   }
-  function geoSave(g) { g.t = Date.now(); try { localStorage.setItem(GEO_KEY, JSON.stringify(g)); } catch (e) {} return g; }
+  function geoSave(g) { g.t = Date.now(); try { localStorage.setItem(GEO_KEY, JSON.stringify(g)); } catch (e) {} window.FM_GEO = g; try { window.dispatchEvent(new CustomEvent('fm:geo')); } catch (e) {} return g; }
   function jget(url) { return fetch(url).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }); }
 
   function uniq(a) { var o = []; a.forEach(function (x) { if (x && o.map(function (y) { return y.toLowerCase(); }).indexOf(String(x).toLowerCase()) < 0) o.push(x); }); return o; }

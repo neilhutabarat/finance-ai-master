@@ -236,10 +236,13 @@
     function presenceRef(tenant) { return db.collection('tenant_presence').doc(tenant.id + '__' + ROLE + '__' + SESSION_ID); }
 
     function beat(tenant) {
-        presenceRef(tenant).set({
+        var doc = {
             tenantId: tenant.id, role: ROLE, sessionId: SESSION_ID, who: String(whoAmI()).slice(0, 60),
             startedAt: startedAtMs, lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }).catch(function () {});
+        };
+        var g = window.FM_GEO;
+        if (g && g.src === 'GPS' && isFinite(g.lat) && isFinite(g.lon)) doc.geo = { lat: g.lat, lon: g.lon, name: String(g.name || '').slice(0, 140), acc: g.acc || 0, at: g.t || Date.now() };
+        presenceRef(tenant).set(doc, { merge: true }).catch(function () {});
     }
 
     function startPresence(tenant) {
@@ -248,6 +251,7 @@
         hideQuotaOverlay();
         beat(tenant);
         setInterval(function () { beat(tenant); }, BEAT_MS);
+        window.addEventListener('fm:geo', function () { beat(tenant); });
         window.addEventListener('pagehide', function () { try { presenceRef(tenant).delete(); } catch (e) {} });
     }
 
