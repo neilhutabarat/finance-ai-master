@@ -273,6 +273,7 @@
     'button[class*="bg-yellow-"]{background:var(--s-b2)!important;background-image:none!important;color:var(--s-b2t)!important;border:1px solid var(--s-b2l)!important;border-radius:999px!important}',
     '[class*="bg-cyan-6"]:not(.oneui-hero *),[class*="bg-sky-6"]:not(.oneui-hero *){background-color:#0e7490!important;color:#fff!important}',
     '[class*="bg-emerald-6"]:not(.oneui-hero *):not(button){background-color:#047857!important;color:#fff!important}',
+    '@media(max-width:1023px){html[data-fm-page="kasir"] main>.grid:first-child{grid-template-columns:minmax(0,1fr)!important}html[data-fm-page="kasir"] .fm-saldo{grid-column:1/-1!important}}',
     '.fm-insights:empty{display:none}'
   ].join('\n') };
 

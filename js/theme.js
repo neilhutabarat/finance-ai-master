@@ -12,6 +12,7 @@
       '[Tampilan] Logo Oneilverse baru: cincin orbit emas dengan planet dan huruf N di pusatnya',
       '[Tampilan] Portal login, partner, dan semua halaman kini satu gaya: font, kartu kaca, tombol, dan dock',
       '[Perbaikan] Kontras teks disempurnakan di mode terang, gelap, dan gelap pekat (termasuk kartu Pajak dan semua pop-up)',
+      '[Perbaikan] Tampilan kasir di HP: kartu saldo kini selebar layar dan tidak lagi terpotong',
       '[Perbaikan] Catatan rilis kini ringkas: hanya 10 rilis terakhir yang ditampilkan',
       '[Keamanan] Nama produk, nama akun, keterangan nota, dan nama petugas kini ditampilkan sebagai teks murni sehingga tidak bisa disusupi kode berbahaya'
     ]],
