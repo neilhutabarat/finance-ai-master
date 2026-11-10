@@ -3,8 +3,9 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.2';
+  var BETA = 'BETA 1.3';
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.3)', '11 Nov 2026', ['Tampilan baru bergaya One UI berbalut kaca: bilah header ringkas, kartu rata tanpa gradasi, tombol pil seragam', 'Halaman desktop pas satu layar tanpa gulir halaman; ruang kosong diisi ringkasan', 'Tombol tindakan dirapikan dalam grid seragam; bagian panjang (instruksi kasir, analisis AI) dibuka lewat pop-up', 'Tombol Keluar dipindah ke dock (di HP ada di Pengaturan); chip versi di header dihapus', 'Scrollbar pop-up disembunyikan agar tampil bersih']],
     ['1.0.0 (BETA 1.2)', '11 Nov 2026', ['Kulit tampilan baru "Glass 2026": kartu, tombol, dan pop-up bergaya kaca seragam di semua halaman', 'Dock di bagian bawah layar; setiap menu membuka pop-up tanpa pindah halaman', 'Judul pop-up diperbaiki di semua halaman']],
     ['1.0.0 (BETA 1.1)', '11 Nov 2026', ['Tampilan baru yang lebih tenang dan rapi di desktop, tablet, dan HP: satu warna aksen, permukaan netral','Rilis uji awal: kasir, manager, owner, dan portal login per toko', 'Fitur & Paket: lihat fitur Basic, Plus, Pro (yang terkunci tetap terlihat)', 'Dashboard owner: ringkasan hari ini, laba per produk, stok menipis, metode bayar, target omzet, ekspor CSV', 'Kasir: scan barcode, jumlah (pcs), metode bayar, struk WhatsApp (Plus)', 'Tema terang/gelap pekat, warna halaman, logo usaha']]
   ];
@@ -138,6 +139,7 @@
         '<p id="fm-logo-msg" style="font-size:12px;margin:8px 0 0;color:#fca5a5"></p></div></div>';
     }
     if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur &amp; Paket</button></div>';
+    if (window.FM_LOGOUT && window.innerWidth < 480) h += '<div class="fm-sec"><button class="fm-btn" data-logout style="width:100%;padding:13px;color:#fda4af">Keluar dari Akun</button></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>v' + APP_VERSION + ' · ' + BETA + '</b></div></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.map(function (n, i) {
       return '<details ' + (i === 0 ? 'open' : '') + '><summary>v' + n[0] + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></details>';
@@ -145,6 +147,7 @@
     h += '<p style="font-size:11px;color:#8e96a8;margin-top:14px;line-height:1.5">Tema dan warna tersimpan di perangkat ini, terpisah untuk tiap peran.</p>';
     box.innerHTML = h;
 
+    var lo = box.querySelector('[data-logout]'); if (lo) lo.onclick = function () { document.getElementById('fm-set').style.display = 'none'; window.FM_LOGOUT(); };
     var pb = box.querySelector('[data-plans]'); if (pb) pb.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_PLANS) FM_PLANS.openModal(); };
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
     box.querySelectorAll('[data-mode]').forEach(function (b) { b.onclick = function () { pref.mode = b.getAttribute('data-mode'); savePref(pref); apply(); render(); }; });

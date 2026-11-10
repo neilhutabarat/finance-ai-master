@@ -230,10 +230,6 @@
                 <div class="ios-pill px-3 py-1.5 text-xs font-bold bg-white/10 border border-white/15 flex items-center shadow-sm">
                     <span id="user-role-display">Role: Staf Kasir</span>
                 </div>
-                <button onclick="openReleaseNotesModal()" class="ios-pill px-3 py-1.5 bg-slate-900/40 hover:bg-slate-900/60 border border-white/15 text-[10px] font-bold flex items-center space-x-1.5 transition active:scale-95" title="Catatan Rilis & Keamanan">
-                    <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-300"></i>
-                    <span class="font-mono text-cyan-100">v1.0.0 (Beta 1.0)</span>
-                </button>
                 <button onclick="logoutKasirSession()" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     <span>Keluar</span>
@@ -249,7 +245,7 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
             
             <!-- 1. KARTU SALDO LACI KASIR (PUTIH 3D GLASS KILAP) -->
-            <div class="md:col-span-8 white-ice-glass-card p-5 sm:p-6 flex flex-col justify-between space-y-3">
+            <div class="fm-saldo md:col-span-8 white-ice-glass-card p-5 sm:p-6 flex flex-col justify-between space-y-3">
                 <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5 relative z-10">
                     <div class="flex items-center space-x-2">
                         <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
@@ -292,7 +288,7 @@
             </div>
 
             <!-- 2. KARTU PAJAK 12% KECIL (PUTIH 3D GLASS KILAP BERAKSEN EMAS) -->
-            <div onclick="showTaxExplainer()" role="button" tabindex="0" class="md:col-span-4 cursor-pointer white-ice-glass-card p-5 sm:p-6 flex flex-col justify-between select-none border-amber-200/80">
+            <div onclick="showTaxExplainer()" role="button" tabindex="0" class="fm-gone md:col-span-4 cursor-pointer white-ice-glass-card p-5 sm:p-6 flex flex-col justify-between select-none border-amber-200/80">
                 <div class="flex items-center justify-between relative z-10">
                     <span class="text-[11px] font-black tracking-wider text-amber-900 uppercase flex items-center">
                         <i data-lucide="landmark" class="w-3.5 h-3.5 mr-1.5 text-amber-700"></i>
