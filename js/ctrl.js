@@ -164,18 +164,120 @@
         }, function (e) { console.warn('ctrl.js: gagal membaca pengumuman.', e); });
     }
 
+    // ===== KEHADIRAN (PRESENCE) & KUOTA KASIR =====
+    // Setiap layar kasir/manager/owner yang terbuka mengirim "tanda hidup" tiap 60 detik ke
+    // tenant_presence/<TOKO>__<peran>__<sesi>. Tower membaca ini untuk menampilkan siapa yang online.
+    // Kasir, manager, dan owner masing-masing dibatasi kuota (allowedCashiers/allowedManagers/allowedOwners, default 1)
+    // dari tenant_ctrl; toko master tidak dibatasi.
+    var BEAT_MS = 60000, ACTIVE_MS = 150000;
+    var SESSION_ID = (function () {
+        var k = 'fm_presence_sid';
+        try { var v = sessionStorage.getItem(k); if (!v) { v = Math.random().toString(36).slice(2, 10); sessionStorage.setItem(k, v); } return v; }
+        catch (e) { return Math.random().toString(36).slice(2, 10); }
+    })();
+    var ROLE = (function () {
+        var p = (window.location.pathname || '').toLowerCase();
+        if (p.indexOf('kasir') >= 0) return 'kasir';
+        if (p.indexOf('manager') >= 0) return 'manager';
+        if (p.indexOf('dashboard') >= 0) return 'owner';
+        return 'lain';
+    })();
+    var startedAtMs = Date.now();
+    var presenceState = null; // null | 'started' | 'blocked'
+    var quotaOverlayId = 'ctrl-quota-overlay';
+    var QUOTA_FIELD = { kasir: 'allowedCashiers', manager: 'allowedManagers', owner: 'allowedOwners' };
+    var ROLE_NAME = { kasir: 'kasir', manager: 'manager', owner: 'owner' };
+
+    function whoAmI() {
+        try { var u = JSON.parse(localStorage.getItem('currentUser') || 'null'); return (u && (u.title || u.name)) || ROLE; } catch (e) { return ROLE; }
+    }
+
+    function presenceRef(tenant) { return db.collection('tenant_presence').doc(tenant.id + '__' + ROLE + '__' + SESSION_ID); }
+
+    function beat(tenant) {
+        presenceRef(tenant).set({
+            tenantId: tenant.id, role: ROLE, sessionId: SESSION_ID, who: String(whoAmI()).slice(0, 60),
+            startedAt: startedAtMs, lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).catch(function () {});
+    }
+
+    function startPresence(tenant) {
+        if (presenceState === 'started') return;
+        presenceState = 'started';
+        hideQuotaOverlay();
+        beat(tenant);
+        setInterval(function () { beat(tenant); }, BEAT_MS);
+        window.addEventListener('pagehide', function () { try { presenceRef(tenant).delete(); } catch (e) {} });
+    }
+
+    function hideQuotaOverlay() {
+        var el = document.getElementById(quotaOverlayId);
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+    }
+
+    function showQuotaOverlay(used, allowed) {
+        var rn = ROLE_NAME[ROLE] || 'terminal';
+        var el = document.getElementById(quotaOverlayId);
+        if (!el) {
+            el = document.createElement('div');
+            el.id = quotaOverlayId;
+            el.style.cssText = 'position:fixed;inset:0;z-index:2147482900;background:rgba(2,6,23,.97);display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;';
+            document.body.appendChild(el);
+        }
+        el.innerHTML = '<div style="max-width:420px;text-align:center;color:#e2e8f0"><div style="font-size:44px">🖥️</div>' +
+            '<h2 style="font-size:20px;font-weight:900;margin:12px 0 8px">Kuota Terminal ' + rn.charAt(0).toUpperCase() + rn.slice(1) + ' Penuh</h2>' +
+            '<p style="font-size:13px;line-height:1.6;color:#94a3b8">Toko ini memiliki lisensi <b style="color:#fff">' + allowed + ' terminal ' + rn + '</b> dan saat ini <b style="color:#fff">' + used + '</b> sedang aktif di perangkat lain.' +
+            '<br><br>Tutup layar ' + rn + ' di perangkat lain, atau ajukan penambahan terminal lewat menu Manager/Owner. Layar ini akan terbuka otomatis setelah kuota tersedia.</p>' +
+            '<button id="ctrl-quota-exit" style="margin-top:18px;padding:10px 22px;border-radius:12px;background:#0891b2;color:#fff;font-weight:800;font-size:13px;border:0;cursor:pointer">Keluar</button></div>';
+        var b = document.getElementById('ctrl-quota-exit');
+        if (b) b.onclick = function () {
+            if (typeof window.logout === 'function') { try { window.logout(); return; } catch (e) {} }
+            window.location.replace('index.html');
+        };
+    }
+
+    function checkQuota(tenant, allowed, onOk, onFull) {
+        db.collection('tenant_presence').where('tenantId', '==', tenant.id).where('role', '==', ROLE).get().then(function (snap) {
+            var now = Date.now(), n = 0;
+            snap.forEach(function (d) {
+                if (d.id.slice(-(SESSION_ID.length + 2)) === '__' + SESSION_ID) return; // sesi ini sendiri
+                var ls = d.data().lastSeen;
+                var ms = (ls && typeof ls.toMillis === 'function') ? ls.toMillis() : 0;
+                if (now - ms < ACTIVE_MS) n++;
+            });
+            if (n >= allowed) onFull(n); else onOk();
+        }).catch(function () { onOk(); }); // gagal membaca: jangan menghalangi toko
+    }
+
+    function proceedPresence(tenant, ctrl) {
+        if (presenceState === 'started') return;
+        if (ctrl && ctrl.suspended === true) return;
+        var field = QUOTA_FIELD[ROLE];
+        if (field && !tenant.isMaster) {
+            var allowed = (ctrl && typeof ctrl[field] === 'number' && ctrl[field] > 0) ? ctrl[field] : 1;
+            checkQuota(tenant, allowed, function () { startPresence(tenant); }, function (n) {
+                presenceState = 'blocked';
+                showQuotaOverlay(n, allowed);
+            });
+        } else {
+            startPresence(tenant);
+        }
+    }
+
     function attach() {
         var tenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
         if (!tenant || !tenant.id) return;
         attachNotices(tenant);
-        if (tenant.isMaster) return; // master tidak pernah dikunci
+        if (tenant.isMaster) { proceedPresence(tenant, null); return; } // master tidak dikunci / tidak dibatasi
         db.collection('tenant_ctrl').doc(tenant.id).onSnapshot(function (snap) {
             var d = snap.exists ? snap.data() : null;
             window.TENANT_CTRL = d || {};
             if (d && d.suspended === true) showOverlay(d.suspendReason || '');
             else hideOverlay();
+            proceedPresence(tenant, d); // saat diblokir kuota, dicek ulang tiap data kontrol berubah (mis. kuota ditambah)
         }, function (err) {
             console.warn('ctrl.js: gagal membaca tenant_ctrl, layar tidak dikunci.', err);
+            proceedPresence(tenant, null);
         });
     }
 

@@ -393,11 +393,19 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                             <div>
-                                <label class="font-bold text-slate-300 block mb-1">Jumlah Kasir yang Dibuka:</label>
+                                <label class="font-bold text-slate-300 block mb-1">Jenis Terminal:</label>
+                                <select id="req-role" class="w-full bg-slate-900 border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
+                                    <option value="kasir">Kasir</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="owner">Owner</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-300 block mb-1">Jumlah Tambahan:</label>
                                 <select id="req-cashier-qty" class="w-full bg-slate-900 border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
-                                    <option value="1">+1 Terminal Kasir</option>
-                                    <option value="2">+2 Terminal Kasir</option>
-                                    <option value="3">+3 Terminal Kasir</option>
+                                    <option value="1">+1 Terminal</option>
+                                    <option value="2">+2 Terminal</option>
+                                    <option value="3">+3 Terminal</option>
                                 </select>
                             </div>
                             <div>
@@ -833,13 +841,16 @@
 
         function submitCashierRequest() {
             const qty = document.getElementById('req-cashier-qty').value;
-            const name = document.getElementById('req-cashier-name').value.trim() || `Kasir Tambahan (+${qty})`;
+            const role = document.getElementById('req-role').value;
+            const roleLabel = { kasir: 'Kasir', manager: 'Manager', owner: 'Owner' }[role] || 'Kasir';
+            const name = document.getElementById('req-cashier-name').value.trim() || `${roleLabel} Tambahan (+${qty})`;
 
             const ticket = {
                 id: 'req_' + Date.now(),
                 tenantId: activeTenant ? activeTenant.id : 'ID26110901',
                 tenantName: activeTenant ? activeTenant.nama : 'Oneilverse',
                 qty: qty,
+                role: role,
                 terminalName: name,
                 status: 'PENDING',
                 requestedBy: user.title,
@@ -858,7 +869,7 @@
                 localStorage.setItem('fm_cashier_license_requests', JSON.stringify(reqList));
             }
 
-            alert(`Permohonan lisensi +${qty} terminal kasir baru ("${name}") telah terkirim ke portal penyedia platform!`);
+            alert(`Permohonan lisensi +${qty} terminal ${roleLabel} baru ("${name}") telah terkirim ke portal penyedia platform!`);
             closeModal();
         }
 

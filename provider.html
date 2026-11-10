@@ -471,7 +471,8 @@
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Slogan / Keterangan</label><input id="nt-slogan" type="text" placeholder="Contoh: Kopi lokal, harga bersahabat" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Paket</label>
                                 <select id="nt-tier" onchange="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="basic">Basic</option><option value="plus">Plus</option><option value="pro">Pro</option></select></div>
-                            <div><label class="font-bold text-slate-300 block mb-1">Jumlah Kasir Awal</label><input id="nt-kasir" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Kuota Terminal Awal (Kasir / Manager / Owner)</label>
+                                <div class="grid grid-cols-3 gap-2"><input id="nt-kasir" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><input id="nt-mgr" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><input id="nt-own" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Siklus Tagihan</label>
                                 <select id="nt-cycle" onchange="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="monthly">Per Bulan</option><option value="yearly">Per Tahun (hemat)</option></select></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Harga Khusus (opsional, Rp)</label><input id="nt-custom" type="number" min="0" placeholder="Kosongkan = harga standar" oninput="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
@@ -664,6 +665,14 @@
         let ctrlMap = {};
         function getCtrl(id) { return ctrlMap[id] || {}; }
         function getAllowedCashiers(id) { const c = getCtrl(id).allowedCashiers; return (typeof c === 'number' && c > 0) ? c : 1; }
+        const QUOTA_FIELD = { kasir: 'allowedCashiers', manager: 'allowedManagers', owner: 'allowedOwners' };
+        function getQuota(id, role) { const c = getCtrl(id)[QUOTA_FIELD[role]]; return (typeof c === 'number' && c > 0) ? c : 1; }
+        function quotaLine(id) {
+            return ['kasir', 'manager', 'owner'].map(function (r) {
+                const used = onlineSessions(id).filter(function (x) { return x.role === r; }).length;
+                return ROLE_LABEL[r] + ' ' + used + '/' + getQuota(id, r);
+            }).join(' • ');
+        }
         function isTenantSuspended(id) { return getCtrl(id).suspended === true; }
         // >>> JARINGAN-BEGIN
         // ===== DATA JARINGAN TENANT (Firestore: koleksi tx_<ID> per tenant) =====
@@ -759,6 +768,66 @@
             if (isOpen('tickets') && typeof renderTicketsList === 'function') renderTicketsList();
         }
 
+        // ===== AKTIVITAS TOKO (PRESENCE) =====
+        let presenceMap = {};
+        const PRESENCE_ACTIVE_MS = 150000;
+        const ROLE_LABEL = { kasir: 'Kasir', manager: 'Manager', owner: 'Owner' };
+
+        function tsMs(v) { return (v && typeof v.toMillis === 'function') ? v.toMillis() : (typeof v === 'number' ? v : 0); }
+
+        function onlineSessions(tenantId) {
+            const now = Date.now();
+            return Object.keys(presenceMap).map(function (k) { return presenceMap[k]; })
+                .filter(function (p) { return p.tenantId === tenantId && now - p.ms < PRESENCE_ACTIVE_MS; });
+        }
+
+        function lastActiveMs(tenantId) {
+            let m = 0;
+            Object.keys(presenceMap).forEach(function (k) { const p = presenceMap[k]; if (p.tenantId === tenantId && p.ms > m) m = p.ms; });
+            const tx = getTenantTxList(tenantId);
+            if (tx.length && tx[0].timestamp > m) m = tx[0].timestamp;
+            return m;
+        }
+
+        function agoText(ms) {
+            if (!ms) return 'belum pernah';
+            const d = Math.max(0, Date.now() - ms), mnt = Math.floor(d / 60000);
+            if (mnt < 2) return 'baru saja';
+            if (mnt < 60) return mnt + ' menit lalu';
+            const h = Math.floor(mnt / 60);
+            if (h < 24) return h + ' jam lalu';
+            return Math.floor(h / 24) + ' hari lalu';
+        }
+
+        function activityTag(tenant) {
+            if (tenant.isMaster) return '';
+            const last = lastActiveMs(tenant.id);
+            const created = tenant.createdAtMs || 0;
+            const DAY3 = 3 * 24 * 3600 * 1000;
+            if (!last && created && Date.now() - created > DAY3) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-500/20 text-rose-300 border border-rose-400/30" title="Toko dibuat lebih dari 3 hari lalu dan belum pernah dipakai">BELUM AKTIF</span>';
+            if (last && Date.now() - last > DAY3) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-400/30" title="Tidak ada aktivitas lebih dari 3 hari">SEPI</span>';
+            return '';
+        }
+
+        function startPresenceListener() {
+            if (!(typeof db !== 'undefined' && db)) return;
+            db.collection('tenant_presence').onSnapshot(function (snap) {
+                const m = {};
+                const stale = [];
+                const now = Date.now();
+                snap.forEach(function (doc) {
+                    const d = doc.data();
+                    const ms = tsMs(d.lastSeen);
+                    m[doc.id] = { tenantId: d.tenantId, role: d.role, who: d.who, startedAt: d.startedAt || 0, ms: ms };
+                    if (ms && now - ms > 24 * 3600 * 1000) stale.push(doc.id);
+                });
+                presenceMap = m;
+                stale.forEach(function (id) { db.collection('tenant_presence').doc(id).delete().catch(function () {}); }); // bersih-bersih sesi lama
+                refreshProviderViews();
+            }, function (e) { console.error('Provider: gagal membaca presence', e); });
+            setInterval(refreshProviderViews, 60000); // agar status "online" ikut menua tanpa menunggu data baru
+        }
+
         // ===== HARGA PAKET & TAGIHAN =====
         let pricing = { basic: { monthly: 0 }, plus: { monthly: 0 }, pro: { monthly: 0 }, yearlyDiscountPct: 20 };
         const TIER_LABEL = { basic: 'Basic', plus: 'Plus', pro: 'Pro' };
@@ -841,6 +910,7 @@
             if (planPanelFor === tenant.id) return; // jangan menimpa isian yang sedang diketik
             planPanelFor = tenant.id;
             const c = getCtrl(tenant.id);
+            const q = function (r) { return getQuota(tenant.id, r); };
             const tier = tenant.tier || 'basic';
             const cycle = c.billingCycle || 'monthly';
             const sel = function (v, cur) { return v === cur ? ' selected' : ''; };
@@ -856,7 +926,13 @@
                 '<div><label class="font-bold text-slate-300 block mb-1">Harga Khusus (opsional)</label><input id="ip-custom" type="number" min="0" placeholder="Kosong = harga standar" class="' + cls + '"></div>' +
                 '</div>' +
                 '<div id="ip-prev" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div>' +
-                '<button id="ip-save" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition">Simpan Paket</button>';
+                '<button id="ip-save" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition">Simpan Paket</button>' +
+                '<div class="pt-3 mt-1 border-t border-white/10"><span class="font-black text-sm text-white block mb-2">Kuota Terminal (atur manual)</span>' +
+                '<div class="grid grid-cols-3 gap-3">' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Kasir</label><input id="iq-kasir" type="number" min="1" value="' + q('kasir') + '" class="' + cls + '"></div>' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Manager</label><input id="iq-manager" type="number" min="1" value="' + q('manager') + '" class="' + cls + '"></div>' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Owner</label><input id="iq-owner" type="number" min="1" value="' + q('owner') + '" class="' + cls + '"></div>' +
+                '</div><button id="iq-save" class="mt-3 w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-black text-xs transition">Simpan Kuota</button></div>';
             const upd = function () { document.getElementById('ip-prev').innerHTML = planSummaryHtml(document.getElementById('ip-tier').value, document.getElementById('ip-cycle').value, document.getElementById('ip-custom').value); };
             ['ip-tier', 'ip-cycle'].forEach(function (i) { document.getElementById(i).onchange = upd; });
             document.getElementById('ip-custom').oninput = upd;
@@ -864,6 +940,15 @@
                 setTenantPlan(tenant.id, document.getElementById('ip-tier').value, document.getElementById('ip-cycle').value, document.getElementById('ip-custom').value);
             };
             upd();
+            document.getElementById('iq-save').onclick = function () {
+                const g = function (id) { return Math.max(1, parseInt(document.getElementById(id).value) || 1); };
+                if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+                db.collection('tenant_ctrl').doc(tenant.id).set({
+                    allowedCashiers: g('iq-kasir'), allowedManagers: g('iq-manager'), allowedOwners: g('iq-owner'),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).then(function () { planPanelFor = null; alert('Kuota terminal tersimpan.'); })
+                  .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+            };
         }
 
         function setTenantPlan(tenantId, tier, cycle, custom) {
@@ -927,7 +1012,7 @@
             btn.disabled = true;
             const batch = db.batch();
             batch.set(db.collection('tenants_registry').doc(key), { id: id, nama: nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-            batch.set(db.collection('tenant_ctrl').doc(id), { suspended: false, suspendReason: '', allowedCashiers: kasir, tier: cfg.tier, billingCycle: cycle, priceMonthlyAtPurchase: plan.monthly, billedAmount: plan.amount, customPrice: plan.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+            batch.set(db.collection('tenant_ctrl').doc(id), { suspended: false, suspendReason: '', allowedCashiers: kasir, allowedManagers: Math.max(1, parseInt(document.getElementById('nt-mgr').value) || 1), allowedOwners: Math.max(1, parseInt(document.getElementById('nt-own').value) || 1), tier: cfg.tier, billingCycle: cycle, priceMonthlyAtPurchase: plan.monthly, billedAmount: plan.amount, customPrice: plan.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             batch.commit().then(function () {
                 registryMergeLocal(cfg);
                 const link = tenantLink(id);
@@ -1052,6 +1137,7 @@
             startRegistryListener();
             startPricingListener();
             startNoticesListener();
+            startPresenceListener();
             listNetworkTenants().forEach(startOneTenantListener);
             refreshProviderViews();
         }
@@ -1130,10 +1216,14 @@
                             ${(getCtrl(tenant.id).billingCycle === 'yearly') ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">TAHUNAN</span>' : ''}
                             ${masterTag}
                             ${localTag}
+                            ${activityTag(tenant)}
                         </div>
                         <span class="text-[10px] text-slate-400 block">${escHtml(tenant.slogan)}</span>
                     </td>
-                    <td class="py-3.5 px-4 font-bold text-emerald-400 font-mono">${activeCashiers} Kasir</td>
+                    <td class="py-3.5 px-4 font-mono">
+                        <span class="font-bold text-emerald-400">${quotaLine(tenant.id)}</span>
+                        <span class="block text-[10px] ${onlineSessions(tenant.id).length ? 'text-emerald-300' : 'text-slate-500'}">${onlineSessions(tenant.id).length ? '● Online ' + onlineSessions(tenant.id).length + ' layar' : '○ Terakhir: ' + agoText(lastActiveMs(tenant.id))}</span>
+                    </td>
                     <td class="py-3.5 px-4 text-right font-black text-emerald-400 font-mono">${formatThousand(incMonth)}</td>
                     <td class="py-3.5 px-4 text-right font-black text-rose-400 font-mono">${formatThousand(outMonth)}</td>
                     <td class="py-3.5 px-4 text-center">${finBadgeHtml(netOmzet, false)}</td>
@@ -1232,7 +1322,7 @@
             document.getElementById('inspect-header-card').innerHTML = `
                 <div>
                     <h4 class="font-black text-sm text-white">${escHtml(tenant.nama)} [${tenant.id}]</h4>
-                    <p class="text-slate-400">Lisensi Terpasang: ${activeCashiers} Terminal Kasir • Status: ${isTenantSuspended(tenant.id) ? '<b class="text-rose-400">DIBEKUKAN</b>' : 'Aktif'}</p>
+                    <p class="text-slate-400">Lisensi Terminal: ${quotaLine(tenant.id)} • Status: ${isTenantSuspended(tenant.id) ? '<b class="text-rose-400">DIBEKUKAN</b>' : 'Aktif'}</p>
                 </div>
                 <div class="text-right">
                     <span class="text-emerald-400 font-bold block font-mono">${list.length} Transaksi Sah Tercatat</span>
@@ -1248,6 +1338,16 @@
                 const sbx = document.getElementById('btn-toggle-suspend');
                 if (sbx && sbx.parentNode) sbx.parentNode.appendChild(hb);
             }
+            (function () {
+                const on = onlineSessions(tenant.id);
+                const hdr = document.getElementById('inspect-header-card');
+                const row = document.createElement('div');
+                row.className = 'w-full basis-full text-[11px] pt-2 mt-1 border-t border-white/10';
+                row.innerHTML = '<b class="text-slate-300">Sedang online:</b> ' + (on.length
+                    ? on.map(function (x) { return '<span class="inline-block mr-2 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">● ' + escHtml(ROLE_LABEL[x.role] || x.role) + ' (' + escHtml(x.who) + ') • ' + agoText(x.startedAt) + '</span>'; }).join('')
+                    : '<span class="text-slate-500">tidak ada. Aktivitas terakhir: ' + agoText(lastActiveMs(tenant.id)) + '</span>');
+                hdr.appendChild(row);
+            })();
             renderInspectPlan(tenant);
             const sb = document.getElementById('btn-toggle-suspend');
             if (sb) sb.onclick = function () { setTenantSuspended(tenant.id, !isTenantSuspended(tenant.id)); };
@@ -1587,14 +1687,14 @@
                             <span class="font-black text-white">${t.tenantName}</span>
                             <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${isPending ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'}">${t.status}</span>
                         </div>
-                        <p class="text-slate-300 mt-1">Mengajukan <b>+${t.qty} Terminal Kasir Baru</b> (${t.terminalName || 'Kasir Tambahan'})</p>
+                        <p class="text-slate-300 mt-1">Mengajukan <b>+${t.qty} Terminal ${ROLE_LABEL[t.role || 'kasir'] || 'Kasir'} Baru</b> (${t.terminalName || 'Terminal Tambahan'})</p>
                         <span class="text-[10px] text-slate-500 font-mono">Diajukan: ${t.requestedAt} oleh ${t.requestedBy}</span>
                     </div>
 
                     ${isPending ? `
                     <div class="flex items-center space-x-2">
                         <button onclick="approveTicket(${idx})" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition">
-                            Setujui (+${t.qty} Kasir)
+                            Setujui (+${t.qty} ${ROLE_LABEL[t.role || 'kasir'] || 'Kasir'})
                         </button>
                         <button onclick="rejectTicket(${idx})" class="px-3 py-1.5 rounded-xl bg-rose-600/30 hover:bg-rose-600 text-rose-200 font-bold text-xs transition">
                             Tolak
@@ -1618,13 +1718,15 @@
             const tRef = db.collection('provider_tickets').doc(ticket.docId);
             db.runTransaction(function (tr) {
                 return tr.get(ctrlRef).then(function (c) {
-                    const cur = (c.exists && typeof c.data().allowedCashiers === 'number') ? c.data().allowedCashiers : 1;
-                    tr.set(ctrlRef, { allowedCashiers: cur + qty, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                    const fld = QUOTA_FIELD[ticket.role || 'kasir'] || 'allowedCashiers';
+                    const cur = (c.exists && typeof c.data()[fld] === 'number') ? c.data()[fld] : 1;
+                    const upd = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() }; upd[fld] = cur + qty;
+                    tr.set(ctrlRef, upd, { merge: true });
                     tr.update(tRef, { status: 'APPROVED', processedAt: new Date().toLocaleString('id-ID') });
                     return cur + qty;
                 });
             }).then(function (n) {
-                alert(`Permohonan disetujui! Kuota kasir ${ticket.tenantName} kini menjadi ${n} terminal.`);
+                alert(`Permohonan disetujui! Kuota ${ROLE_LABEL[ticket.role || 'kasir'] || 'kasir'} ${ticket.tenantName} kini menjadi ${n} terminal.`);
             }).catch(function (e) { alert('Gagal memproses: ' + e.message); });
         }
 
