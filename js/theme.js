@@ -3,8 +3,9 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.1';
+  var BETA = 'BETA 1.2';
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.2)', '11 Nov 2026', ['Kulit tampilan baru "Glass 2026": kartu, tombol, dan pop-up bergaya kaca seragam di semua halaman', 'Dock di bagian bawah layar; setiap menu membuka pop-up tanpa pindah halaman', 'Judul pop-up diperbaiki di semua halaman']],
     ['1.0.0 (BETA 1.1)', '11 Nov 2026', ['Tampilan baru yang lebih tenang dan rapi di desktop, tablet, dan HP: satu warna aksen, permukaan netral','Rilis uji awal: kasir, manager, owner, dan portal login per toko', 'Fitur & Paket: lihat fitur Basic, Plus, Pro (yang terkunci tetap terlihat)', 'Dashboard owner: ringkasan hari ini, laba per produk, stok menipis, metode bayar, target omzet, ekspor CSV', 'Kasir: scan barcode, jumlah (pcs), metode bayar, struk WhatsApp (Plus)', 'Tema terang/gelap pekat, warna halaman, logo usaha']]
   ];
   var ACCENTS = ['#2563eb', '#4f46e5', '#7c3aed', '#db2777', '#e11d48', '#ea580c', '#ca8a04', '#059669', '#0d9488', '#475569'];
@@ -46,26 +47,6 @@
     'html[data-fm-invert="1"] body{background-color:#fff!important;background-image:none!important}',
     'html[data-fm-invert="1"] img,html[data-fm-invert="1"] video,html[data-fm-invert="1"] canvas,html[data-fm-invert="1"] .oneui-hero,html[data-fm-invert="1"] header.bg-gradient-to-r,html[data-fm-invert="1"] .fm-keep{filter:invert(1) hue-rotate(180deg)}',
     '@media print{html[data-fm-invert="1"]{filter:none!important;background:#fff!important}html[data-fm-invert="1"] img,html[data-fm-invert="1"] .oneui-hero,html[data-fm-invert="1"] header.bg-gradient-to-r{filter:none!important}}',
-    // ===== kulit tenang: satu warna aksen, permukaan netral, bayangan lembut =====
-    '.oneui-hero{background:linear-gradient(160deg,#0b0e13 0%,#121722 100%)!important;border-bottom-left-radius:28px!important;border-bottom-right-radius:28px!important;box-shadow:0 14px 30px -18px rgba(0,0,0,.5)!important}',
-    'html[data-fm-native="light"]:not([data-fm-black]):not([data-fm-invert]) body{background:#f3f4f7!important;background-image:none!important}',
-    '.shadow-xl,.shadow-lg,.shadow-2xl,.shadow-md{box-shadow:0 1px 2px rgba(15,23,42,.06),0 10px 28px -14px rgba(15,23,42,.28)!important}',
-    '[class*="shadow-\\[0_0"]{box-shadow:none!important}',
-    '.oneui-hero #tier-badge-indicator,.oneui-hero [class*="from-amber"]{background:rgba(255,255,255,.08)!important;border-color:rgba(255,255,255,.22)!important;color:#e5e7eb!important}',
-    // warna menyolok -> satu aksen (tombol) atau permukaan netral (ubin)
-    '[class*="bg-purple-6"],[class*="bg-purple-7"],[class*="bg-purple-8"],[class*="bg-indigo-6"],[class*="bg-indigo-7"],[class*="bg-indigo-8"],[class*="bg-violet-6"],[class*="bg-violet-7"]{background-color:var(--fm-accent,#4f6bd8)!important;border-color:transparent!important}',
-    '[class*="bg-amber-5"],[class*="bg-amber-6"],[class*="bg-amber-7"],[class*="bg-orange-5"],[class*="bg-orange-6"],[class*="bg-rose-6"],[class*="bg-rose-7"],[class*="bg-red-6"],[class*="bg-red-7"],[class*="bg-pink-6"]{background-color:#1d222c!important;border-color:rgba(255,255,255,.08)!important;color:#f3f4f6!important}',
-    '[class*="bg-emerald-6"],[class*="bg-emerald-7"],[class*="bg-teal-6"]{background-color:#1f8f6b!important}',
-    '[class*="from-purple"]:not(.oneui-hero *),[class*="from-indigo"]:not(.oneui-hero *),[class*="from-violet"]:not(.oneui-hero *){background-image:none!important;background-color:var(--fm-accent,#4f6bd8)!important}',
-    '[class*="from-emerald"]:not(.oneui-hero *),[class*="from-teal"]:not(.oneui-hero *){background-image:none!important;background-color:#1f8f6b!important}',
-    '[class*="from-amber"]:not(.oneui-hero *),[class*="from-orange"]:not(.oneui-hero *),[class*="from-rose"]:not(.oneui-hero *){background-image:none!important;background-color:#1d222c!important}',
-    'button.rounded-2xl,button.rounded-xl{font-weight:700}',
-    'html[data-fm-black] button:has(h4)[class*="bg-slate-9"]{background:#1d222c!important}',
-    'button:has(h4)[class*="bg-purple"],button:has(h4)[class*="bg-indigo"],button:has(h4)[class*="bg-amber"],button:has(h4)[class*="bg-rose"],button:has(h4)[class*="bg-orange"],button:has(h4)[class*="bg-emerald"],button:has(h4)[class*="bg-slate-9"]{background:#1d222c!important;color:#f3f4f6!important;border:1px solid rgba(255,255,255,.07)!important}',
-    'button:has(h4)[class*="bg-purple"]:hover,button:has(h4)[class*="bg-indigo"]:hover,button:has(h4)[class*="bg-amber"]:hover,button:has(h4)[class*="bg-rose"]:hover,button:has(h4)[class*="bg-orange"]:hover,button:has(h4)[class*="bg-emerald"]:hover,button:has(h4)[class*="bg-slate-9"]:hover{background:#272d3a!important}',
-    'button:has(h4) p,button:has(h4) i,button:has(h4) svg{color:#9aa3b2!important}',
-    '.white-ice-glass-card[class*="border-amber"]{background:#fff!important;border-color:#e5e7eb!important}',
-    '[class*="bg-amber-50"],[class*="bg-amber-100/9"]{background:#fff!important;border-color:#e5e7eb!important}',
     // warna pilihan pengguna
     'html[data-fm-accent] .oneui-hero{background:linear-gradient(160deg,#0b0e13 0%,color-mix(in srgb,var(--fm-accent) 30%,#0b0e13) 100%)!important}',
     'html[data-fm-accent] header.bg-gradient-to-r{background:linear-gradient(90deg,#000 0%,color-mix(in srgb,var(--fm-accent) 45%,#000) 55%,#000 100%)!important}',
