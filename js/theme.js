@@ -15,6 +15,7 @@
       '[Perbaikan] Barcode kini dibaca dari alat scanner laser/infra merah (seperti di minimarket), bukan kamera',
       '[Perbaikan] Kartu Total Income/Outcome pemilik sama dengan manager, kartu Pajak tidak lagi duplikat pop-up karena sudah ada di dock',
       '[Perbaikan] Lokasi terminal di Tower kini live dari GPS masing-masing perangkat, bukan lagi alamat contoh',
+      '[Perbaikan] Kasir: ketukan ganda pada tombol Simpan ke Antrean tidak lagi memunculkan peringatan "Nominal rupiah tidak valid"',
       '[Keamanan] Aplikasi tidak lagi meminta izin kamera karena pemindaian barcode memakai scanner; lokasi hanya dibaca di perangkat Anda'
     ]],
     ['1.0.0 (BETA 1.4)', '11 Nov 2026', [

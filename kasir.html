@@ -132,9 +132,9 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/theme.js?v=1.5.1"></script>
-    <script src="js/logo.js?v=1.5.1"></script>
-    <script src="js/skin.js?v=1.5.1"></script>
+    <script src="js/theme.js?v=1.5.2"></script>
+    <script src="js/logo.js?v=1.5.2"></script>
+    <script src="js/skin.js?v=1.5.2"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -1006,7 +1006,10 @@
             }
         }
 
+        let _lastDraftSave = 0;
         function saveToDraftKasir() {
+            // Cegah ketukan ganda: ketukan kedua (form sudah kosong) tidak boleh memunculkan peringatan
+            if (Date.now() - _lastDraftSave < 1200) return;
             const select = document.getElementById('tx-account');
             const opt = select.options[select.selectedIndex];
             const rawAmount = document.getElementById('tx-amount').value;
@@ -1017,7 +1020,8 @@
             const editId = document.getElementById('edit-draft-id').value;
 
             if (!opt.value) return alert("Pilih Akun COA atau Produk!");
-            if (amount <= 0) return alert("Nominal rupiah tidak valid!");
+            if (amount <= 0 && opt.dataset.isProduct !== "true") return alert("Nominal rupiah tidak valid!");
+            _lastDraftSave = Date.now();
 
             const formattedDateFull = new Date(dateVal + 'T00:00:00').toLocaleDateString('id-ID');
             const isOutcome = (opt.dataset.category === 'cogs' || opt.dataset.category === 'expense');
