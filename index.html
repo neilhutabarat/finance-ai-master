@@ -392,6 +392,14 @@
             checkLockoutStatus();
         }
 
+        // Tenant klien tidak ada di dropdown (dropdown disembunyikan), jadi ambil dari ?toko=
+        function resolveTenantKey(picker) {
+            const p = (urlParams.get('toko') || '').toLowerCase().trim();
+            const pickerHidden = picker && picker.classList.contains('hidden');
+            if (pickerHidden && p && typeof TENANTS_CONFIG !== 'undefined' && TENANTS_CONFIG[p]) return p;
+            return picker ? picker.value : "id26110901";
+        }
+
         function selectRole(role) {
             currentRole = role;
             ['staff', 'manager', 'owner'].forEach(r => {
@@ -447,7 +455,7 @@
 
         function handleLogin() {
             const picker = document.getElementById('tenant-picker');
-            const selectedKey = picker ? picker.value : "id26110901";
+            const selectedKey = resolveTenantKey(picker);
             activeTenant = TENANTS_CONFIG[selectedKey] || TENANTS_CONFIG["id26110901"];
             tenantKey = activeTenant.id;
             const singlePageMode = activeTenant && activeTenant.isSinglePage;
@@ -614,7 +622,7 @@
                 if (picker) picker.value = paramToko.toLowerCase();
             }
 
-            const selectedKey = picker ? picker.value : "id26110901";
+            const selectedKey = resolveTenantKey(picker);
             onTenantPickerChange(selectedKey);
 
             setupEasterEgg();
