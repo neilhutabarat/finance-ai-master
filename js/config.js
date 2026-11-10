@@ -3,7 +3,7 @@
  * Dimuat setelah tenants.js. Dipanggil oleh halaman lewat initFirebase().
  * Halaman memeriksa variabel `db`: jika null, aplikasi memakai localStorage.
  */
-const firebaseConfig = {
+const ONEILVERSE_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI",
   authDomain: "finance-ai-master-byneilverse.firebaseapp.com",
   databaseURL: "https://finance-ai-master-byneilverse-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -23,7 +23,7 @@ function initFirebase() {
       return;
     }
     if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+      firebase.initializeApp(ONEILVERSE_FIREBASE_CONFIG);
     }
     db = firebase.firestore();
   } catch (e) {

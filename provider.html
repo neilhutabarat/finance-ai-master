@@ -721,9 +721,23 @@
             tbody.appendChild(tr);
         }
 
+        function deleteTenantTx(txId) {
+            if (!confirm("Hapus transaksi ini dari tampilan lokal provider? Tindakan ini tidak menghapus data di Firestore.")) return;
+            tenantTx = tenantTx.filter(function (t) { return t.id !== txId; });
+            var key = localStorage.getItem('fm_v11_tx_ID26110901') !== null ? 'fm_v11_tx_ID26110901' : 'fm_v11_tx';
+            localStorage.setItem(key, JSON.stringify(tenantTx));
+            loadProviderDashboard();
+            openInspectUMKM('ID26110901');
+        }
+
         function openInspectUMKM(tenantId) {
-            const tenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse" };
-            const activeCashiers = parseInt(localStorage.getItem('fm_allowed_cashiers_ID26110901') || "1");
+            const tenant = (typeof TENANTS_CONFIG !== 'undefined' && tenantId && TENANTS_CONFIG[String(tenantId).toLowerCase()])
+                || ((typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse" });
+            const activeCashiers = parseInt(localStorage.getItem('fm_allowed_cashiers_' + tenant.id) || "1");
+            let inspectTx = tenantTx;
+            if (tenant.id !== 'ID26110901') {
+                try { inspectTx = JSON.parse(localStorage.getItem('fm_v11_tx_' + tenant.id) || "[]"); } catch (e) { inspectTx = []; }
+            }
 
             document.getElementById('inspect-header-card').innerHTML = `
                 <div>
@@ -731,18 +745,20 @@
                     <p class="text-slate-400">Lisensi Terpasang: ${activeCashiers} Terminal Kasir • Status: Terverifikasi</p>
                 </div>
                 <div class="text-right">
-                    <span class="text-emerald-400 font-bold block font-mono">${tenantTx.length} Transaksi Sah Tercatat</span>
+                    <span class="text-emerald-400 font-bold block font-mono">${inspectTx.length} Transaksi Sah Tercatat</span>
                     <span class="text-[10px] text-slate-400">Sinkronisasi Cloud Live Terhubung</span>
                 </div>
             `;
 
-            document.getElementById('gps-kasir-addr').innerText = "Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat";
-            document.getElementById('gps-mgr-addr').innerText = "Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat";
-            document.getElementById('gps-owner-addr').innerText = "Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat";
+            const _loc = tenant.locations || {};
+            const _def = "Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat";
+            document.getElementById('gps-kasir-addr').innerText = (_loc.kasir && _loc.kasir.name) || _def;
+            document.getElementById('gps-mgr-addr').innerText = (_loc.manager && _loc.manager.name) || _def;
+            document.getElementById('gps-owner-addr').innerText = (_loc.owner && _loc.owner.name) || _def;
 
             const tbody = document.getElementById('inspect-tx-body');
             tbody.innerHTML = "";
-            tenantTx.slice(0, 15).forEach(tx => {
+            inspectTx.slice(0, 15).forEach(tx => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-white/5";
                 tr.innerHTML = `
@@ -1280,5 +1296,16 @@ function closeWeatherModal() {
         </div>
     </div>
 </div>
+
+<script>
+/* Cadangan logout: dipakai hanya jika js/core.js belum mendefinisikan logout() */
+if (typeof window.logout !== 'function') {
+  window.logout = function () {
+    try { ['currentUser','auth_role','auth_title'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+    var t = new URLSearchParams(window.location.search).get('toko');
+    window.location.replace('index.html' + (t ? '?toko=' + encodeURIComponent(t) : ''));
+  };
+}
+</script>
 </body>
 </html>
