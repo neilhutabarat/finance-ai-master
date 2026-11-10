@@ -205,7 +205,10 @@ const COA_TEMPLATES = {
   kosong: { label: "Kosong (isi sendiri)", coa: [] }
 };
 
-function registrySig(c) { return c ? [c.tier, c.nama, c.slogan, c.warna, c.warnaAksen, c.logoText].join("|") : ""; }
+function registrySig(c) { return c ? [c.tier, c.nama, c.slogan, c.warna, c.warnaAksen, c.logoText, JSON.stringify(c.features || {})].join("|") : ""; }
+
+// Fitur per toko (diatur dari Tower). Jika belum diatur, fitur dianggap aktif.
+function tenantHasFeature(tn, key) { return !(tn && tn.features && tn.features[key] === false); }
 
 const REGISTRY_PROJECT_ID = "finance-ai-master-byneilverse";
 const REGISTRY_API_KEY = "AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI"; // kunci web Firebase (bukan rahasia)
@@ -228,6 +231,11 @@ function registryWriteCache(key, cfg) {
   try { const c = registryReadCache(); c[key] = cfg; localStorage.setItem(REGISTRY_CACHE_KEY, JSON.stringify(c)); } catch (e) {}
 }
 
+function registryDropCache(key) {
+  try { const c = registryReadCache(); delete c[key]; localStorage.setItem(REGISTRY_CACHE_KEY, JSON.stringify(c)); } catch (e) {}
+  try { if (TENANTS_CONFIG[key] && TENANTS_CONFIG[key].fromRegistry) delete TENANTS_CONFIG[key]; } catch (e) {}
+}
+
 function registryFetch(key, isAsync, done) {
   const url = "https://firestore.googleapis.com/v1/projects/" + REGISTRY_PROJECT_ID +
     "/databases/(default)/documents/tenants_registry/" + encodeURIComponent(key) + "?key=" + REGISTRY_API_KEY;
@@ -243,7 +251,8 @@ function registryFetch(key, isAsync, done) {
         } catch (e) {}
       }
       if (cfg) { registryMerge(cfg); registryWriteCache(key, cfg); }
-      if (done) done(cfg);
+      else if (xhr.status === 404) { registryDropCache(key); }   // toko sudah dihapus dari Tower
+      if (done) done(cfg, xhr.status);
     };
     if (isAsync) { xhr.onload = handle; xhr.onerror = function () { if (done) done(null); }; }
     xhr.send();
@@ -258,9 +267,13 @@ function registryFetch(key, isAsync, done) {
     const cached = registryReadCache()[key];
     if (cached) {
       registryMerge(cached);            // pakai cache supaya halaman langsung siap
-      registryFetch(key, true, function (fresh) {   // segarkan cache di latar belakang
+      registryFetch(key, true, function (fresh, status) {   // segarkan cache di latar belakang
         try {
           const flag = "fm_reload_" + key;
+          if (status === 404) {                // toko dihapus: buang cache lalu muat ulang agar tampil "Toko Tidak Ditemukan"
+            if (!sessionStorage.getItem(flag)) { sessionStorage.setItem(flag, "1"); window.location.reload(); }
+            return;
+          }
           if (fresh && registrySig(fresh) !== registrySig(cached)) {   // paket/nama/slogan/tampilan berubah: muat ulang sekali
             if (!sessionStorage.getItem(flag)) { sessionStorage.setItem(flag, "1"); window.location.reload(); }
           } else { sessionStorage.removeItem(flag); }
@@ -271,4 +284,86 @@ function registryFetch(key, isAsync, done) {
     }
   } catch (e) {}
 })();
+
+// ===== TOKO BERHENTI (arsip 90 hari) =====
+const FORMER_BASE = "https://firestore.googleapis.com/v1/projects/" + REGISTRY_PROJECT_ID + "/databases/(default)/documents/former_tenants/";
+function formerFetch(key, cb) {
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", FORMER_BASE + encodeURIComponent(String(key).toLowerCase()) + "?key=" + REGISTRY_API_KEY, true);
+    xhr.onload = function () {
+      if (xhr.status !== 200) return cb(null);
+      try {
+        const f = JSON.parse(xhr.responseText).fields || {};
+        const g = function (k) { const v = f[k]; return v ? (v.stringValue !== undefined ? v.stringValue : v.integerValue !== undefined ? Number(v.integerValue) : v.booleanValue !== undefined ? v.booleanValue : null) : null; };
+        cb({ id: g("id"), nama: g("nama"), endedAt: g("endedAt"), purgeAt: g("purgeAt"), status: g("status"), downloadRequested: g("downloadRequested"), requestedAt: g("requestedAt") });
+      } catch (e) { cb(null); }
+    };
+    xhr.onerror = function () { cb(null); };
+    xhr.send();
+  } catch (e) { cb(null); }
+}
+function formerRequest(key, name, email, cb) {
+  try {
+    const xhr = new XMLHttpRequest();
+    const mask = ["downloadRequested", "requestedAt", "contactName", "contactEmail"].map(function (m) { return "updateMask.fieldPaths=" + m; }).join("&");
+    xhr.open("PATCH", FORMER_BASE + encodeURIComponent(String(key).toLowerCase()) + "?" + mask + "&key=" + REGISTRY_API_KEY, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onload = function () { cb(xhr.status === 200); };
+    xhr.onerror = function () { cb(false); };
+    xhr.send(JSON.stringify({ fields: {
+      downloadRequested: { booleanValue: true }, requestedAt: { integerValue: String(Date.now()) },
+      contactName: { stringValue: String(name || "") }, contactEmail: { stringValue: String(email || "") }
+    } }));
+  } catch (e) { cb(false); }
+}
+const FORMER_NOTICE_HTML =
+  '<div style="text-align:left;font-size:12px;line-height:1.65;color:#cbd5e1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px;margin:14px 0">' +
+  '<b style="color:#fff;display:block;margin-bottom:6px">Ketentuan permintaan riwayat toko</b>' +
+  '• Riwayat transaksi (seluruh waktu) dikirim oleh Tower Kontrol ke email Anda.<br>' +
+  '• Pengunduhan hanya <b>1 kali</b>. Setelah data dikirim/diunduh, data toko langsung <b>dihapus permanen</b>.<br>' +
+  '• Jika tidak diminta, data toko dihapus otomatis oleh sistem <b>90 hari</b> setelah kerja sama berakhir.<br>' +
+  '• Tower Kontrol dapat menghapus data riwayat toko kapan saja.</div>';
+function showFormerStoreCard(key, info) {
+  const old = document.getElementById("former-card"); if (old) old.remove();
+  const el = document.createElement("div");
+  el.id = "former-card";
+  el.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:rgba(2,6,23,.98);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',Inter,system-ui,sans-serif;";
+  const fmt = function (ms) { return new Date(ms).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" }); };
+  const left = Math.max(0, Math.ceil((info.purgeAt - Date.now()) / 86400000));
+  let body;
+  if (info.status !== "archived" || Date.now() > info.purgeAt) {
+    body = '<p style="font-size:13px;color:#94a3b8;line-height:1.6">Masa penyimpanan data toko ini sudah berakhir, sehingga data riwayat telah dihapus.</p>';
+  } else if (info.downloadRequested) {
+    body = '<p style="font-size:13px;color:#86efac;line-height:1.6;margin-top:10px">✓ Permintaan Anda sudah diterima' + (info.requestedAt ? ' pada ' + fmt(info.requestedAt) : '') + '. Tower Kontrol akan mengirim riwayat toko ke email Anda.</p>' + FORMER_NOTICE_HTML;
+  } else {
+    body = '<p style="font-size:13px;color:#94a3b8;line-height:1.6">Data riwayat tersedia untuk diminta sampai <b style="color:#fff">' + fmt(info.purgeAt) + '</b> (' + left + ' hari lagi).</p>' + FORMER_NOTICE_HTML +
+      '<input id="fc-name" placeholder="Nama Anda" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:#0f172a;color:#fff;margin-bottom:8px;font-size:13px">' +
+      '<input id="fc-email" type="email" placeholder="Email tujuan pengiriman" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:#0f172a;color:#fff;margin-bottom:10px;font-size:13px">' +
+      '<label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#cbd5e1;text-align:left;margin-bottom:12px"><input id="fc-ok" type="checkbox" style="margin-top:2px"> Saya sudah membaca dan memahami ketentuan di atas.</label>' +
+      '<button id="fc-send" style="width:100%;padding:13px;border-radius:14px;border:0;background:#2563eb;color:#fff;font-weight:800;font-size:13px;cursor:pointer">Ajukan Permintaan Riwayat</button><p id="fc-msg" style="font-size:12px;color:#fca5a5;margin-top:8px"></p>';
+  }
+  el.innerHTML = '<div style="max-width:440px;width:100%;text-align:center;color:#e2e8f0"><div style="font-size:42px">📁</div>' +
+    '<h2 style="font-size:20px;font-weight:800;margin:10px 0 6px">Kerja sama ' + String(info.nama || "").replace(/[<>&]/g, "") + ' telah berakhir</h2>' + body + '</div>';
+  document.body.appendChild(el);
+  const sb = document.getElementById("fc-send");
+  if (sb) sb.onclick = function () {
+    const n = document.getElementById("fc-name").value.trim(), em = document.getElementById("fc-email").value.trim(), msg = document.getElementById("fc-msg");
+    if (!n || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { msg.innerText = "Isi nama dan email yang valid."; return; }
+    if (!document.getElementById("fc-ok").checked) { msg.innerText = "Centang pernyataan memahami ketentuan."; return; }
+    sb.disabled = true; sb.innerText = "Mengirim...";
+    formerRequest(key, n, em, function (ok) {
+      if (ok) { info.downloadRequested = true; info.requestedAt = Date.now(); showFormerStoreCard(key, info); }
+      else { sb.disabled = false; sb.innerText = "Ajukan Permintaan Riwayat"; msg.innerText = "Gagal mengirim. Periksa internet lalu coba lagi."; }
+    });
+  };
+}
+// Dipanggil pada halaman yang menerima ?toko= yang tidak dikenal: jika ternyata toko lama, tampilkan kartu riwayat.
+function checkFormerStore() {
+  try {
+    const key = (new URLSearchParams(window.location.search).get("toko") || "").toLowerCase().trim();
+    if (!key) return;
+    formerFetch(key, function (info) { if (info && info.id) showFormerStoreCard(key, info); });
+  } catch (e) {}
+}
 // <<< REGISTRY-END

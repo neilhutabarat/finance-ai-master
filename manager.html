@@ -57,6 +57,8 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
     </style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="js/theme.js?v=1.0"></script>
 </head>
 <body class="text-white min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white pb-6">
 
@@ -389,6 +391,7 @@
                             <input type="number" min="0" id="mp-sell" placeholder="Harga jual" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
                             <input type="number" min="0" id="mp-hpp" placeholder="HPP (modal)" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
                             <input type="number" min="0" id="mp-stock" placeholder="Stok" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
+                            <input type="text" id="mp-barcode" placeholder="Barcode (opsional, bisa di-scan)" class="sm:col-span-5 bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-mono font-bold outline-none">
                         </div>
                         <div class="flex justify-end">
                             <button onclick="saveProductByManager()" class="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm">+ Simpan Produk</button>
@@ -401,6 +404,7 @@
                                 <tr>
                                     <th class="py-2.5 px-3">Kode</th>
                                     <th class="py-2.5 px-3">Produk</th>
+                                    <th class="py-2.5 px-3">Barcode</th>
                                     <th class="py-2.5 px-3 text-right">Harga Jual</th>
                                     <th class="py-2.5 px-3 text-right">HPP</th>
                                     <th class="py-2.5 px-3 text-right">Stok</th>
@@ -547,10 +551,11 @@
     </div>
 
     <script src="js/tenants.js"></script>
+    <script src="js/widgets.js?v=1.0"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/ctrl.js?v=2.0"></script>
-    <script src="js/store.js?v=1.0"></script>
+    <script src="js/ctrl.js?v=2.1"></script>
+    <script src="js/store.js?v=1.1"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -858,6 +863,8 @@
                     <td class="py-2.5 px-3 font-bold text-white">${c.name}</td>
                     <td class="py-2.5 px-3 uppercase text-[10px] text-slate-500">${c.category}</td>
                     <td class="py-2.5 px-3 text-center space-x-1">
+                        <button onclick="STORE.moveCOA('${c.code}',-1);renderCOATable()" class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 font-black text-[10px]">▲</button>
+                        <button onclick="STORE.moveCOA('${c.code}',1);renderCOATable()" class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 font-black text-[10px]">▼</button>
                         <button onclick="editCOAItem('${c.code}')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-slate-200 text-slate-300 font-bold text-[10px]">Edit</button>
                         <button onclick="deleteCOAItem('${c.code}')" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px]">Hapus</button>
                     </td>
@@ -1168,14 +1175,6 @@ function closeWeatherModal() {
 
 </script>
 
-    <!-- LIVE NEWS TICKER (PRO) -->
-    <div id="live-news-ticker" class="hidden fixed bottom-0 left-0 right-0 h-9 bg-slate-950/90 backdrop-blur-md border-t border-white/20 z-40 flex items-center overflow-hidden text-[11px] text-slate-200">
-        <div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-slate-950 to-transparent w-8 z-10"></div>
-        <div class="flex items-center bg-rose-600 px-3 h-full font-black text-white shrink-0 z-20">LIVE NEWS</div>
-        <div class="animate-marquee flex items-center h-full" id="news-content">
-            <!-- News here -->
-        </div>
-    </div>
 
 <div id='modal-main' class='hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-start justify-center'>
     <!-- WIDGET CUACA MODAL -->
@@ -1217,11 +1216,16 @@ window.logout = function () {
             const sell = Number(document.getElementById('mp-sell').value) || 0;
             const hpp = Number(document.getElementById('mp-hpp').value) || 0;
             const stock = Number(document.getElementById('mp-stock').value) || 0;
+            const barcode = document.getElementById('mp-barcode').value.trim();
+            if (barcode) {
+                const dup = STORE.getProducts().find(p => p.barcode === barcode && p.code !== code);
+                if (dup) return alert(`Barcode ${barcode} sudah dipakai produk [${dup.code}] ${dup.name}.`);
+            }
             const exists = STORE.getProducts().find(p => p.code === code);
-            STORE.saveProduct({ code, name, sellPrice: sell, hpp, stock });
+            STORE.saveProduct({ code, name, sellPrice: sell, hpp, stock, barcode });
             recordAuditLog(exists ? "EDIT_PRODUK" : "TAMBAH_PRODUK", `Manager ${exists ? 'mengubah' : 'menambahkan'} produk [${code}] ${name}`,
                 exists ? `Stok ${exists.stock}, jual ${exists.sellPrice}` : "-", `Stok ${stock}, jual ${sell}, HPP ${hpp}`);
-            ['mp-code', 'mp-name', 'mp-sell', 'mp-hpp', 'mp-stock'].forEach(i => document.getElementById(i).value = '');
+            ['mp-code', 'mp-name', 'mp-sell', 'mp-hpp', 'mp-stock', 'mp-barcode'].forEach(i => document.getElementById(i).value = '');
             renderProductTable();
         }
 
@@ -1233,6 +1237,7 @@ window.logout = function () {
             document.getElementById('mp-sell').value = p.sellPrice;
             document.getElementById('mp-hpp').value = p.hpp;
             document.getElementById('mp-stock').value = p.stock;
+            document.getElementById('mp-barcode').value = p.barcode || '';
             document.getElementById('mp-name').focus();
         }
 
@@ -1251,7 +1256,7 @@ window.logout = function () {
             const list = STORE.getProducts();
             tbody.innerHTML = '';
             if (!list.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="py-5 text-center text-slate-500 text-xs">Belum ada produk.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="py-5 text-center text-slate-500 text-xs">Belum ada produk.</td></tr>';
                 return;
             }
             const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -1261,11 +1266,17 @@ window.logout = function () {
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono font-bold text-white">${esc(p.code)}</td>
                     <td class="py-2.5 px-3 font-bold text-white">${esc(p.name)}</td>
+                    <td class="py-2.5 px-3 font-mono text-[10px] text-slate-400">${esc(p.barcode || '-')}</td>
                     <td class="py-2.5 px-3 text-right font-mono text-slate-300">${formatThousandSeparator(p.sellPrice)}</td>
                     <td class="py-2.5 px-3 text-right font-mono text-slate-400">${formatThousandSeparator(p.hpp)}</td>
                     <td class="py-2.5 px-3 text-right font-mono font-black ${p.stock <= 0 ? 'text-rose-400' : 'text-emerald-400'}">${p.stock}</td>
                     <td class="py-2.5 px-3 text-center space-x-1"></td>`;
                 const cell = tr.lastElementChild;
+                const mk = (t, cls, fn, dis) => { const b = document.createElement('button'); b.className = cls; b.textContent = t; b.disabled = !!dis; if (dis) b.style.opacity = '.3'; b.onclick = fn; return b; };
+                const arrow = 'px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 font-black text-[10px]';
+                const idx = list.indexOf(p);
+                cell.appendChild(mk('▲', arrow, () => { STORE.moveProduct(p.code, -1); renderProductTable(); }, idx === 0));
+                cell.appendChild(mk('▼', arrow, () => { STORE.moveProduct(p.code, 1); renderProductTable(); }, idx === list.length - 1));
                 const b1 = document.createElement('button'); b1.className = 'px-2.5 py-1 rounded-lg bg-white/10 hover:bg-slate-200 text-slate-300 font-bold text-[10px]'; b1.textContent = 'Edit'; b1.onclick = () => editProductByManager(p.code);
                 const b2 = document.createElement('button'); b2.className = 'px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px]'; b2.textContent = 'Hapus'; b2.onclick = () => deleteProductByManager(p.code);
                 cell.appendChild(b1); cell.appendChild(b2);

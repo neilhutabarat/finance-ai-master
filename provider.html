@@ -59,6 +59,8 @@
             border: 1px solid #d97706;
         }
     </style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="js/theme.js?v=1.0"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
@@ -238,6 +240,14 @@
                 <button onclick="openModal('pricing')" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-lg">
                     <i data-lucide="tag" class="w-3.5 h-3.5"></i>
                     <span>Harga Paket</span>
+                </button>
+                <button onclick="openModal('former')" class="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-lg">
+                    <i data-lucide="archive" class="w-3.5 h-3.5"></i>
+                    <span>Toko Berhenti</span><span id="former-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-black"></span>
+                </button>
+                <button onclick="openModal('rates')" class="px-3.5 py-2 rounded-xl bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-lg">
+                    <i data-lucide="coins" class="w-3.5 h-3.5"></i>
+                    <span>Kurs & Emas</span>
                 </button>
                 <button onclick="openModal('add_tenant')" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-lg">
                     <i data-lucide="store" class="w-3.5 h-3.5"></i>
@@ -461,6 +471,7 @@
                             <div><label class="font-bold text-slate-300 block mb-1">Inisial Logo (maks. 3 huruf)</label><input id="ts-logo" type="text" maxlength="3" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="grid grid-cols-2 gap-2"><div><label class="font-bold text-slate-300 block mb-1">Warna Utama</label><input id="ts-warna" type="color" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
                                 <div><label class="font-bold text-slate-300 block mb-1">Warna Aksen</label><input id="ts-aksen" type="color" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div></div>
+                            <label class="sm:col-span-2 flex items-center gap-2 p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-200 font-bold cursor-pointer"><input id="ts-barcode" type="checkbox" checked class="w-4 h-4"> Fitur Scan Barcode kasir (untuk minimarket)</label>
                         </div>
                         <button id="ts-profile-save" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs transition">Simpan Profil Toko</button>
                     </div>
@@ -491,10 +502,11 @@
                             <input id="ts-p-sell" type="number" min="0" placeholder="Harga jual" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
                             <input id="ts-p-hpp" type="number" min="0" placeholder="HPP" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
                             <input id="ts-p-stock" type="number" min="0" placeholder="Stok" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                            <input id="ts-p-barcode" type="text" placeholder="Barcode (opsional)" class="sm:col-span-5 col-span-2 w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white font-mono outline-none">
                         </div>
                         <button id="ts-p-save" class="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition">Simpan Produk</button>
                         <div class="overflow-x-auto border border-white/10 rounded-2xl max-h-64 overflow-y-auto">
-                            <table class="w-full text-left text-xs"><thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400"><tr><th class="py-2 px-3">Kode</th><th class="py-2 px-3">Produk</th><th class="py-2 px-3 text-right">Jual</th><th class="py-2 px-3 text-right">HPP</th><th class="py-2 px-3 text-right">Stok</th><th class="py-2 px-3 text-center">Aksi</th></tr></thead>
+                            <table class="w-full text-left text-xs"><thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400"><tr><th class="py-2 px-3">Kode</th><th class="py-2 px-3">Produk</th><th class="py-2 px-3">Barcode</th><th class="py-2 px-3 text-right">Jual</th><th class="py-2 px-3 text-right">HPP</th><th class="py-2 px-3 text-right">Stok</th><th class="py-2 px-3 text-center">Aksi</th></tr></thead>
                             <tbody id="ts-prod-body"></tbody></table>
                         </div>
                     </div>
@@ -513,6 +525,29 @@
                         <div id="pr-preview" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300 space-y-1"></div>
                         <button onclick="savePricing()" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition">Simpan Harga</button>
                         <p class="text-slate-500 text-[11px]">Perubahan harga hanya berlaku untuk pembelian/perubahan paket berikutnya. Klien yang sudah berjalan tetap memakai harga saat mereka membeli.</p>
+                    </div>
+                </div>
+
+                <div id="popup-content-rates" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-yellow-950/40 border border-yellow-400/30 space-y-3 text-xs">
+                        <span class="font-black text-sm text-white block">Kurs & Emas (dibaca semua toko)</span>
+                        <p class="text-slate-400">Disegarkan otomatis saat Tower dibuka bila data lebih tua dari 12 jam, dan bisa disegarkan manual kapan saja. Toko klien hanya membaca data ini, sehingga hemat kuota.</p>
+                        <p id="rt-updated" class="text-amber-300 font-bold"></p>
+                        <div><label class="font-bold text-slate-300 block mb-1">Emas Antam (Rp per gram) — isi manual dari logammulia.com</label><input id="rt-gold" type="number" min="0" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                        <div id="rt-grid" class="grid grid-cols-2 gap-2"></div>
+                        <div class="flex gap-2">
+                            <button onclick="fetchRatesOnline(true)" class="flex-1 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-black text-xs">Segarkan Kurs dari Internet</button>
+                            <button onclick="saveRates()" class="flex-1 py-2.5 rounded-xl bg-yellow-600 hover:bg-yellow-700 text-white font-black text-xs">Simpan</button>
+                        </div>
+                        <p id="rt-msg" class="text-slate-400"></p>
+                    </div>
+                </div>
+
+                <div id="popup-content-former" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-slate-900/60 border border-white/10 space-y-3 text-xs">
+                        <span class="font-black text-sm text-white block">Arsip Toko yang Berhenti Bekerja Sama</span>
+                        <p class="text-slate-400 leading-relaxed">Data toko disimpan 90 hari sejak berhenti, lalu dihapus otomatis (pembersihan berjalan saat Tower dibuka). Toko dapat meminta riwayatnya lewat link tokonya. Unduhan hanya 1 kali: setelah diunduh dan Anda konfirmasi, seluruh data toko langsung dihapus permanen. Tower dapat menghapus kapan saja.</p>
+                        <div id="former-list" class="space-y-2"></div>
                     </div>
                 </div>
 
@@ -536,6 +571,7 @@
                             <div><label class="font-bold text-slate-300 block mb-1">Harga Khusus (opsional, Rp)</label><input id="nt-custom" type="number" min="0" placeholder="Kosongkan = harga standar" oninput="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="sm:col-span-2"><div id="nt-planprev" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Alamat Usaha (untuk catatan lokasi)</label><input id="nt-alamat" type="text" placeholder="Contoh: Jl. Merdeka No. 5, Ketapang" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <label class="sm:col-span-2 flex items-center gap-2 p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-200 font-bold cursor-pointer"><input id="nt-barcode" type="checkbox" checked class="w-4 h-4"> Fitur Scan Barcode kasir (untuk minimarket)</label>
                             <div><label class="font-bold text-slate-300 block mb-1">Warna Utama</label><input id="nt-warna" type="color" value="#0f172a" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Warna Aksen</label><input id="nt-aksen" type="color" value="#22d3ee" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
                         </div>
@@ -660,7 +696,7 @@
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/store.js?v=1.0"></script>
+    <script src="js/store.js?v=1.1"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -931,6 +967,54 @@
             document.getElementById('pr-preview').innerHTML = rows.join('');
         }
 
+
+        // ===== KURS & EMAS (provider_settings/rates) =====
+        const RATE_CURS = [['USD', 'Dolar Amerika'], ['EUR', 'Euro'], ['GBP', 'Poundsterling'], ['JPY', 'Yen Jepang'], ['SAR', 'Riyal Arab'], ['SGD', 'Dolar Singapura'], ['CNY', 'Yuan China']];
+        let ratesDoc = null;
+        function ratesListen() {
+            if (!(typeof db !== 'undefined' && db)) return;
+            db.collection('provider_settings').doc('rates').onSnapshot(function (snap) {
+                ratesDoc = snap.exists ? snap.data() : null;
+                const m = document.getElementById('popup-content-rates');
+                if (m && !m.classList.contains('hidden') && document.activeElement && !m.contains(document.activeElement)) fillRatesForm();
+                if (!ratesDoc || Date.now() - (ratesDoc.updatedAt || 0) > 12 * 3600 * 1000) { if (!ratesListen._auto) { ratesListen._auto = true; fetchRatesOnline(false); } }
+            }, function () {});
+        }
+        function fillRatesForm() {
+            const grid = document.getElementById('rt-grid');
+            grid.innerHTML = RATE_CURS.map(function (c) {
+                const v = ratesDoc && ratesDoc.rates && ratesDoc.rates[c[0]];
+                return '<div><label class="font-bold text-slate-300 block mb-1">' + c[0] + ' · ' + c[1] + ' (Rp)</label><input id="rt-' + c[0] + '" type="number" step="0.01" min="0" value="' + (v || '') + '" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>';
+            }).join('');
+            document.getElementById('rt-gold').value = (ratesDoc && ratesDoc.gold) || '';
+            const u = ratesDoc && ratesDoc.updatedAt;
+            document.getElementById('rt-updated').innerText = u ? 'Terakhir diperbarui: ' + new Date(u).toLocaleString('id-ID') : 'Belum ada data.';
+            document.getElementById('rt-msg').innerText = '';
+        }
+        function saveRates() {
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+            const rates = {};
+            RATE_CURS.forEach(function (c) { const v = Number(document.getElementById('rt-' + c[0]).value); if (v > 0) rates[c[0]] = v; });
+            const gold = Number(document.getElementById('rt-gold').value) || 0;
+            db.collection('provider_settings').doc('rates').set({ rates: rates, gold: gold, updatedAt: Date.now(), source: 'Tower' }).then(function () {
+                document.getElementById('rt-msg').innerText = 'Tersimpan.';
+            }).catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+        }
+        function fetchRatesOnline(manual) {
+            const msg = document.getElementById('rt-msg');
+            if (msg) msg.innerText = 'Mengambil kurs...';
+            fetch('https://open.er-api.com/v6/latest/USD').then(function (r) { return r.json(); }).then(function (j) {
+                if (!j || !j.rates || !j.rates.IDR) throw new Error('data kosong');
+                const rates = {};
+                RATE_CURS.forEach(function (c) { const k = c[0]; if (k === 'USD') rates[k] = j.rates.IDR; else if (j.rates[k]) rates[k] = j.rates.IDR / j.rates[k]; });
+                Object.keys(rates).forEach(function (k) { rates[k] = Math.round(rates[k] * 100) / 100; });
+                const gold = (ratesDoc && ratesDoc.gold) || 0;
+                return db.collection('provider_settings').doc('rates').set({ rates: rates, gold: gold, updatedAt: Date.now(), source: 'open.er-api.com' }).then(function () {
+                    if (msg) msg.innerText = 'Kurs berhasil disegarkan. Emas Antam tetap isi manual.';
+                });
+            }).catch(function (e) { if (msg) msg.innerText = 'Gagal mengambil kurs dari internet: ' + e.message + '. Isi manual lalu Simpan.'; });
+        }
+
         function savePricing() {
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const g = function (id) { return Math.max(0, parseInt(document.getElementById(id).value) || 0); };
@@ -1071,6 +1155,8 @@
             set('ts-nama', tn.nama); set('ts-slogan', tn.slogan); set('ts-alamat', loc); set('ts-logo', tn.logoText);
             set('ts-warna', /^#[0-9a-f]{6}$/i.test(tn.warna || '') ? tn.warna : '#0f172a');
             set('ts-aksen', /^#[0-9a-f]{6}$/i.test(tn.warnaAksen || '') ? tn.warnaAksen : '#22d3ee');
+            const bc = document.getElementById('ts-barcode');
+            bc.checked = !(tn.features && tn.features.barcode === false); bc.disabled = !editable;
             const sv = document.getElementById('ts-profile-save');
             sv.disabled = !editable; sv.classList.toggle('opacity-40', !editable);
             sv.onclick = function () { saveTenantProfile(tn.id); };
@@ -1085,7 +1171,7 @@
             document.getElementById('ts-coa-add').onclick = tsAddCOA;
             document.getElementById('ts-coa-apply').onclick = tsApplyTemplate;
             document.getElementById('ts-p-save').onclick = tsSaveProduct;
-            ['ts-coa-code', 'ts-coa-name', 'ts-p-code', 'ts-p-name', 'ts-p-sell', 'ts-p-hpp', 'ts-p-stock'].forEach(function (i) { document.getElementById(i).value = ''; });
+            ['ts-coa-code', 'ts-coa-name', 'ts-p-code', 'ts-p-name', 'ts-p-sell', 'ts-p-hpp', 'ts-p-stock', 'ts-p-barcode'].forEach(function (i) { document.getElementById(i).value = ''; });
             renderTsTables();
         }
 
@@ -1103,6 +1189,7 @@
             cfg.logoText = (document.getElementById('ts-logo').value.trim() || nama.slice(0, 2)).toUpperCase().slice(0, 3);
             cfg.warna = document.getElementById('ts-warna').value;
             cfg.warnaAksen = document.getElementById('ts-aksen').value;
+            cfg.features = Object.assign({}, cfg.features || {}, { barcode: !!document.getElementById('ts-barcode').checked });
             ['kasir', 'manager', 'owner'].forEach(function (r) {
                 cfg.locations = cfg.locations || {};
                 cfg.locations[r] = Object.assign({ lat: 0, lon: 0 }, cfg.locations[r] || {}, { name: alamat });
@@ -1128,6 +1215,10 @@
                     tr.className = 'border-t border-white/5';
                     tr.innerHTML = '<td class="py-2 px-3 font-mono font-bold text-cyan-300">' + esc(c.code) + '</td><td class="py-2 px-3 text-white font-bold">' + esc(c.name) + '</td><td class="py-2 px-3 text-slate-400">' + esc(CAT_LABEL[c.category] || c.category) + '</td><td class="py-2 px-3 text-center space-x-1"></td>';
                     const cell = tr.lastElementChild;
+                    const ar = function (t, fn, dis) { const b = document.createElement('button'); b.className = 'px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-black text-[10px]'; b.textContent = t; b.disabled = !!dis; if (dis) b.style.opacity = '.3'; b.onclick = fn; return b; };
+                    const ci = coa.indexOf(c);
+                    cell.appendChild(ar('▲', function () { tsStore.moveCOA(c.code, -1); }, ci === 0));
+                    cell.appendChild(ar('▼', function () { tsStore.moveCOA(c.code, 1); }, ci === coa.length - 1));
                     const e = document.createElement('button'); e.className = 'px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-[10px]'; e.textContent = 'Edit'; e.onclick = function () { tsEditCOA(c.code); };
                     const d = document.createElement('button'); d.className = 'px-2 py-1 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white font-bold text-[10px]'; d.textContent = 'Hapus'; d.onclick = function () { tsDelCOA(c.code); };
                     cell.appendChild(e); cell.appendChild(d);
@@ -1139,15 +1230,17 @@
             if (pbody) {
                 const list = tsStore.getProducts();
                 pbody.innerHTML = '';
-                if (!list.length) pbody.innerHTML = '<tr><td colspan="6" class="py-4 text-center text-slate-500">Belum ada produk.</td></tr>';
+                if (!list.length) pbody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-slate-500">Belum ada produk.</td></tr>';
                 list.forEach(function (p) {
                     const tr = document.createElement('tr');
                     tr.className = 'border-t border-white/5';
-                    tr.innerHTML = '<td class="py-2 px-3 font-mono font-bold text-cyan-300">' + esc(p.code) + '</td><td class="py-2 px-3 text-white font-bold">' + esc(p.name) + '</td><td class="py-2 px-3 text-right font-mono text-slate-300">' + formatThousand(p.sellPrice) + '</td><td class="py-2 px-3 text-right font-mono text-slate-400">' + formatThousand(p.hpp) + '</td><td class="py-2 px-3 text-right font-mono font-black ' + (p.stock <= 0 ? 'text-rose-400' : 'text-emerald-400') + '">' + p.stock + '</td><td class="py-2 px-3 text-center space-x-1"></td>';
+                    tr.innerHTML = '<td class="py-2 px-3 font-mono font-bold text-cyan-300">' + esc(p.code) + '</td><td class="py-2 px-3 text-white font-bold">' + esc(p.name) + '</td><td class="py-2 px-3 font-mono text-[10px] text-slate-400">' + esc(p.barcode || '-') + '</td><td class="py-2 px-3 text-right font-mono text-slate-300">' + formatThousand(p.sellPrice) + '</td><td class="py-2 px-3 text-right font-mono text-slate-400">' + formatThousand(p.hpp) + '</td><td class="py-2 px-3 text-right font-mono font-black ' + (p.stock <= 0 ? 'text-rose-400' : 'text-emerald-400') + '">' + p.stock + '</td><td class="py-2 px-3 text-center space-x-1"></td>';
                     const cell = tr.lastElementChild;
+                    const pi = list.indexOf(p);
+                    [['▲', -1, pi === 0], ['▼', 1, pi === list.length - 1]].forEach(function (a) { const b = document.createElement('button'); b.className = 'px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-black text-[10px]'; b.textContent = a[0]; b.disabled = a[2]; if (a[2]) b.style.opacity = '.3'; b.onclick = function () { tsStore.moveProduct(p.code, a[1]); }; cell.appendChild(b); });
                     const e = document.createElement('button'); e.className = 'px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-[10px]'; e.textContent = 'Edit'; e.onclick = function () {
                         document.getElementById('ts-p-code').value = p.code; document.getElementById('ts-p-name').value = p.name;
-                        document.getElementById('ts-p-sell').value = p.sellPrice; document.getElementById('ts-p-hpp').value = p.hpp; document.getElementById('ts-p-stock').value = p.stock;
+                        document.getElementById('ts-p-sell').value = p.sellPrice; document.getElementById('ts-p-hpp').value = p.hpp; document.getElementById('ts-p-stock').value = p.stock; document.getElementById('ts-p-barcode').value = p.barcode || '';
                     };
                     const d = document.createElement('button'); d.className = 'px-2 py-1 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white font-bold text-[10px]'; d.textContent = 'Hapus'; d.onclick = function () { tsDelProduct(p.code); };
                     cell.appendChild(e); cell.appendChild(d);
@@ -1199,10 +1292,11 @@
             const code = document.getElementById('ts-p-code').value.trim();
             const name = document.getElementById('ts-p-name').value.trim();
             if (!code || !name) return alert('Kode dan nama produk wajib diisi.');
-            const p = { code: code, name: name, sellPrice: document.getElementById('ts-p-sell').value, hpp: document.getElementById('ts-p-hpp').value, stock: document.getElementById('ts-p-stock').value };
+            const p = { code: code, name: name, sellPrice: document.getElementById('ts-p-sell').value, hpp: document.getElementById('ts-p-hpp').value, stock: document.getElementById('ts-p-stock').value, barcode: document.getElementById('ts-p-barcode').value.trim() };
+            if (p.barcode) { const dup = tsStore.getProducts().find(function (x) { return x.barcode === p.barcode && x.code !== code; }); if (dup) return alert('Barcode ' + p.barcode + ' sudah dipakai produk [' + dup.code + '] ' + dup.name + '.'); }
             const ex = tsStore.getProducts().find(function (x) { return x.code === code; });
             tsStore.saveProduct(p).then(function () { ctAudit(tsTenant.id, ex ? 'EDIT_PRODUK' : 'TAMBAH_PRODUK', 'Provider ' + (ex ? 'mengubah' : 'menambahkan') + ' produk [' + code + '] ' + name, ex ? 'Stok ' + ex.stock : '-', 'Stok ' + p.stock); });
-            ['ts-p-code', 'ts-p-name', 'ts-p-sell', 'ts-p-hpp', 'ts-p-stock'].forEach(function (i) { document.getElementById(i).value = ''; });
+            ['ts-p-code', 'ts-p-name', 'ts-p-sell', 'ts-p-hpp', 'ts-p-stock', 'ts-p-barcode'].forEach(function (i) { document.getElementById(i).value = ''; });
         }
 
         function tsDelProduct(code) {
@@ -1219,7 +1313,7 @@
             const d = new Date();
             const base = 'ID' + String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
             let n = 1;
-            while (TENANTS_CONFIG[(base + String(n).padStart(2, '0')).toLowerCase()]) n++;
+            while (TENANTS_CONFIG[(base + String(n).padStart(2, '0')).toLowerCase()] || formerMap[(base + String(n).padStart(2, '0')).toLowerCase()]) n++;
             return base + String(n).padStart(2, '0');
         }
 
@@ -1252,7 +1346,7 @@
             const kasir = Math.max(1, parseInt(document.getElementById('nt-kasir').value) || 1);
             const manualId = (document.getElementById('nt-id').value || '').trim().toUpperCase();
             if (manualId && !/^ID\d{8}$/.test(manualId)) return alert('Format ID harus ID diikuti 8 angka, contoh ID26111101.');
-            if (manualId && TENANTS_CONFIG[manualId.toLowerCase()]) return alert('ID ' + manualId + ' sudah dipakai toko lain.');
+            if (manualId && (TENANTS_CONFIG[manualId.toLowerCase()] || formerMap[manualId.toLowerCase()])) return alert('ID ' + manualId + ' sudah pernah dipakai (aktif atau arsip) dan tidak dapat dipakai lagi.');
             const id = manualId || nextTenantId();
             const loc = { name: alamat, lat: 0, lon: 0 };
             const cfg = {
@@ -1266,6 +1360,7 @@
                 isMaster: false,
                 isSinglePage: false,
                 isProviderID: false,
+                features: { barcode: !!document.getElementById('nt-barcode').checked },
                 customCOA: JSON.parse(JSON.stringify(COA_TEMPLATES[document.getElementById('nt-type').value || 'umum'].coa)),
                 locations: { kasir: loc, manager: loc, owner: loc },
                 createdAtMs: Date.now()
@@ -1304,16 +1399,123 @@
         }
 
         function deleteTenantRegistry(tenantId) {
-            const tn = TENANTS_CONFIG[String(tenantId).toLowerCase()];
-            if (!tn || !tn.fromRegistry) return alert('Hanya toko klien buatan Tower yang dapat dihapus dari sini.');
-            if (!confirm('Hapus toko ' + tn.nama + ' [' + tenantId + '] dari daftar klien?\nData transaksinya tidak ikut dihapus, tetapi link toko tidak bisa dibuka lagi.')) return;
-            db.collection('tenants_registry').doc(String(tenantId).toLowerCase()).delete().then(function () {
-                delete TENANTS_CONFIG[String(tenantId).toLowerCase()];
+            const key = String(tenantId).toLowerCase();
+            const tn = TENANTS_CONFIG[key];
+            if (!tn || !tn.fromRegistry) return alert('Hanya toko klien buatan Tower yang dapat diberhentikan dari sini.');
+            if (!confirm('Hentikan kerja sama dengan ' + tn.nama + ' [' + tenantId + ']?\n\n• Link toko langsung tidak bisa dipakai.\n• Data riwayat toko DISIMPAN 90 hari, bisa diminta toko lewat link tokonya, lalu dihapus otomatis.\n• ID ini tidak bisa dipakai lagi.')) return;
+            const now = Date.now();
+            const batch = db.batch();
+            batch.set(db.collection('former_tenants').doc(key), { id: tn.id, nama: tn.nama, endedAt: now, purgeAt: now + 90 * 86400000, status: 'archived', downloadRequested: false, cfg: JSON.stringify(tn) });
+            batch.delete(db.collection('tenants_registry').doc(key));
+            batch.commit().then(function () {
+                ctAudit(tn.id, 'HENTIKAN_KERJA_SAMA', 'Provider menghentikan kerja sama dan mengarsipkan toko ' + tn.nama, 'AKTIF', 'ARSIP 90 HARI');
+                delete TENANTS_CONFIG[key];
                 if (tenantUnsubs[tenantId]) { tenantUnsubs[tenantId](); delete tenantUnsubs[tenantId]; }
                 delete tenantTxMap[tenantId];
                 closeModal();
                 refreshProviderViews();
-            }).catch(function (e) { alert('Gagal menghapus: ' + e.message); });
+            }).catch(function (e) { alert('Gagal: ' + e.message); });
+        }
+
+        // ===== TOKO BERHENTI (arsip) =====
+        let formerMap = {};
+        function formerListen() {
+            if (!(typeof db !== 'undefined' && db)) return;
+            db.collection('former_tenants').onSnapshot(function (snap) {
+                formerMap = {};
+                snap.forEach(function (d) { const x = d.data(); x.key = d.id; formerMap[d.id] = x; });
+                const pend = Object.values(formerMap).filter(function (f) { return f.status === 'archived' && f.downloadRequested; }).length;
+                const bd = document.getElementById('former-badge');
+                if (bd) { bd.innerText = pend; bd.classList.toggle('hidden', !pend); }
+                const pop = document.getElementById('popup-content-former');
+                if (pop && !pop.classList.contains('hidden')) renderFormerList();
+                if (!formerListen._swept) { formerListen._swept = true; sweepExpiredFormer(); }
+            }, function () {});
+        }
+        function sweepExpiredFormer() {
+            Object.values(formerMap).forEach(function (f) {
+                if (f.status === 'archived' && f.purgeAt && f.purgeAt < Date.now()) purgeFormerData(f.key, true);
+            });
+        }
+        function renderFormerList() {
+            const box = document.getElementById('former-list');
+            const list = Object.values(formerMap).sort(function (a, b) { return (b.endedAt || 0) - (a.endedAt || 0); });
+            if (!list.length) { box.innerHTML = '<p class="text-slate-500 text-center py-4">Belum ada toko berhenti.</p>'; return; }
+            box.innerHTML = '';
+            list.forEach(function (f) {
+                const row = document.createElement('div');
+                row.className = 'p-3 rounded-xl bg-slate-950/60 border border-white/10 space-y-2';
+                const left = Math.max(0, Math.ceil((f.purgeAt - Date.now()) / 86400000));
+                const st = f.status === 'purged' ? '<span class="text-slate-500 font-bold">Data sudah dihapus' + (f.purgedAt ? ' · ' + new Date(f.purgedAt).toLocaleDateString('id-ID') : '') + '</span>'
+                    : '<span class="text-amber-300 font-bold">Sisa ' + left + ' hari</span>' + (f.downloadRequested ? ' · <span class="text-rose-300 font-black">MEMINTA RIWAYAT</span>' : '');
+                row.innerHTML = '<div class="flex justify-between gap-2"><b class="text-white">' + escHtml(f.nama) + ' <span class="font-mono text-cyan-300">[' + escHtml(f.id) + ']</span></b><span class="text-slate-500">Berhenti ' + new Date(f.endedAt).toLocaleDateString('id-ID') + '</span></div><div>' + st + '</div>' +
+                    (f.downloadRequested && f.status === 'archived' ? '<div class="text-slate-300">Kontak: ' + escHtml(f.contactName || '-') + ' · <span class="font-mono">' + escHtml(f.contactEmail || '-') + '</span></div>' : '');
+                if (f.status === 'archived') {
+                    const act = document.createElement('div'); act.className = 'flex flex-wrap gap-2';
+                    const mk = function (t, cls, fn) { const b = document.createElement('button'); b.className = 'px-3 py-1.5 rounded-lg font-black text-[10px] ' + cls; b.textContent = t; b.onclick = fn; act.appendChild(b); };
+                    mk('Unduh Riwayat (1x) & Hapus', 'bg-emerald-600 hover:bg-emerald-700 text-white', function () { downloadFormerHistory(f.key); });
+                    mk('Hapus Data Sekarang', 'bg-rose-600 hover:bg-rose-700 text-white', function () { if (confirm('Hapus PERMANEN seluruh data ' + f.nama + '? Tidak bisa dikembalikan.')) purgeFormerData(f.key, false); });
+                    row.appendChild(act);
+                }
+                box.appendChild(row);
+            });
+        }
+        function csvCell(v) {
+            if (v == null) return '';
+            if (typeof v === 'object') v = JSON.stringify(v);
+            v = String(v);
+            return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+        }
+        function csvSection(title, rows) {
+            let out = '### ' + title + '\r\n';
+            if (!rows.length) return out + '(kosong)\r\n\r\n';
+            const cols = []; rows.forEach(function (r) { Object.keys(r).forEach(function (k) { if (cols.indexOf(k) < 0) cols.push(k); }); });
+            out += cols.map(csvCell).join(',') + '\r\n';
+            rows.forEach(function (r) { out += cols.map(function (c) { return csvCell(r[c]); }).join(',') + '\r\n'; });
+            return out + '\r\n';
+        }
+        function readAll(col) {
+            return db.collection(col).get().then(function (snap) { const a = []; snap.forEach(function (d) { const x = d.data(); x._id = d.id; a.push(x); }); return a; });
+        }
+        function downloadFormerHistory(key) {
+            const f = formerMap[key]; if (!f) return;
+            if (!confirm('Unduh riwayat ' + f.nama + ' (seluruh waktu)?\n\nUnduhan hanya 1 kali. Setelah file terunduh Anda akan diminta konfirmasi untuk menghapus data permanen.')) return;
+            const id = f.id;
+            Promise.all([readAll('tx_' + id), readAll('tp_' + id), db.collection('tenant_settings').doc(id).get()]).then(function (r) {
+                const coa = (r[2].exists && r[2].data().coa) || [];
+                let out = '\ufeffRIWAYAT TOKO ' + f.nama + ' [' + id + ']\r\nDiekspor: ' + new Date().toLocaleString('id-ID') + '\r\n\r\n';
+                out += csvSection('TRANSAKSI', r[0]) + csvSection('PRODUK', r[1]) + csvSection('AKUN COA', coa);
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([out], { type: 'text/csv;charset=utf-8' }));
+                a.download = 'riwayat_' + id + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(function () {
+                    if (f.contactEmail) {
+                        window.open('mailto:' + encodeURIComponent(f.contactEmail) + '?subject=' + encodeURIComponent('Riwayat toko ' + f.nama + ' [' + id + ']') + '&body=' + encodeURIComponent('Terlampir riwayat transaksi toko ' + f.nama + ' (seluruh waktu). Data di sistem kami telah dihapus.\n\nSalam,\nOneilverse'), '_blank');
+                    }
+                    if (confirm('File sudah terunduh' + (f.contactEmail ? ' dan email klien dibuka' : '') + '?\n\nLampirkan file ke email terlebih dahulu.\nOK = HAPUS PERMANEN seluruh data toko dari sistem.\nBatal = simpan dulu (data tetap ada).')) purgeFormerData(key, false);
+                }, 800);
+            }).catch(function (e) { alert('Gagal membaca data: ' + e.message); });
+        }
+        function deleteCollectionChunks(col) {
+            return db.collection(col).limit(400).get().then(function (snap) {
+                if (snap.empty) return;
+                const b = db.batch(); snap.forEach(function (d) { b.delete(d.ref); });
+                return b.commit().then(function () { if (snap.size >= 400) return deleteCollectionChunks(col); });
+            });
+        }
+        function purgeFormerData(key, silent) {
+            const f = formerMap[key]; if (!f) return;
+            const id = f.id;
+            const tasks = [deleteCollectionChunks('tx_' + id), deleteCollectionChunks('tp_' + id)];
+            tasks.push(db.collection('tenant_settings').doc(id).delete());
+            tasks.push(db.collection('tenant_ctrl').doc(id).delete());
+            tasks.push(db.collection('manager_audit_logs').where('tenantId', '==', id).limit(400).get().then(function (snap) { const b = db.batch(); snap.forEach(function (d) { b.delete(d.ref); }); return b.commit(); }));
+            tasks.push(db.collection('tenant_presence').where('tenantId', '==', id).get().then(function (snap) { const b = db.batch(); snap.forEach(function (d) { b.delete(d.ref); }); return b.commit(); }));
+            Promise.all(tasks).then(function () {
+                return db.collection('former_tenants').doc(key).set({ id: id, nama: f.nama, endedAt: f.endedAt, purgeAt: f.purgeAt, status: 'purged', purgedAt: Date.now(), downloadRequested: false }, { merge: false });
+            }).then(function () { if (!silent) alert('Data ' + f.nama + ' sudah dihapus permanen.'); })
+              .catch(function (e) { if (!silent) alert('Gagal menghapus sebagian data: ' + e.message); });
         }
 
         function startRegistryListener() {
@@ -1401,6 +1603,8 @@
         function startTenantListeners() {
             startControlListeners();
             startRegistryListener();
+            ratesListen();
+            formerListen();
             startPricingListener();
             startNoticesListener();
             startPresenceListener();
@@ -2083,7 +2287,7 @@
 
         window.openModal = function(type) {
             if (type !== 'tenant_settings' && tsStore) { tsStore.stop(); tsStore = null; }
-            ['provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
+            ['provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
@@ -2121,6 +2325,16 @@
                 document.getElementById('modal-subtitle').innerText = "Atur harga bulanan dan diskon tahunan";
                 fillPricingForm();
                 document.getElementById('popup-content-pricing').classList.remove('hidden');
+            } else if (type === 'former') {
+                document.getElementById('modal-title').innerText = "Toko Berhenti";
+                document.getElementById('modal-subtitle').innerText = "Arsip riwayat 90 hari, unduh 1 kali";
+                renderFormerList();
+                document.getElementById('popup-content-former').classList.remove('hidden');
+            } else if (type === 'rates') {
+                document.getElementById('modal-title').innerText = "Kurs & Emas";
+                document.getElementById('modal-subtitle').innerText = "Data acuan untuk semua toko klien";
+                fillRatesForm();
+                document.getElementById('popup-content-rates').classList.remove('hidden');
             } else if (type === 'add_tenant') {
                 previewNewTenantPlan();
                 previewNewTenantId();
@@ -2258,13 +2472,7 @@ function closeWeatherModal() {
 </script>
 
     <!-- LIVE NEWS TICKER (PRO) -->
-    <div id="live-news-ticker" class="hidden fixed bottom-0 left-0 right-0 h-9 bg-slate-950/90 backdrop-blur-md border-t border-white/20 z-40 flex items-center overflow-hidden text-[11px] text-slate-200">
-        <div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-slate-950 to-transparent w-8 z-10"></div>
-        <div class="flex items-center bg-rose-600 px-3 h-full font-black text-white shrink-0 z-20">LIVE NEWS</div>
-        <div class="animate-marquee flex items-center h-full" id="news-content">
-            <!-- News here -->
-        </div>
-    </div>
+
 
 <div id='modal-main' class='hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-start justify-center'>
     <!-- WIDGET CUACA MODAL -->

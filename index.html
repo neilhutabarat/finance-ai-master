@@ -102,6 +102,8 @@
             animation-play-state: paused;
         }
     </style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="js/theme.js?v=1.0" data-lite></script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 antialiased selection:bg-cyan-500 selection:text-white">
 
@@ -280,11 +282,6 @@
         </div>
     </div>
 
-    <!-- LIVE NEWS TICKER (FIXED DI SEMUA APLIKASI) -->
-    <div id="live-news-ticker" class="fixed bottom-0 left-0 right-0 h-9 bg-slate-900/95 backdrop-blur-md border-t border-slate-700/40 z-50 flex items-center overflow-hidden text-[11px] text-slate-200 shadow-lg">
-        <div class="flex items-center bg-rose-600 px-3 h-full font-black text-white shrink-0 z-20">LIVE NEWS</div>
-        <div class="animate-marquee flex items-center h-full text-slate-300" id="news-content"></div>
-    </div>
 
     <script src="js/tenants.js"></script>
     <script>
@@ -450,7 +447,7 @@
             }
             const pin = document.getElementById('input-pin');
             const btn = document.getElementById('btn-login-submit');
-            if (tn && tn.notFound) { if (pin) pin.disabled = true; if (btn) btn.disabled = true; }
+            if (tn && tn.notFound) { if (pin) pin.disabled = true; if (btn) btn.disabled = true; if (typeof checkFormerStore === 'function' && !window.__formerChecked) { window.__formerChecked = true; checkFormerStore(); } }
         }
 
         function onTenantPickerChange(key) {

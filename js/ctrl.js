@@ -305,10 +305,30 @@
         }
     }
 
+    // Jika toko dihapus dari Tower saat sedang dipakai: buang cache, kunci layar, dan keluarkan sesi
+    function watchDeletion(tenant) {
+        var key = String(tenant.id).toLowerCase();
+        db.collection('tenants_registry').doc(key).onSnapshot(function (snap) {
+            if (snap.exists || snap.metadata.fromCache) return;
+            if (typeof registryDropCache === 'function') registryDropCache(key);
+            try { sessionStorage.clear(); } catch (e) {}
+            var old = document.getElementById(overlayId); if (old) old.remove();
+            var el = document.createElement('div');
+            el.id = overlayId;
+            el.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(2,6,23,.98);display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;';
+            el.innerHTML = '<div style="max-width:420px;text-align:center;color:#e2e8f0"><div style="font-size:44px">🗑️</div>' +
+                '<h2 style="font-size:20px;font-weight:900;margin:12px 0 8px">Toko Sudah Dihapus</h2>' +
+                '<p style="font-size:13px;line-height:1.6;color:#94a3b8">Akun toko ini sudah dinonaktifkan oleh penyedia aplikasi. Riwayat toko dapat diminta lewat halaman berikut.</p>' +
+                '<a href="index.html?toko=' + encodeURIComponent(tenant.id) + '" style="display:inline-block;margin-top:14px;padding:11px 18px;border-radius:14px;background:#2563eb;color:#fff;font-weight:800;font-size:13px;text-decoration:none">Buka Halaman Riwayat</a></div>';
+            document.body.appendChild(el);
+        }, function () {});
+    }
+
     function attach() {
         var tenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
         if (!tenant || !tenant.id) return;
         attachNotices(tenant);
+        if (tenant.fromRegistry) watchDeletion(tenant);
         if (tenant.isMaster) { proceedPresence(tenant, null); return; } // master tidak dikunci / tidak dibatasi
         db.collection('tenant_ctrl').doc(tenant.id).onSnapshot(function (snap) {
             var d = snap.exists ? snap.data() : null;

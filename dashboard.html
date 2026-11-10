@@ -57,6 +57,8 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
     </style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="js/theme.js?v=1.0"></script>
 </head>
 <body class="text-white min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
@@ -604,10 +606,11 @@
     </div>
 
     <script src="js/tenants.js"></script>
+    <script src="js/widgets.js?v=1.0"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/ctrl.js?v=2.0"></script>
-    <script src="js/store.js?v=1.0"></script>
+    <script src="js/ctrl.js?v=2.1"></script>
+    <script src="js/store.js?v=1.1"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -1217,14 +1220,6 @@ function closeWeatherModal() {
 
 </script>
 
-    <!-- LIVE NEWS TICKER (PRO) -->
-    <div id="live-news-ticker" class="hidden fixed bottom-0 left-0 right-0 h-9 bg-slate-950/90 backdrop-blur-md border-t border-white/20 z-40 flex items-center overflow-hidden text-[11px] text-slate-200">
-        <div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-slate-950 to-transparent w-8 z-10"></div>
-        <div class="flex items-center bg-rose-600 px-3 h-full font-black text-white shrink-0 z-20">LIVE NEWS</div>
-        <div class="animate-marquee flex items-center h-full" id="news-content">
-            <!-- News here -->
-        </div>
-    </div>
 
 <div id='modal-main' class='hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-start justify-center'>
     <!-- WIDGET CUACA MODAL -->
