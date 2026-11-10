@@ -10,79 +10,88 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-            background: linear-gradient(145deg, #070d18 0%, #0f172a 40%, #1e1b4b 75%, #180d2a 100%);
+            background-color: #070d18;
+            background-image: radial-gradient(at 0% 0%, rgba(30, 27, 75, 0.4) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(49, 16, 66, 0.3) 0px, transparent 50%);
+            color: #f1f5f9;
         }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
         .ios-glass {
-            background: rgba(255, 255, 255, 0.94);
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%), rgba(15, 23, 42, 0.88);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 1px solid rgba(255, 255, 255, 0.35);
+            border-left: 1px solid rgba(255, 255, 255, 0.22);
             border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,0.18);
         }
         .modal-sheet {
-            animation: sheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            background: linear-gradient(135deg, rgba(20, 30, 55, 0.95) 0%, rgba(10, 15, 30, 0.98) 100%);
+            backdrop-filter: blur(32px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-top: 1px solid rgba(255,255,255,0.45);
+            border-radius: 28px;
+            box-shadow: 0 25px 60px -15px rgba(0,0,0,0.85);
+            animation: sheetUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         @keyframes sheetUp {
-            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 antialiased text-slate-800">
+<body class="min-h-screen flex items-center justify-center p-4 antialiased text-slate-100">
 
     <div class="ios-glass w-full max-w-md p-7 sm:p-8 space-y-5 text-center relative overflow-hidden">
         
-        <!-- LOGO EMBLEM ON ICE / GLASS (EASTER EGG 7X TAP UNTUK SUPERADMIN) -->
-        <div class="pt-1">
-            <div class="relative w-20 h-20 mx-auto flex items-center justify-center select-none cursor-pointer group" id="login-logo-trigger">
-    <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/35 via-indigo-500/25 to-blue-400/35 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-    <div class="relative w-full h-full rounded-2xl bg-gradient-to-b from-white/25 via-white/10 to-white/5 border border-white/40 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_rgba(255,255,255,0.4)] flex items-center justify-center p-3 overflow-hidden">
-        <div class="absolute -top-10 -left-10 w-20 h-20 bg-white/30 rounded-full blur-md pointer-events-none"></div>
-        <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-cyan-400/25 rounded-full blur-lg pointer-events-none"></div>
-        <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_4px_12px_rgba(14,165,233,0.5)]" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="lgnIce1" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#E0F2FE"/>
-                    <stop offset="35%" stop-color="#38BDF8"/>
-                    <stop offset="70%" stop-color="#2563EB"/>
-                    <stop offset="100%" stop-color="#4F46E5"/>
-                </linearGradient>
-                <linearGradient id="lgnIce2" x1="90" y1="10" x2="10" y2="90" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#FFFFFF"/>
-                    <stop offset="40%" stop-color="#67E8F9"/>
-                    <stop offset="100%" stop-color="#0284C7"/>
-                </linearGradient>
-                <filter id="lgnGlow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="2" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-            </defs>
-            <path d="M50 14 C29 14 14 29 14 50 C14 71 29 86 50 86 C71 86 86 71 86 50 C86 29 71 14 50 14 Z M50 25 C64.5 25 75 35.5 75 50 C75 64.5 64.5 75 50 75 C35.5 75 25 64.5 25 50 C25 35.5 35.5 25 50 25 Z" fill="url(#lgnIce1)" opacity="0.9" />
-            <path d="M34 32 L44 32 L44 68 L34 68 Z" fill="url(#lgnIce2)" />
-            <path d="M41 32 L66 64 L66 68 L56 68 L34 40 L34 32 Z" fill="#F8FAFC" />
-            <path d="M56 32 L66 32 L66 68 L56 68 Z" fill="url(#lgnIce1)" />
-            <circle cx="50" cy="20" r="2.5" fill="#FFFFFF" filter="url(#lgnGlow)" />
-            <path d="M66 32 L75 42 L66 46 Z" fill="white" opacity="0.4" />
-        </svg>
-    </div>
-</div>
+        <!-- LOGO ON 3D ICE GLASS (EASTER EGG 7X TAP UNTUK SUPERADMIN) -->
+        <div class="pt-1 flex justify-center">
+            <div class="relative w-20 h-20 flex items-center justify-center select-none cursor-pointer group" id="login-logo-trigger" title="Ketuk logo">
+                <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/35 via-indigo-500/25 to-blue-400/35 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                <div class="relative w-full h-full rounded-2xl bg-gradient-to-b from-white/25 via-white/10 to-white/5 border border-white/40 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.4)] flex items-center justify-center p-3 overflow-hidden">
+                    <div class="absolute -top-10 -left-10 w-20 h-20 bg-white/30 rounded-full blur-md pointer-events-none"></div>
+                    <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-cyan-400/25 rounded-full blur-lg pointer-events-none"></div>
+                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_4px_12px_rgba(14,165,233,0.7)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="lgnIce1" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#E0F2FE"/>
+                                <stop offset="35%" stop-color="#38BDF8"/>
+                                <stop offset="70%" stop-color="#2563EB"/>
+                                <stop offset="100%" stop-color="#4F46E5"/>
+                            </linearGradient>
+                            <linearGradient id="lgnIce2" x1="90" y1="10" x2="10" y2="90" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#FFFFFF"/>
+                                <stop offset="40%" stop-color="#67E8F9"/>
+                                <stop offset="100%" stop-color="#0284C7"/>
+                            </linearGradient>
+                            <filter id="lgnGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="2" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                        </defs>
+                        <path d="M50 14 C29 14 14 29 14 50 C14 71 29 86 50 86 C71 86 86 71 86 50 C86 29 71 14 50 14 Z M50 25 C64.5 25 75 35.5 75 50 C75 64.5 64.5 75 50 75 C35.5 75 25 64.5 25 50 C25 35.5 35.5 25 50 25 Z" fill="url(#lgnIce1)" opacity="0.95" />
+                        <path d="M34 32 L44 32 L44 68 L34 68 Z" fill="url(#lgnIce2)" />
+                        <path d="M41 32 L66 64 L66 68 L56 68 L34 40 L34 32 Z" fill="#F8FAFC" />
+                        <path d="M56 32 L66 32 L66 68 L56 68 Z" fill="url(#lgnIce1)" />
+                        <circle cx="50" cy="20" r="2.5" fill="#FFFFFF" filter="url(#lgnGlow)" />
+                    </svg>
+                </div>
+            </div>
         </div>
 
         <!-- Identity -->
         <div class="space-y-1">
-            <h1 id="login-brand" class="text-2xl font-black text-slate-900 tracking-tight leading-tight">Oneilverse</h1>
-            <p id="login-sub" class="text-xs text-slate-500 font-medium">Financial Hub & Otorisasi Sistem Enterprise</p>
+            <h1 id="login-brand" class="text-2xl font-black text-white tracking-tight leading-tight">Oneilverse</h1>
+            <p id="login-sub" class="text-xs text-slate-400 font-medium">Financial Hub & Otorisasi Sistem Enterprise</p>
         </div>
 
         <!-- BANNER PERINGATAN BLOKIR / LOCKOUT BERTAHAP -->
-        <div id="lockout-banner" class="hidden p-3.5 rounded-2xl bg-rose-50 border border-rose-300 text-rose-800 text-xs text-left space-y-1 shadow-sm">
-            <div class="flex items-center space-x-2 font-black text-rose-900">
-                <i data-lucide="shield-alert" class="w-4 h-4 text-rose-600"></i>
+        <div id="lockout-banner" class="hidden p-3.5 rounded-2xl bg-rose-950/50 border border-rose-500/50 text-rose-200 text-xs text-left space-y-1 shadow-sm">
+            <div class="flex items-center space-x-2 font-black text-rose-300">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-rose-400"></i>
                 <span id="lockout-title">Akses Terkunci Sementara</span>
             </div>
-            <p id="lockout-desc" class="text-[11px] text-rose-700 leading-relaxed"></p>
+            <p id="lockout-desc" class="text-[11px] text-rose-200 leading-relaxed"></p>
         </div>
 
         <!-- FORM LOGIN -->
@@ -90,95 +99,91 @@
             
             <!-- 1. PEMILIH ID APLIKASI / TENANT SELECTOR -->
             <div id="tenant-select-container">
-                <div class="flex items-center justify-between mb-1">
-                    <label class="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider block">
+                <div class="flex items-center justify-between mb-1.5">
+                    <label class="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider block">
                         Pilih ID Aplikasi / Toko:
                     </label>
-                    <span id="tenant-type-tag" class="text-[9px] font-black px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 font-mono">
+                    <span id="tenant-type-tag" class="text-[9px] font-black px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-400/30 font-mono">
                         Master Engine
                     </span>
                 </div>
                 <div class="relative">
-                    <!-- Dropdown Pemilih ID (Untuk Anda & Partner) -->
-                    <select id="tenant-picker" onchange="onTenantPickerChange(this.value)" class="w-full bg-white border-2 border-indigo-200 hover:border-indigo-400 focus:border-indigo-600 rounded-2xl py-2.5 px-3.5 text-xs font-bold text-slate-800 outline-none shadow-sm transition">
+                    <select id="tenant-picker" onchange="onTenantPickerChange(this.value)" class="w-full bg-slate-900/90 border border-white/20 hover:border-cyan-400 focus:border-cyan-400 rounded-2xl py-2.5 px-3.5 text-xs font-bold text-white outline-none shadow-sm transition">
                         <option value="id26110901" selected>ID26110901 — Oneilverse (Master Template)</option>
                         <option value="id261110b">ID261110B — Provider by Oneilverse (Partner)</option>
                         <option value="id261110a">ID261110A — ONEntertainment (Partner)</option>
                     </select>
-                    <!-- Input Terkunci untuk Klien Luar -->
-                    <input type="text" id="input-tenant-id" readonly class="hidden w-full bg-slate-100 border border-slate-300 rounded-2xl py-3 px-4 text-xs font-mono font-bold text-slate-700 outline-none cursor-not-allowed">
+                    <input type="text" id="input-tenant-id" readonly class="hidden w-full bg-slate-900 border border-white/20 rounded-2xl py-3 px-4 text-xs font-mono font-bold text-slate-300 outline-none cursor-not-allowed">
                 </div>
             </div>
 
-            <!-- 2. PILIHAN JABATAN / ROLE (OTOMATIS MENYESUAIKAN JIKA 1 LAMAN PARTNER) -->
+            <!-- 2. PILIHAN JABATAN / ROLE -->
             <div id="role-selector-container">
-                <label class="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider block mb-1">
+                <label class="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider block mb-1.5">
                     Jabatan / Hak Akses:
                 </label>
                 <div class="grid grid-cols-3 gap-2" id="role-buttons-grid">
-                    <button type="button" onclick="selectRole('staff')" id="role-btn-staff" class="py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-indigo-600 bg-indigo-50 text-indigo-900 shadow-sm transition active:scale-95">
+                    <button type="button" onclick="selectRole('staff')" id="role-btn-staff" class="py-2.5 px-2 rounded-2xl text-xs font-extrabold border border-cyan-400 bg-cyan-500/20 text-cyan-200 shadow-sm transition active:scale-95">
                         Kasir
                     </button>
-                    <button type="button" onclick="selectRole('manager')" id="role-btn-manager" class="py-2.5 px-2 rounded-2xl text-xs font-bold border-2 border-slate-200 text-slate-600 hover:border-purple-600 transition active:scale-95">
+                    <button type="button" onclick="selectRole('manager')" id="role-btn-manager" class="py-2.5 px-2 rounded-2xl text-xs font-bold border border-white/10 bg-white/5 text-slate-300 hover:border-purple-400 transition active:scale-95">
                         Manager
                     </button>
-                    <button type="button" onclick="selectRole('owner')" id="role-btn-owner" class="py-2.5 px-2 rounded-2xl text-xs font-bold border-2 border-slate-200 text-slate-600 hover:border-slate-900 transition active:scale-95">
+                    <button type="button" onclick="selectRole('owner')" id="role-btn-owner" class="py-2.5 px-2 rounded-2xl text-xs font-bold border border-white/10 bg-white/5 text-slate-300 hover:border-amber-400 transition active:scale-95">
                         Owner
                     </button>
                 </div>
                 <!-- Banner jika 1 Laman Partner (ID261110A / ID261110B) -->
-                <div id="partner-view-pill" class="hidden p-3 rounded-2xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-semibold flex items-center space-x-2">
-                    <i data-lucide="eye" class="w-4 h-4 text-purple-600"></i>
+                <div id="partner-view-pill" class="hidden p-3 rounded-2xl bg-purple-950/50 border border-purple-400/40 text-purple-200 text-xs font-semibold flex items-center space-x-2">
+                    <i data-lucide="eye" class="w-4 h-4 text-purple-300"></i>
                     <span>Akses Portal Partner • 1 Laman Penampil Data Transparan</span>
                 </div>
             </div>
 
             <!-- 3. KOLOM PASSWORD / PIN (TANPA PETUNJUK SANDI) -->
             <div>
-                <label class="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider block mb-1">
+                <label class="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider block mb-1.5">
                     Password / PIN Keamanan:
                 </label>
-                <input type="password" id="input-pin" maxlength="8" placeholder="• • • •" class="w-full text-center tracking-[0.4em] text-2xl font-black bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 outline-none focus:border-indigo-600 transition focus:bg-white text-slate-900" autofocus>
+                <input type="password" id="input-pin" maxlength="8" placeholder="• • • •" class="w-full text-center tracking-[0.4em] text-2xl font-black bg-slate-900/90 border border-white/20 rounded-2xl p-3 outline-none focus:border-cyan-400 transition text-white placeholder-slate-600" autofocus>
             </div>
 
             <!-- TOMBOL SUBMIT -->
-            <button onclick="handleLogin()" id="btn-login-submit" class="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl shadow-slate-900/20 transition active:scale-98 flex items-center justify-center space-x-2">
+            <button onclick="handleLogin()" id="btn-login-submit" class="w-full bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 disabled:from-slate-700 disabled:to-slate-800 text-white font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition active:scale-98 flex items-center justify-center space-x-2">
                 <span id="btn-login-label">Masuk ke Sistem</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
 
-            
-
         </div>
 
-        <div class="pt-2 text-[10px] text-slate-400 border-t border-slate-100 flex items-center justify-between">
-            <span class="font-mono">Security Core Shield v1.1.2</span>
-            <span class="text-emerald-600 font-bold flex items-center">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-                Sistem Siap
+        <div class="pt-3 text-[10px] text-slate-400 border-t border-white/10 flex items-center justify-between">
+            <span class="font-mono">v1.0.0 (Beta 1.0)</span>
+            <span class="text-emerald-400 font-bold flex items-center">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+                Core Shield v1.0.0 (Beta 1.0)
             </span>
         </div>
 
     </div>
 
-    <!-- MODAL RAHASIA PROVIDER SUPERADMIN OVERRIDE (7X TAP LOGO ON) -->
-    <div id="modal-provider-override" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-sm p-6 space-y-4 modal-sheet bg-white text-center">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-indigo-600/30">
+    <!-- MODAL RAHASIA SUPERADMIN OVERRIDE (7X TAP LOGO ON) -->
+    <div id="modal-provider-override" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="modal-sheet w-full max-w-sm p-6 space-y-4 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-600/30 border border-cyan-400/40 text-cyan-300 flex items-center justify-center mx-auto shadow-lg shadow-cyan-600/30">
                 <i data-lucide="shield-check" class="w-6 h-6"></i>
             </div>
             <div>
-                <h3 class="font-black text-sm text-slate-900 uppercase tracking-wider">Akses Rahasia Superadmin</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Otorisasi Master Platform Engine</p>
+                <h3 class="font-black text-sm text-white uppercase tracking-wider">Akses Rahasia Superadmin</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Otorisasi Master Platform Engine</p>
             </div>
             <div>
-                <input type="password" id="input-prov-secret" maxlength="6" placeholder="Kode 6 Digit" class="w-full text-center tracking-[0.5em] text-xl font-black bg-slate-100 border border-slate-300 rounded-2xl p-3 outline-none focus:border-indigo-600 font-mono">
+                <input type="password" id="input-prov-secret" maxlength="6" placeholder="Kode 6 Digit" class="w-full text-center tracking-[0.5em] text-xl font-black bg-slate-900 border border-white/20 rounded-2xl p-3 outline-none focus:border-cyan-400 font-mono text-white">
             </div>
             <div class="flex space-x-2 pt-1">
-                <button onclick="verifyProviderSecret()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95">
+                <button onclick="verifyProviderSecret()" class="flex-1 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95 shadow-md">
                     Buka Mahkamah
                 </button>
-                <button onclick="closeProviderModal()" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-xs transition">
+                <button onclick="closeProviderModal()" class="px-4 bg-white/10 hover:bg-white/20 text-slate-300 font-bold py-2.5 rounded-xl text-xs transition">
                     Batal
                 </button>
             </div>
@@ -190,12 +195,7 @@
         let currentRole = 'staff';
         const urlParams = new URLSearchParams(window.location.search);
         let activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse", slogan: "Creative Production & Software Infrastructure" };
-        const tenantKey = activeTenant ? activeTenant.id : 'ID26110901';
-        const isSinglePage = activeTenant && activeTenant.isSinglePage;
-        const tokoParam = urlParams.get('toko') ? `?toko=${encodeURIComponent(urlParams.get('toko'))}` : '';
-
-        // SINKRONISASI LOGIKA BLOKIR & LOCKOUT
-        let lockTimerInterval = null;
+        let tenantKey = activeTenant ? activeTenant.id : 'ID26110901';
 
         function getSecurityState() {
             const key = `fm_security_${tenantKey}`;
@@ -211,6 +211,7 @@
             localStorage.setItem(key, JSON.stringify(state));
         }
 
+        let lockTimerInterval = null;
         function checkLockoutStatus() {
             const state = getSecurityState();
             const now = Date.now();
@@ -245,7 +246,7 @@
                         banner.classList.add('hidden');
                         btnSubmit.disabled = false;
                         pinInput.disabled = false;
-                        btnLabel.innerText = isSinglePage ? "Buka Portal Partner" : "Masuk ke Sistem";
+                        btnLabel.innerText = activeTenant.isSinglePage ? "Buka Portal Partner" : "Masuk ke Sistem";
                         pinInput.focus();
                     } else {
                         const mins = Math.floor(remainingMs / 60000);
@@ -263,7 +264,7 @@
             banner.classList.add('hidden');
             btnSubmit.disabled = false;
             pinInput.disabled = false;
-            btnLabel.innerText = isSinglePage ? "Buka Portal Partner" : "Masuk ke Sistem";
+            btnLabel.innerText = activeTenant.isSinglePage ? "Buka Portal Partner" : "Masuk ke Sistem";
             return false;
         }
 
@@ -275,12 +276,12 @@
             if (state.tier === 0 && state.fails >= 3) {
                 state.tier = 1;
                 state.fails = 0;
-                state.lockUntil = now + (5 * 60 * 1000); // Kunci 5 menit
+                state.lockUntil = now + (5 * 60 * 1000);
                 alert("Kesalahan sandi 3x! Akses Anda dikunci sementara selama 5 menit.");
             } else if (state.tier === 1 && state.fails >= 5) {
                 state.tier = 2;
                 state.fails = 0;
-                state.lockUntil = now + (10 * 60 * 1000); // Kunci 10 menit
+                state.lockUntil = now + (10 * 60 * 1000);
                 alert("Kesalahan sandi 5x! Akses Anda dikunci sementara selama 10 menit.");
             } else if (state.tier === 2 && state.fails >= 10) {
                 state.isBlocked = true;
@@ -302,12 +303,12 @@
                 if (b) {
                     if (r === role) {
                         b.className = r === 'manager' 
-                            ? "py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-purple-600 bg-purple-50 text-purple-900 shadow-sm"
+                            ? "py-2.5 px-2 rounded-2xl text-xs font-extrabold border border-purple-400 bg-purple-500/20 text-purple-200 shadow-sm"
                             : r === 'owner'
-                            ? "py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-slate-900 bg-slate-100 text-slate-900 shadow-sm"
-                            : "py-2.5 px-2 rounded-2xl text-xs font-extrabold border-2 border-indigo-600 bg-indigo-50 text-indigo-900 shadow-sm";
+                            ? "py-2.5 px-2 rounded-2xl text-xs font-extrabold border border-amber-400 bg-amber-500/20 text-amber-200 shadow-sm"
+                            : "py-2.5 px-2 rounded-2xl text-xs font-extrabold border border-cyan-400 bg-cyan-500/20 text-cyan-200 shadow-sm";
                     } else {
-                        b.className = "py-2.5 px-2 rounded-2xl text-xs font-bold border-2 border-slate-200 text-slate-600 hover:border-slate-400";
+                        b.className = "py-2.5 px-2 rounded-2xl text-xs font-bold border border-white/10 bg-white/5 text-slate-300 hover:border-white/20";
                     }
                 }
             });
@@ -315,13 +316,12 @@
             document.getElementById('input-pin').focus();
         }
 
-        
         function onTenantPickerChange(key) {
             activeTenant = TENANTS_CONFIG[key] || TENANTS_CONFIG["id26110901"];
-            const currentTenantKey = activeTenant.id;
+            tenantKey = activeTenant.id;
             const singlePageMode = activeTenant && activeTenant.isSinglePage;
 
-            document.getElementById('input-tenant-id').value = currentTenantKey;
+            document.getElementById('input-tenant-id').value = tenantKey;
             document.getElementById('login-brand').innerText = activeTenant.nama;
             document.getElementById('login-sub').innerText = activeTenant.slogan;
 
@@ -335,13 +335,13 @@
                 partnerPill.classList.remove('hidden');
                 btnLabel.innerText = "Buka Portal Partner";
                 typeTag.innerText = "Partner Portal";
-                typeTag.className = "text-[9px] font-black px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200 font-mono";
+                typeTag.className = "text-[9px] font-black px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-400/30 font-mono";
             } else {
                 roleGrid.classList.remove('hidden');
                 partnerPill.classList.add('hidden');
                 btnLabel.innerText = "Masuk ke Sistem";
                 typeTag.innerText = activeTenant.isMaster ? "Master Engine" : "Mitra UMKM";
-                typeTag.className = "text-[9px] font-black px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 font-mono";
+                typeTag.className = "text-[9px] font-black px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-400/30 font-mono";
             }
 
             document.getElementById('input-pin').value = "";
@@ -349,17 +349,11 @@
             checkLockoutStatus();
         }
 
-        function openSuperAdminDirect() {
-            document.getElementById('modal-provider-override').classList.remove('hidden');
-            document.getElementById('input-prov-secret').value = "";
-            document.getElementById('input-prov-secret').focus();
-        }
-
         function handleLogin() {
             const picker = document.getElementById('tenant-picker');
             const selectedKey = picker ? picker.value : "id26110901";
             activeTenant = TENANTS_CONFIG[selectedKey] || TENANTS_CONFIG["id26110901"];
-            const currentTenantKey = activeTenant.id;
+            tenantKey = activeTenant.id;
             const singlePageMode = activeTenant && activeTenant.isSinglePage;
             const currentTokoParam = `?toko=${encodeURIComponent(selectedKey)}`;
 
@@ -370,10 +364,10 @@
 
             // JIKA TOKO PARTNER 1-LAMAN (ID261110A / ID261110B)
             if (singlePageMode) {
-                const pwObj = JSON.parse(localStorage.getItem(`fm_passwords_${currentTenantKey}`) || "{}");
+                const pwObj = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
                 const validPins = [pwObj.staff || "1234", pwObj.owner || "9999", "0000", "5678", "1234"];
                 if (validPins.includes(pin)) {
-                    const partnerUser = { role: 'partner', title: 'Partner Pemantau', tenantId: currentTenantKey };
+                    const partnerUser = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey };
                     localStorage.setItem('currentUser', JSON.stringify(partnerUser));
                     localStorage.setItem('auth_role', 'partner');
                     window.location.href = `partner.html${currentTokoParam}`;
@@ -384,7 +378,7 @@
             }
 
             // AMBIL PASSWORD KUSTOM DARI OWNER JIKA ADA
-            const storedPw = JSON.parse(localStorage.getItem(`fm_passwords_${currentTenantKey}`) || "{}");
+            const storedPw = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
             const staffTargetPin = storedPw.staff || "1234";
             const mgrTargetPin = storedPw.manager || "5678";
             const ownerTargetPin = storedPw.owner || "9999";
@@ -420,7 +414,6 @@
                 }
             }
 
-            // Reset Fails on success
             const state = getSecurityState();
             state.fails = 0;
             state.tier = 0;
@@ -434,7 +427,7 @@
             window.location.href = targetUrl + currentTokoParam;
         }
 
-        // EASTER EGG: 7X TAP PADA LOGO ON UNTUK BUKA SUPERADMIN
+        // EASTER EGG: 7X TAP PADA LOGO ON UNTUK BUKA SUPERADMIN (TERSEMBUNYI)
         let tapCount = 0;
         let tapTimer = null;
 
@@ -482,22 +475,18 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
 
-            // Cek apakah ada parameter URL ?toko=xxx (misal untuk build client khusus)
             const paramToko = urlParams.get('toko');
             const picker = document.getElementById('tenant-picker');
             const lockedInput = document.getElementById('input-tenant-id');
 
             if (paramToko && !['id26110901', 'id261110b', 'id261110a', 'oneilverse'].includes(paramToko.toLowerCase())) {
-                // Untuk APK user/klien UMKM lain: sembunyikan dropdown picker, kunci ID nya!
                 picker.classList.add('hidden');
                 lockedInput.classList.remove('hidden');
                 lockedInput.value = activeTenant.id;
             } else if (paramToko) {
-                // Pilih opsi dropdown sesuai parameter
                 if (picker) picker.value = paramToko.toLowerCase();
             }
 
-            // Jalankan sinkronisasi awal
             const selectedKey = picker ? picker.value : "id26110901";
             onTenantPickerChange(selectedKey);
 
