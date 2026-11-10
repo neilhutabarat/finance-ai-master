@@ -82,8 +82,9 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/theme.js?v=1.3"></script>
-    <script src="js/skin.js?v=1.0"></script>
+    <script src="js/theme.js?v=1.4"></script>
+    <script src="js/logo.js?v=1.4"></script>
+    <script src="js/skin.js?v=1.4"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white">
 
@@ -211,12 +212,21 @@
                     <i data-lucide="file-spreadsheet" class="w-6 h-6 text-purple-300"></i>
                 </div>
                 <div class="text-left">
-                    <span class="font-black text-base block tracking-tight">Buka Mutasi Rekening Koran</span>
+                    <h4 class="font-black text-base block tracking-tight">Buka Mutasi Rekening Koran</h4>
                     <span class="text-xs text-slate-400">Rincian mutasi kas masuk dan keluar resmi</span>
                 </div>
                 <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 ml-4 group-hover:translate-x-1 transition"></i>
             </button>
         </div>
+
+        <!-- AKTIVITAS TERBARU -->
+        <section id="partner-recent" class="ios-glass fm-ic p-5">
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="text-sm font-black text-white">Aktivitas Terbaru</h2>
+                <span class="text-[11px] text-slate-400">8 mutasi terakhir</span>
+            </div>
+            <div id="partner-recent-list" class="fm-scroll"></div>
+        </section>
 
     </main>
 
@@ -429,8 +439,8 @@
                     tr.innerHTML = `
                         <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${tx.dateFull || ''} ${tx.date || ''}</td>
                         <td class="py-3 px-4">
-                            <span class="font-bold text-white block">[${tx.accountCode}] ${tx.accountName}</span>
-                            <span class="text-[10px] text-slate-400">${tx.desc || '-'}</span>
+                            <span class="font-bold text-white block">[${fmEsc(tx.accountCode)}] ${fmEsc(tx.accountName)}</span>
+                            <span class="text-[10px] text-slate-400">${fmEsc(tx.desc || '-')}</span>
                         </td>
                         <td class="py-3 px-4 text-right font-black text-emerald-400 font-mono">${tx.category === 'sales' ? formatThousand(tx.amount) : '-'}</td>
                         <td class="py-3 px-4 text-right font-black text-rose-400 font-mono">${tx.category !== 'sales' ? formatThousand(tx.amount) : '-'}</td>
@@ -440,6 +450,10 @@
                 });
             }
 
+            const rl = document.getElementById('partner-recent-list');
+            if (rl) {
+                rl.innerHTML = displayList.length ? displayList.slice(0, 8).map(tx => '<div class="fm-row"><span style="min-width:0"><b style="font-weight:700">' + fmEsc(tx.accountName) + '</b><span class="fm-sub" style="display:block">' + fmEsc((tx.dateFull || '') + ' ' + (tx.date || '')) + '</span></span><b class="' + (tx.category === 'sales' ? 'pos' : 'neg') + '">' + (tx.category === 'sales' ? '+' : '-') + formatThousand(tx.amount) + '</b></div>').join('') : '<div class="fm-empty">Belum ada transaksi tercatat.<br><span>Mutasi kas masuk dan keluar akan tampil di sini.</span></div>';
+            }
             const net = totalIn - totalOut;
             document.getElementById('card-total-income').innerText = formatThousand(totalIn);
             document.getElementById('card-total-outcome').innerText = formatThousand(totalOut);

@@ -60,13 +60,30 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/theme.js?v=1.3"></script>
-    <script src="js/skin.js?v=1.0"></script>
+    <script>
+        window.FM_DOCK_ITEMS = [
+            { label: 'Pendapatan', icon: 'chart', run: "openModal('provider_monthly_history')" },
+            { label: 'Jaringan', icon: 'building', run: "openModal('network_monthly_history')" },
+            { label: 'Peringkat', icon: 'trophy', run: "openModal('leaderboard')" },
+            { label: 'Tiket', icon: 'ticket', run: "openModal('tickets')" },
+            { label: 'Klien', icon: 'store', run: "openModal('add_tenant')" },
+            { label: 'Catat', icon: 'plus', run: "openModal('provider_input_tx')" },
+            { label: 'COA Provider', icon: 'list', run: "openModal('provider_coa_mgmt')" },
+            { label: 'Harga Paket', icon: 'tag', run: "openModal('pricing')" },
+            { label: 'Toko Berhenti', icon: 'archive', run: "openModal('former')" },
+            { label: 'Kurs & Emas', icon: 'coins', run: "openModal('rates')" },
+            { label: 'Kirim Pesan', icon: 'send', run: "openModal('broadcast_modal')" },
+            { label: 'Catatan Rilis', icon: 'book', run: "openModal('release_notes')" }
+        ];
+    </script>
+    <script src="js/theme.js?v=1.4"></script>
+    <script src="js/logo.js?v=1.4"></script>
+    <script src="js/skin.js?v=1.4"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
     <!-- HEADER PROVIDER (DARK PREMIUM COMMAND HUB) -->
-    <header class="bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 px-6 py-6 border-b border-white/10 shadow-2xl">
+    <header class="oneui-hero text-white px-5 sm:px-8 pt-6 pb-7 shadow-xl relative overflow-hidden">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-3 sm:gap-4 min-w-0">
                 <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-b from-white/25 via-white/10 to-white/5 border border-white/30 backdrop-blur-xl flex items-center justify-center p-2 shadow-inner relative overflow-hidden group select-none shrink-0">
@@ -112,7 +129,7 @@
                     <i data-lucide="server" class="w-3.5 h-3.5"></i>
                     <span>Catatan Rilis Global</span>
                 </button>
-                <button onclick="window.location.href='index.html'" class="px-4 py-2 rounded-full bg-slate-900/10 hover:bg-slate-900/20 text-xs font-bold transition flex items-center space-x-1.5">
+                <button onclick="window.location.href='index.html'" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     <span>Keluar</span>
                 </button>
@@ -225,40 +242,14 @@
         </div>
 
         <!-- TOMBOL AKSI CEPAT PROVIDER -->
-        <div class="ios-glass p-4 flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 border-white/10">
-            <div class="flex items-center space-x-2">
-                <span class="text-xs font-black uppercase text-slate-300 tracking-wider">Aksi Cepat Superadmin:</span>
-            </div>
-            <div class="flex flex-wrap items-center gap-2.5">
-                <button onclick="openModal('provider_input_tx')" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-sm">
-                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-                    <span>+ Catat Transaksi Provider</span>
-                </button>
-                <button onclick="openModal('provider_coa_mgmt')" class="px-3.5 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-sm">
-                    <i data-lucide="list-plus" class="w-3.5 h-3.5"></i>
-                    <span>Kelola COA Provider</span>
-                </button>
-                <button onclick="openModal('pricing')" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-lg">
-                    <i data-lucide="tag" class="w-3.5 h-3.5"></i>
-                    <span>Harga Paket</span>
-                </button>
-                <button onclick="openModal('former')" class="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-lg">
-                    <i data-lucide="archive" class="w-3.5 h-3.5"></i>
-                    <span>Toko Berhenti</span><span id="former-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-black"></span>
-                </button>
-                <button onclick="openModal('rates')" class="px-3.5 py-2 rounded-xl bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-lg">
-                    <i data-lucide="coins" class="w-3.5 h-3.5"></i>
-                    <span>Kurs & Emas</span>
-                </button>
-                <button onclick="openModal('add_tenant')" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-lg">
-                    <i data-lucide="store" class="w-3.5 h-3.5"></i>
-                    <span>+ Tambah Klien Baru</span>
-                </button>
-                <button onclick="openModal('broadcast_modal')" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-sm">
-                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                    <span>Kirim Pesan ke User</span>
-                </button>
-            </div>
+        <div id="fm-actions" class="fm-actions">
+            <button data-fm-action data-ic="plus" onclick="openModal('provider_input_tx')"><span>Catat Transaksi</span></button>
+            <button data-fm-action data-ic="list" onclick="openModal('provider_coa_mgmt')"><span>COA Provider</span></button>
+            <button data-fm-action data-ic="tag" onclick="openModal('pricing')"><span>Harga Paket</span></button>
+            <button data-fm-action data-ic="archive" onclick="openModal('former')"><span>Toko Berhenti</span><span id="former-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-black"></span></button>
+            <button data-fm-action data-ic="coins" onclick="openModal('rates')"><span>Kurs &amp; Emas</span></button>
+            <button data-fm-action data-ic="store" onclick="openModal('add_tenant')"><span>Klien Baru</span></button>
+            <button data-fm-action data-ic="send" onclick="openModal('broadcast_modal')"><span>Kirim Pesan</span></button>
         </div>
 
         <!-- TABEL DIREKTORI MITRA UMKM -->
@@ -2249,44 +2240,24 @@
               .catch(function (e) { alert('Gagal memproses: ' + e.message); });
         }
 
-        const GLOBAL_RELEASE_NOTES = [
-            { version: "v1.0.0 (Beta 1.0)", type: "App", date: "10 Nov 2026", title: "Penyederhanaan Closing Kasir", desc: "Konsep penamaan shift dihapus. Kasir cukup menekan Closing Kasir untuk mereset laci ke Rp 0 secara presisi." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "10 Nov 2026", title: "Single-Session Lockout", desc: "Perlindungan anti-fitnah: sesi kasir dikunci pada 1 perangkat kerja aktif." },
-            { version: "v1.1.1", type: "App", date: "09 Nov 2026", title: "Sistem Kasir 2-Langkah", desc: "Input pesanan masuk ke draft sementara bebas edit sebelum dicetak struk sah." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "09 Nov 2026", title: "Audit Trail Forensik", desc: "Seluruh tindakan koreksi nota oleh Manager otomatis terekam permanen di Owner." },
-            { version: "v1.1.0", type: "App", date: "05 Nov 2026", title: "Tiket Penambahan Kasir", desc: "Penambahan menu pengajuan lisensi terminal meja kasir baru ke panel Provider." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "05 Nov 2026", title: "Restriksi Waktu Transaksi", desc: "Hanya Owner yang memiliki wewenang mengoreksi tanggal nota transaksi." },
-            { version: "v1.0.5", type: "App", date: "01 Nov 2026", title: "Kapsul Waktu Realtime Glass", desc: "Desain kapsul jam dan tanggal realtime berbalut kaca es transparan." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "01 Nov 2026", title: "Proteksi Sandi Bertahap", desc: "Sistem penguncian bertahap 5 menit, 10 menit, hingga pemblokiran akun." },
-            { version: "v1.0.0", type: "App", date: "25 Okt 2026", title: "Rilis Perdana Oneilverse POS", desc: "Peluncuran sistem kasir dan keuangan multi-tenant jaringan UMKM." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "25 Okt 2026", title: "Enkripsi Multi-Tenant", desc: "Isolasi data antar toko untuk keamanan pembukuan finansial." }
-        ];
-
+        /* Tower menampilkan SELURUH catatan rilis aplikasi klien, dari yang pertama sampai terbaru (sumber: js/theme.js). */
         function renderGlobalReleaseNotes() {
             const container = document.getElementById('release-notes-global-container');
             container.innerHTML = "";
-            GLOBAL_RELEASE_NOTES.forEach(note => {
-                const isSec = note.type === "Security";
-                const bg = isSec ? "bg-amber-500/10 border-amber-500/30 text-amber-200" : "bg-cyan-500/10 border-cyan-500/30 text-cyan-200";
-                const icon = isSec ? '<i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>' : '<i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i>';
-                const pillBg = isSec ? "bg-amber-500/20 text-amber-300" : "bg-cyan-500/20 text-cyan-300";
-
+            const all = (window.FM_RELEASES && FM_RELEASES.all) || [];
+            const tagCls = { keamanan: 'bg-amber-500/20 text-amber-300', perbaikan: 'bg-emerald-500/20 text-emerald-300', fitur: 'bg-sky-500/20 text-sky-300', tampilan: 'bg-purple-500/20 text-purple-300' };
+            all.forEach((n, idx) => {
                 const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border ${bg} space-y-1.5`;
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            ${icon}
-                            <span class="font-black text-[11px] text-white font-mono">${note.version}</span>
-                        </div>
-                        <span class="px-2 py-0.5 rounded text-[9px] font-bold ${pillBg}">${note.date}</span>
-                    </div>
-                    <h4 class="font-bold text-xs text-white">${note.title}</h4>
-                    <p class="text-[11px] text-slate-300 leading-relaxed">${note.desc}</p>
-                `;
+                card.className = 'p-4 rounded-2xl border border-white/10 bg-white/5 space-y-2';
+                const items = n[2].map(t => {
+                    const m = /^\[(\w+)\]\s*/.exec(t);
+                    const tag = m ? m[1] : '';
+                    const cls = tagCls[tag.toLowerCase()] || 'bg-white/10 text-slate-200';
+                    return '<li class="text-[11px] text-slate-300 leading-relaxed">' + (tag ? '<span class="px-1.5 py-0.5 mr-1.5 rounded-full text-[9px] font-black uppercase ' + cls + '">' + escHtml(tag) + '</span>' : '') + escHtml(t.replace(/^\[\w+\]\s*/, '')) + '</li>';
+                }).join('');
+                card.innerHTML = '<div class="flex items-center justify-between"><span class="font-black text-[11px] text-white font-mono">v' + escHtml(n[0]) + (idx === 0 ? ' · terbaru' : '') + '</span><span class="px-2 py-0.5 rounded text-[9px] font-bold bg-white/10 text-slate-300">' + escHtml(n[1]) + '</span></div><ul class="space-y-1.5 list-none">' + items + '</ul>';
                 container.appendChild(card);
             });
-            if (window.lucide) lucide.createIcons();
         }
 
         window.openModal = function(type) {

@@ -3,12 +3,40 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.3';
+  var BETA = 'BETA 1.4';
+  /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
+     Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
+     Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
-    ['1.0.0 (BETA 1.3)', '11 Nov 2026', ['Tampilan baru bergaya One UI berbalut kaca: bilah header ringkas, kartu rata tanpa gradasi, tombol pil seragam', 'Halaman desktop pas satu layar tanpa gulir halaman; ruang kosong diisi ringkasan', 'Tombol tindakan dirapikan dalam grid seragam; bagian panjang (instruksi kasir, analisis AI) dibuka lewat pop-up', 'Tombol Keluar dipindah ke dock (di HP ada di Pengaturan); chip versi di header dihapus', 'Scrollbar pop-up disembunyikan agar tampil bersih']],
-    ['1.0.0 (BETA 1.2)', '11 Nov 2026', ['Kulit tampilan baru "Glass 2026": kartu, tombol, dan pop-up bergaya kaca seragam di semua halaman', 'Dock di bagian bawah layar; setiap menu membuka pop-up tanpa pindah halaman', 'Judul pop-up diperbaiki di semua halaman']],
-    ['1.0.0 (BETA 1.1)', '11 Nov 2026', ['Tampilan baru yang lebih tenang dan rapi di desktop, tablet, dan HP: satu warna aksen, permukaan netral','Rilis uji awal: kasir, manager, owner, dan portal login per toko', 'Fitur & Paket: lihat fitur Basic, Plus, Pro (yang terkunci tetap terlihat)', 'Dashboard owner: ringkasan hari ini, laba per produk, stok menipis, metode bayar, target omzet, ekspor CSV', 'Kasir: scan barcode, jumlah (pcs), metode bayar, struk WhatsApp (Plus)', 'Tema terang/gelap pekat, warna halaman, logo usaha']]
+    ['1.0.0 (BETA 1.4)', '11 Nov 2026', [
+      '[Tampilan] Logo Oneilverse baru: cincin orbit emas dengan planet dan huruf N di pusatnya',
+      '[Tampilan] Portal login, partner, dan semua halaman kini satu gaya: font, kartu kaca, tombol, dan dock',
+      '[Perbaikan] Kontras teks disempurnakan di mode terang, gelap, dan gelap pekat (termasuk kartu Pajak dan semua pop-up)',
+      '[Perbaikan] Catatan rilis kini ringkas: hanya 10 rilis terakhir yang ditampilkan',
+      '[Keamanan] Nama produk, nama akun, keterangan nota, dan nama petugas kini ditampilkan sebagai teks murni sehingga tidak bisa disusupi kode berbahaya'
+    ]],
+    ['1.0.0 (BETA 1.3)', '11 Nov 2026', [
+      '[Tampilan] Gaya One UI berbalut kaca: header ringkas, kartu rata tanpa gradasi, tombol pil seragam',
+      '[Tampilan] Halaman desktop pas satu layar tanpa gulir; tombol tindakan dalam grid; instruksi kasir dan analisis AI dibuka lewat pop-up',
+      '[Perbaikan] Form kasir tidak lagi terpotong di layar laptop yang pendek; scrollbar pop-up disembunyikan',
+      '[Keamanan] Tombol Keluar selalu tersedia (dock atau Pengaturan) agar perangkat bersama mudah dikunci'
+    ]],
+    ['1.0.0 (BETA 1.2)', '11 Nov 2026', [
+      '[Tampilan] Kulit "Glass 2026": kartu, tombol, dan pop-up bergaya kaca seragam; dock di bawah layar membuka pop-up tanpa pindah halaman',
+      '[Perbaikan] Judul pop-up yang kosong diperbaiki di semua halaman'
+    ]],
+    ['1.0.0 (BETA 1.1)', '11 Nov 2026', [
+      '[Fitur] Fitur & Paket: lihat fitur Basic, Plus, Pro (yang terkunci tetap terlihat)',
+      '[Fitur] Dashboard owner: ringkasan hari ini, laba per produk, stok menipis, metode bayar, target omzet, ekspor CSV',
+      '[Fitur] Kasir: scan barcode, jumlah (pcs), metode bayar, struk WhatsApp (Plus)',
+      '[Fitur] Tema terang/gelap pekat, warna halaman, logo usaha',
+      '[Perbaikan] Tanggal nota memakai waktu setempat sehingga tidak bergeser sehari di malam hari',
+      '[Keamanan] Data tiap toko terisolasi per ID; aturan database diperbarui untuk logo toko dan riwayat toko'
+    ]]
   ];
+  var SHOW_LAST = 10;
+  window.FM_RELEASES = { all: RELEASE_NOTES, last: function (n) { return RELEASE_NOTES.slice(0, n || SHOW_LAST); }, beta: BETA, version: APP_VERSION };
+  window.fmEsc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
   var ACCENTS = ['#2563eb', '#4f46e5', '#7c3aed', '#db2777', '#e11d48', '#ea580c', '#ca8a04', '#059669', '#0d9488', '#475569'];
 
   var script = document.currentScript;
@@ -42,7 +70,7 @@
     'html[data-fm-black="1"] .ios-glass{background:rgba(10,10,12,.97)!important;border-color:rgba(255,255,255,.1)!important;box-shadow:0 1px 0 rgba(255,255,255,.05) inset!important}',
     'html[data-fm-black="1"] .glass-capsule,html[data-fm-black="1"] .glass-capsule-dark{background:#000!important;border-color:rgba(255,255,255,.14)!important}',
     'html[data-fm-black="1"] .bg-slate-900,html[data-fm-black="1"] .bg-slate-950{background-color:#050507!important}',
-    'html[data-fm-black="1"] .text-slate-500{color:#8e96a8!important}html[data-fm-black="1"] .text-slate-400{color:#b6bece!important}html[data-fm-black="1"] .text-slate-600{color:#7f8799!important}',
+    'html[data-fm-black="1"] .text-slate-500{color:#aab2c5!important}html[data-fm-black="1"] .text-slate-400{color:#b6bece!important}html[data-fm-black="1"] .text-slate-600{color:#7f8799!important}',
     // mode kebalikan (terang pada halaman gelap / gelap pada halaman terang)
     'html[data-fm-invert="1"]{filter:invert(1) hue-rotate(180deg);background:#fff}',
     'html[data-fm-invert="1"] body{background-color:#fff!important;background-image:none!important}',
@@ -62,7 +90,7 @@
     '#fm-set .fm-sheet{width:100%;max-width:460px;max-height:90vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:26px 26px 0 0;padding:20px 18px 26px;animation:fmSheet .3s cubic-bezier(.16,1,.3,1)}',
     '@media(min-width:640px){#fm-set .fm-sheet{border-radius:26px}}',
     '#fm-set h3{font-size:18px;font-weight:800;margin:0}',
-    '#fm-set .fm-sec{margin-top:18px}#fm-set .fm-lab{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8e96a8;margin-bottom:8px}',
+    '#fm-set .fm-sec{margin-top:18px}#fm-set .fm-lab{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#aab2c5;margin-bottom:8px}',
     '#fm-set .fm-card{background:#15151b;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px 14px}',
     '#fm-set .fm-modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}',
     '#fm-set .fm-mode{border:2px solid rgba(255,255,255,.1);border-radius:16px;padding:12px;cursor:pointer;background:#15151b;text-align:left;color:#f5f5f7;font-weight:700;font-size:13px}',
@@ -72,9 +100,10 @@
     '#fm-set .fm-dot{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer;outline:1px solid rgba(255,255,255,.2)}',
     '#fm-set .fm-dot.on{border-color:#fff}',
     '#fm-set .fm-btn{border:0;border-radius:12px;padding:10px 14px;font-weight:800;font-size:12px;cursor:pointer;background:#2a2a33;color:#fff}',
-    '#fm-set .fm-btn.pri{background:var(--fm-pick,#2563eb)}',
+    '#fm-set .fm-btn.pri{background:color-mix(in srgb,var(--fm-pick,#2563eb) 84%,#000);color:var(--fm-on,#fff)}',
     '#fm-set details{background:#15151b;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 14px;margin-bottom:8px}',
     '#fm-set summary{cursor:pointer;font-weight:700;font-size:13px}',
+    '#fm-set .fm-tag{display:inline-block;font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:1px 7px;border-radius:99px;margin-right:7px;vertical-align:1px;background:rgba(255,255,255,.12);color:#e5e7eb}#fm-set .fm-tag-keamanan{background:rgba(251,191,36,.2);color:#fcd34d}#fm-set .fm-tag-perbaikan{background:rgba(52,211,153,.2);color:#6ee7b7}#fm-set .fm-tag-fitur{background:rgba(96,165,250,.22);color:#93c5fd}#fm-set .fm-tag-tampilan{background:rgba(192,132,252,.22);color:#d8b4fe}',
     '#fm-set ul{margin:8px 0 0;padding-left:18px;font-size:12px;line-height:1.7;color:#c7cbd6}'
   ].join('\n');
 
@@ -83,6 +112,13 @@
   styleEl.textContent = CSS;
   (document.head || document.documentElement).appendChild(styleEl);
 
+  /* warna teks di atas warna aksen: putih atau hampir-hitam, mana yang kontrasnya lebih tinggi */
+  function onColor(hex) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '')); if (!m) return '#fff';
+    var v = [0, 2, 4].map(function (i) { var c = parseInt(m[1].substr(i, 2), 16) / 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); });
+    var L = 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+    return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.0543) ? '#fff' : '#0b0d12';
+  }
   function apply() {
     var h = document.documentElement;
     var mode = pref.mode || NATIVE;           // 'light' | 'dark'
@@ -93,6 +129,7 @@
       else if (mode === 'dark') h.setAttribute('data-fm-black', '1');
       if (pref.accent) { h.setAttribute('data-fm-accent', '1'); h.style.setProperty('--fm-accent', pref.accent); }
       else h.style.removeProperty('--fm-accent');
+      h.style.setProperty('--fm-on', onColor(pref.accent || '#3d63dd'));
     }
   }
   apply();
@@ -133,7 +170,7 @@
       '</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px"><label style="font-size:12px;color:#c7cbd6">Warna bebas</label><input type="color" id="fm-acc-custom" value="' + esc(pick) + '" style="width:44px;height:30px;border:0;background:none;padding:0"><button class="fm-btn" data-accreset style="margin-left:auto">Kembali ke Bawaan</button></div></div></div>';
     if (CAN_LOGO) {
       h += '<div class="fm-sec"><div class="fm-lab">Logo Usaha</div><div class="fm-card">' +
-        '<div style="display:flex;gap:12px;align-items:center"><div id="fm-logo-prev" style="width:64px;height:64px;border-radius:16px;background:#22222b;display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:800;color:#8e96a8;font-size:12px">' + (logoData ? '<img src="' + esc(logoData) + '" style="width:100%;height:100%;object-fit:contain">' : 'Inisial') + '</div>' +
+        '<div style="display:flex;gap:12px;align-items:center"><div id="fm-logo-prev" style="width:64px;height:64px;border-radius:16px;background:#22222b;display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:800;color:#aab2c5;font-size:12px">' + (logoData ? '<img src="' + esc(logoData) + '" style="width:100%;height:100%;object-fit:contain">' : 'Inisial') + '</div>' +
         '<div style="flex:1;font-size:12px;line-height:1.55;color:#c7cbd6">Unggah logo (JPG, PNG, atau WebP). <b style="color:#fff">Ukuran logo dibatasi maksimal 100 KB.</b> Gambar yang lebih besar akan diperkecil otomatis; disarankan bentuk persegi. Jika tidak ada logo, tampil inisial nama usaha.</div></div>' +
         '<div style="display:flex;gap:8px;margin-top:10px"><label class="fm-btn pri" style="cursor:pointer">Pilih Gambar<input type="file" id="fm-logo-file" accept="image/*" style="display:none"></label>' + (logoData ? '<button class="fm-btn" data-logodel>Hapus Logo</button>' : '') + '</div>' +
         '<p id="fm-logo-msg" style="font-size:12px;margin:8px 0 0;color:#fca5a5"></p></div></div>';
@@ -141,10 +178,10 @@
     if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur &amp; Paket</button></div>';
     if (window.FM_LOGOUT && window.innerWidth < 480) h += '<div class="fm-sec"><button class="fm-btn" data-logout style="width:100%;padding:13px;color:#fda4af">Keluar dari Akun</button></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>v' + APP_VERSION + ' · ' + BETA + '</b></div></div>';
-    h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.map(function (n, i) {
-      return '<details ' + (i === 0 ? 'open' : '') + '><summary>v' + n[0] + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></details>';
+    h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.slice(0, SHOW_LAST).map(function (n, i) {
+      return '<details ' + (i === 0 ? 'open' : '') + '><summary>v' + n[0] + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { var m = /^\[(\w+)\]\s*/.exec(t); var tag = m ? m[1] : ''; return '<li>' + (tag ? '<i class="fm-tag fm-tag-' + tag.toLowerCase() + '">' + esc(tag) + '</i>' : '') + esc(t.replace(/^\[\w+\]\s*/, '')) + '</li>'; }).join('') + '</ul></details>';
     }).join('') + '</div>';
-    h += '<p style="font-size:11px;color:#8e96a8;margin-top:14px;line-height:1.5">Tema dan warna tersimpan di perangkat ini, terpisah untuk tiap peran.</p>';
+    h += '<p style="font-size:11px;color:#aab2c5;margin-top:14px;line-height:1.5">Tema dan warna tersimpan di perangkat ini, terpisah untuk tiap peran.</p>';
     box.innerHTML = h;
 
     var lo = box.querySelector('[data-logout]'); if (lo) lo.onclick = function () { document.getElementById('fm-set').style.display = 'none'; window.FM_LOGOUT(); };

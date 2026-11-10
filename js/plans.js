@@ -62,16 +62,17 @@
   function cardHtml(f) {
     var cur = ORDER[tenantTier()], need = ORDER[f.tier];
     var state, badge, op = 1;
-    if (f.status === 'soon') { state = 'soon'; badge = f.need === 'server' ? 'Segera tersedia' : 'Segera tersedia'; op = .5; }
+    if (f.status === 'soon') { state = 'soon'; badge = 'Segera tersedia'; op = .9; }
     else if (cur >= need) { state = 'on'; badge = '✓ Aktif'; }
     else { state = 'lock'; badge = '🔒 ' + LABEL[f.tier]; }
     var bg = state === 'soon' ? 'rgba(15,23,42,.55)' : 'rgba(255,255,255,.06)';
     var bc = state === 'on' ? 'rgba(52,211,153,.5)' : 'rgba(255,255,255,.12)';
-    var bgc = state === 'on' ? 'rgba(52,211,153,.2);color:#34d399' : state === 'lock' ? 'rgba(245,158,11,.2);color:#f59e0b' : 'rgba(148,163,184,.2);color:#94a3b8';
-    return '<div style="border:1px solid ' + bc + ';background:' + bg + ';border-radius:16px;padding:12px;opacity:' + op + '">' +
+    var bgc = state === 'on' ? 'rgba(52,211,153,.2)' : state === 'lock' ? 'rgba(245,158,11,.2)' : 'rgba(148,163,184,.22)';
+    var tc = state === 'on' ? 'text-emerald-600' : state === 'lock' ? 'text-amber-600' : 'text-slate-500';
+    return '<div style="border:1px ' + (state === 'soon' ? 'dashed' : 'solid') + ' ' + bc + ';background:' + bg + ';border-radius:16px;padding:12px;opacity:' + op + '">' +
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><b style="font-size:13px">' + f.icon + ' ' + esc(f.label) + '</b>' +
-      '<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;background:' + bgc + '">' + badge + '</span></div>' +
-      '<div style="font-size:11.5px;margin-top:5px;line-height:1.5;opacity:.8">' + esc(f.desc) + '</div></div>';
+      '<span class="' + tc + '" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;background:' + bgc + '">' + badge + '</span></div>' +
+      '<div style="font-size:11.5px;margin-top:5px;line-height:1.5;opacity:.88">' + esc(f.desc) + '</div></div>';
   }
 
   function renderSections(filterSoonOnly) {
