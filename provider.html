@@ -109,7 +109,7 @@
                     <i data-lucide="server" class="w-3.5 h-3.5"></i>
                     <span>Catatan Rilis Global</span>
                 </button>
-                <button onclick="window.location.href='index.html'" class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs font-bold transition flex items-center space-x-1.5">
+                <button onclick="window.location.href='index.html'" class="px-4 py-2 rounded-full bg-slate-900/10 hover:bg-slate-900/20 text-xs font-bold transition flex items-center space-x-1.5">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     <span>Keluar</span>
                 </button>
@@ -285,7 +285,7 @@
                     <h3 id="modal-title" class="font-black text-base text-white">Judul Pop-Up</h3>
                     <p id="modal-subtitle" class="text-xs text-slate-400">Keterangan Laporan</p>
                 </div>
-                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-900/10 hover:bg-slate-900/20 text-white flex items-center justify-center transition">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -530,7 +530,7 @@
             </div>
 
             <div class="px-6 py-3 border-t border-white/10 bg-slate-900 flex justify-end">
-                <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition">
+                <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-slate-900/10 hover:bg-slate-900/20 text-white text-xs font-bold transition">
                     Tutup
                 </button>
             </div>
@@ -689,7 +689,7 @@
             const tierBadge = '<span class="px-2 py-0.5 rounded text-[9px] font-black badge-pro-gold text-white uppercase">Gold • Pro</span>';
 
             const tr = document.createElement('tr');
-            tr.className = "border-b border-white/5 hover:bg-white/5 cursor-pointer transition";
+            tr.className = "border-b border-white/5 hover:bg-slate-900/5 cursor-pointer transition";
             tr.onclick = () => openInspectUMKM(tenant.id);
             tr.innerHTML = `
                 <td class="py-3.5 px-4">
@@ -750,7 +750,7 @@
                     <td class="py-2 px-3"><span class="font-bold text-white">[${tx.accountCode}] ${tx.accountName}</span><br><span class="text-[10px] text-slate-400">${tx.desc || '-'}</span></td>
                     <td class="py-2 px-3 text-right font-black text-emerald-400 font-mono">${tx.category === 'sales' ? formatThousand(tx.amount) : '-'}</td>
                     <td class="py-2 px-3 text-right font-black text-rose-400 font-mono">${tx.category !== 'sales' ? formatThousand(tx.amount) : '-'}</td>
-                    <td class="py-2 px-3 text-center text-slate-400 text-[10px]">${tx.staff || 'Kasir'}</td>
+                    <td class="py-2 px-3 text-center text-slate-400 text-[10px]">${tx.staff || 'Kasir'}</td><td class="py-2 px-3 text-center"><button onclick="deleteTenantTx('${tx.id}')" class="text-rose-400 hover:text-rose-300 font-bold">Hapus</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -945,7 +945,7 @@
                     <td class="py-2.5 px-3 font-bold text-white">${k}</td>
                     <td class="py-2.5 px-3 text-right text-emerald-400 font-mono">${formatThousand(item.inc)}</td>
                     <td class="py-2.5 px-3 text-right text-rose-400 font-mono">${formatThousand(item.out)}</td>
-                    <td class="py-2.5 px-3 text-right font-black font-mono text-indigo-300">${formatThousand(net)}</td>
+                    <td class="py-2.5 px-3 text-right font-black font-mono text-indigo-300">${formatThousand(net)}</td><td class="py-2.5 px-3 text-center"><button class="text-cyan-400 hover:text-cyan-300 font-bold text-[10px]">Edit/Hapus via DB</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -994,7 +994,7 @@
 
             allTickets.forEach((t, idx) => {
                 const card = document.createElement('div');
-                card.className = "p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs";
+                card.className = "p-4 rounded-2xl bg-slate-900/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs";
                 const isPending = (t.status === 'PENDING');
 
                 card.innerHTML = `
@@ -1055,16 +1055,16 @@
         }
 
         const GLOBAL_RELEASE_NOTES = [
-            { version: "v1.1.2", type: "App", date: "10 Nov 2026", title: "Penyederhanaan Closing Kasir", desc: "Konsep penamaan shift dihapus. Kasir cukup menekan Closing Kasir untuk mereset laci ke Rp 0 secara presisi." },
-            { version: "Core Shield 1.1.2", type: "Security", date: "10 Nov 2026", title: "Single-Session Lockout", desc: "Perlindungan anti-fitnah: sesi kasir dikunci pada 1 perangkat kerja aktif." },
+            { version: "v1.0.0 (Beta 1.0)", type: "App", date: "10 Nov 2026", title: "Penyederhanaan Closing Kasir", desc: "Konsep penamaan shift dihapus. Kasir cukup menekan Closing Kasir untuk mereset laci ke Rp 0 secara presisi." },
+            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "10 Nov 2026", title: "Single-Session Lockout", desc: "Perlindungan anti-fitnah: sesi kasir dikunci pada 1 perangkat kerja aktif." },
             { version: "v1.1.1", type: "App", date: "09 Nov 2026", title: "Sistem Kasir 2-Langkah", desc: "Input pesanan masuk ke draft sementara bebas edit sebelum dicetak struk sah." },
-            { version: "Core Shield 1.1.1", type: "Security", date: "09 Nov 2026", title: "Audit Trail Forensik", desc: "Seluruh tindakan koreksi nota oleh Manager otomatis terekam permanen di Owner." },
+            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "09 Nov 2026", title: "Audit Trail Forensik", desc: "Seluruh tindakan koreksi nota oleh Manager otomatis terekam permanen di Owner." },
             { version: "v1.1.0", type: "App", date: "05 Nov 2026", title: "Tiket Penambahan Kasir", desc: "Penambahan menu pengajuan lisensi terminal meja kasir baru ke panel Provider." },
-            { version: "Core Shield 1.1.0", type: "Security", date: "05 Nov 2026", title: "Restriksi Waktu Transaksi", desc: "Hanya Owner yang memiliki wewenang mengoreksi tanggal nota transaksi." },
+            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "05 Nov 2026", title: "Restriksi Waktu Transaksi", desc: "Hanya Owner yang memiliki wewenang mengoreksi tanggal nota transaksi." },
             { version: "v1.0.5", type: "App", date: "01 Nov 2026", title: "Kapsul Waktu Realtime Glass", desc: "Desain kapsul jam dan tanggal realtime berbalut kaca es transparan." },
-            { version: "Core Shield 1.0.5", type: "Security", date: "01 Nov 2026", title: "Proteksi Sandi Bertahap", desc: "Sistem penguncian bertahap 5 menit, 10 menit, hingga pemblokiran akun." },
+            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "01 Nov 2026", title: "Proteksi Sandi Bertahap", desc: "Sistem penguncian bertahap 5 menit, 10 menit, hingga pemblokiran akun." },
             { version: "v1.0.0", type: "App", date: "25 Okt 2026", title: "Rilis Perdana Oneilverse POS", desc: "Peluncuran sistem kasir dan keuangan multi-tenant jaringan UMKM." },
-            { version: "Core Shield 1.0.0", type: "Security", date: "25 Okt 2026", title: "Enkripsi Multi-Tenant", desc: "Isolasi data antar toko untuk keamanan pembukuan finansial." }
+            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "25 Okt 2026", title: "Enkripsi Multi-Tenant", desc: "Isolasi data antar toko untuk keamanan pembukuan finansial." }
         ];
 
         function renderGlobalReleaseNotes() {
@@ -1262,7 +1262,7 @@ function closeWeatherModal() {
 <div id='modal-main' class='hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-start justify-center'>
     <!-- WIDGET CUACA MODAL -->
     <div id="modal-weather" class="hidden ios-glass w-full max-w-sm p-6 modal-sheet mx-auto mt-20 relative text-center">
-        <button onclick="closeWeatherModal()" class="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20">
+        <button onclick="closeWeatherModal()" class="absolute top-4 right-4 w-8 h-8 bg-slate-900/10 rounded-full flex items-center justify-center text-white hover:bg-slate-900/20">
             <i data-lucide="x" class="w-4 h-4"></i>
         </button>
         <i data-lucide="cloud-lightning" class="w-12 h-12 text-cyan-400 mx-auto mb-3"></i>

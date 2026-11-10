@@ -16,14 +16,14 @@
 
     <style>
         :root {
-            --app-bg: #f8fafc;
+            --app-bg: #070d18;
             --ios-card: rgba(255, 255, 255, 0.94);
             --ios-border: rgba(226, 232, 240, 0.95);
             --oneui-squircle: 24px;
         }
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-            background-color: var(--app-bg);
+            background-color: #070d18; background-image: radial-gradient(at 0% 0%, rgba(30, 27, 75, 0.45) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(49, 16, 66, 0.35) 0px, transparent 50%); padding-bottom: 48px;
             -webkit-tap-highlight-color: transparent;
         }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -33,7 +33,8 @@
             background: linear-gradient(145deg, #070d18 0%, #0f172a 40%, #1e1b4b 50%, #311042 100%);
         }
         .ios-glass {
-            background: var(--ios-card);
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%), rgba(15, 23, 42, 0.88);
+            box-shadow: 0 12px 35px -10px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.18);
             backdrop-filter: blur(20px);
             border: 1px solid var(--ios-border);
             border-radius: var(--oneui-squircle);
@@ -57,7 +58,7 @@
         }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white pb-6">
+<body class="text-white min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white pb-6">
 
     <!-- HEADER SUPERVISOR / MANAGER -->
     <header class="oneui-hero text-white px-5 sm:px-8 pt-6 pb-7 shadow-xl relative overflow-hidden">
@@ -108,11 +109,11 @@
                 </div>
 
             <div id="premium-widgets-container" class="hidden w-full sm:w-auto flex-wrap items-center gap-2 mt-3 md:mt-0 text-[10px] font-bold text-white">
-                <div onclick="openWeatherModal()" class="px-2.5 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl flex items-center space-x-1.5 cursor-pointer transition">
+                <div onclick="openWeatherModal()" class="px-2.5 py-1.5 bg-slate-900/10 hover:bg-slate-900/20 border border-white/20 rounded-xl flex items-center space-x-1.5 cursor-pointer transition">
                     <i data-lucide="cloud-rain" class="w-3.5 h-3.5 text-cyan-400"></i>
                     <span id="weather-text">Memuat Cuaca...</span>
                 </div>
-                <div class="px-2.5 py-1.5 bg-white/10 border border-white/20 rounded-xl flex items-center space-x-1.5">
+                <div class="px-2.5 py-1.5 bg-slate-900/10 border border-white/20 rounded-xl flex items-center space-x-1.5">
                     <i data-lucide="coins" class="w-3.5 h-3.5 text-yellow-400"></i>
                     <span id="kurs-text">Memuat Kurs...</span>
                 </div>
@@ -123,7 +124,7 @@
                 </div>
                 <button onclick="openReleaseNotesModal()" class="ios-pill px-3 py-1.5 bg-slate-900/40 hover:bg-slate-900/60 border border-white/15 text-[10px] font-bold flex items-center space-x-1 transition active:scale-95" title="Catatan Rilis & Keamanan">
                     <i data-lucide="info" class="w-3.5 h-3.5 text-purple-300"></i>
-                    <span class="font-mono text-purple-100">v1.1.2</span>
+                    <span class="font-mono text-purple-100">v1.0.0 (Beta 1.0)</span>
                 </button>
                 <button onclick="logout()" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
@@ -152,7 +153,7 @@
                 </div>
                 <h3 id="kas-total-out" class="text-2xl sm:text-3xl font-black text-rose-400 my-1 font-mono">Rp 0</h3>
             </div>
-            <div class="ios-glass p-5 flex flex-col justify-between bg-white/5 border-white/20">
+            <div class="ios-glass p-5 flex flex-col justify-between bg-slate-900/5 border-white/20">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-extrabold text-white uppercase tracking-wider">Laba Bersih</span>
                     <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
@@ -180,8 +181,8 @@
         <!-- GRID 2 KOLOM -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             <section class="lg:col-span-5 ios-glass p-5 sm:p-6 shadow-sm space-y-4">
-                <div class="border-b border-slate-200/80 pb-3 flex justify-between items-center">
-                    <h2 class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
+                <div class="border-b border-white/10/80 pb-3 flex justify-between items-center">
+                    <h2 class="text-base font-extrabold text-white flex items-center space-x-2">
                         <div class="w-7 h-7 rounded-lg bg-purple-700 text-white flex items-center justify-center shadow">
                             <i data-lucide="send" class="w-4 h-4"></i>
                         </div>
@@ -189,10 +190,10 @@
                     </h2>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-                    <span class="text-xs font-bold text-slate-800 block">Kirim Catatan / Arahan ke Kasir:</span>
-                    <input type="text" id="mgr-instruction-title" placeholder="Judul Pesan" class="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500">
-                    <textarea id="mgr-instruction-msg" rows="3" placeholder="Tulis instruksi atau konfirmasi pengeluaran..." class="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                <div class="p-4 rounded-2xl bg-slate-900/50 border border-white/10 space-y-2.5">
+                    <span class="text-xs font-bold text-white block">Kirim Catatan / Arahan ke Kasir:</span>
+                    <input type="text" id="mgr-instruction-title" placeholder="Judul Pesan" class="w-full bg-slate-900 border border-slate-300 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500">
+                    <textarea id="mgr-instruction-msg" rows="3" placeholder="Tulis instruksi atau konfirmasi pengeluaran..." class="w-full bg-slate-900 border border-slate-300 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-purple-500"></textarea>
                     <div class="flex justify-end">
                         <button onclick="submitManagerInstruction()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm flex items-center space-x-1">
                             <i data-lucide="send" class="w-3.5 h-3.5"></i>
@@ -206,7 +207,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button onclick="openModal('mutasi')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
                         <div class="flex items-center space-x-3 text-left">
-                            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-purple-300">
+                            <div class="w-10 h-10 rounded-xl bg-slate-900/10 flex items-center justify-center text-purple-300">
                                 <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
                             </div>
                             <div>
@@ -219,7 +220,7 @@
 
                     <button onclick="openModal('tax')" class="p-4 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-between shadow-md transition active:scale-98">
                         <div class="flex items-center space-x-3 text-left">
-                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                            <div class="w-10 h-10 rounded-xl bg-slate-900/20 flex items-center justify-center text-white">
                                 <i data-lucide="receipt" class="w-5 h-5"></i>
                             </div>
                             <div>
@@ -232,7 +233,7 @@
 
                     <button onclick="openModal('ledger')" class="p-4 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
                         <div class="flex items-center space-x-3 text-left">
-                            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-purple-200">
+                            <div class="w-10 h-10 rounded-xl bg-slate-900/10 flex items-center justify-center text-purple-200">
                                 <i data-lucide="book-open" class="w-5 h-5"></i>
                             </div>
                             <div>
@@ -245,7 +246,7 @@
 
                     <button onclick="openModal('closing_history')" class="p-4 rounded-2xl bg-indigo-700 hover:bg-indigo-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
                         <div class="flex items-center space-x-3 text-left">
-                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                            <div class="w-10 h-10 rounded-xl bg-slate-900/20 flex items-center justify-center text-white">
                                 <i data-lucide="history" class="w-5 h-5"></i>
                             </div>
                             <div>
@@ -263,13 +264,13 @@
 
     <!-- MODAL POP-UP DIALOG UNIVERSAL -->
     <div id="main-modal-container" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl modal-sheet overflow-hidden bg-white">
-            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="ios-glass w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl modal-sheet overflow-hidden bg-slate-900">
+            <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                 <div>
-                    <h3 id="modal-title" class="font-black text-base text-slate-900">Judul</h3>
+                    <h3 id="modal-title" class="font-black text-base text-white">Judul</h3>
                     <p id="modal-subtitle" class="text-xs text-slate-400">Keterangan</p>
                 </div>
-                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-slate-200 text-slate-400 flex items-center justify-center transition">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -277,9 +278,9 @@
             <div id="modal-body-content" class="p-6 overflow-y-auto flex-1 space-y-4">
                 <!-- 1. MUTASI KAS DENGAN KOREKSI & VOID -->
                 <div id="popup-content-mutasi" class="space-y-4 hidden">
-                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
                         <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-600 border-b">
+                            <thead class="bg-white/10 text-[11px] font-black uppercase text-slate-400 border-b">
                                 <tr>
                                     <th class="py-3 px-3">Waktu</th>
                                     <th class="py-3 px-3">Uraian Transaksi</th>
@@ -293,36 +294,7 @@
                         </table>
                     </div>
 
-                    <!-- MANAJEMEN PRODUK -->
-                    <div class="bg-indigo-950/40 border border-indigo-400/30 rounded-2xl p-4 space-y-3 mt-4 text-white">
-                        <span class="text-xs font-black block">Tambah Inventaris Produk Minimarket:</span>
-                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                            <input type="text" id="new-prod-code" placeholder="Kode Brg" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs font-mono font-bold outline-none text-white">
-                            <input type="text" id="new-prod-name" placeholder="Nama Barang" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs font-bold outline-none text-white">
-                            <input type="number" id="new-prod-stock" placeholder="Stok" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs outline-none text-white">
-                            <input type="number" id="new-prod-price" placeholder="Harga Jual" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs outline-none text-white">
-                        </div>
-                        <div class="flex justify-end">
-                            <button onclick="saveNewProduct()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm">
-                                + Simpan Produk
-                            </button>
-                        </div>
-                        
-                        <div class="overflow-x-auto border border-white/10 rounded-xl mt-3 bg-black/20">
-                            <table class="w-full text-left text-xs">
-                                <thead class="bg-white/5 text-[10px] font-black uppercase text-slate-400 border-b border-white/10">
-                                    <tr>
-                                        <th class="py-2.5 px-3">Kode</th>
-                                        <th class="py-2.5 px-3">Produk</th>
-                                        <th class="py-2.5 px-3 text-center">Stok</th>
-                                        <th class="py-2.5 px-3 text-right">Hrg Jual</th>
-                                        <th class="py-2.5 px-3 text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="product-table-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                    
 
                 </div>
 
@@ -330,7 +302,7 @@
                 <div id="popup-content-tax" class="space-y-4 hidden">
                     <div class="overflow-x-auto border border-amber-200 rounded-2xl">
                         <table class="w-full text-left text-xs">
-                            <thead class="bg-amber-100/70 text-[11px] font-black uppercase text-amber-950 border-b">
+                            <thead class="bg-amber-100/70 text-[11px] font-black uppercase text-amber-400 border-b">
                                 <tr>
                                     <th class="py-3 px-3">Tanggal</th>
                                     <th class="py-3 px-3">Pos Pengeluaran</th>
@@ -344,36 +316,7 @@
                         </table>
                     </div>
 
-                    <!-- MANAJEMEN PRODUK -->
-                    <div class="bg-indigo-950/40 border border-indigo-400/30 rounded-2xl p-4 space-y-3 mt-4 text-white">
-                        <span class="text-xs font-black block">Tambah Inventaris Produk Minimarket:</span>
-                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                            <input type="text" id="new-prod-code" placeholder="Kode Brg" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs font-mono font-bold outline-none text-white">
-                            <input type="text" id="new-prod-name" placeholder="Nama Barang" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs font-bold outline-none text-white">
-                            <input type="number" id="new-prod-stock" placeholder="Stok" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs outline-none text-white">
-                            <input type="number" id="new-prod-price" placeholder="Harga Jual" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs outline-none text-white">
-                        </div>
-                        <div class="flex justify-end">
-                            <button onclick="saveNewProduct()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm">
-                                + Simpan Produk
-                            </button>
-                        </div>
-                        
-                        <div class="overflow-x-auto border border-white/10 rounded-xl mt-3 bg-black/20">
-                            <table class="w-full text-left text-xs">
-                                <thead class="bg-white/5 text-[10px] font-black uppercase text-slate-400 border-b border-white/10">
-                                    <tr>
-                                        <th class="py-2.5 px-3">Kode</th>
-                                        <th class="py-2.5 px-3">Produk</th>
-                                        <th class="py-2.5 px-3 text-center">Stok</th>
-                                        <th class="py-2.5 px-3 text-right">Hrg Jual</th>
-                                        <th class="py-2.5 px-3 text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="product-table-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                    
 
                 </div>
 
@@ -384,9 +327,9 @@
 
                 <!-- 4. REKAP CLOSING -->
                 <div id="popup-content-closing_history" class="space-y-4 hidden">
-                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
                         <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-700 border-b">
+                            <thead class="bg-white/10 text-[11px] font-black uppercase text-slate-300 border-b">
                                 <tr>
                                     <th class="py-3 px-3">Waktu Closing</th>
                                     <th class="py-3 px-3 text-right">Kas Masuk</th>
@@ -399,47 +342,18 @@
                         </table>
                     </div>
 
-                    <!-- MANAJEMEN PRODUK -->
-                    <div class="bg-indigo-950/40 border border-indigo-400/30 rounded-2xl p-4 space-y-3 mt-4 text-white">
-                        <span class="text-xs font-black block">Tambah Inventaris Produk Minimarket:</span>
-                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                            <input type="text" id="new-prod-code" placeholder="Kode Brg" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs font-mono font-bold outline-none text-white">
-                            <input type="text" id="new-prod-name" placeholder="Nama Barang" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs font-bold outline-none text-white">
-                            <input type="number" id="new-prod-stock" placeholder="Stok" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs outline-none text-white">
-                            <input type="number" id="new-prod-price" placeholder="Harga Jual" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs outline-none text-white">
-                        </div>
-                        <div class="flex justify-end">
-                            <button onclick="saveNewProduct()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm">
-                                + Simpan Produk
-                            </button>
-                        </div>
-                        
-                        <div class="overflow-x-auto border border-white/10 rounded-xl mt-3 bg-black/20">
-                            <table class="w-full text-left text-xs">
-                                <thead class="bg-white/5 text-[10px] font-black uppercase text-slate-400 border-b border-white/10">
-                                    <tr>
-                                        <th class="py-2.5 px-3">Kode</th>
-                                        <th class="py-2.5 px-3">Produk</th>
-                                        <th class="py-2.5 px-3 text-center">Stok</th>
-                                        <th class="py-2.5 px-3 text-right">Hrg Jual</th>
-                                        <th class="py-2.5 px-3 text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="product-table-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                    
 
                 </div>
 
                 <!-- 5. KELOLA AKUN COA (TAMBAH, EDIT, HAPUS & TERHUBUNG OTOMATIS KE KASIR) -->
                 <div id="popup-content-coa_mgmt" class="space-y-4 hidden">
-                    <div class="bg-purple-50/70 border border-purple-200 rounded-2xl p-4 space-y-3">
+                    <div class="bg-purple-950/70 border border-purple-200 rounded-2xl p-4 space-y-3">
                         <span class="text-xs font-black text-purple-950 block">Tambah Akun Baru (COA):</span>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <input type="text" id="new-coa-code" placeholder="Kode (misal: 108 / 208)" class="bg-white border border-purple-300 rounded-xl p-2 text-xs font-mono font-bold outline-none">
-                            <input type="text" id="new-coa-name" placeholder="Nama Akun" class="bg-white border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
-                            <select id="new-coa-cat" class="bg-white border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
+                            <input type="text" id="new-coa-code" placeholder="Kode (misal: 108 / 208)" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-mono font-bold outline-none">
+                            <input type="text" id="new-coa-name" placeholder="Nama Akun" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
+                            <select id="new-coa-cat" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
                                 <option value="sales">Income (Pemasukan)</option>
                                 <option value="cogs">Outcome (Produksi)</option>
                                 <option value="expense">Outcome (Operasional)</option>
@@ -452,9 +366,9 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
                         <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-100 text-[11px] font-black uppercase text-slate-700 border-b">
+                            <thead class="bg-white/10 text-[11px] font-black uppercase text-slate-300 border-b">
                                 <tr>
                                     <th class="py-2.5 px-3">Kode</th>
                                     <th class="py-2.5 px-3">Nama Akun</th>
@@ -466,36 +380,7 @@
                         </table>
                     </div>
 
-                    <!-- MANAJEMEN PRODUK -->
-                    <div class="bg-indigo-950/40 border border-indigo-400/30 rounded-2xl p-4 space-y-3 mt-4 text-white">
-                        <span class="text-xs font-black block">Tambah Inventaris Produk Minimarket:</span>
-                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                            <input type="text" id="new-prod-code" placeholder="Kode Brg" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs font-mono font-bold outline-none text-white">
-                            <input type="text" id="new-prod-name" placeholder="Nama Barang" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs font-bold outline-none text-white">
-                            <input type="number" id="new-prod-stock" placeholder="Stok" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs outline-none text-white">
-                            <input type="number" id="new-prod-price" placeholder="Harga Jual" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs outline-none text-white">
-                        </div>
-                        <div class="flex justify-end">
-                            <button onclick="saveNewProduct()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm">
-                                + Simpan Produk
-                            </button>
-                        </div>
-                        
-                        <div class="overflow-x-auto border border-white/10 rounded-xl mt-3 bg-black/20">
-                            <table class="w-full text-left text-xs">
-                                <thead class="bg-white/5 text-[10px] font-black uppercase text-slate-400 border-b border-white/10">
-                                    <tr>
-                                        <th class="py-2.5 px-3">Kode</th>
-                                        <th class="py-2.5 px-3">Produk</th>
-                                        <th class="py-2.5 px-3 text-center">Stok</th>
-                                        <th class="py-2.5 px-3 text-right">Hrg Jual</th>
-                                        <th class="py-2.5 px-3 text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="product-table-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                    
 
                 </div>
 
@@ -508,16 +393,16 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                             <div>
-                                <label class="font-bold text-slate-700 block mb-1">Jumlah Kasir yang Dibuka:</label>
-                                <select id="req-cashier-qty" class="w-full bg-white border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
+                                <label class="font-bold text-slate-300 block mb-1">Jumlah Kasir yang Dibuka:</label>
+                                <select id="req-cashier-qty" class="w-full bg-slate-900 border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
                                     <option value="1">+1 Terminal Kasir</option>
                                     <option value="2">+2 Terminal Kasir</option>
                                     <option value="3">+3 Terminal Kasir</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="font-bold text-slate-700 block mb-1">Nama / Keterangan Terminal:</label>
-                                <input type="text" id="req-cashier-name" placeholder="Misal: Kasir Meja 2 / Kasir Lantai 2" class="w-full bg-white border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
+                                <label class="font-bold text-slate-300 block mb-1">Nama / Keterangan Terminal:</label>
+                                <input type="text" id="req-cashier-name" placeholder="Misal: Kasir Meja 2 / Kasir Lantai 2" class="w-full bg-slate-900 border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
                             </div>
                         </div>
                         <div class="flex justify-end pt-1">
@@ -530,8 +415,8 @@
                 </div>
             </div>
 
-            <div class="px-6 py-3 border-t border-slate-100 bg-white flex justify-end">
-                <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+            <div class="px-6 py-3 border-t border-white/5 bg-slate-900 flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-white/10 hover:bg-slate-200 text-slate-300 text-xs font-bold transition">
                     Tutup
                 </button>
             </div>
@@ -540,36 +425,36 @@
 
     <!-- MODAL EDIT TRANSAKSI KHUSUS MANAGER -->
     <div id="modal-mgr-edit" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl modal-sheet space-y-4 border border-purple-200">
+        <div class="bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl modal-sheet space-y-4 border border-purple-200">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-black text-sm text-slate-900 flex items-center space-x-1.5">
+                <h3 class="font-black text-sm text-white flex items-center space-x-1.5">
                     <i data-lucide="edit-3" class="w-4 h-4 text-purple-600"></i>
                     <span>Koreksi Transaksi Sah</span>
                 </h3>
-                <button onclick="closeManagerEditModal()" class="text-slate-400 hover:text-slate-600">
+                <button onclick="closeManagerEditModal()" class="text-slate-400 hover:text-slate-400">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
             <input type="hidden" id="mgr-edit-id">
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="font-bold text-slate-600 block mb-1">Akun Transaksi</label>
-                    <input type="text" id="mgr-edit-account" readonly class="w-full bg-slate-100 border rounded-xl p-2.5 font-bold text-slate-700 outline-none">
+                    <label class="font-bold text-slate-400 block mb-1">Akun Transaksi</label>
+                    <input type="text" id="mgr-edit-account" readonly class="w-full bg-white/10 border rounded-xl p-2.5 font-bold text-slate-300 outline-none">
                 </div>
                 <div>
-                    <label class="font-bold text-slate-600 block mb-1">Nominal Transaksi (Rp)</label>
+                    <label class="font-bold text-slate-400 block mb-1">Nominal Transaksi (Rp)</label>
                     <input type="text" id="mgr-edit-amount" oninput="formatInputThousand(this)" class="w-full bg-purple-50/50 border border-purple-300 rounded-xl p-3 text-base font-black text-purple-950 outline-none font-mono">
                 </div>
                 <div>
-                    <label class="font-bold text-slate-600 block mb-1">Keterangan Koreksi</label>
-                    <input type="text" id="mgr-edit-desc" class="w-full bg-slate-50 border rounded-xl p-2.5 outline-none">
+                    <label class="font-bold text-slate-400 block mb-1">Keterangan Koreksi</label>
+                    <input type="text" id="mgr-edit-desc" class="w-full bg-slate-900/50 border rounded-xl p-2.5 outline-none">
                 </div>
             </div>
             <div class="flex space-x-2 pt-2">
                 <button onclick="saveManagerCorrection()" class="flex-1 bg-purple-700 hover:bg-purple-800 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95 shadow-sm">
                     Simpan Perubahan
                 </button>
-                <button onclick="closeManagerEditModal()" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-xs transition">
+                <button onclick="closeManagerEditModal()" class="px-4 bg-white/10 hover:bg-slate-200 text-slate-400 font-bold py-2.5 rounded-xl text-xs transition">
                     Batal
                 </button>
             </div>
@@ -578,17 +463,17 @@
 
     <!-- MODAL PENJELASAN PAJAK 12% -->
     <div id="modal-tax-explainer" style="display: none;" class="hidden fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-sm p-6 shadow-2xl modal-sheet space-y-4 bg-white text-center border border-slate-200">
+        <div class="ios-glass w-full max-w-sm p-6 shadow-2xl modal-sheet space-y-4 bg-slate-900 text-center border border-white/10">
             <div class="w-12 h-12 bg-amber-100 text-amber-800 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
                 <i data-lucide="info" class="w-6 h-6"></i>
             </div>
             <div>
-                <h3 class="font-black text-sm text-slate-900">Catatan Pajak 12%</h3>
+                <h3 class="font-black text-sm text-white">Catatan Pajak 12%</h3>
                 <span class="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300 mt-1 inline-block">
                     Pajak Belanja Inklusif
                 </span>
             </div>
-            <p class="text-xs text-slate-700 leading-relaxed bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200/80 text-left">
+            <p class="text-xs text-slate-300 leading-relaxed bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200/80 text-left">
                 Kolom ini hanya catatan transparan agar kamu tahu berapa rupiah dari belanjaanmu yang sudah disumbangkan ke kas negara.
             </p>
             <button onclick="closeTaxExplainer()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95 shadow-md">
@@ -599,10 +484,10 @@
 
     <!-- MODAL CATATAN RILIS & VERSI -->
     <div id="modal-release-notes" class="hidden fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-lg p-0 shadow-2xl modal-sheet flex flex-col overflow-hidden bg-white">
-            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
+        <div class="ios-glass w-full max-w-lg p-0 shadow-2xl modal-sheet flex flex-col overflow-hidden bg-slate-900">
+            <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-slate-900 text-white">
                 <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+                    <div class="w-9 h-9 rounded-xl bg-slate-900/10 flex items-center justify-center">
                         <i data-lucide="info" class="w-5 h-5 text-purple-300"></i>
                     </div>
                     <div>
@@ -610,13 +495,13 @@
                         <p class="text-[10px] text-slate-400">Pembaruan fungsional dan keamanan terbaru</p>
                     </div>
                 </div>
-                <button onclick="closeReleaseNotesModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                <button onclick="closeReleaseNotesModal()" class="w-8 h-8 rounded-full bg-slate-900/10 hover:bg-slate-900/20 flex items-center justify-center transition">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
             <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4" id="release-notes-container"></div>
-            <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex justify-end">
-                <button onclick="closeReleaseNotesModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition">
+            <div class="px-6 py-3 border-t border-white/5 bg-slate-900/50 flex justify-end">
+                <button onclick="closeReleaseNotesModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-300 text-xs font-bold transition">
                     Tutup
                 </button>
             </div>
@@ -748,7 +633,7 @@
                 else totalOut += tx.amount;
 
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-100 hover:bg-slate-50 text-xs";
+                tr.className = "border-b border-white/5 hover:bg-slate-900/50 text-xs";
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono">${tx.dateFull} ${tx.date}</td>
                     <td class="py-2.5 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}<br><span class="text-[10px] text-slate-400 font-normal">${tx.desc || '-'} (Kasir: ${tx.staff})</span></td>
@@ -768,7 +653,7 @@
             document.getElementById('kas-total-out').innerText = "Rp " + formatThousandSeparator(totalOut);
             const netEl = document.getElementById('kas-net');
             netEl.innerText = formatCurrency(net);
-            netEl.className = net < 0 ? "text-3xl sm:text-4xl font-black text-rose-600 tracking-tight font-mono" : "text-3xl sm:text-4xl font-black text-slate-900 tracking-tight font-mono";
+            netEl.className = net < 0 ? "text-3xl sm:text-4xl font-black text-rose-600 tracking-tight font-mono" : "text-3xl sm:text-4xl font-black text-white tracking-tight font-mono";
         }
 
         function recordAuditLog(actionType, detail, beforeData, afterData) {
@@ -930,13 +815,13 @@
 
             coaList.forEach(c => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-100 text-xs";
+                tr.className = "border-b border-white/5 text-xs";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-mono font-bold text-slate-900">${c.code}</td>
-                    <td class="py-2.5 px-3 font-bold text-slate-800">${c.name}</td>
+                    <td class="py-2.5 px-3 font-mono font-bold text-white">${c.code}</td>
+                    <td class="py-2.5 px-3 font-bold text-white">${c.name}</td>
                     <td class="py-2.5 px-3 uppercase text-[10px] text-slate-500">${c.category}</td>
                     <td class="py-2.5 px-3 text-center space-x-1">
-                        <button onclick="editCOAItem('${c.code}')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10px]">Edit</button>
+                        <button onclick="editCOAItem('${c.code}')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-slate-200 text-slate-300 font-bold text-[10px]">Edit</button>
                         <button onclick="deleteCOAItem('${c.code}')" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px]">Hapus</button>
                     </td>
                 `;
@@ -993,7 +878,7 @@
                     <td class="py-2 px-3 font-bold">[${tx.accountCode}] ${tx.accountName}</td>
                     <td class="py-2 px-3 text-slate-500">${tx.desc || '-'}</td>
                     <td class="py-2 px-3 text-right font-mono">Rp ${formatThousandSeparator(tx.amount)}</td>
-                    <td class="py-2 px-3 text-right font-black text-amber-900 bg-amber-100/60 font-mono">Rp ${formatThousandSeparator(tax)}</td>
+                    <td class="py-2 px-3 text-right font-black text-amber-300 bg-amber-100/60 font-mono">Rp ${formatThousandSeparator(tax)}</td>
                     <td class="py-2 px-3 text-right text-slate-500 font-mono">Rp ${formatThousandSeparator(tx.dpp || (tx.amount - tax))}</td>
                 `;
                 tbody.appendChild(tr);
@@ -1021,14 +906,14 @@
             const activeList = Object.values(groups).filter(a => a.items.length > 0);
             activeList.forEach(acc => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2 text-xs";
+                card.className = "bg-slate-900/50 border border-white/10 rounded-2xl p-4 space-y-2 text-xs";
                 card.innerHTML = `
-                    <div class="flex justify-between items-start border-b border-slate-200/60 pb-2">
+                    <div class="flex justify-between items-start border-b border-white/10/60 pb-2">
                         <div>
                             <span class="text-[10px] font-mono font-bold text-slate-500">[${acc.code}]</span>
-                            <h4 class="font-bold text-slate-900">${acc.name}</h4>
+                            <h4 class="font-bold text-white">${acc.name}</h4>
                         </div>
-                        <span class="font-black text-slate-900 font-mono">Rp ${formatThousandSeparator(acc.total)}</span>
+                        <span class="font-black text-white font-mono">Rp ${formatThousandSeparator(acc.total)}</span>
                     </div>
                     <span class="text-[10px] text-slate-400">${acc.items.length} kali mutasi</span>
                 `;
@@ -1069,7 +954,7 @@
             tbody.innerHTML = "";
             closingHistory.forEach(s => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-100 text-xs";
+                tr.className = "border-b border-white/5 text-xs";
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono">${s.closedAt}</td>
                     <td class="py-2.5 px-3 text-right font-black text-emerald-600 font-mono">Rp ${formatThousandSeparator(s.totalIn)}</td>
@@ -1098,16 +983,16 @@
 
         // CATATAN RILIS LOGIKA (MAKSIMAL 10 TERBARU)
         const RELEASE_NOTES_DB = [
-            { version: "v1.1.2", type: "App", date: "10 Nov 2026", title: "Penyederhanaan Closing Kasir", desc: "Konsep penamaan shift dihapus. Kasir cukup menekan Closing Kasir untuk mereset laci ke Rp 0." },
-            { version: "Core Shield 1.1.2", type: "Security", date: "10 Nov 2026", title: "Single-Session Lockout", desc: "Perlindungan anti-fitnah: sesi kasir dikunci pada 1 perangkat kerja aktif." },
+            { version: "v1.0.0 (Beta 1.0)", type: "App", date: "10 Nov 2026", title: "Penyederhanaan Closing Kasir", desc: "Konsep penamaan shift dihapus. Kasir cukup menekan Closing Kasir untuk mereset laci ke Rp 0." },
+            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "10 Nov 2026", title: "Single-Session Lockout", desc: "Perlindungan anti-fitnah: sesi kasir dikunci pada 1 perangkat kerja aktif." },
             { version: "v1.1.1", type: "App", date: "09 Nov 2026", title: "Sistem Kasir 2-Langkah", desc: "Input pesanan masuk ke draft sementara bebas edit sebelum dicetak struk sah." },
-            { version: "Core Shield 1.1.1", type: "Security", date: "09 Nov 2026", title: "Audit Trail Forensik", desc: "Seluruh tindakan koreksi nota oleh Manager otomatis terekam permanen di Owner." },
+            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "09 Nov 2026", title: "Audit Trail Forensik", desc: "Seluruh tindakan koreksi nota oleh Manager otomatis terekam permanen di Owner." },
             { version: "v1.1.0", type: "App", date: "05 Nov 2026", title: "Tiket Penambahan Kasir", desc: "Penambahan menu pengajuan lisensi terminal meja kasir baru ke panel Provider." },
-            { version: "Core Shield 1.1.0", type: "Security", date: "05 Nov 2026", title: "Restriksi Waktu Transaksi", desc: "Hanya Owner yang memiliki wewenang mengoreksi tanggal nota transaksi." },
+            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "05 Nov 2026", title: "Restriksi Waktu Transaksi", desc: "Hanya Owner yang memiliki wewenang mengoreksi tanggal nota transaksi." },
             { version: "v1.0.5", type: "App", date: "01 Nov 2026", title: "Kapsul Waktu Realtime Glass", desc: "Desain kapsul jam dan tanggal realtime berbalut kaca es transparan." },
-            { version: "Core Shield 1.0.5", type: "Security", date: "01 Nov 2026", title: "Proteksi Sandi Bertahap", desc: "Sistem penguncian bertahap 5 menit, 10 menit, hingga pemblokiran akun." },
+            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "01 Nov 2026", title: "Proteksi Sandi Bertahap", desc: "Sistem penguncian bertahap 5 menit, 10 menit, hingga pemblokiran akun." },
             { version: "v1.0.0", type: "App", date: "25 Okt 2026", title: "Rilis Perdana Oneilverse POS", desc: "Peluncuran sistem kasir dan keuangan multi-tenant jaringan UMKM." },
-            { version: "Core Shield 1.0.0", type: "Security", date: "25 Okt 2026", title: "Enkripsi Multi-Tenant", desc: "Isolasi data antar toko untuk keamanan pembukuan finansial." }
+            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "25 Okt 2026", title: "Enkripsi Multi-Tenant", desc: "Isolasi data antar toko untuk keamanan pembukuan finansial." }
         ];
 
         function renderReleaseNotes() {
@@ -1126,12 +1011,12 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             ${icon}
-                            <span class="font-black text-[11px] text-slate-900 font-mono">${note.version}</span>
+                            <span class="font-black text-[11px] text-white font-mono">${note.version}</span>
                         </div>
                         <span class="px-2 py-0.5 rounded text-[9px] font-bold ${pillBg}">${note.date}</span>
                     </div>
-                    <h4 class="font-bold text-xs text-slate-800">${note.title}</h4>
-                    <p class="text-[11px] text-slate-600 leading-relaxed">${note.desc}</p>
+                    <h4 class="font-bold text-xs text-white">${note.title}</h4>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">${note.desc}</p>
                 `;
                 container.appendChild(card);
             });
@@ -1249,7 +1134,7 @@ function closeWeatherModal() {
 <div id='modal-main' class='hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-start justify-center'>
     <!-- WIDGET CUACA MODAL -->
     <div id="modal-weather" class="hidden ios-glass w-full max-w-sm p-6 modal-sheet mx-auto mt-20 relative text-center">
-        <button onclick="closeWeatherModal()" class="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20">
+        <button onclick="closeWeatherModal()" class="absolute top-4 right-4 w-8 h-8 bg-slate-900/10 rounded-full flex items-center justify-center text-white hover:bg-slate-900/20">
             <i data-lucide="x" class="w-4 h-4"></i>
         </button>
         <i data-lucide="cloud-lightning" class="w-12 h-12 text-cyan-400 mx-auto mb-3"></i>
