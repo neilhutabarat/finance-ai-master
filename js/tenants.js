@@ -106,57 +106,6 @@ const TENANTS_CONFIG = {
     }
   },
   // 4. Mitra Klien UMKM Contoh
-  "id26111001": {
-    id: "ID26111001",
-    nama: "Berkah Jati Furniture",
-    slogan: "Mebel & Kerajinan Kayu Berkualitas",
-    warna: "#1e293b",
-    warnaAksen: "#10b981",
-    logoText: "BJ",
-    tier: "plus",
-    isMaster: false,
-    isSinglePage: false,
-    customCOA: ONEILVERSE_COA_LIST,
-    locations: {
-      kasir: { name: "Kantor Mulia, Delta Pawan, Ketapang, Kalimantan Barat", lat: -1.8390, lon: 109.9801 },
-      manager: { name: "Kantor Mulia, Delta Pawan, Ketapang, Kalimantan Barat", lat: -1.8385, lon: 109.9805 },
-      owner: { name: "Mulia Kerta, Benua Kayong, Ketapang, Kalimantan Barat", lat: -1.8450, lon: 109.9910 }
-    }
-  },
-  "id26111003": {
-    id: "ID26111003",
-    nama: "Kopi Sentosa Ritel",
-    slogan: "Coffee Roastery & Retail Cafe",
-    warna: "#292524",
-    warnaAksen: "#f59e0b",
-    logoText: "KS",
-    tier: "basic",
-    isMaster: false,
-    isSinglePage: false,
-    customCOA: ONEILVERSE_COA_LIST,
-    locations: {
-      kasir: { name: "Sukaharja, Delta Pawan, Ketapang, Kalimantan Barat", lat: -1.8510, lon: 109.9740 },
-      manager: { name: "Sukaharja, Delta Pawan, Ketapang, Kalimantan Barat", lat: -1.8512, lon: 109.9745 },
-      owner: { name: "Sampit, Delta Pawan, Ketapang, Kalimantan Barat", lat: -1.8490, lon: 109.9710 }
-    }
-  },
-  "id26111004": {
-    id: "ID26111004",
-    nama: "Studio Kreatif Mandiri",
-    slogan: "Design Graphic & Digital Printing",
-    warna: "#1e1b4b",
-    warnaAksen: "#6366f1",
-    logoText: "SM",
-    tier: "plus",
-    isMaster: false,
-    isSinglePage: false,
-    customCOA: ONEILVERSE_COA_LIST,
-    locations: {
-      kasir: { name: "Tengah, Delta Pawan, Ketapang, Kalimantan Barat", lat: -1.8440, lon: 109.9680 },
-      manager: { name: "Tengah, Delta Pawan, Ketapang, Kalimantan Barat", lat: -1.8442, lon: 109.9685 },
-      owner: { name: "Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat", lat: -1.8480, lon: 109.9719 }
-    }
-  }
 };
 
 function getActiveTenant() {
