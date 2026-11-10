@@ -108,11 +108,25 @@ const TENANTS_CONFIG = {
   // 4. Mitra Klien UMKM Contoh
 };
 
+const TENANT_NOT_FOUND = {
+  id: "TOKO-TIDAK-DITEMUKAN",
+  nama: "Toko tidak ditemukan",
+  slogan: "Periksa kembali link toko Anda dan pastikan perangkat terhubung ke internet.",
+  warna: "#334155", warnaAksen: "#94a3b8", logoText: "?",
+  tier: "basic", isMaster: false, isSinglePage: false, isProviderID: false,
+  notFound: true, customCOA: [],
+  locations: { kasir: { name: "-", lat: 0, lon: 0 }, manager: { name: "-", lat: 0, lon: 0 }, owner: { name: "-", lat: 0, lon: 0 } }
+};
+
 function getActiveTenant() {
   const urlParams = new URLSearchParams(window.location.search);
   const tenantKey = (urlParams.get("toko") || "").toLowerCase().trim();
   if (tenantKey && TENANTS_CONFIG[tenantKey]) {
     return TENANTS_CONFIG[tenantKey];
+  }
+  // Ada parameter ?toko= tetapi tokonya tidak dikenal: jangan jatuh ke Oneilverse.
+  if (tenantKey && tenantKey !== "oneilverse") {
+    return TENANT_NOT_FOUND;
   }
   return TENANTS_CONFIG["id26110901"];
 }
@@ -194,7 +208,14 @@ function registryFetch(key, isAsync, done) {
     const cached = registryReadCache()[key];
     if (cached) {
       registryMerge(cached);            // pakai cache supaya halaman langsung siap
-      registryFetch(key, true);         // segarkan cache di latar belakang (berlaku untuk pembukaan berikutnya)
+      registryFetch(key, true, function (fresh) {   // segarkan cache di latar belakang
+        try {
+          const flag = "fm_reload_" + key;
+          if (fresh && fresh.tier !== cached.tier) {   // paket berubah: muat ulang sekali agar fitur baru aktif
+            if (!sessionStorage.getItem(flag)) { sessionStorage.setItem(flag, "1"); window.location.reload(); }
+          } else { sessionStorage.removeItem(flag); }
+        } catch (e) {}
+      });
     } else {
       registryFetch(key, false);        // pertama kali: ambil dulu dari server sebelum halaman berjalan
     }

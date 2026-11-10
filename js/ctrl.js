@@ -44,6 +44,17 @@
     }
 
     function start() {
+        var tn0 = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
+        if (tn0 && tn0.notFound) {
+            var el = document.createElement('div');
+            el.id = overlayId;
+            el.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(2,6,23,.98);display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;';
+            el.innerHTML = '<div style="max-width:420px;text-align:center;color:#e2e8f0"><div style="font-size:44px">🔎</div>' +
+                '<h2 style="font-size:20px;font-weight:900;margin:12px 0 8px">Toko Tidak Ditemukan</h2>' +
+                '<p style="font-size:13px;line-height:1.6;color:#94a3b8">Link toko tidak dikenal atau perangkat sedang offline. Periksa link dari penyedia aplikasi dan coba lagi.</p></div>';
+            document.body.appendChild(el);
+            return;
+        }
         var tries = 0;
         var timer = setInterval(function () {
             tries++;

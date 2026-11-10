@@ -393,10 +393,17 @@
         }
 
         // Tenant klien tidak ada di dropdown (dropdown disembunyikan), jadi ambil dari ?toko=
+        function lookupTenant(key) {
+            if (TENANTS_CONFIG[key]) return TENANTS_CONFIG[key];
+            if (key === '__notfound__') return getActiveTenant();
+            return TENANTS_CONFIG["id26110901"];
+        }
+
         function resolveTenantKey(picker) {
             const p = (urlParams.get('toko') || '').toLowerCase().trim();
             const pickerHidden = picker && picker.classList.contains('hidden');
             if (pickerHidden && p && typeof TENANTS_CONFIG !== 'undefined' && TENANTS_CONFIG[p]) return p;
+            if (pickerHidden && p) return '__notfound__';
             return picker ? picker.value : "id26110901";
         }
 
@@ -420,14 +427,42 @@
             document.getElementById('input-pin').focus();
         }
 
+        function applyTenantBranding(tn) {
+            const trig = document.getElementById('login-logo-trigger');
+            if (!trig) return;
+            const svg = trig.querySelector('svg');
+            let badge = document.getElementById('login-logo-badge');
+            const custom = !!(tn && (tn.fromRegistry || tn.notFound));
+            if (custom) {
+                if (svg) svg.style.display = 'none';
+                if (!badge) {
+                    badge = document.createElement('div');
+                    badge.id = 'login-logo-badge';
+                    badge.style.cssText = 'width:80px;height:80px;border-radius:24px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:28px;letter-spacing:1px;box-shadow:0 8px 24px rgba(0,0,0,.25);';
+                    trig.appendChild(badge);
+                }
+                badge.style.display = 'flex';
+                badge.style.background = 'linear-gradient(135deg,' + (tn.warna || '#0f172a') + ',' + (tn.warnaAksen || '#22d3ee') + ')';
+                badge.innerText = tn.logoText || 'UM';
+            } else {
+                if (svg) svg.style.display = '';
+                if (badge) badge.style.display = 'none';
+            }
+            const pin = document.getElementById('input-pin');
+            const btn = document.getElementById('btn-login-submit');
+            if (tn && tn.notFound) { if (pin) pin.disabled = true; if (btn) btn.disabled = true; }
+        }
+
         function onTenantPickerChange(key) {
-            activeTenant = TENANTS_CONFIG[key] || TENANTS_CONFIG["id26110901"];
+            activeTenant = lookupTenant(key);
             tenantKey = activeTenant.id;
             const singlePageMode = activeTenant && activeTenant.isSinglePage;
 
             document.getElementById('input-tenant-id').value = tenantKey;
             document.getElementById('login-brand').innerText = activeTenant.nama;
             document.getElementById('login-sub').innerText = activeTenant.slogan;
+            document.title = activeTenant.notFound ? 'Toko tidak ditemukan' : (activeTenant.nama + ' - Masuk');
+            applyTenantBranding(activeTenant);
 
             const roleGrid = document.getElementById('role-buttons-grid');
             const partnerPill = document.getElementById('partner-view-pill');
@@ -456,7 +491,8 @@
         function handleLogin() {
             const picker = document.getElementById('tenant-picker');
             const selectedKey = resolveTenantKey(picker);
-            activeTenant = TENANTS_CONFIG[selectedKey] || TENANTS_CONFIG["id26110901"];
+            activeTenant = lookupTenant(selectedKey);
+            if (activeTenant.notFound) return alert("Toko tidak ditemukan. Periksa link toko Anda dan pastikan perangkat terhubung internet.");
             tenantKey = activeTenant.id;
             const singlePageMode = activeTenant && activeTenant.isSinglePage;
             const currentTokoParam = `?toko=${encodeURIComponent(selectedKey)}`;
