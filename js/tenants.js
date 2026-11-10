@@ -2,6 +2,7 @@
  * tenants.js - Konfigurasi Multi-Tenant & Master Engine Oneilverse
  */
 
+// COA Standar Master Template Oneilverse
 const ONEILVERSE_COA_LIST = [
   { code: "101", name: "Iklan Video YouTube", category: "sales" },
   { code: "102", name: "Adsense YouTube", category: "sales" },
@@ -20,6 +21,7 @@ const ONEILVERSE_COA_LIST = [
   { code: "401", name: "Prive / Penarikan Owner", category: "prive" }
 ];
 
+// COA Khusus ONEntertainment (Showbiz / Musik / Rekaman)
 const ONENTERTAINMENT_COA_LIST = [
   { code: "101", name: "Royalti Musik Digital & Streaming", category: "sales" },
   { code: "102", name: "Adsense YouTube Music & Channel", category: "sales" },
@@ -33,6 +35,7 @@ const ONENTERTAINMENT_COA_LIST = [
   { code: "401", name: "Prive / Bagi Hasil Partner", category: "prive" }
 ];
 
+// COA Khusus Provider by Oneilverse (Infrastruktur / Cloud)
 const PROVIDER_COA_LIST = [
   { code: "P101", name: "Langganan Server UMKM (50rb/bln)", category: "sales" },
   { code: "P102", name: "Biaya Lisensi Terminal Kasir Tambahan", category: "sales" },
