@@ -601,7 +601,11 @@
         ];
 
         let providerTx = JSON.parse(localStorage.getItem('fm_provider_tx') || "[]");
-        let allTickets = JSON.parse(localStorage.getItem('fm_cashier_license_requests') || "[]");
+        let allTickets = [];
+        let ctrlMap = {};
+        function getCtrl(id) { return ctrlMap[id] || {}; }
+        function getAllowedCashiers(id) { const c = getCtrl(id).allowedCashiers; return (typeof c === 'number' && c > 0) ? c : 1; }
+        function isTenantSuspended(id) { return getCtrl(id).suspended === true; }
         // >>> JARINGAN-BEGIN
         // ===== DATA JARINGAN TENANT (Firestore: koleksi tx_<ID> per tenant) =====
         // Tenant master (Oneilverse) tampil di direktori tetapi TIDAK dihitung di statistik jaringan,
@@ -693,9 +697,48 @@
             if (isOpen('network_monthly_history')) renderNetworkMonthlyTable();
             if (isOpen('leaderboard')) renderLeaderboardTable();
             if (isOpen('inspect') && currentInspectId) renderInspect(currentInspectId);
+            if (isOpen('tickets') && typeof renderTicketsList === 'function') renderTicketsList();
+        }
+
+        function startControlListeners() {
+            if (!(typeof db !== 'undefined' && db)) {
+                try { allTickets = JSON.parse(localStorage.getItem('fm_cashier_license_requests') || "[]"); } catch (e) { allTickets = []; }
+                return;
+            }
+            db.collection('tenant_ctrl').onSnapshot(function (snap) {
+                const m = {};
+                snap.forEach(function (doc) { m[doc.id] = doc.data(); });
+                ctrlMap = m;
+                refreshProviderViews();
+            }, function (e) { console.error('Provider: gagal membaca tenant_ctrl', e); });
+
+            db.collection('provider_tickets').onSnapshot(function (snap) {
+                const list = [];
+                snap.forEach(function (doc) { const d = doc.data(); d.docId = doc.id; list.push(d); });
+                list.sort(function (a, b) { return (b.timestamp || 0) - (a.timestamp || 0); });
+                allTickets = list;
+                refreshProviderViews();
+            }, function (e) { console.error('Provider: gagal membaca provider_tickets', e); });
+        }
+
+        function setTenantSuspended(tenantId, suspend) {
+            const tn = (typeof TENANTS_CONFIG !== 'undefined') ? TENANTS_CONFIG[String(tenantId).toLowerCase()] : null;
+            if (tn && tn.isMaster) return alert('Toko master tidak dapat dibekukan.');
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung, status beku tidak dapat disimpan.');
+            let reason = '';
+            if (suspend) {
+                reason = prompt('Alasan pembekuan (akan terlihat oleh toko):', 'Pembayaran cicilan belum diterima');
+                if (reason === null) return;
+            } else if (!confirm('Aktifkan kembali toko ' + tenantId + '?')) return;
+            db.collection('tenant_ctrl').doc(tenantId).set({
+                suspended: !!suspend,
+                suspendReason: suspend ? reason : '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true }).catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
         function startTenantListeners() {
+        startControlListeners();
             listNetworkTenants().forEach(function (t) {
                 const id = t.id;
                 if (typeof db !== 'undefined' && db) {
@@ -765,8 +808,8 @@
             const firstOfMonthISO = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
 
             listNetworkTenants().forEach(function (tenant) {
-                const activeCashiers = parseInt(localStorage.getItem('fm_allowed_cashiers_' + tenant.id) || "1");
-                const isSuspended = localStorage.getItem('fm_tenant_suspended_' + tenant.id) === 'true';
+                const activeCashiers = getAllowedCashiers(tenant.id);
+                const isSuspended = isTenantSuspended(tenant.id);
                 const idAgeText = tenantIdAgeText(tenant);
 
                 let incMonth = 0;
@@ -891,19 +934,22 @@
                 || ((typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse" });
             currentInspectId = tenant.id;
             const list = getTenantTxList(tenant.id);
-            const activeCashiers = parseInt(localStorage.getItem('fm_allowed_cashiers_' + tenant.id) || "1");
+            const activeCashiers = getAllowedCashiers(tenant.id);
             const live = tenantSource[tenant.id] === 'firestore';
 
             document.getElementById('inspect-header-card').innerHTML = `
                 <div>
                     <h4 class="font-black text-sm text-white">${escHtml(tenant.nama)} [${tenant.id}]</h4>
-                    <p class="text-slate-400">Lisensi Terpasang: ${activeCashiers} Terminal Kasir • Status: Terverifikasi</p>
+                    <p class="text-slate-400">Lisensi Terpasang: ${activeCashiers} Terminal Kasir • Status: ${isTenantSuspended(tenant.id) ? '<b class="text-rose-400">DIBEKUKAN</b>' : 'Aktif'}</p>
                 </div>
                 <div class="text-right">
                     <span class="text-emerald-400 font-bold block font-mono">${list.length} Transaksi Sah Tercatat</span>
                     <span class="text-[10px] ${live ? 'text-slate-400' : 'text-amber-300'}">${live ? 'Sinkronisasi Cloud Live Terhubung' : 'Mode lokal: Firestore belum aktif, data dari browser ini'}</span>
+                    ${tenant.isMaster ? '' : `<button id="btn-toggle-suspend" class="mt-2 px-3 py-1 rounded-xl ${isTenantSuspended(tenant.id) ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'} text-white font-bold text-[10px] transition">${isTenantSuspended(tenant.id) ? 'Aktifkan Kembali Toko' : 'Bekukan Toko'}</button>`}
                 </div>
             `;
+            const sb = document.getElementById('btn-toggle-suspend');
+            if (sb) sb.onclick = function () { setTenantSuspended(tenant.id, !isTenantSuspended(tenant.id)); };
 
             const loc = tenant.locations || {};
             const def = "Kalinilam, Delta Pawan, Ketapang, Kalimantan Barat";
@@ -1213,31 +1259,33 @@
 
         function approveTicket(idx) {
             const ticket = allTickets[idx];
+            if (!ticket) return;
             if (!confirm(`Setujui permohonan +${ticket.qty} terminal kasir baru untuk ${ticket.tenantName}?`)) return;
-
-            ticket.status = "APPROVED";
-            ticket.processedAt = new Date().toLocaleString('id-ID');
-
-            let currentAllowed = parseInt(localStorage.getItem(`fm_allowed_cashiers_${ticket.tenantId}`) || "1");
-            currentAllowed += parseInt(ticket.qty);
-            localStorage.setItem(`fm_allowed_cashiers_${ticket.tenantId}`, currentAllowed.toString());
-
-            localStorage.setItem('fm_cashier_license_requests', JSON.stringify(allTickets));
-            loadProviderDashboard();
-            renderTicketsList();
-            alert(`Permohonan disetujui! Kuota kasir ${ticket.tenantName} kini menjadi ${currentAllowed} terminal.`);
+            if (!(typeof db !== 'undefined' && db) || !ticket.docId) return alert('Firestore belum terhubung.');
+            const qty = parseInt(ticket.qty) || 1;
+            const ctrlRef = db.collection('tenant_ctrl').doc(ticket.tenantId);
+            const tRef = db.collection('provider_tickets').doc(ticket.docId);
+            db.runTransaction(function (tr) {
+                return tr.get(ctrlRef).then(function (c) {
+                    const cur = (c.exists && typeof c.data().allowedCashiers === 'number') ? c.data().allowedCashiers : 1;
+                    tr.set(ctrlRef, { allowedCashiers: cur + qty, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                    tr.update(tRef, { status: 'APPROVED', processedAt: new Date().toLocaleString('id-ID') });
+                    return cur + qty;
+                });
+            }).then(function (n) {
+                alert(`Permohonan disetujui! Kuota kasir ${ticket.tenantName} kini menjadi ${n} terminal.`);
+            }).catch(function (e) { alert('Gagal memproses: ' + e.message); });
         }
 
         function rejectTicket(idx) {
             const ticket = allTickets[idx];
+            if (!ticket) return;
             if (!confirm(`Tolak permohonan pembukaan kasir baru ini?`)) return;
-
-            ticket.status = "REJECTED";
-            ticket.processedAt = new Date().toLocaleString('id-ID');
-            localStorage.setItem('fm_cashier_license_requests', JSON.stringify(allTickets));
-            loadProviderDashboard();
-            renderTicketsList();
-            alert("Permohonan telah ditolak.");
+            if (!(typeof db !== 'undefined' && db) || !ticket.docId) return alert('Firestore belum terhubung.');
+            db.collection('provider_tickets').doc(ticket.docId).update({
+                status: 'REJECTED', processedAt: new Date().toLocaleString('id-ID')
+            }).then(function () { alert('Permohonan telah ditolak.'); })
+              .catch(function (e) { alert('Gagal memproses: ' + e.message); });
         }
 
         const GLOBAL_RELEASE_NOTES = [

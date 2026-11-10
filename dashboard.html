@@ -598,6 +598,7 @@
     <script src="js/tenants.js"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
+    <script src="js/ctrl.js?v=1.0"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -1007,9 +1008,16 @@
                 timestamp: Date.now()
             };
 
-            let reqList = JSON.parse(localStorage.getItem('fm_cashier_license_requests') || "[]");
-            reqList.unshift(ticket);
-            localStorage.setItem('fm_cashier_license_requests', JSON.stringify(reqList));
+            if (typeof db !== 'undefined' && db) {
+                db.collection('provider_tickets').doc(ticket.id).set(ticket).catch(function (e) {
+                    console.error(e);
+                    alert('Permohonan gagal terkirim ke server: ' + e.message);
+                });
+            } else {
+                let reqList = JSON.parse(localStorage.getItem('fm_cashier_license_requests') || "[]");
+                reqList.unshift(ticket);
+                localStorage.setItem('fm_cashier_license_requests', JSON.stringify(reqList));
+            }
 
             alert(`Permohonan lisensi +${qty} terminal kasir baru ("${name}") terkirim ke portal penyedia platform!`);
             closeModal();
