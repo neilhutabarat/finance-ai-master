@@ -496,6 +496,12 @@
                                     <option value="ID26110901">ID26110901 - Oneilverse</option>
                                 </select>
                             </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="font-bold text-slate-300 block mb-1">Tingkat:</label>
+                                    <select id="notif-level" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="info">Info biasa</option><option value="penting">Penting (langsung terbuka di layar klien)</option></select></div>
+                                <div><label class="font-bold text-slate-300 block mb-1">Tampil selama:</label>
+                                    <select id="notif-days" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="1">1 hari</option><option value="3">3 hari</option><option value="7" selected>7 hari</option><option value="30">30 hari</option><option value="0">Sampai dihapus</option></select></div>
+                            </div>
                             <div>
                                 <label class="font-bold text-slate-300 block mb-1">Judul Notifikasi:</label>
                                 <input type="text" id="notif-title" placeholder="Misal: Pemeliharaan Server Cloud Jam 00:00" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none font-bold">
@@ -512,7 +518,13 @@
                             </button>
                         </div>
                     </div>
+                    <div class="p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-2 text-xs">
+                        <span class="font-black text-white block">Pengumuman Terkirim</span>
+                        <div id="notif-history" class="space-y-2"></div>
+                    </div>
                 </div>
+
+                <!-- RIWAYAT PENGUMUMAN (bagian dari popup broadcast; ditaruh di bawah form lewat JS) -->
 
                 <!-- 7. POPUP DETAIL INSPEKSI LOKASI 3 AKUN & CERMIN LIVE -->
                 <div id="popup-content-inspect" class="space-y-4 hidden">
@@ -1039,6 +1051,7 @@
             startControlListeners();
             startRegistryListener();
             startPricingListener();
+            startNoticesListener();
             listNetworkTenants().forEach(startOneTenantListener);
             refreshProviderViews();
         }
@@ -1444,30 +1457,79 @@
             });
         }
 
+        let noticesList = [];
+
+        function fillNoticeTargets() {
+            const sel = document.getElementById('notif-target-tenant');
+            const keep = sel.value;
+            let h = '<option value="ALL">Semua Toko (Broadcast Global)</option>';
+            listNetworkTenants().forEach(function (t) {
+                h += '<option value="' + escHtml(t.id) + '">' + escHtml(t.id) + ' - ' + escHtml(t.nama) + (t.isMaster ? ' (Master)' : '') + '</option>';
+            });
+            sel.innerHTML = h;
+            if (keep) sel.value = keep;
+        }
+
+        function startNoticesListener() {
+            if (!(typeof db !== 'undefined' && db)) return;
+            db.collection('provider_notices').onSnapshot(function (snap) {
+                const list = [];
+                snap.forEach(function (d) { const x = d.data(); x.docId = d.id; list.push(x); });
+                list.sort(function (a, b) { return (b.timestamp || 0) - (a.timestamp || 0); });
+                noticesList = list;
+                renderNoticeHistory();
+            }, function (e) { console.error('Provider: gagal membaca pengumuman', e); });
+        }
+
+        function renderNoticeHistory() {
+            const box = document.getElementById('notif-history');
+            if (!box) return;
+            if (!noticesList.length) { box.innerHTML = '<p class="text-slate-500">Belum ada pengumuman terkirim.</p>'; return; }
+            const now = Date.now();
+            box.innerHTML = '';
+            noticesList.forEach(function (n) {
+                const expired = n.expiresAt && n.expiresAt <= now;
+                const row = document.createElement('div');
+                row.className = 'p-2.5 rounded-xl bg-slate-800/60 border border-white/5 flex items-start justify-between gap-2';
+                row.innerHTML = '<div class="min-w-0"><div class="flex flex-wrap items-center gap-1.5"><b class="text-white">' + escHtml(n.title) + '</b>' +
+                    (n.level === 'penting' ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-600 text-white">PENTING</span>' : '') +
+                    (expired ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-slate-600 text-white">KEDALUWARSA</span>' : '') + '</div>' +
+                    '<p class="text-slate-400 mt-0.5">' + escHtml(n.message) + '</p>' +
+                    '<span class="text-[10px] text-slate-500">Ke: ' + escHtml(n.targetTenant === 'ALL' ? 'Semua toko' : n.targetTenant) + ' • ' + escHtml(n.date || '') + '</span></div>' +
+                    '<button class="px-2 py-1 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white font-bold text-[10px] shrink-0">Tarik</button>';
+                row.querySelector('button').onclick = function () {
+                    if (!confirm('Tarik pengumuman ini? Pengumuman akan hilang dari layar semua klien.')) return;
+                    db.collection('provider_notices').doc(n.docId).delete().catch(function (e) { alert('Gagal: ' + e.message); });
+                };
+                box.appendChild(row);
+            });
+        }
+
         function sendProviderNotification() {
             const target = document.getElementById('notif-target-tenant').value;
             const title = document.getElementById('notif-title').value.trim();
             const msg = document.getElementById('notif-message').value.trim();
+            const level = document.getElementById('notif-level').value;
+            const days = parseInt(document.getElementById('notif-days').value) || 0;
 
             if (!title || !msg) return alert("Judul dan isi pesan wajib diisi!");
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung. Pesan tidak dapat dikirim.');
 
-            const newNotif = {
-                id: 'notif_' + Date.now(),
+            const now = Date.now();
+            const notif = {
                 targetTenant: target,
                 title: title,
                 message: msg,
+                level: level,
                 date: new Date().toLocaleString('id-ID'),
-                timestamp: Date.now()
+                timestamp: now,
+                expiresAt: days > 0 ? now + days * 24 * 3600 * 1000 : 0
             };
-
-            let notifs = JSON.parse(localStorage.getItem('fm_provider_notices') || "[]");
-            notifs.unshift(newNotif);
-            localStorage.setItem('fm_provider_notices', JSON.stringify(notifs));
-
-            alert(`Pesan notifikasi berhasil dikirimkan ke target: ${target}!`);
-            document.getElementById('notif-title').value = "";
-            document.getElementById('notif-message').value = "";
-            closeModal();
+            db.collection('provider_notices').add(notif).then(function () {
+                document.getElementById('notif-title').value = "";
+                document.getElementById('notif-message').value = "";
+                alert(`Pengumuman terkirim ke: ${target === 'ALL' ? 'semua toko' : target}.`);
+            }).catch(function (e) { alert('Gagal mengirim: ' + e.message); });
         }
 
         function renderProviderMonthlyTable() {
@@ -1662,7 +1724,9 @@
                 document.getElementById('popup-content-add_tenant').classList.remove('hidden');
             } else if (type === 'broadcast_modal') {
                 document.getElementById('modal-title').innerText = "Kirim Pesan / Notifikasi Sistem";
-                document.getElementById('modal-subtitle').innerText = "Pesan akan masuk ke lonceng notifikasi Owner & Manager toko tujuan";
+                document.getElementById('modal-subtitle').innerText = "Pesan tampil di lonceng pojok kanan bawah layar kasir, manager, dan owner toko tujuan";
+                fillNoticeTargets();
+                renderNoticeHistory();
                 document.getElementById('popup-content-broadcast_modal').classList.remove('hidden');
             } else if (type === 'inspect') {
                 document.getElementById('modal-title').innerText = "Cermin Data Kasir & Lokasi GPS 3 Akun";
