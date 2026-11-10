@@ -127,3 +127,77 @@ function formatIdAge(createdAtMs) {
   const totalDays = Math.floor(totalHours / 24);
   return `${totalDays} hari`;
 }
+
+// >>> REGISTRY-BEGIN
+// ===== TOKO KLIEN DINAMIS (dibuat dari Tower Kontrol, disimpan di Firestore: tenants_registry) =====
+// COA standar untuk toko klien baru (bisa diubah per toko nanti).
+const DEFAULT_UMKM_COA = [
+  { code: "101", name: "Penjualan Produk/Jasa", category: "sales" },
+  { code: "102", name: "Pendapatan Lain-lain", category: "sales" },
+  { code: "201", name: "Pembelian Bahan Baku / Barang Dagang", category: "cogs" },
+  { code: "301", name: "Gaji & Upah", category: "expense" },
+  { code: "302", name: "Sewa Tempat", category: "expense" },
+  { code: "303", name: "Listrik, Air & Internet", category: "expense" },
+  { code: "304", name: "Transportasi & Operasional", category: "expense" },
+  { code: "305", name: "Perlengkapan & Pemeliharaan", category: "expense" },
+  { code: "401", name: "Prive (Pengambilan Pribadi Owner)", category: "prive" }
+];
+
+const REGISTRY_PROJECT_ID = "finance-ai-master-byneilverse";
+const REGISTRY_API_KEY = "AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI"; // kunci web Firebase (bukan rahasia)
+const REGISTRY_CACHE_KEY = "fm_registry_cache_v1";
+
+function registryMerge(cfg) {
+  if (!cfg || !cfg.id) return null;
+  const k = String(cfg.id).toLowerCase();
+  if (TENANTS_CONFIG[k] && !TENANTS_CONFIG[k].fromRegistry) return null; // toko bawaan file tidak boleh ditimpa
+  cfg.fromRegistry = true;
+  if (!cfg.customCOA || !cfg.customCOA.length) cfg.customCOA = DEFAULT_UMKM_COA;
+  TENANTS_CONFIG[k] = cfg;
+  return k;
+}
+
+function registryReadCache() {
+  try { return JSON.parse(localStorage.getItem(REGISTRY_CACHE_KEY) || "{}") || {}; } catch (e) { return {}; }
+}
+function registryWriteCache(key, cfg) {
+  try { const c = registryReadCache(); c[key] = cfg; localStorage.setItem(REGISTRY_CACHE_KEY, JSON.stringify(c)); } catch (e) {}
+}
+
+function registryFetch(key, isAsync, done) {
+  const url = "https://firestore.googleapis.com/v1/projects/" + REGISTRY_PROJECT_ID +
+    "/databases/(default)/documents/tenants_registry/" + encodeURIComponent(key) + "?key=" + REGISTRY_API_KEY;
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", url, isAsync);
+    const handle = function () {
+      let cfg = null;
+      if (xhr.status === 200) {
+        try {
+          const f = JSON.parse(xhr.responseText).fields || {};
+          if (f.json && f.json.stringValue) cfg = JSON.parse(f.json.stringValue);
+        } catch (e) {}
+      }
+      if (cfg) { registryMerge(cfg); registryWriteCache(key, cfg); }
+      if (done) done(cfg);
+    };
+    if (isAsync) { xhr.onload = handle; xhr.onerror = function () { if (done) done(null); }; }
+    xhr.send();
+    if (!isAsync) handle();
+  } catch (e) { if (done) done(null); }
+}
+
+(function loadRegistryForCurrentUrl() {
+  try {
+    const key = (new URLSearchParams(window.location.search).get("toko") || "").toLowerCase().trim();
+    if (!key || (TENANTS_CONFIG[key] && !TENANTS_CONFIG[key].fromRegistry)) return;
+    const cached = registryReadCache()[key];
+    if (cached) {
+      registryMerge(cached);            // pakai cache supaya halaman langsung siap
+      registryFetch(key, true);         // segarkan cache di latar belakang (berlaku untuk pembukaan berikutnya)
+    } else {
+      registryFetch(key, false);        // pertama kali: ambil dulu dari server sebelum halaman berjalan
+    }
+  } catch (e) {}
+})();
+// <<< REGISTRY-END

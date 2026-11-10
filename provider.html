@@ -235,6 +235,10 @@
                     <i data-lucide="list-plus" class="w-3.5 h-3.5"></i>
                     <span>Kelola COA Provider</span>
                 </button>
+                <button onclick="openModal('add_tenant')" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-lg">
+                    <i data-lucide="store" class="w-3.5 h-3.5"></i>
+                    <span>+ Tambah Klien Baru</span>
+                </button>
                 <button onclick="openModal('broadcast_modal')" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center space-x-1.5 shadow-sm">
                     <i data-lucide="send" class="w-3.5 h-3.5"></i>
                     <span>Kirim Pesan ke User</span>
@@ -439,6 +443,24 @@
                 </div>
 
                 <!-- 6. POPUP KIRIM PESAN KE USER -->
+                <div id="popup-content-add_tenant" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-400/30 space-y-3 text-xs">
+                        <span class="font-black text-sm text-white block">Data Klien Baru</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Nama Usaha *</label><input id="nt-nama" type="text" placeholder="Contoh: Kedai Kopi Senja" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Slogan / Keterangan</label><input id="nt-slogan" type="text" placeholder="Contoh: Kopi lokal, harga bersahabat" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Paket</label>
+                                <select id="nt-tier" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="basic">Basic</option><option value="plus">Plus</option><option value="pro">Pro</option></select></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Jumlah Kasir Awal</label><input id="nt-kasir" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Alamat Usaha (untuk catatan lokasi)</label><input id="nt-alamat" type="text" placeholder="Contoh: Jl. Merdeka No. 5, Ketapang" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Warna Utama</label><input id="nt-warna" type="color" value="#0f172a" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Warna Aksen</label><input id="nt-aksen" type="color" value="#22d3ee" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
+                        </div>
+                        <button id="nt-submit" onclick="createTenant()" class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-black text-xs transition">Buat Toko Klien</button>
+                    </div>
+                    <div id="nt-result" class="hidden p-4 rounded-2xl bg-emerald-950/40 border border-emerald-400/30 text-xs space-y-2"></div>
+                </div>
+
                 <div id="popup-content-broadcast_modal" class="space-y-4 hidden">
                     <div class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-400/30 space-y-3 text-xs">
                         <span class="font-black text-sm text-white block">Kirim Pesan / Notifikasi Sistem ke Mitra:</span>
@@ -678,7 +700,7 @@
 
         function tenantIdAgeText(tn) {
             const key = 'fm_id_created_' + tn.id;
-            let ts = parseInt(localStorage.getItem(key) || "0");
+            let ts = tn.createdAtMs || parseInt(localStorage.getItem(key) || "0");
             if (!ts) {
                 ts = tn.isMaster ? Date.now() - (41 * 24 * 3600 * 1000 + 16 * 3600 * 1000) : Date.now();
                 localStorage.setItem(key, ts.toString());
@@ -698,6 +720,104 @@
             if (isOpen('leaderboard')) renderLeaderboardTable();
             if (isOpen('inspect') && currentInspectId) renderInspect(currentInspectId);
             if (isOpen('tickets') && typeof renderTicketsList === 'function') renderTicketsList();
+        }
+
+        // ===== TOKO KLIEN DINAMIS =====
+        function appBaseUrl() { return window.location.href.split('?')[0].replace(/[^\/]*$/, ''); }
+        function tenantLink(id) { return appBaseUrl() + 'index.html?toko=' + String(id).toLowerCase(); }
+
+        function nextTenantId() {
+            const d = new Date();
+            const base = 'ID' + String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+            let n = 1;
+            while (TENANTS_CONFIG[(base + String(n).padStart(2, '0')).toLowerCase()]) n++;
+            return base + String(n).padStart(2, '0');
+        }
+
+        function createTenant() {
+            const nama = document.getElementById('nt-nama').value.trim();
+            if (!nama) return alert('Nama usaha wajib diisi.');
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung. Toko baru tidak dapat dibuat.');
+            const alamat = document.getElementById('nt-alamat').value.trim() || 'Alamat belum diisi';
+            const kasir = Math.max(1, parseInt(document.getElementById('nt-kasir').value) || 1);
+            const id = nextTenantId();
+            const loc = { name: alamat, lat: 0, lon: 0 };
+            const cfg = {
+                id: id,
+                nama: nama,
+                slogan: document.getElementById('nt-slogan').value.trim() || 'Mitra UMKM Oneilverse',
+                warna: document.getElementById('nt-warna').value,
+                warnaAksen: document.getElementById('nt-aksen').value,
+                logoText: nama.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0].toUpperCase(); }).join('') || 'UM',
+                tier: document.getElementById('nt-tier').value,
+                isMaster: false,
+                isSinglePage: false,
+                isProviderID: false,
+                customCOA: DEFAULT_UMKM_COA,
+                locations: { kasir: loc, manager: loc, owner: loc },
+                createdAtMs: Date.now()
+            };
+            const key = id.toLowerCase();
+            const btn = document.getElementById('nt-submit');
+            btn.disabled = true;
+            const batch = db.batch();
+            batch.set(db.collection('tenants_registry').doc(key), { id: id, nama: nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            batch.set(db.collection('tenant_ctrl').doc(id), { suspended: false, suspendReason: '', allowedCashiers: kasir, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+            batch.commit().then(function () {
+                registryMergeLocal(cfg);
+                const link = tenantLink(id);
+                const box = document.getElementById('nt-result');
+                box.classList.remove('hidden');
+                box.innerHTML = '<b class="text-emerald-300 block text-sm">Toko berhasil dibuat: ' + escHtml(nama) + ' [' + id + ']</b>' +
+                    '<p class="text-slate-300">Kirim link ini ke klien:</p>' +
+                    '<input readonly id="nt-link" value="' + escHtml(link) + '" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-[11px] text-cyan-300 font-mono outline-none">' +
+                    '<button id="nt-copy" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]">Salin Link</button>' +
+                    '<p class="text-amber-300 text-[11px]">PIN awal toko masih bawaan sistem. Minta owner menggantinya di menu Kelola Password pada login pertama.</p>';
+                const cb = document.getElementById('nt-copy');
+                cb.onclick = function () { const i = document.getElementById('nt-link'); i.select(); try { document.execCommand('copy'); cb.innerText = 'Tersalin'; } catch (e) {} };
+                ['nt-nama', 'nt-slogan', 'nt-alamat'].forEach(function (x) { document.getElementById(x).value = ''; });
+                btn.disabled = false;
+            }).catch(function (e) { btn.disabled = false; alert('Gagal membuat toko: ' + e.message); });
+        }
+
+        function registryMergeLocal(cfg) {
+            if (typeof registryMerge === 'function') {
+                const k = registryMerge(cfg);
+                if (k) startOneTenantListener(cfg);
+            }
+        }
+
+        function deleteTenantRegistry(tenantId) {
+            const tn = TENANTS_CONFIG[String(tenantId).toLowerCase()];
+            if (!tn || !tn.fromRegistry) return alert('Hanya toko klien buatan Tower yang dapat dihapus dari sini.');
+            if (!confirm('Hapus toko ' + tn.nama + ' [' + tenantId + '] dari daftar klien?\nData transaksinya tidak ikut dihapus, tetapi link toko tidak bisa dibuka lagi.')) return;
+            db.collection('tenants_registry').doc(String(tenantId).toLowerCase()).delete().then(function () {
+                delete TENANTS_CONFIG[String(tenantId).toLowerCase()];
+                if (tenantUnsubs[tenantId]) { tenantUnsubs[tenantId](); delete tenantUnsubs[tenantId]; }
+                delete tenantTxMap[tenantId];
+                closeModal();
+                refreshProviderViews();
+            }).catch(function (e) { alert('Gagal menghapus: ' + e.message); });
+        }
+
+        function startRegistryListener() {
+            if (!(typeof db !== 'undefined' && db)) return;
+            db.collection('tenants_registry').onSnapshot(function (snap) {
+                const seen = {};
+                snap.forEach(function (doc) {
+                    try {
+                        const cfg = JSON.parse(doc.data().json);
+                        seen[doc.id] = true;
+                        const had = !!TENANTS_CONFIG[doc.id];
+                        if (!had) { registryMergeLocal(cfg); }
+                        else if (TENANTS_CONFIG[doc.id].fromRegistry) { cfg.fromRegistry = true; if (!cfg.customCOA || !cfg.customCOA.length) cfg.customCOA = DEFAULT_UMKM_COA; TENANTS_CONFIG[doc.id] = cfg; }
+                    } catch (e) { console.error('registry rusak', doc.id, e); }
+                });
+                Object.keys(TENANTS_CONFIG).forEach(function (k) {
+                    if (TENANTS_CONFIG[k].fromRegistry && !seen[k]) { delete TENANTS_CONFIG[k]; }
+                });
+                refreshProviderViews();
+            }, function (e) { console.error('Provider: gagal membaca tenants_registry', e); });
         }
 
         function startControlListeners() {
@@ -737,31 +857,35 @@
             }, { merge: true }).catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
-        function startTenantListeners() {
-        startControlListeners();
-            listNetworkTenants().forEach(function (t) {
-                const id = t.id;
-                if (typeof db !== 'undefined' && db) {
-                    if (tenantUnsubs[id]) tenantUnsubs[id]();
+        function startOneTenantListener(t) {
+            const id = t.id;
+            if (t.isSinglePage) return;
+            if (typeof db !== 'undefined' && db) {
+                if (tenantUnsubs[id]) tenantUnsubs[id]();
+                tenantSource[id] = 'firestore';
+                tenantUnsubs[id] = db.collection('tx_' + id).onSnapshot(function (snap) {
+                    const list = [];
+                    snap.forEach(function (doc) { list.push(normalizeTx(doc.data(), doc.id)); });
+                    list.sort(function (a, b) { return (b.timestamp || 0) - (a.timestamp || 0); });
+                    tenantTxMap[id] = list;
                     tenantSource[id] = 'firestore';
-                    tenantUnsubs[id] = db.collection('tx_' + id).onSnapshot(function (snap) {
-                        const list = [];
-                        snap.forEach(function (doc) { list.push(normalizeTx(doc.data(), doc.id)); });
-                        list.sort(function (a, b) { return (b.timestamp || 0) - (a.timestamp || 0); });
-                        tenantTxMap[id] = list;
-                        tenantSource[id] = 'firestore';
-                        refreshProviderViews();
-                    }, function (err) {
-                        console.error('Provider: gagal membaca tx_' + id, err);
-                        tenantTxMap[id] = readLocalTx(id);
-                        tenantSource[id] = 'lokal';
-                        refreshProviderViews();
-                    });
-                } else {
+                    refreshProviderViews();
+                }, function (err) {
+                    console.error('Provider: gagal membaca tx_' + id, err);
                     tenantTxMap[id] = readLocalTx(id);
                     tenantSource[id] = 'lokal';
-                }
-            });
+                    refreshProviderViews();
+                });
+            } else {
+                tenantTxMap[id] = readLocalTx(id);
+                tenantSource[id] = 'lokal';
+            }
+        }
+
+        function startTenantListeners() {
+            startControlListeners();
+            startRegistryListener();
+            listNetworkTenants().forEach(startOneTenantListener);
             refreshProviderViews();
         }
 
@@ -948,6 +1072,14 @@
                     ${tenant.isMaster ? '' : `<button id="btn-toggle-suspend" class="mt-2 px-3 py-1 rounded-xl ${isTenantSuspended(tenant.id) ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'} text-white font-bold text-[10px] transition">${isTenantSuspended(tenant.id) ? 'Aktifkan Kembali Toko' : 'Bekukan Toko'}</button>`}
                 </div>
             `;
+            if (tenant.fromRegistry) {
+                const hb = document.createElement('button');
+                hb.className = 'mt-2 ml-2 px-3 py-1 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-[10px] transition';
+                hb.innerText = 'Hapus Klien';
+                hb.onclick = function () { deleteTenantRegistry(tenant.id); };
+                const sbx = document.getElementById('btn-toggle-suspend');
+                if (sbx && sbx.parentNode) sbx.parentNode.appendChild(hb);
+            }
             const sb = document.getElementById('btn-toggle-suspend');
             if (sb) sb.onclick = function () { setTenantSuspended(tenant.id, !isTenantSuspended(tenant.id)); };
 
@@ -1329,7 +1461,7 @@
         }
 
         window.openModal = function(type) {
-            ['provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'inspect', 'tickets', 'release_notes'].forEach(k => {
+            ['provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'inspect', 'tickets', 'release_notes'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
@@ -1360,6 +1492,11 @@
                 document.getElementById('modal-subtitle').innerText = "Tambah atau sesuaikan pos pendapatan dan beban internal Provider";
                 renderProviderCOATable();
                 document.getElementById('popup-content-provider_coa_mgmt').classList.remove('hidden');
+            } else if (type === 'add_tenant') {
+                document.getElementById('modal-title').innerText = "Tambah Klien Baru";
+                document.getElementById('modal-subtitle').innerText = "Toko langsung aktif dan bisa dibuka lewat link khusus";
+                document.getElementById('nt-result').classList.add('hidden');
+                document.getElementById('popup-content-add_tenant').classList.remove('hidden');
             } else if (type === 'broadcast_modal') {
                 document.getElementById('modal-title').innerText = "Kirim Pesan / Notifikasi Sistem";
                 document.getElementById('modal-subtitle').innerText = "Pesan akan masuk ke lonceng notifikasi Owner & Manager toko tujuan";
