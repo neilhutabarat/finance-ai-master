@@ -262,6 +262,9 @@
                         Memantau Usia ID, Plakat Mode, Badges Finansial, dan Lokasi GPS 3 Akun (Kasir, Manager, Owner)
                     </p>
                 </div>
+                <div class="w-full sm:w-64">
+                    <input id="dir-search" type="search" placeholder="Cari ID atau nama toko..." oninput="setDirFilter(this.value)" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-400">
+                </div>
             </div>
 
             <div class="overflow-x-auto border border-white/10 rounded-2xl">
@@ -467,6 +470,9 @@
                     <div class="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-400/30 space-y-3 text-xs">
                         <span class="font-black text-sm text-white block">Data Klien Baru</span>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">ID Toko (kosongkan = otomatis)</label>
+                                <input id="nt-id" type="text" maxlength="10" placeholder="Format: ID + tahun + bulan + tanggal + urutan, contoh ID26111101" oninput="previewNewTenantId()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                                <p id="nt-idprev" class="mt-1 text-[11px] text-slate-400"></p></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Nama Usaha *</label><input id="nt-nama" type="text" placeholder="Contoh: Kedai Kopi Senja" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Slogan / Keterangan</label><input id="nt-slogan" type="text" placeholder="Contoh: Kopi lokal, harga bersahabat" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Paket</label>
@@ -982,13 +988,26 @@
             return base + String(n).padStart(2, '0');
         }
 
+        function previewNewTenantId() {
+            const el = document.getElementById('nt-idprev');
+            if (!el) return;
+            const v = (document.getElementById('nt-id').value || '').trim().toUpperCase();
+            if (!v) { el.className = 'mt-1 text-[11px] text-slate-400'; el.innerText = 'Otomatis: ' + nextTenantId() + ' (hari ini, urutan berikutnya)'; return; }
+            if (!/^ID\d{8}$/.test(v)) { el.className = 'mt-1 text-[11px] text-rose-300'; el.innerText = 'Format harus ID diikuti 8 angka (YYMMDD + 2 digit urutan), contoh ID26111101.'; return; }
+            if (TENANTS_CONFIG[v.toLowerCase()]) { el.className = 'mt-1 text-[11px] text-rose-300'; el.innerText = 'ID ini sudah dipakai toko lain.'; return; }
+            el.className = 'mt-1 text-[11px] text-emerald-300'; el.innerText = 'ID tersedia: ' + v;
+        }
+
         function createTenant() {
             const nama = document.getElementById('nt-nama').value.trim();
             if (!nama) return alert('Nama usaha wajib diisi.');
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung. Toko baru tidak dapat dibuat.');
             const alamat = document.getElementById('nt-alamat').value.trim() || 'Alamat belum diisi';
             const kasir = Math.max(1, parseInt(document.getElementById('nt-kasir').value) || 1);
-            const id = nextTenantId();
+            const manualId = (document.getElementById('nt-id').value || '').trim().toUpperCase();
+            if (manualId && !/^ID\d{8}$/.test(manualId)) return alert('Format ID harus ID diikuti 8 angka, contoh ID26111101.');
+            if (manualId && TENANTS_CONFIG[manualId.toLowerCase()]) return alert('ID ' + manualId + ' sudah dipakai toko lain.');
+            const id = manualId || nextTenantId();
             const loc = { name: alamat, lat: 0, lon: 0 };
             const cfg = {
                 id: id,
@@ -1025,7 +1044,7 @@
                     '<p class="text-amber-300 text-[11px]">PIN awal toko masih bawaan sistem. Minta owner menggantinya di menu Kelola Password pada login pertama.</p>';
                 const cb = document.getElementById('nt-copy');
                 cb.onclick = function () { const i = document.getElementById('nt-link'); i.select(); try { document.execCommand('copy'); cb.innerText = 'Tersalin'; } catch (e) {} };
-                ['nt-nama', 'nt-slogan', 'nt-alamat', 'nt-custom'].forEach(function (x) { document.getElementById(x).value = ''; });
+                ['nt-id', 'nt-nama', 'nt-slogan', 'nt-alamat', 'nt-custom'].forEach(function (x) { document.getElementById(x).value = ''; });
                 btn.disabled = false;
             }).catch(function (e) { btn.disabled = false; alert('Gagal membuat toko: ' + e.message); });
         }
@@ -1177,6 +1196,9 @@
             document.getElementById('pending-badge').innerText = `${pending} Tiket`;
         }
 
+        let dirFilter = '';
+        function setDirFilter(v) { dirFilter = v || ''; renderUMKMDirectory(); }
+
         function renderUMKMDirectory() {
             const tbody = document.getElementById('umkm-table-body');
             tbody.innerHTML = "";
@@ -1184,7 +1206,15 @@
             const now = new Date();
             const firstOfMonthISO = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
 
-            listNetworkTenants().forEach(function (tenant) {
+            const q = (dirFilter || '').trim().toLowerCase();
+            const shown = listNetworkTenants().filter(function (t) {
+                return !q || String(t.id).toLowerCase().indexOf(q) >= 0 || String(t.nama || '').toLowerCase().indexOf(q) >= 0;
+            });
+            if (shown.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="py-6 text-center text-slate-500 text-xs">Tidak ada toko dengan ID atau nama "' + escHtml(dirFilter) + '".</td></tr>';
+                return;
+            }
+            shown.forEach(function (tenant) {
                 const activeCashiers = getAllowedCashiers(tenant.id);
                 const isSuspended = isTenantSuspended(tenant.id);
                 const idAgeText = tenantIdAgeText(tenant);
@@ -1346,6 +1376,24 @@
                 row.innerHTML = '<b class="text-slate-300">Sedang online:</b> ' + (on.length
                     ? on.map(function (x) { return '<span class="inline-block mr-2 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">● ' + escHtml(ROLE_LABEL[x.role] || x.role) + ' (' + escHtml(x.who) + ') • ' + agoText(x.startedAt) + '</span>'; }).join('')
                     : '<span class="text-slate-500">tidak ada. Aktivitas terakhir: ' + agoText(lastActiveMs(tenant.id)) + '</span>');
+                hdr.appendChild(row);
+            })();
+            (function () {
+                if (tenant.isSinglePage) return;
+                const hdr = document.getElementById('inspect-header-card');
+                const link = tenantLink(tenant.id);
+                const row = document.createElement('div');
+                row.className = 'w-full text-[11px] pt-2 mt-1 border-t border-white/10';
+                row.innerHTML = '<b class="text-slate-300 block mb-1">Link login toko:</b>' +
+                    '<div class="flex items-center gap-2"><input readonly value="' + escHtml(link) + '" class="flex-1 min-w-0 bg-slate-900 border border-white/15 rounded-xl p-2 text-[11px] text-cyan-300 font-mono outline-none">' +
+                    '<button class="px-3 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-[11px] shrink-0">Salin</button></div>';
+                const inp = row.querySelector('input'), btn = row.querySelector('button');
+                btn.onclick = function () {
+                    inp.select();
+                    const done = function () { btn.innerText = 'Tersalin ✓'; setTimeout(function () { btn.innerText = 'Salin'; }, 1800); };
+                    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { document.execCommand('copy'); done(); });
+                    else { try { document.execCommand('copy'); done(); } catch (e) {} }
+                };
                 hdr.appendChild(row);
             })();
             renderInspectPlan(tenant);
@@ -1820,6 +1868,7 @@
                 document.getElementById('popup-content-pricing').classList.remove('hidden');
             } else if (type === 'add_tenant') {
                 previewNewTenantPlan();
+                previewNewTenantId();
                 document.getElementById('modal-title').innerText = "Tambah Klien Baru";
                 document.getElementById('modal-subtitle').innerText = "Toko langsung aktif dan bisa dibuka lewat link khusus";
                 document.getElementById('nt-result').classList.add('hidden');

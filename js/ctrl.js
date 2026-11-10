@@ -43,7 +43,45 @@
         if (el && el.parentNode) el.parentNode.removeChild(el);
     }
 
+    // ===== NAMA, ID, LOGO, DAN PAKET TOKO DI HEADER (sebelumnya tertulis mati "Oneilverse") =====
+    function applyHeaderBranding(tn) {
+        if (!tn || tn.isMaster || tn.notFound) return;
+        try {
+            var nameEl = document.getElementById('topbar-store-name');
+            if (nameEl) nameEl.textContent = tn.nama;
+            var idEl = document.getElementById('tenant-badge-indicator');
+            if (idEl) idEl.textContent = tn.id;
+            var rc = document.getElementById('receipt-store-name');
+            if (rc) rc.textContent = String(tn.nama || '').toUpperCase();
+            if (document.title) document.title = document.title.replace(/^Oneilverse/, tn.nama);
+
+            var tierEl = document.getElementById('tier-badge-indicator');
+            if (tierEl) {
+                var t = tn.tier || 'basic';
+                var base = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ';
+                if (t === 'pro') { tierEl.textContent = 'Gold • Pro'; }
+                else if (t === 'plus') { tierEl.textContent = 'Plus'; tierEl.className = base + 'bg-cyan-500/30 border-cyan-400/60 text-cyan-200'; }
+                else { tierEl.textContent = 'Basic'; tierEl.className = base + 'bg-slate-500/30 border-slate-400/50 text-slate-200'; }
+            }
+
+            // logo: ganti kristal Oneilverse dengan inisial toko
+            if (nameEl) {
+                var box = nameEl, svg = null;
+                while (box && box.parentElement && !svg) { box = box.parentElement; svg = box.querySelector('svg'); }
+                if (svg && svg.parentElement && !document.getElementById('ctrl-logo-badge')) {
+                    var b = document.createElement('div');
+                    b.id = 'ctrl-logo-badge';
+                    b.style.cssText = 'width:100%;height:100%;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:14px;color:#fff;font-weight:900;font-size:20px;letter-spacing:1px;background:linear-gradient(135deg,' + (tn.warna || '#0f172a') + ',' + (tn.warnaAksen || '#22d3ee') + ');';
+                    b.textContent = tn.logoText || 'UM';
+                    svg.style.display = 'none';
+                    svg.parentElement.appendChild(b);
+                }
+            }
+        } catch (e) { console.warn('ctrl.js: gagal menerapkan nama toko', e); }
+    }
+
     function start() {
+        try { applyHeaderBranding((typeof getActiveTenant === 'function') ? getActiveTenant() : null); } catch (e) {}
         var tn0 = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
         if (tn0 && tn0.notFound) {
             var el = document.createElement('div');
