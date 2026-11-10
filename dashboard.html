@@ -607,6 +607,7 @@
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
     <script src="js/ctrl.js?v=2.0"></script>
+    <script src="js/store.js?v=1.0"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -704,8 +705,7 @@
             let totalIncome = 0;
             let totalOutcome = 0;
             const groups = {};
-            let coa = JSON.parse(localStorage.getItem('fm_custom_coa') || "[]");
-            if (coa.length === 0) coa = (activeTenant && activeTenant.customCOA) ? activeTenant.customCOA : [];
+            let coa = STORE.getCOA();
             coa.forEach(c => { groups[c.code] = { code: c.code, name: c.name, category: c.category, count: 0, total: 0 }; });
 
             txList.forEach(t => {
@@ -1257,5 +1257,10 @@ window.logout = function () {
   window.location.replace('index.html' + (t ? '?toko=' + encodeURIComponent(t) : ''));
 };
 </script>
+    <script>
+        if (window.STORE) STORE.onChange(function () {
+            try { if (typeof renderLabaRugi === 'function') renderLabaRugi(); } catch (e) { console.warn(e); }
+        });
+    </script>
 </body>
 </html>

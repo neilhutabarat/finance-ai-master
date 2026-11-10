@@ -450,6 +450,56 @@
                 </div>
 
                 <!-- 6. POPUP KIRIM PESAN KE USER -->
+                <div id="popup-content-tenant_settings" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-400/30 space-y-3 text-xs">
+                        <span class="font-black text-sm text-white block">Profil & Tampilan Toko</span>
+                        <p id="ts-profile-note" class="text-amber-300 hidden"></p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Nama Toko</label><input id="ts-nama" type="text" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Slogan (teks di bawah nama toko)</label><input id="ts-slogan" type="text" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Alamat Usaha</label><input id="ts-alamat" type="text" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Inisial Logo (maks. 3 huruf)</label><input id="ts-logo" type="text" maxlength="3" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div class="grid grid-cols-2 gap-2"><div><label class="font-bold text-slate-300 block mb-1">Warna Utama</label><input id="ts-warna" type="color" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
+                                <div><label class="font-bold text-slate-300 block mb-1">Warna Aksen</label><input id="ts-aksen" type="color" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div></div>
+                        </div>
+                        <button id="ts-profile-save" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs transition">Simpan Profil Toko</button>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-purple-950/40 border border-purple-400/30 space-y-3 text-xs">
+                        <span class="font-black text-sm text-white block">Daftar Akun (COA)</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                            <input id="ts-coa-code" type="text" placeholder="Kode" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                            <input id="ts-coa-name" type="text" placeholder="Nama akun" class="sm:col-span-2 w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                            <select id="ts-coa-cat" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="sales">Income</option><option value="cogs">Outcome Produksi/HPP</option><option value="expense">Outcome Operasional</option><option value="prive">Prive</option></select>
+                        </div>
+                        <button id="ts-coa-add" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-xs transition">+ Tambah Akun</button>
+                        <div class="flex flex-col sm:flex-row gap-2 pt-1 border-t border-white/10">
+                            <select id="ts-coa-tpl" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></select>
+                            <button id="ts-coa-apply" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs shrink-0">Ganti dengan Template</button>
+                        </div>
+                        <div class="overflow-x-auto border border-white/10 rounded-2xl max-h-64 overflow-y-auto">
+                            <table class="w-full text-left text-xs"><thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400"><tr><th class="py-2 px-3">Kode</th><th class="py-2 px-3">Nama Akun</th><th class="py-2 px-3">Kategori</th><th class="py-2 px-3 text-center">Aksi</th></tr></thead>
+                            <tbody id="ts-coa-body"></tbody></table>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-400/30 space-y-3 text-xs">
+                        <span class="font-black text-sm text-white block">Produk & Stok</span>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                            <input id="ts-p-code" type="text" placeholder="Kode" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                            <input id="ts-p-name" type="text" placeholder="Nama produk" class="sm:col-span-2 w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                            <input id="ts-p-sell" type="number" min="0" placeholder="Harga jual" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                            <input id="ts-p-hpp" type="number" min="0" placeholder="HPP" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                            <input id="ts-p-stock" type="number" min="0" placeholder="Stok" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                        </div>
+                        <button id="ts-p-save" class="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition">Simpan Produk</button>
+                        <div class="overflow-x-auto border border-white/10 rounded-2xl max-h-64 overflow-y-auto">
+                            <table class="w-full text-left text-xs"><thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400"><tr><th class="py-2 px-3">Kode</th><th class="py-2 px-3">Produk</th><th class="py-2 px-3 text-right">Jual</th><th class="py-2 px-3 text-right">HPP</th><th class="py-2 px-3 text-right">Stok</th><th class="py-2 px-3 text-center">Aksi</th></tr></thead>
+                            <tbody id="ts-prod-body"></tbody></table>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="popup-content-pricing" class="space-y-4 hidden">
                     <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-400/30 space-y-3 text-xs">
                         <span class="font-black text-sm text-white block">Harga Paket per Bulan (Rp)</span>
@@ -475,6 +525,8 @@
                                 <p id="nt-idprev" class="mt-1 text-[11px] text-slate-400"></p></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Nama Usaha *</label><input id="nt-nama" type="text" placeholder="Contoh: Kedai Kopi Senja" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Slogan / Keterangan</label><input id="nt-slogan" type="text" placeholder="Contoh: Kopi lokal, harga bersahabat" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Jenis Usaha (menentukan COA awal)</label>
+                                <select id="nt-type" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></select></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Paket</label>
                                 <select id="nt-tier" onchange="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="basic">Basic</option><option value="plus">Plus</option><option value="pro">Pro</option></select></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Kuota Terminal Awal (Kasir / Manager / Owner)</label>
@@ -605,8 +657,10 @@
     </div>
 
     <script src="js/tenants.js"></script>
+    <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
+    <script src="js/store.js?v=1.0"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -976,6 +1030,187 @@
                 .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
+        // ===== PENGATURAN TOKO (profil, COA, produk) =====
+        let tsStore = null;
+        let tsTenant = null;
+        const CAT_LABEL = { sales: 'Income', cogs: 'Outcome Produksi/HPP', expense: 'Outcome Operasional', prive: 'Prive' };
+
+        function ctAudit(tenantId, action, detail, before, after) {
+            if (!(typeof db !== 'undefined' && db)) return;
+            db.collection('manager_audit_logs').add({
+                tenantId: tenantId, id: 'audit_' + Date.now(), action: action, detail: detail,
+                actor: 'Platform Provider', before: before || '-', after: after || '-',
+                date: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID'),
+                timestamp: Date.now(), createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(function () {});
+        }
+
+        function openTenantSettings(tenantId) {
+            const tn = TENANTS_CONFIG[String(tenantId).toLowerCase()];
+            if (!tn) return;
+            if (tsStore) { tsStore.stop(); }
+            tsTenant = tn;
+            tsStore = createStore(tn);
+            tsStore.onChange(renderTsTables);
+            document.getElementById('modal-title').innerText = 'Pengaturan Toko';
+            document.getElementById('modal-subtitle').innerText = tn.nama + ' [' + tn.id + ']';
+            openModal('tenant_settings');
+            document.getElementById('modal-title').innerText = 'Pengaturan Toko';
+            document.getElementById('modal-subtitle').innerText = tn.nama + ' [' + tn.id + ']';
+            fillTsShell(tn);
+            tsStore.start();
+        }
+
+        function fillTsShell(tn) {
+            const editable = !!tn.fromRegistry;
+            const note = document.getElementById('ts-profile-note');
+            note.classList.toggle('hidden', editable);
+            note.innerText = editable ? '' : 'Toko bawaan sistem: nama, slogan, dan warna diatur lewat file tenants.js. COA dan produk tetap bisa diatur di bawah.';
+            const loc = (tn.locations && tn.locations.kasir && tn.locations.kasir.name) || '';
+            const set = function (id, v) { const el = document.getElementById(id); el.value = v || ''; el.disabled = !editable; };
+            set('ts-nama', tn.nama); set('ts-slogan', tn.slogan); set('ts-alamat', loc); set('ts-logo', tn.logoText);
+            set('ts-warna', /^#[0-9a-f]{6}$/i.test(tn.warna || '') ? tn.warna : '#0f172a');
+            set('ts-aksen', /^#[0-9a-f]{6}$/i.test(tn.warnaAksen || '') ? tn.warnaAksen : '#22d3ee');
+            const sv = document.getElementById('ts-profile-save');
+            sv.disabled = !editable; sv.classList.toggle('opacity-40', !editable);
+            sv.onclick = function () { saveTenantProfile(tn.id); };
+
+            const tpl = document.getElementById('ts-coa-tpl');
+            tpl.innerHTML = '';
+            Object.keys(COA_TEMPLATES).forEach(function (k) {
+                const o = document.createElement('option');
+                o.value = k; o.textContent = 'Template: ' + COA_TEMPLATES[k].label + ' (' + COA_TEMPLATES[k].coa.length + ' akun)';
+                tpl.appendChild(o);
+            });
+            document.getElementById('ts-coa-add').onclick = tsAddCOA;
+            document.getElementById('ts-coa-apply').onclick = tsApplyTemplate;
+            document.getElementById('ts-p-save').onclick = tsSaveProduct;
+            ['ts-coa-code', 'ts-coa-name', 'ts-p-code', 'ts-p-name', 'ts-p-sell', 'ts-p-hpp', 'ts-p-stock'].forEach(function (i) { document.getElementById(i).value = ''; });
+            renderTsTables();
+        }
+
+        function saveTenantProfile(tenantId) {
+            const key = String(tenantId).toLowerCase();
+            const tn = TENANTS_CONFIG[key];
+            if (!tn || !tn.fromRegistry) return;
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+            const nama = document.getElementById('ts-nama').value.trim();
+            if (!nama) return alert('Nama toko wajib diisi.');
+            const alamat = document.getElementById('ts-alamat').value.trim() || 'Alamat belum diisi';
+            const cfg = JSON.parse(JSON.stringify(tn)); delete cfg.fromRegistry;
+            cfg.nama = nama;
+            cfg.slogan = document.getElementById('ts-slogan').value.trim() || 'Mitra UMKM Oneilverse';
+            cfg.logoText = (document.getElementById('ts-logo').value.trim() || nama.slice(0, 2)).toUpperCase().slice(0, 3);
+            cfg.warna = document.getElementById('ts-warna').value;
+            cfg.warnaAksen = document.getElementById('ts-aksen').value;
+            ['kasir', 'manager', 'owner'].forEach(function (r) {
+                cfg.locations = cfg.locations || {};
+                cfg.locations[r] = Object.assign({ lat: 0, lon: 0 }, cfg.locations[r] || {}, { name: alamat });
+            });
+            db.collection('tenants_registry').doc(key).set({ id: cfg.id, nama: nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+                .then(function () {
+                    ctAudit(tn.id, 'UBAH_PROFIL_TOKO', 'Provider mengubah profil/tampilan toko', tn.nama + ' | ' + tn.slogan, nama + ' | ' + cfg.slogan);
+                    alert('Profil toko tersimpan. Tampilan di toko berubah saat halaman toko dibuka kembali (otomatis memuat ulang sekali).');
+                }).catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+        }
+
+        function renderTsTables() {
+            if (!tsStore) return;
+            const esc = escHtml;
+            // COA
+            const cbody = document.getElementById('ts-coa-body');
+            if (cbody) {
+                const coa = tsStore.getCOA();
+                cbody.innerHTML = '';
+                if (!coa.length) cbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-500">Belum ada akun.</td></tr>';
+                coa.forEach(function (c) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-t border-white/5';
+                    tr.innerHTML = '<td class="py-2 px-3 font-mono font-bold text-cyan-300">' + esc(c.code) + '</td><td class="py-2 px-3 text-white font-bold">' + esc(c.name) + '</td><td class="py-2 px-3 text-slate-400">' + esc(CAT_LABEL[c.category] || c.category) + '</td><td class="py-2 px-3 text-center space-x-1"></td>';
+                    const cell = tr.lastElementChild;
+                    const e = document.createElement('button'); e.className = 'px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-[10px]'; e.textContent = 'Edit'; e.onclick = function () { tsEditCOA(c.code); };
+                    const d = document.createElement('button'); d.className = 'px-2 py-1 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white font-bold text-[10px]'; d.textContent = 'Hapus'; d.onclick = function () { tsDelCOA(c.code); };
+                    cell.appendChild(e); cell.appendChild(d);
+                    cbody.appendChild(tr);
+                });
+            }
+            // Produk
+            const pbody = document.getElementById('ts-prod-body');
+            if (pbody) {
+                const list = tsStore.getProducts();
+                pbody.innerHTML = '';
+                if (!list.length) pbody.innerHTML = '<tr><td colspan="6" class="py-4 text-center text-slate-500">Belum ada produk.</td></tr>';
+                list.forEach(function (p) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-t border-white/5';
+                    tr.innerHTML = '<td class="py-2 px-3 font-mono font-bold text-cyan-300">' + esc(p.code) + '</td><td class="py-2 px-3 text-white font-bold">' + esc(p.name) + '</td><td class="py-2 px-3 text-right font-mono text-slate-300">' + formatThousand(p.sellPrice) + '</td><td class="py-2 px-3 text-right font-mono text-slate-400">' + formatThousand(p.hpp) + '</td><td class="py-2 px-3 text-right font-mono font-black ' + (p.stock <= 0 ? 'text-rose-400' : 'text-emerald-400') + '">' + p.stock + '</td><td class="py-2 px-3 text-center space-x-1"></td>';
+                    const cell = tr.lastElementChild;
+                    const e = document.createElement('button'); e.className = 'px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-[10px]'; e.textContent = 'Edit'; e.onclick = function () {
+                        document.getElementById('ts-p-code').value = p.code; document.getElementById('ts-p-name').value = p.name;
+                        document.getElementById('ts-p-sell').value = p.sellPrice; document.getElementById('ts-p-hpp').value = p.hpp; document.getElementById('ts-p-stock').value = p.stock;
+                    };
+                    const d = document.createElement('button'); d.className = 'px-2 py-1 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white font-bold text-[10px]'; d.textContent = 'Hapus'; d.onclick = function () { tsDelProduct(p.code); };
+                    cell.appendChild(e); cell.appendChild(d);
+                    pbody.appendChild(tr);
+                });
+            }
+        }
+
+        function tsAddCOA() {
+            const code = document.getElementById('ts-coa-code').value.trim();
+            const name = document.getElementById('ts-coa-name').value.trim();
+            const cat = document.getElementById('ts-coa-cat').value;
+            if (!code || !name) return alert('Kode dan nama akun wajib diisi.');
+            const coa = tsStore.getCOA();
+            if (coa.some(function (c) { return c.code === code; })) return alert('Kode akun [' + code + '] sudah ada.');
+            coa.push({ code: code, name: name, category: cat });
+            tsStore.saveCOA(coa).then(function () { ctAudit(tsTenant.id, 'TAMBAH_AKUN_COA', 'Provider menambahkan akun [' + code + '] ' + name, '-', 'Kategori: ' + cat); });
+            document.getElementById('ts-coa-code').value = ''; document.getElementById('ts-coa-name').value = '';
+        }
+
+        function tsEditCOA(code) {
+            const coa = tsStore.getCOA();
+            const it = coa.find(function (c) { return c.code === code; });
+            if (!it) return;
+            const nn = prompt('Ubah nama akun [' + it.code + ']:', it.name);
+            if (!nn || !nn.trim() || nn.trim() === it.name) return;
+            const old = it.name; it.name = nn.trim();
+            tsStore.saveCOA(coa).then(function () { ctAudit(tsTenant.id, 'EDIT_AKUN_COA', 'Provider mengubah nama akun [' + code + ']', old, it.name); });
+        }
+
+        function tsDelCOA(code) {
+            const coa = tsStore.getCOA();
+            const i = coa.findIndex(function (c) { return c.code === code; });
+            if (i < 0) return;
+            if (!confirm('Hapus akun [' + coa[i].code + '] ' + coa[i].name + '?\nTransaksi lama dengan akun ini tetap tersimpan.')) return;
+            const del = coa.splice(i, 1)[0];
+            tsStore.saveCOA(coa).then(function () { ctAudit(tsTenant.id, 'HAPUS_AKUN_COA', 'Provider menghapus akun [' + del.code + '] ' + del.name, del.name, 'DIHAPUS'); });
+        }
+
+        function tsApplyTemplate() {
+            const k = document.getElementById('ts-coa-tpl').value;
+            const t = COA_TEMPLATES[k];
+            if (!t) return;
+            if (!confirm('Ganti SELURUH daftar akun toko ini dengan template "' + t.label + '" (' + t.coa.length + ' akun)?\nAkun yang ada sekarang akan diganti. Transaksi lama tidak dihapus.')) return;
+            tsStore.saveCOA(JSON.parse(JSON.stringify(t.coa))).then(function () { ctAudit(tsTenant.id, 'TERAPKAN_TEMPLATE_COA', 'Provider menerapkan template COA: ' + t.label, '-', t.coa.length + ' akun'); });
+        }
+
+        function tsSaveProduct() {
+            const code = document.getElementById('ts-p-code').value.trim();
+            const name = document.getElementById('ts-p-name').value.trim();
+            if (!code || !name) return alert('Kode dan nama produk wajib diisi.');
+            const p = { code: code, name: name, sellPrice: document.getElementById('ts-p-sell').value, hpp: document.getElementById('ts-p-hpp').value, stock: document.getElementById('ts-p-stock').value };
+            const ex = tsStore.getProducts().find(function (x) { return x.code === code; });
+            tsStore.saveProduct(p).then(function () { ctAudit(tsTenant.id, ex ? 'EDIT_PRODUK' : 'TAMBAH_PRODUK', 'Provider ' + (ex ? 'mengubah' : 'menambahkan') + ' produk [' + code + '] ' + name, ex ? 'Stok ' + ex.stock : '-', 'Stok ' + p.stock); });
+            ['ts-p-code', 'ts-p-name', 'ts-p-sell', 'ts-p-hpp', 'ts-p-stock'].forEach(function (i) { document.getElementById(i).value = ''; });
+        }
+
+        function tsDelProduct(code) {
+            const p = tsStore.getProducts().find(function (x) { return x.code === code; });
+            if (!p || !confirm('Hapus produk [' + p.code + '] ' + p.name + '?')) return;
+            tsStore.deleteProduct(code).then(function () { ctAudit(tsTenant.id, 'HAPUS_PRODUK', 'Provider menghapus produk [' + p.code + '] ' + p.name, 'Stok ' + p.stock, 'DIHAPUS'); });
+        }
+
         // ===== TOKO KLIEN DINAMIS =====
         function appBaseUrl() { return window.location.href.split('?')[0].replace(/[^\/]*$/, ''); }
         function tenantLink(id) { return appBaseUrl() + 'index.html?toko=' + String(id).toLowerCase(); }
@@ -986,6 +1221,17 @@
             let n = 1;
             while (TENANTS_CONFIG[(base + String(n).padStart(2, '0')).toLowerCase()]) n++;
             return base + String(n).padStart(2, '0');
+        }
+
+        function fillBusinessTypes() {
+            const sel = document.getElementById('nt-type');
+            if (!sel || sel.options.length) return;
+            Object.keys(COA_TEMPLATES).forEach(function (k) {
+                const o = document.createElement('option');
+                o.value = k; o.textContent = COA_TEMPLATES[k].label + ' (' + COA_TEMPLATES[k].coa.length + ' akun)';
+                sel.appendChild(o);
+            });
+            sel.value = 'umum';
         }
 
         function previewNewTenantId() {
@@ -1020,7 +1266,7 @@
                 isMaster: false,
                 isSinglePage: false,
                 isProviderID: false,
-                customCOA: DEFAULT_UMKM_COA,
+                customCOA: JSON.parse(JSON.stringify(COA_TEMPLATES[document.getElementById('nt-type').value || 'umum'].coa)),
                 locations: { kasir: loc, manager: loc, owner: loc },
                 createdAtMs: Date.now()
             };
@@ -1031,6 +1277,7 @@
             btn.disabled = true;
             const batch = db.batch();
             batch.set(db.collection('tenants_registry').doc(key), { id: id, nama: nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            batch.set(db.collection('tenant_settings').doc(id), { coa: cfg.customCOA, templateKey: document.getElementById('nt-type').value || 'umum', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
             batch.set(db.collection('tenant_ctrl').doc(id), { suspended: false, suspendReason: '', allowedCashiers: kasir, allowedManagers: Math.max(1, parseInt(document.getElementById('nt-mgr').value) || 1), allowedOwners: Math.max(1, parseInt(document.getElementById('nt-own').value) || 1), tier: cfg.tier, billingCycle: cycle, priceMonthlyAtPurchase: plan.monthly, billedAmount: plan.amount, customPrice: plan.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             batch.commit().then(function () {
                 registryMergeLocal(cfg);
@@ -1394,6 +1641,11 @@
                     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { document.execCommand('copy'); done(); });
                     else { try { document.execCommand('copy'); done(); } catch (e) {} }
                 };
+                const sbtn = document.createElement('button');
+                sbtn.className = 'mt-2 w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-[11px] transition';
+                sbtn.innerText = 'Pengaturan Toko: Profil, COA & Produk';
+                sbtn.onclick = function () { openTenantSettings(tenant.id); };
+                row.appendChild(sbtn);
                 hdr.appendChild(row);
             })();
             renderInspectPlan(tenant);
@@ -1830,7 +2082,8 @@
         }
 
         window.openModal = function(type) {
-            ['provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'inspect', 'tickets', 'release_notes'].forEach(k => {
+            if (type !== 'tenant_settings' && tsStore) { tsStore.stop(); tsStore = null; }
+            ['provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
@@ -1861,6 +2114,8 @@
                 document.getElementById('modal-subtitle').innerText = "Tambah atau sesuaikan pos pendapatan dan beban internal Provider";
                 renderProviderCOATable();
                 document.getElementById('popup-content-provider_coa_mgmt').classList.remove('hidden');
+            } else if (type === 'tenant_settings') {
+                document.getElementById('popup-content-tenant_settings').classList.remove('hidden');
             } else if (type === 'pricing') {
                 document.getElementById('modal-title').innerText = "Harga Paket";
                 document.getElementById('modal-subtitle').innerText = "Atur harga bulanan dan diskon tahunan";
@@ -1869,6 +2124,7 @@
             } else if (type === 'add_tenant') {
                 previewNewTenantPlan();
                 previewNewTenantId();
+                fillBusinessTypes();
                 document.getElementById('modal-title').innerText = "Tambah Klien Baru";
                 document.getElementById('modal-subtitle').innerText = "Toko langsung aktif dan bisa dibuka lewat link khusus";
                 document.getElementById('nt-result').classList.add('hidden');
@@ -1900,6 +2156,7 @@
         };
 
         window.closeModal = function() {
+            if (tsStore) { tsStore.stop(); tsStore = null; }
             document.getElementById('main-modal-container').classList.add('hidden');
         };
 

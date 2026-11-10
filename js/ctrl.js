@@ -45,8 +45,11 @@
 
     // ===== NAMA, ID, LOGO, DAN PAKET TOKO DI HEADER (sebelumnya tertulis mati "Oneilverse") =====
     function applyHeaderBranding(tn) {
-        if (!tn || tn.isMaster || tn.notFound) return;
+        if (!tn || tn.notFound) return;
         try {
+            var slEl = document.getElementById('topbar-store-slogan');
+            if (slEl && tn.slogan) slEl.textContent = tn.slogan;
+            if (tn.isMaster) return;
             var nameEl = document.getElementById('topbar-store-name');
             if (nameEl) nameEl.textContent = tn.nama;
             var idEl = document.getElementById('tenant-badge-indicator');

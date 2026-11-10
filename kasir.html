@@ -710,6 +710,7 @@
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
     <script src="js/ctrl.js?v=2.0"></script>
+    <script src="js/store.js?v=1.0"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -797,11 +798,9 @@
         updateRealtimeClock();
 
         function populateCOA() {
-            let coa = JSON.parse(localStorage.getItem('fm_custom_coa') || "[]");
-            if (coa.length === 0) {
-                coa = (activeTenant && activeTenant.customCOA && activeTenant.customCOA.length > 0) ? activeTenant.customCOA : [];
-            }
+            let coa = STORE.getCOA();
             const select = document.getElementById('tx-account');
+            const keepSel = select.value;
             select.innerHTML = '<option value="">-- Pilih Akun COA / Produk --</option>';
 
             // 1. Akun Standar COA
@@ -827,7 +826,7 @@
             });
 
             // 2. Produk Inventaris Minimarket dari Manager
-            let products = JSON.parse(localStorage.getItem('fm_products') || "[]");
+            let products = STORE.getProducts();
             if (products.length > 0) {
                 const prodGroup = document.createElement('optgroup');
                 prodGroup.label = "5. PRODUK INVENTARIS TOKO";
@@ -846,6 +845,7 @@
                 });
                 select.appendChild(prodGroup);
             }
+            if (keepSel) { select.value = keepSel; if (select.value !== keepSel) select.value = ''; }
         }
 
         function updateCategoryBadge() {
@@ -1061,22 +1061,10 @@
             const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const nowFull = new Date().toLocaleDateString('id-ID');
 
-            // 1. Kurangi stok produk jika transaksi memuat item produk
-            let products = JSON.parse(localStorage.getItem('fm_products') || "[]");
-            let stockChanged = false;
+            // 1. Kurangi stok produk (tersimpan di server, aman bila beberapa kasir menjual bersamaan)
             draftList.forEach(d => {
-                if (d.isProduct) {
-                    const pIdx = products.findIndex(p => p.code === d.accountCode);
-                    if (pIdx !== -1) {
-                        products[pIdx].stock = Math.max(0, products[pIdx].stock - 1);
-                        stockChanged = true;
-                    }
-                }
+                if (d.isProduct) STORE.decrementStock(d.accountCode, 1);
             });
-            if (stockChanged) {
-                localStorage.setItem('fm_products', JSON.stringify(products));
-                populateCOA(); // refresh daftar produk
-            }
 
             // 2. Simpan Transaksi Sah
             draftList.forEach(d => {
@@ -1315,8 +1303,7 @@
             if (!container) return;
             container.innerHTML = "";
 
-            let coaList = JSON.parse(localStorage.getItem('fm_custom_coa') || "[]");
-            if (coaList.length === 0) coaList = (activeTenant && activeTenant.customCOA) ? activeTenant.customCOA : [];
+            let coaList = STORE.getCOA();
             
             const groups = {};
             coaList.forEach(c => { groups[c.code] = { code: c.code, name: c.name, category: c.category, total: 0, items: [] }; });
@@ -1500,6 +1487,13 @@
                 if (newsList.length > 20) newsList.pop();
                 renderTicker();
             }, 900000);
+        });
+    </script>
+    <script>
+        // Sinkron otomatis saat COA / produk berubah dari Tower atau manager
+        if (window.STORE) STORE.onChange(function () {
+            try { if (typeof populateCOA === 'function') populateCOA(); } catch (e) { console.warn(e); }
+            try { if (typeof renderPerAccountKasir === 'function') renderPerAccountKasir(); } catch (e) { console.warn(e); }
         });
     </script>
 </body>

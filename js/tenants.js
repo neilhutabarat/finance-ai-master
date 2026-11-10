@@ -157,6 +157,56 @@ const DEFAULT_UMKM_COA = [
   { code: "401", name: "Prive (Pengambilan Pribadi Owner)", category: "prive" }
 ];
 
+// Template COA per jenis usaha (dipilih saat membuat toko di Tower; setelah itu bebas diedit per toko)
+const COA_TEMPLATES = {
+  umum: { label: "Usaha Umum (standar)", coa: DEFAULT_UMKM_COA },
+  warung: { label: "Warung / Kafe / Rumah Makan", coa: [
+    { code: "101", name: "Penjualan Makanan", category: "sales" },
+    { code: "102", name: "Penjualan Minuman", category: "sales" },
+    { code: "103", name: "Pendapatan Lain-lain", category: "sales" },
+    { code: "201", name: "Bahan Baku Makanan", category: "cogs" },
+    { code: "202", name: "Bahan Baku Minuman", category: "cogs" },
+    { code: "203", name: "Kemasan & Perlengkapan Saji", category: "cogs" },
+    { code: "301", name: "Gaji & Upah", category: "expense" },
+    { code: "302", name: "Sewa Tempat", category: "expense" },
+    { code: "303", name: "Listrik, Air & Gas", category: "expense" },
+    { code: "304", name: "Transportasi & Operasional", category: "expense" },
+    { code: "305", name: "Perawatan Peralatan", category: "expense" },
+    { code: "306", name: "Promosi & Iklan", category: "expense" },
+    { code: "401", name: "Prive (Pengambilan Pribadi Owner)", category: "prive" }
+  ] },
+  toko: { label: "Toko / Minimarket", coa: [
+    { code: "101", name: "Penjualan Barang", category: "sales" },
+    { code: "102", name: "Komisi & Jasa (pulsa, token, dll)", category: "sales" },
+    { code: "103", name: "Pendapatan Lain-lain", category: "sales" },
+    { code: "201", name: "Pembelian Barang Dagang", category: "cogs" },
+    { code: "202", name: "Ongkos Kirim Pembelian", category: "cogs" },
+    { code: "301", name: "Gaji & Upah", category: "expense" },
+    { code: "302", name: "Sewa Tempat", category: "expense" },
+    { code: "303", name: "Listrik, Air & Internet", category: "expense" },
+    { code: "304", name: "Transportasi & Operasional", category: "expense" },
+    { code: "305", name: "Perlengkapan Toko", category: "expense" },
+    { code: "306", name: "Barang Rusak / Hilang", category: "expense" },
+    { code: "401", name: "Prive (Pengambilan Pribadi Owner)", category: "prive" }
+  ] },
+  jasa: { label: "Jasa / Layanan", coa: [
+    { code: "101", name: "Pendapatan Jasa", category: "sales" },
+    { code: "102", name: "Pendapatan Lain-lain", category: "sales" },
+    { code: "201", name: "Bahan / Material Jasa", category: "cogs" },
+    { code: "202", name: "Upah Tenaga Lepas", category: "cogs" },
+    { code: "301", name: "Gaji & Upah", category: "expense" },
+    { code: "302", name: "Sewa Tempat", category: "expense" },
+    { code: "303", name: "Listrik, Air & Internet", category: "expense" },
+    { code: "304", name: "Transportasi & Operasional", category: "expense" },
+    { code: "305", name: "Perlengkapan & Alat", category: "expense" },
+    { code: "306", name: "Promosi & Iklan", category: "expense" },
+    { code: "401", name: "Prive (Pengambilan Pribadi Owner)", category: "prive" }
+  ] },
+  kosong: { label: "Kosong (isi sendiri)", coa: [] }
+};
+
+function registrySig(c) { return c ? [c.tier, c.nama, c.slogan, c.warna, c.warnaAksen, c.logoText].join("|") : ""; }
+
 const REGISTRY_PROJECT_ID = "finance-ai-master-byneilverse";
 const REGISTRY_API_KEY = "AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI"; // kunci web Firebase (bukan rahasia)
 const REGISTRY_CACHE_KEY = "fm_registry_cache_v1";
@@ -211,7 +261,7 @@ function registryFetch(key, isAsync, done) {
       registryFetch(key, true, function (fresh) {   // segarkan cache di latar belakang
         try {
           const flag = "fm_reload_" + key;
-          if (fresh && fresh.tier !== cached.tier) {   // paket berubah: muat ulang sekali agar fitur baru aktif
+          if (fresh && registrySig(fresh) !== registrySig(cached)) {   // paket/nama/slogan/tampilan berubah: muat ulang sekali
             if (!sessionStorage.getItem(flag)) { sessionStorage.setItem(flag, "1"); window.location.reload(); }
           } else { sessionStorage.removeItem(flag); }
         } catch (e) {}
