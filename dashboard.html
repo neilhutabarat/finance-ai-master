@@ -1177,14 +1177,13 @@ function closeWeatherModal() {
 </div>
 
 <script>
-/* Cadangan logout: dipakai hanya jika js/core.js belum mendefinisikan logout() */
-if (typeof window.logout !== 'function') {
-  window.logout = function () {
-    try { ['currentUser','auth_role','auth_title'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
-    var t = new URLSearchParams(window.location.search).get('toko');
-    window.location.replace('index.html' + (t ? '?toko=' + encodeURIComponent(t) : ''));
-  };
-}
+/* Logout: hapus semua kunci sesi yang dipakai halaman (core.js hanya menghapus kunci lama) */
+window.logout = function () {
+  if (!confirm("Keluar dari sistem?")) return;
+  try { ['currentUser','auth_role','auth_title','fm_session_user_v13'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+  var t = new URLSearchParams(window.location.search).get('toko');
+  window.location.replace('index.html' + (t ? '?toko=' + encodeURIComponent(t) : ''));
+};
 </script>
 </body>
 </html>
