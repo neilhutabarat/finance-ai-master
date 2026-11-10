@@ -132,9 +132,9 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/theme.js?v=1.4"></script>
-    <script src="js/logo.js?v=1.4"></script>
-    <script src="js/skin.js?v=1.4"></script>
+    <script src="js/theme.js?v=1.5"></script>
+    <script src="js/logo.js?v=1.5"></script>
+    <script src="js/skin.js?v=1.5"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -365,10 +365,9 @@
                 <div class="space-y-3.5 relative z-10">
                     <!-- SCAN BARCODE (fitur per toko, diatur dari Tower Kontrol) -->
                     <div id="barcode-block" class="hidden">
-                        <label class="text-xs font-black text-slate-700 block mb-1">Scan Barcode Produk</label>
+                        <label class="text-xs font-black text-slate-700 block mb-1">Scan Barcode Produk <span id="bc-ready" class="ml-1 text-[10px] font-bold text-slate-400">• scanner siap</span></label>
                         <div class="flex gap-2">
-                            <input type="text" id="barcode-input" autocomplete="off" placeholder="Arahkan scanner ke barcode, lalu otomatis masuk..." class="flex-1 glass-input rounded-2xl p-3 text-xs font-mono font-bold outline-none">
-                            <button type="button" onclick="openBarcodeCamera()" class="px-4 rounded-2xl bg-slate-900 text-white text-xs font-black shrink-0">📷 Kamera</button>
+                            <input type="text" id="barcode-input" autocomplete="off" placeholder="Tembak barcode dengan scanner, otomatis masuk antrean" class="flex-1 glass-input rounded-2xl p-3 text-xs font-mono font-bold outline-none">
                         </div>
                         <p id="barcode-status" class="hidden mt-1.5 text-[11px] font-bold"></p>
                     </div>
@@ -1640,14 +1639,6 @@
             }, 900000);
         });
     </script>
-    <div id="modal-barcode-cam" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
-        <div class="bg-slate-900 rounded-3xl p-4 w-full max-w-md space-y-3 text-center">
-            <p class="text-white font-black text-sm">Arahkan kamera ke barcode</p>
-            <video id="bc-video" class="w-full rounded-2xl bg-black" playsinline muted></video>
-            <p id="bc-msg" class="text-xs text-slate-300 font-bold"></p>
-            <button type="button" onclick="closeBarcodeCamera()" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-black text-xs">Tutup</button>
-        </div>
-    </div>
 
     <script>
 
@@ -1690,7 +1681,6 @@
 
         // ===== SCAN BARCODE =====
         const BARCODE_ON = (typeof tenantHasFeature === 'function') ? tenantHasFeature(activeTenant, 'barcode') : true;
-        let bcStream = null, bcTimer = null, bcReader = null, bcBusy = false;
 
         function bcStatus(msg, ok) {
             const el = document.getElementById('barcode-status');
@@ -1750,59 +1740,28 @@
                 input.value = '';
             });
             setTimeout(() => { try { input.focus(); } catch (e) {} }, 400);
-        }
 
-        function closeBarcodeCamera() {
-            clearInterval(bcTimer); bcTimer = null;
-            try { if (bcReader) bcReader.reset(); } catch (e) {}
-            bcReader = null;
-            if (bcStream) { bcStream.getTracks().forEach(t => t.stop()); bcStream = null; }
-            const v = document.getElementById('bc-video'); if (v) v.srcObject = null;
-            document.getElementById('modal-barcode-cam').classList.add('hidden');
-            bcBusy = false;
-        }
-
-        function onCameraCode(code) {
-            if (bcBusy) return;
-            bcBusy = true;
-            const ok = handleScannedCode(code);
-            if (ok) { closeBarcodeCamera(); }
-            else { document.getElementById('bc-msg').innerText = `Barcode ${code} tidak ada di produk. Coba lagi.`; setTimeout(() => { bcBusy = false; }, 1200); }
-        }
-
-        async function openBarcodeCamera() {
-            if (!BARCODE_ON) return;
-            const msg = document.getElementById('bc-msg');
-            document.getElementById('modal-barcode-cam').classList.remove('hidden');
-            msg.innerText = 'Membuka kamera...';
-            bcBusy = false;
-            try {
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('Kamera tidak didukung di perangkat/peramban ini.');
-                if ('BarcodeDetector' in window) {
-                    bcStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                    const video = document.getElementById('bc-video');
-                    video.srcObject = bcStream; await video.play();
-                    const det = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code'] });
-                    msg.innerText = 'Arahkan ke barcode...';
-                    bcTimer = setInterval(async () => {
-                        try { const r = await det.detect(video); if (r && r.length) onCameraCode(r[0].rawValue); } catch (e) {}
-                    }, 300);
-                } else {
-                    if (!window.ZXing) {
-                        await new Promise((res, rej) => {
-                            const sc = document.createElement('script');
-                            sc.src = 'https://unpkg.com/@zxing/library@0.21.3';
-                            sc.onload = res; sc.onerror = () => rej(new Error('Pustaka pemindai gagal dimuat. Periksa koneksi internet.'));
-                            document.head.appendChild(sc);
-                        });
-                    }
-                    bcReader = new ZXing.BrowserMultiFormatReader();
-                    msg.innerText = 'Arahkan ke barcode...';
-                    bcReader.decodeFromVideoDevice(null, 'bc-video', (result) => { if (result) onCameraCode(result.getText()); });
+            // Scanner laser/USB bekerja seperti keyboard: mengetik kode lalu Enter dengan sangat cepat.
+            // Jika fokus sedang tidak di kolom isian, tangkap ketikan cepat itu dan masukkan sebagai barcode.
+            let buf = '', lastT = 0;
+            document.addEventListener('keydown', (e) => {
+                const t = e.target, tag = (t && t.tagName) || '';
+                if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (t && t.isContentEditable)) return;
+                if (e.ctrlKey || e.metaKey || e.altKey) return;
+                if (document.querySelector('.fixed.inset-0:not(.hidden):not([style*="display: none"])[id*="modal"]')) return;
+                const now = Date.now();
+                if (now - lastT > 120) buf = '';
+                lastT = now;
+                if (e.key === 'Enter') {
+                    if (buf.length >= 4) { e.preventDefault(); handleScannedCode(buf); }
+                    buf = ''; return;
                 }
-            } catch (e) {
-                msg.innerText = 'Tidak dapat memakai kamera: ' + (e.message || e);
-            }
+                if (e.key.length === 1) buf += e.key;
+            });
+            const rd = document.getElementById('bc-ready');
+            const setRd = (on) => { if (rd) { rd.textContent = on ? '• scanner siap' : '• klik kolom ini jika scanner tidak masuk'; rd.style.color = on ? '#059669' : ''; } };
+            input.addEventListener('focus', () => setRd(true));
+            input.addEventListener('blur', () => setRd(false));
         }
 
         initBarcodeUI();

@@ -3,11 +3,19 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.4';
+  var BETA = 'BETA 1.5';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.5)', '11 Nov 2026', [
+      '[Tampilan] Tombol, bar header, dan dock kini berbahan kaca hitam 3D yang mengambang dengan bayangan lembut, di semua halaman',
+      '[Tampilan] Di HP dan tablet halaman tidak lagi bergulir: laporan dan isian panjang dibuka lewat pop-up',
+      '[Perbaikan] Lokasi kini memakai GPS perangkat dan menampilkan nama desa/kelurahan, bukan lagi perkiraan kota dari jaringan',
+      '[Perbaikan] Barcode kini dibaca dari alat scanner laser/infra merah (seperti di minimarket), bukan kamera',
+      '[Perbaikan] Kartu Total Income/Outcome pemilik sama dengan manager, kartu Pajak tidak lagi duplikat pop-up karena sudah ada di dock',
+      '[Keamanan] Aplikasi tidak lagi meminta izin kamera karena pemindaian barcode memakai scanner; lokasi hanya dibaca di perangkat Anda'
+    ]],
     ['1.0.0 (BETA 1.4)', '11 Nov 2026', [
       '[Tampilan] Logo Oneilverse baru: cincin orbit emas dengan planet dan huruf N di pusatnya',
       '[Tampilan] Portal login, partner, dan semua halaman kini satu gaya: font, kartu kaca, tombol, dan dock',

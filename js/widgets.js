@@ -141,27 +141,51 @@
   function compass(d) { return ['U', 'TL', 'T', 'TG', 'S', 'BD', 'B', 'BL'][Math.round((d % 360) / 45) % 8]; }
   function uvLabel(u) { return u < 3 ? 'Rendah' : u < 6 ? 'Sedang' : u < 8 ? 'Tinggi' : u < 11 ? 'Sangat Tinggi' : 'Ekstrem'; }
 
-  // Lokasi: 1) GPS perangkat (jika diizinkan), 2) perkiraan dari jaringan (IP). Tanpa lokasi bawaan.
-  var GEO_KEY = 'fm_geo_v2';
+  // Lokasi: 1) GPS perangkat (presisi tinggi), 2) perkiraan dari jaringan (IP) hanya jika GPS tidak bisa dipakai.
+  // Nama tempat sampai desa/kelurahan (OpenStreetMap), cadangan BigDataCloud.
+  var GEO_KEY = 'fm_geo_v3';
   function geoCached() {
-    try { var c = JSON.parse(localStorage.getItem(GEO_KEY) || 'null'); if (c && Date.now() - c.t < 24 * 3600 * 1000) return c; } catch (e) {}
+    try {
+      var c = JSON.parse(localStorage.getItem(GEO_KEY) || 'null');
+      if (!c) return null;
+      var ttl = c.src === 'GPS' ? 6 * 3600 * 1000 : 5 * 60 * 1000;   // hasil jaringan cepat kedaluwarsa agar GPS dicoba lagi
+      if (Date.now() - c.t < ttl) return c;
+    } catch (e) {}
     return null;
   }
   function geoSave(g) { g.t = Date.now(); try { localStorage.setItem(GEO_KEY, JSON.stringify(g)); } catch (e) {} return g; }
   function jget(url) { return fetch(url).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }); }
 
+  function uniq(a) { var o = []; a.forEach(function (x) { if (x && o.map(function (y) { return y.toLowerCase(); }).indexOf(String(x).toLowerCase()) < 0) o.push(x); }); return o; }
   function placeName(lat, lon) {
-    return jget('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lon + '&localityLanguage=id')
-      .then(function (j) { return [j.locality || j.city, j.principalSubdivision].filter(Boolean).join(', '); })
-      .catch(function () { return ''; });
+    var osm = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&addressdetails=1&accept-language=id&lat=' + lat + '&lon=' + lon;
+    return jget(osm).then(function (j) {
+      var a = (j && j.address) || {};
+      var desa = a.village || a.suburb || a.neighbourhood || a.hamlet || a.quarter;
+      var kec = a.city_district || a.municipality || a.district || a.subdistrict || a.town;
+      var kab = a.county || a.city || a.regency;
+      var prov = a.state;
+      if (!desa && !kec && !kab) throw new Error('osm kosong');
+      var parts = uniq([desa, kec && (/^kec/i.test(kec) ? kec : 'Kec. ' + kec), kab, prov]);
+      return { name: parts.join(', '), short: [desa, kab].filter(Boolean).join(', ') };
+    }).catch(function () {
+      return jget('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lon + '&localityLanguage=id').then(function (j) {
+        var parts = uniq([j.locality, j.city, j.principalSubdivision]);
+        return { name: parts.join(', '), short: parts.slice(0, 2).join(', ') };
+      }).catch(function () { return { name: '', short: '' }; });
+    });
+  }
+  function gpsState() {
+    try { if (navigator.permissions && navigator.permissions.query) return navigator.permissions.query({ name: 'geolocation' }).then(function (p) { return p.state; }).catch(function () { return 'unknown'; }); } catch (e) {}
+    return Promise.resolve('unknown');
   }
   function viaGPS() {
     return new Promise(function (res, rej) {
       if (!navigator.geolocation) return rej(new Error('no-gps'));
       navigator.geolocation.getCurrentPosition(function (p) {
-        var lat = p.coords.latitude, lon = p.coords.longitude;
-        placeName(lat, lon).then(function (n) { res({ lat: lat, lon: lon, name: n || 'Lokasi perangkat (GPS)', src: 'GPS' }); });
-      }, function (e) { rej(e); }, { timeout: 8000, maximumAge: 600000 });
+        var lat = p.coords.latitude, lon = p.coords.longitude, acc = Math.round(p.coords.accuracy || 0);
+        placeName(lat, lon).then(function (n) { res({ lat: lat, lon: lon, acc: acc, name: n.name || 'Lokasi perangkat (GPS)', short: n.short, src: 'GPS' }); });
+      }, function (e) { rej(e); }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
     });
   }
   function viaNetwork() {
@@ -175,10 +199,14 @@
       });
     });
   }
+  var gpsDenied = false;
   function resolveLocation(force) {
     var c = geoCached();
     if (c && !force) return Promise.resolve(c);
-    return viaGPS().catch(function () { return viaNetwork(); }).then(geoSave);
+    return viaGPS().then(function (g) { gpsDenied = false; return g; }).catch(function (e) {
+      gpsDenied = !!(e && e.code === 1);
+      return viaNetwork();
+    }).then(geoSave);
   }
 
   var wx = null, wxState = 'loading';
@@ -223,7 +251,10 @@
     var h = '<div style="text-align:center;padding:4px 0 14px"><div style="font-size:54px;line-height:1">' + w[1] + '</div>' +
       '<div style="font-size:40px;font-weight:900;margin-top:6px">' + Math.round(cur.temperature_2m) + '°C</div>' +
       '<div style="font-size:13px;font-weight:700;color:#67e8f9;margin-top:2px">' + w[0] + '</div>' +
-      '<div style="font-size:11px;color:#94a3b8;margin-top:3px">' + esc(wx.loc.name) + (wx.loc.src === 'Jaringan' ? ' · lokasi perkiraan' : '') + '</div></div>' +
+      '<div style="font-size:12px;font-weight:700;margin-top:6px;line-height:1.4">📍 ' + esc(wx.loc.name) + '</div>' +
+      '<div style="font-size:11px;color:#94a3b8;margin-top:2px">' + (wx.loc.src === 'GPS' ? 'Lokasi GPS' + (wx.loc.acc ? ' · akurasi ±' + wx.loc.acc + ' m' : '') : 'Lokasi perkiraan dari jaringan, bisa meleset ke kota lain') + '</div>' +
+      (wx.loc.src === 'GPS' ? '' : '<div style="font-size:11px;color:#fbbf24;margin-top:4px;line-height:1.4">' + (gpsDenied ? 'Izin lokasi ditolak. Ketuk ikon gembok di samping alamat, izinkan Lokasi, lalu tekan tombol di bawah.' : 'Tekan tombol di bawah lalu pilih Izinkan agar lokasi presisi.') + '</div>') +
+      '<button type="button" data-gps style="margin-top:8px;padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;border:1px solid rgba(148,163,184,.4);background:rgba(148,163,184,.15);color:inherit;cursor:pointer">Perbarui dari GPS</button></div>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
       cell('Terasa seperti', Math.round(cur.apparent_temperature) + '°C') +
       cell('Kelembapan', Math.round(cur.relative_humidity_2m) + '%') +
@@ -240,6 +271,7 @@
     }
     h += '</div><p style="font-size:10px;color:#64748b;margin-top:8px">Diperbarui ' + when(wx.t) + ' · sumber Open-Meteo · lokasi dari ' + (wx.loc.src === 'GPS' ? 'GPS' : 'jaringan') + ' · disegarkan tiap 3 jam.</p>';
     b.innerHTML = h;
+    var gb = b.querySelector('[data-gps]'); if (gb) gb.onclick = function () { gb.textContent = 'Mencari lokasi...'; loadWeather(true); };
   }
 
   function wire() {
