@@ -24,7 +24,7 @@
       { t: 'Pesan Siaran', dup: true, ic: 'send', run: "openModal('broadcast_modal')", d: 'Kirim pengumuman ke semua toko' },
       { t: 'Kurs & Emas', ic: 'coins', find: 'Kurs', d: 'Kurs dan harga emas terkini' },
       { t: 'Catatan Rilis', ic: 'book', find: 'Catatan Rilis', d: 'Riwayat pembaruan untuk klien' },
-      { t: 'Kesehatan Sistem', ic: 'shield', soon: true, d: 'Segera: cek server dan database' }
+      { t: 'Chat Global', ic: 'bell', run: "if(window.FM_CHAT)FM_CHAT.openModeration()", d: 'Hapus pesan, bisukan ID, nyalakan atau matikan' }
     ] }
   ];
 

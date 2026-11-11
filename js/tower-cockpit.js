@@ -307,7 +307,7 @@
       '<button id="tw-snd" class="pl"></button><button id="tw-eco" class="pl"></button><button id="tw-set" class="pl">Atur</button><button id="tw-out" class="pl bad">Keluar</button></div>' +
       '<div id="tw-mon"><div id="tw-strip">' + cell(1, 'OMZET HARI INI') + cell(2, 'OMZET BULAN INI') + cell(3, 'PENGELUARAN BULAN INI') + cell(4, 'PAJAK DISUMBANG') + cell(5, 'BILLING BERJALAN', 'g') + cell(6, 'BILLING UJI COBA', 'y') + cell(7, 'PROYEKSI BULAN INI') + '</div>' +
       '<div id="tw-tbw"><table><thead><tr>' + th.map(function (h, i) { return '<th' + (num[i] ? ' class="n"' : '') + '>' + h + '</th>'; }).join('') + '</tr></thead><tbody id="tw-rows"></tbody></table></div>' +
-      '<div id="tw-bot"><div class="bx"><h4>LOG TRANSAKSI</h4><div id="tw-log"></div></div><div class="bx"><h4>JAM SIBUK</h4><div id="tw-jam"></div><h4 style="margin-top:10px">PERHATIAN</h4><div id="tw-attn"></div></div></div></div>' +
+      '<div id="tw-bot"><div class="bx"><h4>LOG TRANSAKSI</h4><div id="tw-log"></div></div><div class="bx"><h4>JAM SIBUK</h4><div id="tw-jam"></div><h4 style="margin-top:10px">PERHATIAN</h4><div id="tw-attn"></div></div><div class="bx"><h4>CHAT GLOBAL <span class="m">(kamu: DEV)</span></h4><div id="tw-chat" class="tw-chat"></div></div></div></div>' +
       '<div id="tw-ken"></div>';
     document.body.appendChild(root);
     $('tw-ken').appendChild(acts);
@@ -362,11 +362,14 @@
     'html[data-tw-pg="mon"] #tw-mon{display:flex}html[data-tw-pg="mon"] #tw-ken{display:none}html[data-tw-pg="ken"] #tw-mon{display:none}html[data-tw-pg="ken"] #tw-ken{display:flex}',
     '#tw-strip{flex:none;display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid #2a2a2a}#tw-strip>div{padding:7px 10px;border-right:1px solid #1e1e1e}#tw-strip>div:last-child{border:0}#tw-strip small{display:block;color:#666;font-size:10px;letter-spacing:.06em}#tw-strip b{font-size:16px}#tw-strip b.g{color:#3ddc84}#tw-strip b.y{color:#f5c542}',
     '#tw-tbw{flex:1.25 1 0;min-height:60px;overflow:auto;margin-top:4px}#tw-tbw table{width:100%;border-collapse:collapse}#tw-tbw th{position:sticky;top:0;background:#000;font-weight:400;color:#666;text-align:left;border-bottom:1px solid #333;padding:3px 5px;font-size:10px;letter-spacing:.04em;white-space:nowrap}#tw-tbw td{padding:4px 5px;border-bottom:1px solid #151515;white-space:nowrap}#tw-tbw .n{text-align:right}',
-    '#tw-bot{flex:1 1 0;min-height:90px;display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-top:8px}.bx{min-height:0;min-width:0;display:flex;flex-direction:column;border-top:1px solid #333;padding-top:5px}.bx h4{margin:0 0 4px;font-weight:400;color:#666;font-size:10px;letter-spacing:.1em}',
+    '#tw-bot{flex:1 1 0;min-height:90px;display:grid;grid-template-columns:1.5fr 1fr 1.1fr;gap:16px;margin-top:8px}.bx{min-height:0;min-width:0;display:flex;flex-direction:column;border-top:1px solid #333;padding-top:5px}.bx h4{margin:0 0 4px;font-weight:400;color:#666;font-size:10px;letter-spacing:.1em}',
     '#tw-log{flex:1 1 0;min-height:0;overflow:auto}.ln{display:flex;gap:10px;word-break:break-word}.ln .t{color:#555;flex:none}.ln.sale .m{color:#3ddc84}.ln.up .m{color:#3ddc84}.ln.cost .m{color:#999}.ln.down .m{color:#f5c542}.ln.alarm .m{color:#ff5252}.ln.sys .m{color:#eee}',
     '.caret{font-style:normal;color:#3ddc84}',
     '#tw-jam .bars{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;height:46px;align-items:end}#tw-jam .bars>div{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;font-size:9px;color:#555}#tw-jam .bars i{display:block;width:100%;background:#2e7d4f}#tw-jam .bars b{height:11px;font-size:9px;color:#555}',
     '#tw-attn{overflow:auto;min-height:0}',
+    '.tw-chat{flex:1 1 0;min-height:0;display:flex;flex-direction:column}.fmc-feed{flex:1 1 0;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:2px}',
+    '.tw-chat .fmc-m{display:flex;gap:8px}.tw-chat .fmc-t{color:#555;flex:none;font-size:11px}.tw-chat .fmc-id,#tw-root .tw-chat .fmc-id{color:#9a9a9a;flex:none;font-weight:400;pointer-events:none;user-select:none}.tw-chat .fmc-x{color:#ddd;font-size:12px}.tw-chat .fmc-m.dev .fmc-id,#tw-root .tw-chat .fmc-m.dev .fmc-id{color:#f5c542}.tw-chat .fmc-empty{color:#666;padding:6px 0}',
+    '.fmc-note{flex:none;min-height:14px;color:#f5c542;font-size:11px}.fmc-in{flex:none;display:flex;gap:6px}.fmc-in input{flex:1;min-width:0;border-radius:0;background:#000;border:1px solid #333;color:#eee;font:inherit;padding:3px 8px;outline:none}.fmc-in input:focus{border-color:#3ddc84}.fmc-in button{all:unset;cursor:pointer;color:#3ddc84;border:1px solid #333;padding:3px 10px;font:inherit}',
     '#tw-ken{flex:1 1 0;min-height:0;display:none;flex-direction:column;padding:2px 18px 12px;font-family:system-ui,"Segoe UI",Roboto,sans-serif;font-size:13px;color:#e6e6e6}',
     'html[data-tw-ck] #tw-ken #fm-actions{position:static!important;display:flex!important;flex-direction:column;flex:1 1 0;min-height:0;gap:8px;padding:0!important;margin:0!important;overflow:hidden;background:none!important;border:0!important;box-shadow:none!important}',
     'html[data-tw-ck] #tw-ken .tw-group{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:5px}',
@@ -408,6 +411,7 @@
       if (acts && acts.classList.contains('tw-grouped')) {
         build(); preflight(function () { lastTouch = Date.now(); });
         compute(); renderStrip(); renderTable(); renderJam(); renderAttn(); updateBar(); tickLive();
+        if (window.FM_CHAT) FM_CHAT.mountTower($('tw-chat'));
         startTimers();
         var ca = window.ctAudit;
         if (typeof ca === 'function') window.ctAudit = function (tid, action, detail) { try { addLog('sys', 'AKSI TOWER · ' + (tid && tid !== '-' ? tid + ' · ' : '') + (detail || action), false, null); } catch (e) {} return ca.apply(this, arguments); };

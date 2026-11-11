@@ -73,8 +73,10 @@
     <script src="js/logo.js?v=1.5.8"></script>
     <script src="js/skin.js?v=1.5.8"></script>
     <script src="js/tower-menu.js?v=1.5.8"></script>
+    <script src="js/chat.js?v=1.5.8"></script>
     <script src="js/tower-cockpit.js?v=1.5.8"></script>
     <style>#main-modal-container{z-index:70 !important}</style>
+    <script src="js/sw-register.js" defer></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
@@ -595,7 +597,7 @@
                         <div id="nt-features" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-200 text-xs"></div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">ID Toko (kosongkan = otomatis)</label>
-                                <input id="nt-id" type="text" maxlength="10" placeholder="Format: ID + tahun + bulan + tanggal + urutan, contoh ID26111101" oninput="previewNewTenantId()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
+                                <input id="nt-id" type="text" maxlength="11" placeholder="Kosongkan untuk otomatis. Format: ID + YYMMDD + hari(1-7) + urutan, contoh ID261112403" oninput="previewNewTenantId()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
                                 <p id="nt-idprev" class="mt-1 text-[11px] text-slate-400"></p></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Nama Usaha *</label><input id="nt-nama" type="text" placeholder="Contoh: Kedai Kopi Senja" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Slogan / Keterangan</label><input id="nt-slogan" type="text" placeholder="Contoh: Kopi lokal, harga bersahabat" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
@@ -1350,11 +1352,13 @@
         function appBaseUrl() { return window.location.href.split('?')[0].replace(/[^\/]*$/, ''); }
         function tenantLink(id) { return appBaseUrl() + String(id).toLowerCase(); }
 
+        /* Format ID baru: ID + YY + MM + DD + hari ke-(1=Senin ... 7=Minggu) + urutan 2 digit. Contoh ID261112403 = 12 Nov 2026, Kamis, pendaftar ke-3.
+           ID lama (8 angka, mis. ID26111101) tetap sah dan tidak diubah. */
         function nextTenantId() {
-            const d = new Date();
-            const base = 'ID' + String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+            const d = new Date(), dow = d.getDay() === 0 ? 7 : d.getDay();
+            const base = 'ID' + String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + dow;
             let n = 1;
-            while (TENANTS_CONFIG[(base + String(n).padStart(2, '0')).toLowerCase()] || formerMap[(base + String(n).padStart(2, '0')).toLowerCase()]) n++;
+            while (n < 99 && (TENANTS_CONFIG[(base + String(n).padStart(2, '0')).toLowerCase()] || formerMap[(base + String(n).padStart(2, '0')).toLowerCase()])) n++;
             return base + String(n).padStart(2, '0');
         }
 
@@ -1374,7 +1378,7 @@
             if (!el) return;
             const v = (document.getElementById('nt-id').value || '').trim().toUpperCase();
             if (!v) { el.className = 'mt-1 text-[11px] text-slate-400'; el.innerText = 'Otomatis: ' + nextTenantId() + ' (hari ini, urutan berikutnya)'; return; }
-            if (!/^ID\d{8}$/.test(v)) { el.className = 'mt-1 text-[11px] text-rose-300'; el.innerText = 'Format harus ID diikuti 8 angka (YYMMDD + 2 digit urutan), contoh ID26111101.'; return; }
+            if (!/^ID\d{8,9}$/.test(v)) { el.className = 'mt-1 text-[11px] text-rose-300'; el.innerText = 'Format harus ID diikuti 9 angka (YYMMDD + hari 1-7 + 2 digit urutan), contoh ID261112403.'; return; }
             if (TENANTS_CONFIG[v.toLowerCase()]) { el.className = 'mt-1 text-[11px] text-rose-300'; el.innerText = 'ID ini sudah dipakai toko lain.'; return; }
             el.className = 'mt-1 text-[11px] text-emerald-300'; el.innerText = 'ID tersedia: ' + v;
         }
@@ -1386,7 +1390,7 @@
             const alamat = document.getElementById('nt-alamat').value.trim() || 'Alamat belum diisi';
             const kasir = Math.max(1, parseInt(document.getElementById('nt-kasir').value) || 1);
             const manualId = (document.getElementById('nt-id').value || '').trim().toUpperCase();
-            if (manualId && !/^ID\d{8}$/.test(manualId)) return alert('Format ID harus ID diikuti 8 angka, contoh ID26111101.');
+            if (manualId && !/^ID\d{8,9}$/.test(manualId)) return alert('Format ID harus ID diikuti 9 angka, contoh ID261112403.');
             if (manualId && (TENANTS_CONFIG[manualId.toLowerCase()] || formerMap[manualId.toLowerCase()])) return alert('ID ' + manualId + ' sudah pernah dipakai (aktif atau arsip) dan tidak dapat dipakai lagi.');
             const id = manualId || nextTenantId();
             const loc = { name: alamat, lat: 0, lon: 0 };
