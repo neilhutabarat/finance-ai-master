@@ -8,7 +8,7 @@
    LEGACY=true: toko yang akunnya belum diaktifkan masih boleh pakai login lama (sementara, sampai ZIP B). */
 (function () {
   'use strict';
-  var LEGACY = true;
+  var LEGACY = false;
   var DOMAIN = '@login.oneilverse.invalid';
   var ROLES_BY_PAGE = { 'kasir.html': ['staff', 'manager', 'owner'], 'manager.html': ['manager', 'owner'], 'dashboard.html': ['owner'], 'partner.html': ['partner'], 'provider.html': 'tower' };
 

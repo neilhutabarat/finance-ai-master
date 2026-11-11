@@ -1403,7 +1403,7 @@
                     '<p class="text-slate-300">Kirim link ini ke klien:</p>' +
                     '<input readonly id="nt-link" value="' + escHtml(link) + '" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-[11px] text-cyan-300 font-mono outline-none">' +
                     '<button id="nt-copy" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]">Salin Link</button>' +
-                    '<p class="text-amber-300 text-[11px]">PIN awal toko masih bawaan sistem. Minta owner menggantinya di menu Kelola Password pada login pertama.</p>';
+                    '<p class="text-amber-300 text-[11px]">Akun login toko belum dibuat. Buka menu Akun Login, atur PIN Kasir, Manager, dan Owner, lalu berikan PIN ke klien.</p>';
                 const cb = document.getElementById('nt-copy');
                 cb.onclick = function () { const i = document.getElementById('nt-link'); i.select(); try { document.execCommand('copy'); cb.innerText = 'Tersalin'; } catch (e) {} };
                 ['nt-id', 'nt-nama', 'nt-slogan', 'nt-alamat', 'nt-custom'].forEach(function (x) { document.getElementById(x).value = ''; });

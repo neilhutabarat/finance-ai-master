@@ -503,32 +503,6 @@
             window.location.href = targetUrl + param;
         }
 
-        // Login lama (sementara): hanya untuk toko yang akunnya belum diaktifkan Tower
-        function legacyLogin(pin, singlePageMode, currentTokoParam) {
-            const storedPw = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
-            const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
-            let userObj = null, targetUrl = "kasir.html";
-            if (singlePageMode) {
-                const validPins = [storedPw.staff || "1234", storedPw.owner || "9999", "0000", "5678", "1234"];
-                if (!validPins.includes(pin)) return registerFailedAttempt();
-                userObj = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey };
-                targetUrl = "partner.html";
-            } else if (currentRole === 'staff') {
-                if (!(pin === (storedPw.staff || "1234") || pin === "1234" || pin === "0000")) return registerFailedAttempt();
-                userObj = { role: 'staff', title: customRoles.staff || 'Staf Kasir', permissions: ['kasir'] };
-            } else if (currentRole === 'manager') {
-                if (!(pin === (storedPw.manager || "5678") || pin === "5678" || pin === "1234")) return registerFailedAttempt();
-                userObj = { role: 'manager', title: customRoles.manager || 'Supervisor / Manager', permissions: ['manager'] };
-                targetUrl = "manager.html";
-            } else {
-                if (!(pin === (storedPw.owner || "9999") || pin === "9999" || pin === "0000" || pin === "1234")) return registerFailedAttempt();
-                userObj = { role: 'owner', title: customRoles.owner || 'Owner Eksekutif', permissions: ['all'] };
-                targetUrl = "dashboard.html";
-            }
-            localStorage.setItem('fm_legacy_tenant', tenantKey);
-            completeLogin(userObj, targetUrl, currentTokoParam);
-        }
-
         function handleLogin() {
             const picker = document.getElementById('tenant-picker');
             const selectedKey = resolveTenantKey(picker);
@@ -552,10 +526,7 @@
 
             FM_AUTH.login(tenantKey, role, pin).then(function (r) {
                 done();
-                if (r.legacy) {
-                    if (!FM_AUTH.LEGACY) return alert("Akun login untuk peran ini belum diaktifkan. Hubungi provider (Tower Kontrol).");
-                    return legacyLogin(pin, singlePageMode, currentTokoParam);
-                }
+                if (r.legacy) return alert("Akun login untuk peran ini belum diaktifkan. Hubungi provider (Tower Kontrol).");
                 if (!r.ok) {
                     if (r.reason === 'bad') return registerFailedAttempt();
                     return alert(FM_AUTH.errText(r.reason));
@@ -603,12 +574,7 @@
                 localStorage.setItem('auth_role', 'superadmin');
                 window.location.replace("provider.html");
             };
-            if (!em) {
-                // kode lama (sementara; dihapus di pembaruan berikutnya)
-                if (window.FM_AUTH && FM_AUTH.LEGACY && secret === "930223") return enter();
-                alert("Masukkan email dan sandi Tower.");
-                return;
-            }
+            if (!em) { alert("Masukkan email dan sandi Tower."); return; }
             if (!window.FM_AUTH) return alert("Modul keamanan belum termuat. Periksa internet lalu muat ulang halaman.");
             FM_AUTH.loginTower(em, secret).then(function (r) {
                 if (r.ok) return enter();

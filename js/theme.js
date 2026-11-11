@@ -21,7 +21,8 @@
       '[Tampilan] Kartu "Laba Rugi" di halaman manager dan owner: laba bersih bulan ini dan margin; ketuk untuk laporan per hari, minggu, bulan, tahun, atau tanggal bebas, lengkap dengan unduhan PDF dan CSV',
       '[Perbaikan] Prive (penarikan pribadi owner) kini ditampilkan terpisah di laporan dan tidak lagi mengurangi laba',
       '[Perbaikan] Owner kini bisa mengganti PIN kasir, manager, dan PIN sendiri, dan PIN baru berlaku di semua perangkat (sebelumnya hanya di perangkat yang dipakai mengganti)',
-      '[Keamanan] Login kini memakai Firebase Authentication (untuk toko yang akunnya sudah diaktifkan): PIN minimal 6 karakter dan disimpan terenkripsi di server; halaman kasir, manager, dan owner tidak bisa dibuka tanpa login yang sah',
+      '[Keamanan] Login kini memakai Firebase Authentication: PIN minimal 6 karakter disimpan terenkripsi di server, PIN bawaan lama (1234, 5678, 9999) tidak lagi berlaku, dan halaman kasir, manager, dan owner tidak bisa dibuka tanpa login yang sah',
+      '[Keamanan] Data toko kini hanya bisa dibaca dan diubah oleh akun toko itu sendiri; pengaturan layanan dan tagihan hanya bisa diubah oleh penyedia',
       '[Keamanan] Aplikasi tidak lagi meminta izin kamera karena pemindaian barcode memakai scanner; lokasi hanya dibaca di perangkat Anda'
     ]],
     ['1.0.0 (BETA 1.4)', '11 Nov 2026', [
