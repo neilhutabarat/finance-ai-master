@@ -76,9 +76,9 @@
             { label: 'Catatan Rilis', icon: 'book', run: "openModal('release_notes')" }
         ];
     </script>
-    <script src="js/theme.js?v=1.5.2"></script>
-    <script src="js/logo.js?v=1.5.2"></script>
-    <script src="js/skin.js?v=1.5.2"></script>
+    <script src="js/theme.js?v=1.5.3"></script>
+    <script src="js/logo.js?v=1.5.3"></script>
+    <script src="js/skin.js?v=1.5.3"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
@@ -685,11 +685,11 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/widgets.js?v=1.1"></script>
+    <script src="js/widgets.js?v=1.5.3"></script>
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/store.js?v=1.1"></script>
+    <script src="js/store.js?v=1.5.3"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -1863,7 +1863,7 @@
                 if (g) {
                     const mnt = Math.max(0, Math.round((Date.now() - g.ms) / 60000));
                     a.innerText = g.geo.name || 'Lokasi GPS';
-                    c.innerText = 'GPS live · ' + g.geo.lat.toFixed(4) + ', ' + g.geo.lon.toFixed(4) + ' · ' + (mnt < 1 ? 'baru saja' : mnt + ' mnt lalu');
+                    c.innerText = (g.geo.src === 'GPS' ? 'GPS live · ' : 'Perkiraan jaringan (izin GPS belum diberikan) · ') + g.geo.lat.toFixed(4) + ', ' + g.geo.lon.toFixed(4) + ' · ' + (mnt < 1 ? 'baru saja' : mnt + ' mnt lalu');
                 } else {
                     a.innerText = reg && reg !== '-' ? reg : 'Belum ada data lokasi';
                     c.innerText = reg && reg !== '-' ? 'Alamat terdaftar (belum ada GPS live dari terminal ini)' : 'Menunggu terminal login dengan izin lokasi';

@@ -153,7 +153,7 @@
     } catch (e) {}
     return null;
   }
-  function geoSave(g) { g.t = Date.now(); try { localStorage.setItem(GEO_KEY, JSON.stringify(g)); } catch (e) {} window.FM_GEO = g; try { window.dispatchEvent(new CustomEvent('fm:geo')); } catch (e) {} return g; }
+  function geoSave(g) { g.t = g.t || Date.now(); try { localStorage.setItem(GEO_KEY, JSON.stringify(g)); } catch (e) {} window.FM_GEO = g; try { window.dispatchEvent(new CustomEvent('fm:geo')); } catch (e) {} return g; }
   function jget(url) { return fetch(url).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }); }
 
   function uniq(a) { var o = []; a.forEach(function (x) { if (x && o.map(function (y) { return y.toLowerCase(); }).indexOf(String(x).toLowerCase()) < 0) o.push(x); }); return o; }
@@ -202,11 +202,11 @@
   var gpsDenied = false;
   function resolveLocation(force) {
     var c = geoCached();
-    if (c && !force) return Promise.resolve(c);
+    if (c && !force) return Promise.resolve(geoSave(Object.assign({}, c, { t: c.t })));
     return viaGPS().then(function (g) { gpsDenied = false; return g; }).catch(function (e) {
       gpsDenied = !!(e && e.code === 1);
       return viaNetwork();
-    }).then(geoSave);
+    }).then(function (g) { g.t = Date.now(); return geoSave(g); });
   }
 
   var wx = null, wxState = 'loading';

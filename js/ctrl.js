@@ -241,7 +241,7 @@
             startedAt: startedAtMs, lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         };
         var g = window.FM_GEO;
-        if (g && g.src === 'GPS' && isFinite(g.lat) && isFinite(g.lon)) doc.geo = { lat: g.lat, lon: g.lon, name: String(g.name || '').slice(0, 140), acc: g.acc || 0, at: g.t || Date.now() };
+        if (g && isFinite(g.lat) && isFinite(g.lon)) doc.geo = { src: g.src === 'GPS' ? 'GPS' : 'Jaringan', lat: g.lat, lon: g.lon, name: String(g.name || '').slice(0, 140), acc: g.acc || 0, at: g.t || Date.now() };
         presenceRef(tenant).set(doc, { merge: true }).catch(function () {});
     }
 
