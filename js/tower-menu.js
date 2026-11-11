@@ -1,0 +1,146 @@
+/* Menu Control Tower: ubin dikelompokkan (Klien / Uang / Sistem), ubin "segera" untuk fitur yang belum bisa dipakai,
+   dan palet warna yang lebih tenang. Hanya aktif di halaman Tower. */
+(function () {
+  'use strict';
+  if (!/provider/.test(location.pathname)) return;
+
+  var GROUPS = [
+    { id: 'klien', title: 'Klien', hint: 'Toko mitra dan permintaan mereka', c: '#6fc7c0', items: [
+      { t: 'Klien Baru', ic: 'plus', run: "openModal('add_tenant')" },
+      { t: 'Jaringan Mitra', ic: 'building', find: 'Jaringan Mitra' },
+      { t: 'Edit Toko', ic: 'store', edit: true },
+      { t: 'Permohonan Kasir', ic: 'ticket', run: "openModal('tickets')", badge: 'stat-pending-tickets' },
+      { t: 'Toko Berhenti', ic: 'archive', find: 'Toko Berhenti' },
+      { t: 'Kendali Massal', ic: 'users', soon: true }
+    ] },
+    { id: 'uang', title: 'Uang', hint: 'Tagihan, harga, dan pembukuan Provider', c: '#d9b872', items: [
+      { t: 'Billing Jaringan', ic: 'chart', find: 'Billing Jaringan' },
+      { t: 'Harga Paket', ic: 'tag', find: 'Harga Paket' },
+      { t: 'Riwayat Bulanan', ic: 'clock', run: "openModal('network_monthly_history')" },
+      { t: 'Peringkat Omzet', ic: 'trophy', run: "openModal('leaderboard')" },
+      { t: 'Catat Pembukuan', ic: 'swap', run: "openModal('provider_input_tx')" },
+      { t: 'COA Provider', ic: 'list', find: 'COA Provider' }
+    ] },
+    { id: 'sistem', title: 'Sistem', hint: 'Akun, pesan, dan pengaturan platform', c: '#9fa8e6', items: [
+      { t: 'Akun Login', ic: 'key', find: 'Akun Login' },
+      { t: 'Pesan Siaran', ic: 'send', run: "openModal('broadcast_modal')" },
+      { t: 'Kurs & Emas', ic: 'coins', find: 'Kurs' },
+      { t: 'Catatan Rilis', ic: 'book', find: 'Catatan Rilis' },
+      { t: 'Kesehatan Sistem', ic: 'shield', soon: true },
+      { t: 'Riwayat Aksi Tower', ic: 'list', soon: true },
+      { t: 'Cadangan Data Toko', ic: 'download', soon: true },
+      { t: 'Reset PIN & Paksa Keluar', ic: 'key', soon: true },
+      { t: 'Hapus Akun Login Server', ic: 'user', soon: true },
+      { t: 'Email Otomatis', ic: 'bell', soon: true }
+    ] }
+  ];
+
+  var CSS = [
+    /* palet tenang: biru-abu lembut, kartu tidak terlalu pekat */
+    'html[data-fm-page="tower"][data-fm-native="dark"]:not([data-fm-invert]){--s-bg:#1b2130;--s-surf:rgba(188,201,230,.075);--s-line:rgba(188,201,230,.13);--s-hi:rgba(188,201,230,.16);--s-shadow:rgba(6,10,20,.55);--s-gloss:rgba(188,201,230,.04)}',
+    'html[data-fm-page="tower"][data-fm-native="dark"]:not([data-fm-invert]) body{background:#1b2130!important;background-image:radial-gradient(60% 45% at 8% 0%,rgba(120,150,210,.13),transparent 70%),radial-gradient(50% 40% at 100% 100%,rgba(110,170,170,.09),transparent 70%)!important;color:#dfe5f2}',
+    'html[data-fm-page="tower"]:not([data-fm-invert]) main>.grid:first-child>*{background:rgba(188,201,230,.07)!important;background-image:none!important;border-color:rgba(188,201,230,.14)!important}',
+    'html[data-fm-page="tower"]:not([data-fm-invert]) main>.grid:first-child .text-white,html[data-fm-page="tower"]:not([data-fm-invert]) main>.grid:first-child h3{color:#e6ebf6!important}',
+    'html[data-fm-page="tower"]:not([data-fm-invert]) main>.grid:first-child .text-indigo-300,html[data-fm-page="tower"]:not([data-fm-invert]) main>.grid:first-child .text-cyan-300,html[data-fm-page="tower"]:not([data-fm-invert]) main>.grid:first-child .text-amber-300,html[data-fm-page="tower"]:not([data-fm-invert]) main>.grid:first-child .text-rose-300{filter:saturate(.7)}',
+    /* kelompok menu */
+    'html[data-fm-page="tower"] #fm-actions.tw-grouped{display:flex!important;flex-direction:column;gap:16px;flex:1 1 0!important;min-height:0;overflow:auto;grid-template-columns:none!important;padding:2px 2px 84px}',
+    '.tw-group{display:flex;flex-direction:column;gap:8px}',
+    '.tw-head{display:flex;align-items:baseline;gap:10px;padding:0 4px}',
+    '.tw-head b{font-size:13px;font-weight:800;letter-spacing:.01em;color:var(--g)}',
+    '.tw-head span{font-size:11px;opacity:.55}',
+    '.tw-head:before{content:"";align-self:center;width:4px;height:14px;border-radius:3px;background:var(--g)}',
+    '.tw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}',
+    'html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act{flex-direction:row!important;justify-content:flex-start!important;text-align:left!important;gap:11px!important;min-height:58px;height:auto;font-size:13.5px!important;font-weight:700!important;padding:9px 13px!important;position:relative;border-radius:16px}',
+    'html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act i{width:36px!important;height:36px!important;border-radius:12px!important;background:color-mix(in srgb,var(--g) 18%,transparent)!important;color:var(--g)!important}',
+    'html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act svg{width:19px!important;height:19px!important}',
+    'html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act span{white-space:normal!important;line-height:1.2}',
+    '.tw-soon{opacity:.42;filter:grayscale(.55);border-style:dashed!important;cursor:default!important}',
+    '.tw-soon:hover{transform:none!important;filter:grayscale(.55)!important}',
+    '.tw-pill{margin-left:auto;flex:none;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(188,201,230,.16);color:#cdd6ea}',
+    '.tw-cnt{margin-left:auto;flex:none;min-width:22px;text-align:center;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:#c9706f;color:#fff}',
+    '.tw-rowbtns button{white-space:nowrap}',
+    '@media(max-width:640px){.tw-grid{grid-template-columns:repeat(2,minmax(0,1fr))}html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act{padding:8px 10px!important;font-size:12.5px!important;gap:8px!important}html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act i{width:30px!important;height:30px!important}}'
+  ].join('\n');
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function tile(it, g) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'fm-act' + (it.soon ? ' tw-soon' : ''); b.setAttribute('data-tw', it.t);
+    b.innerHTML = '<i>' + (window.FM_SVG ? FM_SVG(it.ic) : '') + '</i><span>' + esc(it.t) + '</span>' + (it.soon ? '<em class="tw-pill" style="font-style:normal">segera</em>' : '');
+    if (it.soon) { b.title = 'Segera hadir'; b.setAttribute('aria-disabled', 'true'); b.onclick = function (e) { e.preventDefault(); }; }
+    return b;
+  }
+
+  function build() {
+    var host = document.getElementById('fm-actions');
+    if (!host || host.classList.contains('tw-grouped')) return;
+    var old = [].slice.call(host.querySelectorAll('.fm-act'));
+    if (!old.length) return;
+    var byText = function (frag) {
+      for (var i = 0; i < old.length; i++) if ((old[i].textContent || '').indexOf(frag) >= 0) return old[i];
+      return null;
+    };
+    var dirTile = byText('Jaringan Mitra');
+    var frag = document.createDocumentFragment();
+    GROUPS.forEach(function (g) {
+      var sec = document.createElement('section'); sec.className = 'tw-group'; sec.style.setProperty('--g', g.c);
+      sec.innerHTML = '<div class="tw-head"><b>' + esc(g.title) + '</b><span>' + esc(g.hint) + '</span></div>';
+      var grid = document.createElement('div'); grid.className = 'tw-grid'; sec.appendChild(grid);
+      g.items.forEach(function (it) {
+        var el;
+        if (it.find) {
+          var src = byText(it.find);
+          if (src) { el = src; var sp = el.querySelector('span'); if (sp && it.t) sp.textContent = it.t; }
+        }
+        if (!el && it.edit) {
+          el = tile(it, g);
+          el.onclick = function () {
+            if (dirTile) dirTile.click();
+            setTimeout(function () { var s = document.getElementById('dir-search'); if (s) { s.focus(); s.placeholder = 'Ketik nama/ID toko, lalu tekan Edit Toko di barisnya'; } }, 250);
+          };
+        } else if (!el && it.run) {
+          el = tile(it, g);
+          el.onclick = function () { new Function(it.run)(); };
+        } else if (!el) {
+          el = tile(it, g);
+        }
+        if (it.badge) {
+          var c = document.createElement('em'); c.className = 'tw-cnt'; c.style.fontStyle = 'normal'; c.setAttribute('data-tw-badge', it.badge); c.style.display = 'none';
+          el.appendChild(c);
+        }
+        grid.appendChild(el);
+      });
+      frag.appendChild(sec);
+    });
+    // ubin lama yang tidak masuk kelompok mana pun tetap ditampilkan agar tidak hilang
+    var rest = old.filter(function (o) { return !o.closest('.tw-group') && !frag.contains(o); });
+    host.innerHTML = '';
+    host.appendChild(frag);
+    if (rest.length) {
+      var sec = document.createElement('section'); sec.className = 'tw-group'; sec.style.setProperty('--g', '#9aa6bd');
+      sec.innerHTML = '<div class="tw-head"><b>Lainnya</b></div>';
+      var gr = document.createElement('div'); gr.className = 'tw-grid'; rest.forEach(function (r) { gr.appendChild(r); }); sec.appendChild(gr); host.appendChild(sec);
+    }
+    host.classList.add('tw-grouped');
+  }
+
+  function badges() {
+    [].slice.call(document.querySelectorAll('[data-tw-badge]')).forEach(function (c) {
+      var src = document.getElementById(c.getAttribute('data-tw-badge'));
+      var n = src ? parseInt(src.textContent, 10) || 0 : 0;
+      c.textContent = n; c.style.display = n > 0 ? '' : 'none';
+    });
+  }
+
+  var st = document.createElement('style'); st.id = 'tw-menu-css'; st.textContent = CSS; document.head.appendChild(st);
+  function start() {
+    var tries = 0;
+    (function wait() {
+      var h = document.getElementById('fm-actions');
+      if (h && h.querySelector('.fm-act')) { build(); badges(); setInterval(badges, 1500); return; }
+      if (++tries < 40) setTimeout(wait, 150);
+    })();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();

@@ -357,6 +357,7 @@
 
   /* ===================== keluar ===================== */
   function findLogout() { return document.querySelector('button[onclick*="ogout"]') || document.querySelector('header button[onclick*="index.html"]'); }
+  window.FM_SVG = svg;
   window.FM_LOGOUT = function () { var b = findLogout(); if (b) b.click(); };
 
   /* ===================== panel popup ===================== */

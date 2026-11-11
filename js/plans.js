@@ -74,6 +74,7 @@
       '<div style="opacity:.65;margin-bottom:6px">Fitur inti selalu aktif. Fitur tambahan hanya tampil bila dicentang.</div>' +
       '<div style="display:flex;gap:6px;margin-bottom:6px"><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',true)" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:11px">Centang semua tambahan</button>' +
       '<button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',false)" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:11px">Kosongkan tambahan</button></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span style="opacity:.65;font-size:11px">Paket siap pakai:</span>' + Object.keys(PRESETS).map(function (k) { return '<button type="button" onclick="FM_PLANS.applyPreset(\'' + prefix + '\',\'' + k + '\')" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(34,197,94,.45);background:rgba(34,197,94,.10);color:inherit;font-size:11px">' + PRESETS[k].label + '</button>'; }).join('') + '</div>' +
       '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:4px 6px">Fitur</th>' +
       ROLES.map(function (r) { return '<th style="' + th + '">' + RLABEL[r] + '</th>'; }).join('') + '</tr></thead><tbody>';
     var order = FEATURES.filter(function (f) { return !f.soon && Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); })
@@ -91,6 +92,23 @@
       h += '</tr>';
     });
     return h + '</tbody></table></div>';
+  }
+  var PRESETS = {
+    warung: { label: 'Warung / Kafe', keys: ['barcode', 'bukti', 'wa_receipt', 'mutasi_wa', 'clock'] },
+    toko: { label: 'Toko Retail', keys: ['barcode', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
+    jasa: { label: 'Jasa / Klinik', keys: ['ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
+    lengkap: { label: 'Lengkap', keys: null }
+  };
+  function applyPreset(prefix, name) {
+    var pr = PRESETS[name]; if (!pr) return;
+    FEATURES.forEach(function (f) {
+      if (f.soon) return;
+      ROLES.forEach(function (r) {
+        if (f.r[r] !== 'o') return;
+        var el = document.getElementById(prefix + '-f-' + f.key + '-' + r);
+        if (el && !el.disabled) el.checked = !pr.keys || pr.keys.indexOf(f.key) >= 0;
+      });
+    });
   }
   function setAll(prefix, on) {
     FEATURES.forEach(function (f) { if (f.soon) return; ROLES.forEach(function (r) { if (f.r[r] === 'o') { var el = document.getElementById(prefix + '-f-' + f.key + '-' + r); if (el && !el.disabled) el.checked = !!on; } }); });
@@ -148,5 +166,5 @@
   }
 
   window.FM_PLANS = { FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml,
-    readChecklist: readChecklist, setAll: setAll, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
+    readChecklist: readChecklist, setAll: setAll, applyPreset: applyPreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();
