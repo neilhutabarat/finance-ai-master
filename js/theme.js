@@ -10,6 +10,8 @@
   var RELEASE_NOTES = [
     ['1.0.0 (BETA 1.5)', '11 Nov 2026', [
       '[Tampilan] Fitur toko kini dirakit sesuai kebutuhan usaha: fitur yang tidak dipilih tidak ditampilkan, dan daftar fitur aktif ada di tombol Fitur Toko',
+      '[Tampilan] Tampilan bawaan kini terang untuk semua toko dan akun; pilihan Terang atau Gelap selalu ada di Pengaturan',
+      '[Tampilan] Kartu dan tombol menata diri otomatis seperti ubin Windows Phone: bentuk dan ukurannya menyesuaikan jumlah fitur dan ruang layar, sehingga tidak ada ruang kosong',
       '[Perbaikan] Tombol Keluar di Admin, Manager, dan Owner kini selalu kembali ke halaman login toko yang sama, bukan ke toko uji coba',
       '[Perbaikan] Menu Pengaturan kini selalu bisa dibuka, termasuk di toko yang fitur tema-nya belum diaktifkan; kartu Permohonan Kasir Baru di Tower kini bisa diketuk; teks pop-up Analisa tidak lagi terpotong',
       '[Tampilan] Mutasi kini bisa dikirim lewat WhatsApp dan dicetak (hari ini, 7 hari, bulan ini, atau rentang tanggal) bila fiturnya diaktifkan untuk toko',
@@ -71,6 +73,7 @@
   var path = (location.pathname || '').toLowerCase();
   var ROLE = path.indexOf('kasir') >= 0 ? 'kasir' : path.indexOf('manager') >= 0 ? 'manager' : path.indexOf('dashboard') >= 0 ? 'owner' : path.indexOf('provider') >= 0 ? 'tower' : path.indexOf('partner') >= 0 ? 'partner' : (path.indexOf('index') >= 0 || /\/$/.test(path)) ? 'login' : 'lain';
   var NATIVE = (ROLE === 'kasir' || ROLE === 'login') ? 'light' : 'dark';
+  var DEFAULT_MODE = (ROLE === 'tower') ? NATIVE : 'light';   // tampilan bawaan: terang untuk semua toko; Tower tetap gelap
   var TOKO = ''; try { TOKO = (new URLSearchParams(location.search).get('toko') || '').toLowerCase().trim(); } catch (e) {}
   var KEY = 'fm_theme_' + (TOKO || 'master') + '_' + ROLE;
 
@@ -148,7 +151,7 @@
   }
   function apply() {
     var h = document.documentElement;
-    var mode = pref.mode || NATIVE;           // 'light' | 'dark'
+    var mode = pref.mode || DEFAULT_MODE;     // 'light' | 'dark'
     h.setAttribute('data-fm-native', NATIVE);
     ['data-fm-black', 'data-fm-invert', 'data-fm-accent'].forEach(function (a) { h.removeAttribute(a); });
     if (!LITE && ROLE !== 'lain') {
@@ -185,12 +188,12 @@
 
   function render() {
     var box = document.querySelector('#fm-set .fm-sheet');
-    var mode = pref.mode || NATIVE;
+    var mode = pref.mode || DEFAULT_MODE;
     var pick = pref.accent || '#2563eb';
     box.style.setProperty('--fm-pick', pick);
     var h = '<div style="display:flex;justify-content:space-between;align-items:center"><h3>Pengaturan</h3><button class="fm-btn" data-close>Tutup</button></div>';
     var THEME_ON = !(window.FM_PLANS && !FM_PLANS.has('theme'));
-    if (THEME_ON) h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
+    h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (mode === 'light' ? 'on' : '') + '" data-mode="light"><div class="fm-prev" style="background:linear-gradient(135deg,#ffffff,#e2e8f0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (mode === 'dark' ? 'on' : '') + '" data-mode="dark"><div class="fm-prev" style="background:#000"></div>Gelap Pekat</button></div></div>';
     if (THEME_ON) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +

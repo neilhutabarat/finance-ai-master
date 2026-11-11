@@ -127,6 +127,13 @@
     '.fm-actions .fm-act i{width:34px;height:34px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,' + A + ' 16%,transparent);color:' + A + '}',
     '.fm-actions .fm-act svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}',
     '.fm-actions .fm-act span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+    /* ubin dinamis: bentuk dan ukuran dihitung dari ruang kosong (lihat layoutTiles) */
+    '.fm-actions[data-fm-mosaic]{align-content:stretch}',
+    '.fm-actions[data-fm-mosaic] .fm-act{min-width:0}',
+    '.fm-actions .fm-act[data-sz="l"],.fm-actions .fm-act[data-sz="xl"]{flex-direction:column;justify-content:center;text-align:center;gap:10px;font-size:15px;font-weight:800;padding:14px}',
+    '.fm-actions .fm-act[data-sz="l"] i{width:46px;height:46px;border-radius:16px}.fm-actions .fm-act[data-sz="l"] svg{width:24px;height:24px}',
+    '.fm-actions .fm-act[data-sz="xl"]{font-size:18px;gap:14px}.fm-actions .fm-act[data-sz="xl"] i{width:64px;height:64px;border-radius:22px}.fm-actions .fm-act[data-sz="xl"] svg{width:32px;height:32px}',
+    '.fm-actions .fm-act[data-sz="l"] span,.fm-actions .fm-act[data-sz="xl"] span{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2}',
     '@media(max-width:640px){.fm-actions{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.fm-actions .fm-act{padding:9px 11px;gap:9px;font-size:12.5px}}',
 
     /* ---- kartu insight ---- */
@@ -239,6 +246,8 @@
     'html[data-fm-fit] #fm-insights .fm-ins-main{flex:1 1 0;min-height:0}',
     'html[data-fm-fit] #fm-insights .fm-ins-main .fm-scroll{flex:1 1 0}',
     'html[data-fm-fit] #fm-actions{flex:none}',
+    'html[data-fm-fit] #fm-insights:empty{display:none}',
+    'html[data-fm-fit] main:has(#fm-insights:empty) #fm-actions{flex:1 1 0;min-height:0}',
     'html[data-fm-page="manager"] main>.grid.lg\\:grid-cols-12{display:none!important}',
     'html[data-fm-page="owner"] main>div:not(#fm-insights):not(#fm-actions):not(.grid):not([data-fm-panel]){display:none}',
     '}',
@@ -531,11 +540,78 @@
     grid.insertBefore(first, grid.firstChild); grid.appendChild(last);
   }
 
+
+  /* ===================== ubin dinamis (gaya Windows Phone) =====================
+     Jumlah kolom, lebar tiap ubin, dan tinggi baris dihitung dari ruang kosong yang tersedia.
+     Tiap baris selalu penuh (tanpa lubang); ubin di baris yang lebih sepi otomatis melebar. */
+  function layoutTiles() {
+    var g = document.getElementById('fm-actions');
+    if (!g || PAGE === 'tower' || PAGE === 'login') return;
+    var tiles = [].slice.call(g.children).filter(function (c) { return c.classList && c.classList.contains('fm-act'); });
+    var N = tiles.length; if (!N) return;
+    g.setAttribute('data-fm-mosaic', '1');
+    var W = g.clientWidth || 0; if (!W) return;
+    var narrow = W < 560, GAP = 10, MIN_W = narrow ? 120 : 170, MIN_H = 60, MAX_H = narrow ? 200 : 460;
+    // tinggi tersedia: hanya bila wadah memang diberi ruang (flex), selain itu tinggi alami
+    g.style.maxHeight = ''; g.style.gridTemplateColumns = ''; g.style.gridAutoRows = '';
+    tiles.forEach(function (t) { t.style.gridColumn = ''; t.removeAttribute('data-sz'); });
+    var H = (parseFloat(getComputedStyle(g).flexGrow) > 0) ? (g.clientHeight || 0) : 0;
+    var cMin = 2, cMax = Math.max(2, Math.min(6, Math.floor((W + GAP) / (MIN_W + GAP))));
+    if (narrow) cMax = Math.min(cMax, 3);
+    var best = null;
+    for (var c = cMin; c <= cMax; c++) {
+      var rows = Math.ceil(N / c), tw = (W - GAP * (c - 1)) / c;
+      var th = H > 0 ? Math.min(MAX_H, (H - GAP * (rows - 1)) / rows) : 78;
+      if (th < MIN_H && H > 0) th = MIN_H;
+      var score = Math.abs(Math.log((tw / th) / 1.8)) + (N % c === 0 ? 0 : 0.04 * (c - (N % c))) ;
+      if (!best || score < best.score) best = { c: c, rows: rows, th: th, score: score };
+    }
+    var cols = best.c, rows2 = best.rows, base = Math.floor(N / rows2), rem = N % rows2, idx = 0;
+    for (var r = 0; r < rows2; r++) {
+      var k = base + (r < rem ? 1 : 0), each = Math.floor(cols / k), extra = cols % k;
+      for (var j = 0; j < k; j++) {
+        var span = each + (j < extra ? 1 : 0);
+        tiles[idx++].style.gridColumn = 'span ' + span;
+      }
+    }
+    g.style.gridTemplateColumns = 'repeat(' + cols + ',minmax(0,1fr))';
+    g.style.gridAutoRows = H > 0 ? 'minmax(' + MIN_H + 'px,' + Math.round(best.th) + 'px)' : 'minmax(' + MIN_H + 'px,auto)';
+    g.style.alignContent = 'start';
+    // ukuran isi ubin mengikuti ruang yang didapat
+    tiles.forEach(function (t) {
+      var w = t.offsetWidth, h = t.offsetHeight;
+      t.setAttribute('data-sz', (h >= 150 && w >= 150) ? 'xl' : (h >= 100 && w >= 120) ? 'l' : 's');
+      if (t.getAttribute('data-sz') === 's') t.removeAttribute('data-sz');
+    });
+  }
+  /* kartu angka di atas: baris terakhir yang tidak penuh dilebarkan supaya tidak ada ruang kosong di pinggir */
+  function fillStatRow() {
+    var g = document.querySelector('main>.grid:first-child'); if (!g || PAGE === 'tower' || PAGE === 'login' || PAGE === 'kasir') return;
+    var kids = [].slice.call(g.children).filter(function (c) { return c.offsetParent !== null || getComputedStyle(c).display !== 'none'; });
+    kids.forEach(function (c) { c.style.gridColumn = ''; });
+    var cols = (getComputedStyle(g).gridTemplateColumns || '').split(' ').filter(Boolean).length;
+    if (cols < 2 || !kids.length) return;
+    var k = kids.length, r = k % cols; if (!r) return;
+    var rowStart = k - r, each = Math.floor(cols / r), extra = cols % r;
+    for (var j = 0; j < r; j++) kids[rowStart + j].style.gridColumn = 'span ' + (each + (j < extra ? 1 : 0));
+    if (k < cols) { g.style.gridTemplateColumns = 'repeat(' + k + ',minmax(0,1fr))'; kids.forEach(function (c) { c.style.gridColumn = ''; }); }
+  }
+  var tileT = 0;
+  function scheduleTiles() { clearTimeout(tileT); tileT = setTimeout(function () { try { fillStatRow(); layoutTiles(); } catch (e) { console.warn('tiles', e); } }, 60); }
+  function watchTiles() {
+    var g = document.getElementById('fm-actions'); if (!g) return;
+    window.addEventListener('resize', scheduleTiles);
+    try { if (window.ResizeObserver) { var ro = new ResizeObserver(scheduleTiles); ro.observe(g); if (g.parentNode) ro.observe(g.parentNode); } } catch (e) {}
+    try { new MutationObserver(scheduleTiles).observe(g, { childList: true }); } catch (e) {}
+    scheduleTiles();
+  }
+
   function init() {
     try { wrapOpenModal(); } catch (e) { console.warn('skin', e); }
     try { buildActions(); } catch (e) { console.warn('actions', e); }
     try { buildDock(); } catch (e) { console.warn('dock', e); }
     try { buildNarrow(); } catch (e) { console.warn('narrow', e); }
+    try { watchTiles(); } catch (e) { console.warn('tiles', e); }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 0); });
   else setTimeout(init, 0);

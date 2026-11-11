@@ -30,7 +30,7 @@
     { key: 'export_csv', label: 'Ekspor CSV', r: { owner: 'o' } },
     { key: 'clock', label: 'Jam', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'weather_rates', label: 'Cuaca dan Kurs', r: { kasir: 'o', manager: 'o', owner: 'o' } },
-    { key: 'theme', label: 'Pilih tema, warna, dan logo', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'theme', label: 'Pilih warna halaman dan logo usaha', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'mutasi_wa', label: 'Mutasi dikirim lewat WA dan dicetak', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'gaji', label: 'Laporan gaji (Manager mencatat; Owner hanya melihat)', r: { manager: 'o', owner: 'o' } },
     { key: 'gaji_auto', label: 'Gaji yang dibayar otomatis tercatat sebagai pengeluaran', r: { manager: 'o' } },
