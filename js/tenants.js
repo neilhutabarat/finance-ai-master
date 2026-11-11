@@ -118,9 +118,13 @@ const TENANT_NOT_FOUND = {
   locations: { kasir: { name: "-", lat: 0, lon: 0 }, manager: { name: "-", lat: 0, lon: 0 }, owner: { name: "-", lat: 0, lon: 0 } }
 };
 
+/* Kunci toko dari alamat (?toko=) atau, di halaman login yang alamatnya dipersingkat, dari memori halaman */
+function fmTokoParam() {
+  try { return new URLSearchParams(window.location.search).get("toko") || window.__fmToko || ""; } catch (e) { return window.__fmToko || ""; }
+}
+
 function getActiveTenant() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const tenantKey = (urlParams.get("toko") || "").toLowerCase().trim();
+  const tenantKey = String(fmTokoParam()).toLowerCase().trim();
   if (tenantKey && TENANTS_CONFIG[tenantKey]) {
     return TENANTS_CONFIG[tenantKey].deletedByTower ? TENANT_NOT_FOUND : TENANTS_CONFIG[tenantKey];
   }
@@ -271,7 +275,7 @@ function registryFetch(key, isAsync, done) {
 
 (function loadRegistryForCurrentUrl() {
   try {
-    const key = (new URLSearchParams(window.location.search).get("toko") || "").toLowerCase().trim();
+    const key = String(fmTokoParam()).toLowerCase().trim();
     if (!key) key = "id26110901";
     if (TENANTS_CONFIG[key] && !TENANTS_CONFIG[key].fromRegistry && !TENANTS_CONFIG[key].isMaster) return;
     const cached = registryReadCache()[key];
@@ -371,7 +375,7 @@ function showFormerStoreCard(key, info) {
 // Dipanggil pada halaman yang menerima ?toko= yang tidak dikenal: jika ternyata toko lama, tampilkan kartu riwayat.
 function checkFormerStore() {
   try {
-    const key = (new URLSearchParams(window.location.search).get("toko") || "").toLowerCase().trim();
+    const key = String(fmTokoParam()).toLowerCase().trim();
     if (!key) return;
     formerFetch(key, function (info) { if (info && info.id) showFormerStoreCard(key, info); });
   } catch (e) {}

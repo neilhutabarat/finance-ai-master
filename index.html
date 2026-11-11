@@ -649,5 +649,17 @@
             }, 900000);
         });
     </script>
+    <script>
+        /* Rapikan alamat: index.html?toko=ID26110901 -> /ID26110901 (muat ulang tetap berfungsi lewat 404.html) */
+        window.addEventListener('load', function () {
+            try {
+                var t = new URLSearchParams(location.search).get('toko');
+                if (t && /index\.html$/.test(location.pathname) && /^[A-Za-z0-9_-]{3,40}$/.test(t)) {
+                    window.__fmToko = t;
+                    history.replaceState(null, '', location.pathname.replace(/index\.html$/, '') + t);
+                }
+            } catch (e) {}
+        });
+    </script>
 </body>
 </html>
