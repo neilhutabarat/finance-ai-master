@@ -782,7 +782,14 @@
             return (isNeg ? "-Rp " : "Rp ") + formatted;
         }
 
-        const MY_DEVICE_SESSION_ID = 'dev_' + Math.random().toString(36).substr(2, 9);
+        // ID perangkat disimpan di sessionStorage: tetap sama saat halaman di-refresh, beda untuk tab/jendela lain
+        const MY_DEVICE_SESSION_ID = (function () {
+            try { let v = sessionStorage.getItem('fm_device_sid'); if (!v) { v = 'dev_' + Math.random().toString(36).substr(2, 9); sessionStorage.setItem('fm_device_sid', v); } return v; }
+            catch (e) { return 'dev_' + Math.random().toString(36).substr(2, 9); }
+        })();
+        window.addEventListener('pagehide', function () {
+            try { const s = JSON.parse(localStorage.getItem('fm_active_cashier_session') || 'null'); if (s && s.deviceId === MY_DEVICE_SESSION_ID) localStorage.removeItem('fm_active_cashier_session'); } catch (e) {}
+        });
         function initSingleSessionKasir() {
             const activeSession = JSON.parse(localStorage.getItem('fm_active_cashier_session') || "null");
             const now = Date.now();
