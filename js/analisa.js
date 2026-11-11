@@ -106,6 +106,7 @@
   function render() {
     if (!cfg) return;
     var box = document.getElementById(cfg.el); if (!box) return;
+    box.style.padding = '6px 14px 10px';
     var r; try { r = compute(); } catch (e) { box.innerHTML = '<p class="fm-sub">Analisa belum bisa dihitung. Muat ulang halaman.</p>'; return; }
     var col = { warn: '#f59e0b', good: '#34d399', info: '#60a5fa' }, tag = { warn: 'Perlu perhatian', good: 'Baik', info: 'Info' };
     var h = '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap"><div><p style="font-size:12px;opacity:.7;margin:2px 0 0">Dihitung dari transaksi toko ini, diperbarui setiap dibuka.</p></div>' +

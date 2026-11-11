@@ -123,7 +123,7 @@
   function toLogin() {
     try { ['currentUser', 'auth_role', 'auth_title'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
     var q = location.search || '';
-    location.replace('index.html' + q);
+    location.replace(loginUrl());
   }
   function guard(roles) {
     var tid = ''; try { tid = (typeof getActiveTenant === 'function' && getActiveTenant() || {}).id || ''; } catch (e) {}
@@ -153,11 +153,25 @@
     var t = setTimeout(f, 1500);
     try { auth().signOut().then(function () { clearTimeout(t); f(); }, function () { clearTimeout(t); f(); }); } catch (e) { clearTimeout(t); f(); }
   }
+  /* alamat login toko ini: selalu bawa ?toko= supaya keluar tidak kembali ke toko uji coba */
+  function loginUrl() {
+    var t = '';
+    if (/(provider|partner)\.html$/i.test(location.pathname)) return 'index.html';
+    try { t = (typeof fmTokoParam === 'function' ? fmTokoParam() : new URLSearchParams(location.search).get('toko')) || ''; } catch (e) {}
+    try { if (t) sessionStorage.setItem('fm_last_toko', t); else t = sessionStorage.getItem('fm_last_toko') || ''; } catch (e) {}
+    return 'index.html' + (t ? '?toko=' + encodeURIComponent(t) : '');
+  }
+  try { loginUrl(); } catch (e) {}
   function wrapLogout() {
     ['logout', 'logoutKasirSession'].forEach(function (n) {
       var f = window[n];
       if (typeof f !== 'function' || f.__fmAuth) return;
-      var w = function () { var a = arguments, self = this; try { localStorage.removeItem('fm_legacy_tenant'); } catch (e) {} doSignOut(function () { f.apply(self, a); }); };
+      var w = function () {
+        var url = loginUrl();
+        if (n === 'logout' && !confirm('Keluar dari sistem?')) return;
+        try { ['currentUser', 'auth_role', 'auth_title', 'fm_session_user_v13', 'fm_active_cashier_session', 'fm_legacy_tenant'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+        doSignOut(function () { location.replace(url); });
+      };
       w.__fmAuth = true; window[n] = w;
     });
   }

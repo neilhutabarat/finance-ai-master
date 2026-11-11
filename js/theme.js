@@ -10,6 +10,8 @@
   var RELEASE_NOTES = [
     ['1.0.0 (BETA 1.5)', '11 Nov 2026', [
       '[Tampilan] Fitur toko kini dirakit sesuai kebutuhan usaha: fitur yang tidak dipilih tidak ditampilkan, dan daftar fitur aktif ada di tombol Fitur Toko',
+      '[Perbaikan] Tombol Keluar di Admin, Manager, dan Owner kini selalu kembali ke halaman login toko yang sama, bukan ke toko uji coba',
+      '[Perbaikan] Menu Pengaturan kini selalu bisa dibuka, termasuk di toko yang fitur tema-nya belum diaktifkan; kartu Permohonan Kasir Baru di Tower kini bisa diketuk; teks pop-up Analisa tidak lagi terpotong',
       '[Tampilan] Mutasi kini bisa dikirim lewat WhatsApp dan dicetak (hari ini, 7 hari, bulan ini, atau rentang tanggal) bila fiturnya diaktifkan untuk toko',
       '[Tampilan] Laporan Gaji: Manager mencatat gaji per karyawan per bulan, menandai dibayar, dan mencetak slip atau laporan; Owner bisa diberi akses lihat saja',
       '[Keamanan] Data gaji hanya bisa dibaca Manager (dan Owner bila diizinkan penyedia), tidak bisa dibaca Admin',
@@ -215,9 +217,9 @@
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
     box.querySelectorAll('[data-mode]').forEach(function (b) { b.onclick = function () { pref.mode = b.getAttribute('data-mode'); savePref(pref); apply(); render(); }; });
     box.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { pref.accent = b.getAttribute('data-acc'); savePref(pref); apply(); render(); }; });
-    box.querySelector('#fm-acc-custom').oninput = function (e) { pref.accent = e.target.value; savePref(pref); apply(); };
-    box.querySelector('#fm-acc-custom').onchange = function () { render(); };
-    box.querySelector('[data-accreset]').onclick = function () { delete pref.accent; savePref(pref); apply(); render(); };
+    var ac = box.querySelector('#fm-acc-custom');
+    if (ac) { ac.oninput = function (e) { pref.accent = e.target.value; savePref(pref); apply(); }; ac.onchange = function () { render(); }; }
+    var ar = box.querySelector('[data-accreset]'); if (ar) ar.onclick = function () { delete pref.accent; savePref(pref); apply(); render(); };
     var lf = box.querySelector('#fm-logo-file'); if (lf) lf.onchange = function () { if (lf.files && lf.files[0]) uploadLogo(lf.files[0]); };
     var ld = box.querySelector('[data-logodel]'); if (ld) ld.onclick = function () { saveLogo(''); };
   }
