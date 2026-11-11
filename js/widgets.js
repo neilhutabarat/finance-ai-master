@@ -281,10 +281,16 @@
     window.openWeatherModal = ow; window.openKursModal = ok;
     window.closeWeatherModal = function () { var m = document.getElementById('w-modal-weather'); if (m) m.style.display = 'none'; };
     window.closeKursModal = function () { var m = document.getElementById('w-modal-kurs'); if (m) m.style.display = 'none'; };
+    var PL = window.FM_PLANS, allowed = !PL || PL.has('weather_rates');
     if (wt && wt.parentElement) { wt.parentElement.onclick = ow; wt.parentElement.style.cursor = 'pointer'; }
     if (kt && kt.parentElement) { kt.parentElement.onclick = ok; kt.parentElement.style.cursor = 'pointer'; }
     var box = document.getElementById('premium-widgets-container');
     if (box) { box.classList.remove('hidden'); box.style.display = 'flex'; }
+    if (!allowed) {
+      if (wt && wt.parentElement) { wt.textContent = 'Cuaca'; PL.lock(wt.parentElement, 'weather_rates', { short: true }); }
+      if (kt && kt.parentElement) { kt.textContent = 'Kurs & Emas'; PL.lock(kt.parentElement, 'weather_rates', { short: true }); }
+      return;
+    }
     if (wt) { loadWeather(false); setInterval(function () { loadWeather(false); }, 3 * 3600 * 1000); }
     if (kt) startRates();
   }

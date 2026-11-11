@@ -13,6 +13,7 @@
     { key: 'low_stock', tier: 'plus', status: 'ready', icon: '📦', label: 'Peringatan stok menipis', desc: 'Daftar belanja otomatis sebelum barang laris habis.' },
     { key: 'pay_methods', tier: 'plus', status: 'ready', icon: '💳', label: 'Rekap metode bayar', desc: 'Tunai, QRIS, dan transfer terpisah agar kas selalu cocok.' },
     { key: 'wa_receipt', tier: 'plus', status: 'ready', icon: '💬', label: 'Struk lewat WhatsApp', desc: 'Kirim struk digital ke pelanggan tanpa kertas.' },
+    { key: 'weather_rates', tier: 'plus', status: 'ready', icon: '🌤️', label: 'Kurs & Cuaca di dashboard', desc: 'Kurs dan prakiraan cuaca tampil langsung di layar toko.' },
     { key: 'targets', tier: 'plus', status: 'ready', icon: '🎯', label: 'Target harian & bulanan', desc: 'Pantau progres omzet terhadap target Anda.' },
     { key: 'ar_debt', tier: 'plus', status: 'soon', icon: '🧾', label: 'Piutang & kasbon pelanggan', desc: 'Catat utang pelanggan dan pengingat jatuh tempo.' },
     { key: 'promo', tier: 'plus', status: 'soon', icon: '🏷️', label: 'Diskon & promo', desc: 'Diskon persen, nominal, dan paket langsung di kasir.' },
@@ -48,6 +49,40 @@
   }
   function tierOf(key) { var f = find(key); return f ? f.tier : 'pro'; }
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+
+
+  /* ---- tampilan terkunci: tetap tampil penuh, redup, bergembok ---- */
+  function injectCss() {
+    if (document.getElementById('fm-lk-css')) return;
+    var s = document.createElement('style'); s.id = 'fm-lk-css';
+    s.textContent = '.fm-lk{position:relative!important;cursor:pointer!important;overflow:hidden}' +
+      '.fm-lk>*{filter:brightness(.5) saturate(.6);pointer-events:none!important;user-select:none!important}' +
+      '.fm-lk::after{content:attr(data-lk);text-shadow:0 1px 6px #000;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px;text-align:center;font:800 12px/1.2 inherit;letter-spacing:.02em;color:#fde68a;background:rgba(2,6,23,.38);z-index:5;pointer-events:none}' +
+      '.fm-lk:hover::after{background:rgba(2,6,23,.22)}' +
+      '.fm-lk-soft{padding-right:24px!important}.fm-lk-soft>*{filter:brightness(.6) saturate(.6)}.fm-lk-soft::after{inset:50% 6px auto auto;transform:translateY(-50%);width:auto;height:auto;padding:0;background:none;content:"🔒";font-size:11px}.fm-lk-soft:hover::after{background:none}';
+    document.head.appendChild(s);
+  }
+  function maskDigits(el) {
+    var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, list = [];
+    while ((n = w.nextNode())) list.push(n);
+    list.forEach(function (t) { t.nodeValue = t.nodeValue.replace(/[0-9]/g, '8'); });
+    [].slice.call(el.querySelectorAll('input,button,select,textarea')).forEach(function (i) { i.disabled = true; if (i.value) i.value = ''; });
+  }
+  // Tandai elemen sebagai terkunci (hanya jika paket belum cukup). opts.mask = samarkan angka di dalamnya.
+  function lock(el, key, opts) {
+    if (!el || has(key)) return false;
+    injectCss(); opts = opts || {};
+    var f = find(key) || { tier: 'plus', label: key };
+    el.classList.add('fm-lk'); if (opts.short) el.classList.add('fm-lk-soft');
+    el.setAttribute('data-lk', opts.short ? '🔒' : '🔒 Paket ' + LABEL[f.tier]);
+    el.setAttribute('data-lk-key', key);
+    if (opts.mask) maskDigits(el);
+    if (!el.__lkBound) {
+      el.__lkBound = true;
+      el.addEventListener('click', function (e) { if (!el.classList.contains('fm-lk')) return; e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); openModal(el.getAttribute('data-lk-key')); }, true);
+    }
+    return true;
+  }
 
   // HTML kotak terkunci dengan teaser dari data toko sendiri
   function lockedHtml(key, teaser) {
@@ -85,7 +120,7 @@
     return out;
   }
 
-  function openModal() {
+  function openModal(focusKey) {
     var m = document.getElementById('fm-plans-modal');
     if (!m) {
       m = document.createElement('div'); m.id = 'fm-plans-modal';
@@ -97,7 +132,9 @@
     m.querySelector('[data-sum]').textContent = 'Paket toko Anda: ' + LABEL[tenantTier()] + '. Fitur yang terkunci tetap terlihat agar Anda tahu apa yang tersedia.';
     m.querySelector('[data-body]').innerHTML = renderSections(false);
     m.style.display = 'flex';
+    var ff = focusKey && find(focusKey);
+    if (ff) m.querySelector('[data-sum]').textContent = '"' + ff.label + '" tersedia di paket ' + LABEL[ff.tier] + '. Paket toko Anda: ' + LABEL[tenantTier()] + '. Hubungi penyedia aplikasi untuk mengaktifkan.';
   }
 
-  window.FM_PLANS = { FEATURES: FEATURES, LABEL: LABEL, tier: tenantTier, has: has, tierOf: tierOf, lockedHtml: lockedHtml, renderSections: renderSections, openModal: openModal, cardHtml: cardHtml };
+  window.FM_PLANS = { FEATURES: FEATURES, LABEL: LABEL, tier: tenantTier, has: has, tierOf: tierOf, lockedHtml: lockedHtml, lock: lock, renderSections: renderSections, openModal: openModal, cardHtml: cardHtml };
 })();

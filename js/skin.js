@@ -501,7 +501,7 @@
       [['Ringkasan Hari Ini', 'chart'], ['Metode Bayar Hari Ini', 'swap'], ['Target Omzet', 'spark'], ['Stok Menipis', 'box'], ['Laba & Margin per Produk', 'tax']].forEach(function (c) {
         first.appendChild(actionTile(c[0].replace(' Hari Ini', ''), c[1], function () {
           var el = [].slice.call(document.querySelectorAll('[data-fm-i]')).filter(function (x) { return x.getAttribute('data-fm-i') === c[0]; })[0];
-          if (el) openPanel(el, c[0], ''); else if (window.FM_PLANS) FM_PLANS.openModal();
+          if (el && el.classList.contains('fm-lk') && window.FM_PLANS) FM_PLANS.openModal(el.getAttribute('data-lk-key')); else if (el) openPanel(el, c[0], ''); else if (window.FM_PLANS) FM_PLANS.openModal();
         }));
       });
     }

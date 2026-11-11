@@ -71,7 +71,7 @@
     var bar = function (v, t) { var pct = t > 0 ? Math.min(100, Math.round(v / t * 100)) : 0; return '<div class="fm-bar"><i style="width:' + pct + '%"></i></div>' + (t > 0 ? '<div class="fm-sub">' + pct + '% dari target ' + rp(t) + '</div>' : '') ; };
 
     var h = '';
-    if (P.has('today_summary')) {
+    {
       h += '<div class="fm-ins-grid">';
       h += card('Ringkasan Hari Ini', line('Omzet', rp(omToday)) + line('Laba kotor', rp(gross)) + line('Jumlah nota', sToday.length) + line('Terlaris', top ? esc(top[0]) + ' (' + top[1] + ')' : '-') + line('Jam ramai', peak ? peak[0] + ':00' : '-'));
       h += card('Metode Bayar Hari Ini', line('Tunai', rp(pay.tunai)) + line('QRIS', rp(pay.qris)) + line('Transfer', rp(pay.transfer)) + '<div class="fm-sub">Cocokkan uang laci dengan baris Tunai.</div>');
@@ -84,12 +84,11 @@
       h += '<div class="ios-glass fm-ic fm-ins-main" data-fm-i="Laba &amp; Margin per Produk"><h4>Laba & Margin per Produk</h4>' + (aggArr.length ? '<div class="fm-scroll"><table><thead><tr><th>Produk</th><th>Terjual</th><th>Omzet</th><th>Laba</th><th>Margin</th></tr></thead><tbody>' +
         aggArr.slice(0, 20).map(function (a) { return '<tr><td>' + esc(a.name) + '</td><td>' + a.qty + '</td><td>' + rp(a.rev) + '</td><td class="' + (a.profit >= 0 ? 'pos' : 'neg') + '">' + rp(a.profit) + '</td><td>' + (a.rev ? Math.round(a.profit / a.rev * 100) : 0) + '%</td></tr>'; }).join('') +
         '</tbody></table></div>' : '<div class="fm-sub">Belum ada penjualan produk.</div>') + '</div>';
-    } else {
-      var teaser = 'Hari ini omzet Anda <b>' + rp(omToday) + '</b> dari ' + sToday.length + ' nota' + (low.length ? ', dan <b>' + low.length + ' produk</b> hampir habis.' : '.') + ' Buka laba per produk, jam ramai, rekap metode bayar, dan target dengan paket Plus.';
-      h += P.lockedHtml('today_summary', teaser);
     }
     box.innerHTML = h;
-    var sb = box.querySelector('[data-save-tg]'); if (sb) sb.onclick = saveTargets;
+    var KEYS = { 'Ringkasan Hari Ini': 'today_summary', 'Metode Bayar Hari Ini': 'pay_methods', 'Target Omzet': 'targets', 'Stok Menipis': 'low_stock', 'Laba & Margin per Produk': 'margin_product' };
+    [].slice.call(box.querySelectorAll('[data-fm-i]')).forEach(function (el) { var k = KEYS[el.getAttribute('data-fm-i')]; if (k) P.lock(el, k, { mask: true }); });
+    var sb = box.querySelector('[data-save-tg]'); if (sb && !sb.disabled) sb.onclick = saveTargets;
   }
 
   window.FM_INSIGHTS = {

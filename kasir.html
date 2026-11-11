@@ -756,6 +756,7 @@
     <script src="js/auth.js?v=1.5.8"></script>
     <script src="js/plans.js?v=1.5.8"></script>
     <script src="js/widgets.js?v=1.5.8"></script>
+    <script>window.addEventListener('load',function(){var b=document.querySelector('button[onclick="sendReceiptWA()"]');if(b&&window.FM_PLANS)FM_PLANS.lock(b,'wa_receipt',{short:true});});</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
     <script src="js/billing.js?v=1.5.8"></script>
@@ -1176,7 +1177,7 @@
         }
 
         function sendReceiptWA() {
-            if (!(window.FM_PLANS && FM_PLANS.has('wa_receipt'))) return alert('Struk lewat WhatsApp tersedia di paket Plus. Hubungi penyedia aplikasi untuk mengaktifkan.');
+            if (!(window.FM_PLANS && FM_PLANS.has('wa_receipt'))) { if (window.FM_PLANS) FM_PLANS.openModal('wa_receipt'); return; }
             if (!lastReceipt) return;
             let phone = prompt('Nomor WhatsApp pelanggan (contoh 08123456789). Kosongkan untuk memilih kontak sendiri di WhatsApp:', '') || '';
             phone = phone.replace(/[^0-9]/g, '');

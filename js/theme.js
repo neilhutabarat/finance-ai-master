@@ -9,6 +9,7 @@
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
     ['1.0.0 (BETA 1.5)', '11 Nov 2026', [
+      '[Tampilan] Fitur yang belum termasuk paket toko tetap tampil, tetapi redup dan bergembok; ketuk untuk melihat paket yang dibutuhkan',
       '[Tampilan] Tombol, bar header, dan dock kini berbahan kaca hitam 3D yang mengambang dengan bayangan lembut, di semua halaman',
       '[Tampilan] Di HP dan tablet halaman tidak lagi bergulir: laporan dan isian panjang dibuka lewat pop-up',
       '[Perbaikan] Lokasi kini memakai GPS perangkat dan menampilkan nama desa/kelurahan, bukan lagi perkiraan kota dari jaringan',
