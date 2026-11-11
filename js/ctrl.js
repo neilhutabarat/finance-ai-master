@@ -62,7 +62,7 @@
             if (tierEl) {
                 var t = tn.tier || 'basic';
                 var base = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ';
-                if (t === 'pro') { tierEl.textContent = 'Gold • Pro'; }
+                if (t === 'pro') { tierEl.textContent = 'Pro'; }
                 else if (t === 'plus') { tierEl.textContent = 'Plus'; tierEl.className = base + 'bg-cyan-500/30 border-cyan-400/60 text-cyan-200'; }
                 else { tierEl.textContent = 'Basic'; tierEl.className = base + 'bg-slate-500/30 border-slate-400/50 text-slate-200'; }
             }
@@ -336,7 +336,10 @@
         db.collection('tenant_ctrl').doc(tenant.id).onSnapshot(function (snap) {
             var d = snap.exists ? snap.data() : null;
             window.TENANT_CTRL = d || {};
+            try { window.dispatchEvent(new CustomEvent('fm:ctrl')); } catch (e) {}
+            var billFreeze = !!(d && window.FM_BILL && FM_BILL.freezeNow(d.billing, Date.now()));
             if (d && d.suspended === true) showOverlay(d.suspendReason || '');
+            else if (billFreeze) showOverlay('Pembayaran layanan belum diterima dan sudah melewati masa tenggang.');
             else hideOverlay();
             proceedPresence(tenant, d); // saat diblokir kuota, dicek ulang tiap data kontrol berubah (mis. kuota ditambah)
         }, function (err) {

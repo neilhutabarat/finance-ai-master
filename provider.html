@@ -64,17 +64,13 @@
         window.FM_DOCK_ITEMS = [
             { label: 'Klien', icon: 'store', run: "openModal('add_tenant')" },
             { label: 'Catat', icon: 'plus', run: "openModal('provider_input_tx')" },
-            { label: 'COA', icon: 'list', run: "openModal('provider_coa_mgmt')" },
-            { label: 'Harga', icon: 'tag', run: "openModal('pricing')" },
-            { label: 'Berhenti', icon: 'archive', run: "openModal('former')" },
-            { label: 'Kurs', icon: 'coins', run: "openModal('rates')" },
-            { label: 'Kirim Pesan', icon: 'send', run: "openModal('broadcast_modal')" },
-            { label: 'Catatan Rilis', icon: 'book', run: "openModal('release_notes')" }
+            { label: 'Pesan', icon: 'send', run: "openModal('broadcast_modal')" }
         ];
     </script>
-    <script src="js/theme.js?v=1.5.4"></script>
-    <script src="js/logo.js?v=1.5.4"></script>
-    <script src="js/skin.js?v=1.5.4"></script>
+    <script src="js/billing.js?v=1.5.6"></script>
+    <script src="js/theme.js?v=1.5.6"></script>
+    <script src="js/logo.js?v=1.5.6"></script>
+    <script src="js/skin.js?v=1.5.6"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
@@ -238,12 +234,17 @@
         </div>
 
         <!-- TOMBOL AKSI CEPAT PROVIDER -->
-        <div id="tw-mini" class="ios-glass"></div>
         <div id="fm-actions" class="fm-actions">
+            <button data-fm-action data-ic="list" onclick="openModal('provider_coa_mgmt')"><span>COA Provider</span></button>
+            <button data-fm-action data-ic="tag" onclick="openModal('pricing')"><span>Harga Paket</span></button>
+            <button data-fm-action data-ic="archive" onclick="openModal('former')"><span>Toko Berhenti</span><span id="former-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-black"></span></button>
+            <button data-fm-action data-ic="chart" onclick="openModal('billing_net')"><span>Billing Jaringan</span></button>
+            <button data-fm-action data-ic="coins" onclick="openModal('rates')"><span>Kurs &amp; Emas</span></button>
+            <button data-fm-action data-ic="book" onclick="openModal('release_notes')"><span>Catatan Rilis</span></button>
         </div>
 
         <!-- TABEL DIREKTORI MITRA UMKM -->
-        <div class="ios-glass p-6 space-y-4" data-fm-panel data-wide data-title="Direktori Mitra" data-sub="Usia ID, mode, terminal, income, outcome, status, dan inspeksi" data-ic="building">
+        <div class="ios-glass p-6 space-y-4" data-fm-panel data-first data-wide data-title="Jaringan Mitra UMKM" data-sub="Usia ID, mode, terminal, income, outcome, status, dan inspeksi" data-ic="building">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <div>
                     <h2 class="text-base font-black text-white flex items-center space-x-2">
@@ -412,6 +413,19 @@
                 </div>
 
                 <div id="popup-content-provider_tx_list" class="hidden"></div>
+                <!-- POPUP BILLING JARINGAN -->
+                <div id="popup-content-billing_net" class="space-y-4 hidden">
+                    <div id="bn-summary" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs"></div>
+                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
+                                <tr><th class="py-2.5 px-3">Toko</th><th class="py-2.5 px-3">Mode</th><th class="py-2.5 px-3 text-right">Total / Siklus</th><th class="py-2.5 px-3 text-right">Estimasi Berjalan</th><th class="py-2.5 px-3">Jatuh Tempo</th><th class="py-2.5 px-3 text-center">Status</th><th class="py-2.5 px-3 text-center">Cicilan</th></tr>
+                            </thead>
+                            <tbody id="bn-body"></tbody>
+                        </table>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Semua angka di sini hanya estimasi realtime (tarif dasar + mode &minus; diskon, termasuk PPN 12%), bukan tagihan.</p>
+                </div>
                 <!-- 5. POPUP KELOLA COA PROVIDER -->
                 <div id="popup-content-provider_coa_mgmt" class="space-y-4 hidden">
                     <div class="p-4 rounded-2xl bg-purple-950/40 border border-purple-400/30 space-y-3 text-xs">
@@ -612,6 +626,7 @@
                 <div id="popup-content-inspect" class="space-y-4 hidden">
                     <div id="inspect-header-card" class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-400/30 space-y-3 text-xs"></div>
                     <div id="inspect-plan-card" class="hidden p-4 rounded-2xl bg-amber-950/30 border border-amber-400/30 space-y-3 text-xs"></div>
+                    <div id="inspect-bill-card" class="hidden p-4 rounded-2xl bg-emerald-950/30 border border-emerald-400/30 space-y-3 text-xs"></div>
 
                     <!-- KOTAK LOKASI GPS PRESISI 3 AKUN: KASIR, MANAGER, OWNER -->
                     <div class="p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-2.5 text-xs">
@@ -680,11 +695,11 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/widgets.js?v=1.5.4"></script>
+    <script src="js/widgets.js?v=1.5.6"></script>
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/store.js?v=1.5.4"></script>
+    <script src="js/store.js?v=1.5.6"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -817,7 +832,7 @@
         }
 
         function tierBadgeHtml(tier) {
-            if (tier === 'pro') return '<span class="px-2 py-0.5 rounded text-[9px] font-black badge-pro-gold text-white uppercase">Gold • Pro</span>';
+            if (tier === 'pro') return '<span class="px-2 py-0.5 rounded text-[9px] font-black badge-pro-gold text-white uppercase">Pro</span>';
             if (tier === 'plus') return '<span class="px-2 py-0.5 rounded text-[9px] font-black bg-cyan-600 text-white uppercase">Plus</span>';
             return '<span class="px-2 py-0.5 rounded text-[9px] font-black bg-slate-600 text-white uppercase">Basic</span>';
         }
@@ -850,6 +865,7 @@
             if (isOpen('leaderboard')) renderLeaderboardTable();
             if (isOpen('inspect') && currentInspectId) renderInspect(currentInspectId);
             if (isOpen('tickets') && typeof renderTicketsList === 'function') renderTicketsList();
+            if (isOpen('billing_net')) renderBillingNet();
         }
 
         // ===== AKTIVITAS TOKO (PRESENCE) =====
@@ -916,7 +932,7 @@
         let pricing = { basic: { monthly: 0 }, plus: { monthly: 0 }, pro: { monthly: 0 }, yearlyDiscountPct: 20 };
         const TIER_LABEL = { basic: 'Basic', plus: 'Plus', pro: 'Pro' };
 
-        function rp(n) { return 'Rp ' + formatThousand(Math.round(n || 0)); }
+        function rp(n) { return formatThousand(Math.round(n || 0)); }
 
         function computePlan(tier, cycle, custom) {
             const m = Number(pricing[tier] && pricing[tier].monthly) || 0;
@@ -929,7 +945,7 @@
 
         function planSummaryHtml(tier, cycle, custom) {
             const r = computePlan(tier, cycle, custom);
-            if (!r.monthly && !r.custom) return '<span class="text-amber-300">Harga paket ' + TIER_LABEL[tier] + ' belum diatur. Atur dulu lewat tombol Harga Paket.</span>';
+            if (!r.monthly && !r.custom && tier !== 'basic') return '<span class="text-amber-300">Harga paket ' + TIER_LABEL[tier] + ' belum diatur. Atur dulu lewat tombol Harga Paket.</span>';
             const unit = cycle === 'yearly' ? 'per tahun' : 'per bulan';
             let h = '<b class="text-white">' + TIER_LABEL[tier] + ' • ' + rp(r.amount) + ' ' + unit + '</b>';
             if (r.custom) h += ' <span class="text-cyan-300">(harga khusus)</span>';
@@ -938,7 +954,7 @@
         }
 
         function fillPricingForm() {
-            document.getElementById('pr-basic').value = pricing.basic.monthly || '';
+            document.getElementById('pr-basic').value = pricing.basic.monthly || 0;
             document.getElementById('pr-plus').value = pricing.plus.monthly || '';
             document.getElementById('pr-pro').value = pricing.pro.monthly || '';
             document.getElementById('pr-disc').value = pricing.yearlyDiscountPct;
@@ -1082,7 +1098,7 @@
             if (!isManaged(tn)) return alert('Paket hanya dapat diubah untuk toko yang dikelola Tower.');
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const r = computePlan(tier, cycle, custom);
-            if (!r.amount) return alert('Harga paket ' + TIER_LABEL[tier] + ' belum diatur. Atur dulu lewat tombol Harga Paket, atau isi Harga Khusus.');
+            if (!r.amount && tier !== 'basic') return alert('Harga paket ' + TIER_LABEL[tier] + ' belum diatur. Atur dulu lewat tombol Harga Paket, atau isi Harga Khusus.');
             if (!confirm('Ubah paket ' + tn.nama + ' menjadi ' + TIER_LABEL[tier] + ' (' + (cycle === 'yearly' ? 'Tahunan' : 'Bulanan') + ') seharga ' + rp(r.amount) + '?')) return;
             const cfg = Object.assign({}, tn); delete cfg.fromRegistry; cfg.tier = tier;
             const batch = db.batch();
@@ -1091,7 +1107,7 @@
                 tier: tier, billingCycle: cycle, priceMonthlyAtPurchase: r.monthly, billedAmount: r.amount,
                 customPrice: r.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
-            batch.commit().then(function () { planPanelFor = null; alert('Paket tersimpan. Fitur baru aktif di toko klien saat halaman toko dibuka kembali.'); })
+            batch.commit().then(function () { planPanelFor = null; billingSyncTier(tn.id, tier); alert('Paket tersimpan. Fitur baru aktif di toko klien saat halaman toko dibuka kembali.'); })
                 .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
@@ -1514,6 +1530,177 @@
               .catch(function (e) { if (!silent) alert('Gagal menghapus sebagian data: ' + e.message); });
         }
 
+
+        // ===== BILLING ESTIMASI PER DETIK =====
+        const MODE_DEFAULT = { basic: 0, plus: 49000, pro: 129000 };
+        function modePriceFor(tier) {
+            if (tier === 'basic') return Number(pricing.basic && pricing.basic.monthly) || 0;
+            const v = Number(pricing[tier] && pricing[tier].monthly) || 0;
+            return v > 0 ? v : (MODE_DEFAULT[tier] || 0);
+        }
+        const BILL_STATE = {
+            lunas: ['Lunas', 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'],
+            tempo: ['Masa tenggang', 'bg-amber-500/20 text-amber-300 border-amber-400/30'],
+            lewat: ['Lewat tenggang', 'bg-rose-500/20 text-rose-300 border-rose-400/30'],
+            belum: ['Belum mulai', 'bg-slate-500/20 text-slate-300 border-slate-400/30'],
+            none: ['Belum diatur', 'bg-slate-500/20 text-slate-400 border-slate-400/20']
+        };
+        function billBadge(state) { const s = BILL_STATE[state] || BILL_STATE.none; return '<span class="px-2 py-0.5 rounded-full text-[10px] font-black border whitespace-nowrap ' + s[1] + '">' + s[0] + '</span>'; }
+        function billTenants() { return Object.keys(TENANTS_CONFIG).map(function (k) { return TENANTS_CONFIG[k]; }).filter(function (t) { return !t.isSinglePage && !t.deletedByTower && !t.notFound; }); }
+
+        let billPanelFor = null;
+        function renderInspectBill(tenant) {
+            const box = document.getElementById('inspect-bill-card'); if (!box) return;
+            if (tenant.isSinglePage || tenant.deletedByTower) { box.classList.add('hidden'); box.innerHTML = ''; billPanelFor = null; return; }
+            const b = getCtrl(tenant.id).billing || null;
+            const sig = tenant.id + '|' + (b ? (b.segs ? b.segs.length : 0) + '|' + (b.paidCount || 0) + '|' + b.startMs + '|' + (b.a || 0) : 'none') + '|' + (tenant.tier || '');
+            if (billPanelFor === sig) return; // jangan menimpa isian yang sedang diketik
+            billPanelFor = sig;
+            box.classList.remove('hidden');
+            const tier = tenant.tier || 'basic', mp = modePriceFor(tier);
+            const cls = 'w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none';
+            const startVal = FM_BILL.toLocalInput(b && b.startMs ? b.startMs : Date.now());
+            box.innerHTML =
+                '<span class="font-black text-sm text-white block">Billing (Estimasi Realtime)</span>' +
+                '<p class="text-slate-400">Bukan tagihan: hanya gambaran biaya layanan per detik untuk Anda dan klien. Mode paket saat ini: <b class="text-white">' + escHtml(TIER_LABEL[tier]) + '</b> (' + rp(mp) + '/bln, ikut paket toko).</p>' +
+                '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Biaya langganan dasar / bulan (Rp)</label><input id="ib-base" type="number" min="0" value="' + (b ? (b.base || 0) : '') + '" placeholder="Contoh: 150000" class="' + cls + '"></div>' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Diskon untuk mode (Rp)</label><input id="ib-disc" type="number" min="0" value="' + (b ? (b.disc || 0) : 0) + '" class="' + cls + '"></div>' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Mulai dihitung (tanggal &amp; jam WIB)</label><input id="ib-start" type="datetime-local" value="' + startVal + '" class="' + cls + '"></div>' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Masa tenggang (hari)</label><input id="ib-grace" type="number" min="0" value="' + (b && typeof b.graceDays === 'number' ? b.graceDays : 3) + '" class="' + cls + '"></div>' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Lama cicilan (bulan, 0 = tanpa)</label><input id="ib-inst" type="number" min="0" value="' + (b && typeof b.installMonths === 'number' ? b.installMonths : 36) + '" class="' + cls + '"></div>' +
+                '<label class="flex items-center gap-2 pt-6 font-bold text-slate-300"><input id="ib-freeze" type="checkbox" ' + (!b || b.autoFreeze !== false ? 'checked' : '') + '> Bekukan otomatis setelah masa tenggang</label>' +
+                '</div>' +
+                '<div id="ib-prev" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300 leading-relaxed"></div>' +
+                '<div class="grid grid-cols-2 gap-2"><button id="ib-save" class="py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition">Simpan Billing</button>' +
+                '<button id="ib-pay" class="py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs transition">Catat Pembayaran</button></div>';
+            const prev = function () {
+                const base = Math.max(0, parseInt(document.getElementById('ib-base').value) || 0), disc = Math.max(0, parseInt(document.getElementById('ib-disc').value) || 0);
+                const sub = base + Math.max(0, mp - disc), ppn = sub * 0.12, tot = FM_BILL.cycleTotal(base, mp, disc);
+                document.getElementById('ib-prev').innerHTML =
+                    'Dasar ' + rp(base) + ' + mode ' + rp(Math.max(0, mp - disc)) + (disc ? ' <span class="text-slate-500">(diskon ' + rp(Math.min(disc, mp)) + ')</span>' : '') + ' = ' + rp(sub) +
+                    '<br>PPN 12% ' + rp(ppn) + ' &rarr; <b class="text-white">Total per siklus Rp ' + FM_BILL.fmt(tot) + '</b>' +
+                    '<div id="ib-live" class="mt-2 pt-2 border-t border-white/10"></div>';
+                updateBillLive();
+            };
+            ['ib-base', 'ib-disc'].forEach(function (i) { document.getElementById(i).oninput = prev; });
+            document.getElementById('ib-save').onclick = function () { saveBilling(tenant); };
+            document.getElementById('ib-pay').onclick = function () { recordBillingPayment(tenant); };
+            prev();
+        }
+
+        function updateBillLive() {
+            const t = Date.now();
+            const el = document.getElementById('ib-live');
+            if (el && currentInspectId) {
+                const b = getCtrl(currentInspectId).billing;
+                if (!FM_BILL.ok(b)) el.innerHTML = '<span class="text-slate-500">Billing belum disimpan untuk toko ini.</span>';
+                else {
+                    const st = FM_BILL.status(b, t);
+                    let h = '';
+                    if (st.state === 'belum') h = 'Mulai dihitung: <b class="text-white">' + FM_BILL.dateText(b.startMs) + '</b>';
+                    else {
+                        h = 'Estimasi berjalan: <b class="text-emerald-300 font-mono text-sm">Rp ' + FM_BILL.fmt(FM_BILL.meter(b, t)) + '</b> &nbsp;' + billBadge(st.state) +
+                            '<br>Jatuh tempo berikutnya: <b class="text-white">' + FM_BILL.dateText(st.E) + '</b> &bull; pembayaran tercatat: <b class="text-white">' + (b.paidCount || 0) + 'x</b>';
+                        if (st.state === 'tempo' || st.state === 'lewat') h += '<br><span class="text-amber-300">Jatuh tempo ' + FM_BILL.dateText(st.overdueFrom) + (st.state === 'tempo' ? '; masa tenggang sampai ' + FM_BILL.dateText(st.graceEnd) : '; sudah lewat masa tenggang' + (b.autoFreeze === false ? ' (pembekuan otomatis mati)' : ' (toko otomatis dibekukan)')) + '</span>';
+                        if (b.installMonths > 0) {
+                            const done = Math.min(st.k, b.installMonths);
+                            h += '<br>Cicilan: jatuh tempo ke-' + done + ' dari ' + b.installMonths + (st.k >= b.installMonths ? ' <b class="text-amber-300">&mdash; cicilan selesai, turunkan total biaya dasar toko ini.</b>' : '');
+                        }
+                    }
+                    el.innerHTML = h;
+                }
+            }
+            document.querySelectorAll('.bn-live').forEach(function (n) {
+                const b = getCtrl(n.getAttribute('data-id')).billing;
+                n.textContent = FM_BILL.ok(b) ? 'Rp ' + FM_BILL.fmt(FM_BILL.meter(b, t)) : '-';
+            });
+            const sum = document.getElementById('bn-sum');
+            if (sum) { let s = 0; billTenants().forEach(function (tn) { const b = getCtrl(tn.id).billing; if (FM_BILL.ok(b)) s += FM_BILL.meter(b, t); }); sum.textContent = 'Rp ' + FM_BILL.fmt(s); }
+        }
+        setInterval(function () { if (!document.hidden) updateBillLive(); }, 250);
+
+        function saveBilling(tenant) {
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+            const g = function (id) { return document.getElementById(id); };
+            const base = Math.max(0, parseInt(g('ib-base').value) || 0), disc = Math.max(0, parseInt(g('ib-disc').value) || 0);
+            const startMs = FM_BILL.fromLocalInput(g('ib-start').value);
+            if (!startMs) return alert('Isi tanggal dan jam mulai billing.');
+            const old = getCtrl(tenant.id).billing || null;
+            const sameStart = !!(old && old.startMs === startMs);
+            if (old && !sameStart && !confirm('Tanggal/jam mulai berubah. Hitungan siklus diulang dari awal dan catatan pembayaran di billing ini di-reset. Lanjut?')) return;
+            const tier = tenant.tier || 'basic', mp = modePriceFor(tier), a = FM_BILL.cycleTotal(base, mp, disc);
+            let segs;
+            if (sameStart && old.segs && old.segs.length) {
+                segs = old.segs.slice();
+                const last = segs.slice().sort(function (x, y) { return x.f - y.f; }).pop();
+                if (!last || Math.abs(last.a - a) > 0.001) segs.push({ f: Date.now(), a: a });
+            } else segs = [{ f: startMs, a: a }];
+            const billing = {
+                base: base, modePrice: mp, disc: disc, tier: tier, a: a, segs: segs, startMs: startMs,
+                graceDays: Math.max(0, parseInt(g('ib-grace').value) || 0), installMonths: Math.max(0, parseInt(g('ib-inst').value) || 0),
+                autoFreeze: g('ib-freeze').checked, paidCount: sameStart ? (old.paidCount || 0) : 0
+            };
+            db.collection('tenant_ctrl').doc(tenant.id).set({ billing: billing, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+                .then(function () { billPanelFor = null; ctAudit(tenant.id, 'UBAH_BILLING', 'Provider mengatur billing estimasi', old ? String(old.a || 0) : '-', String(a)); alert('Billing tersimpan. Meter mulai berjalan dari ' + FM_BILL.dateText(startMs) + '.'); })
+                .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+        }
+
+        function recordBillingPayment(tenant) {
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+            const b = getCtrl(tenant.id).billing;
+            if (!FM_BILL.ok(b)) return alert('Simpan billing dulu.');
+            const def = Math.round(FM_BILL.curA(b, Date.now()));
+            const v = prompt('Nominal pembayaran yang diterima dari ' + tenant.nama + ' (Rp):', String(def));
+            if (v === null) return;
+            const n = parseInt(String(v).replace(/\D/g, '')) || 0;
+            if (n <= 0) return alert('Nominal tidak valid.');
+            const ke = (b.paidCount || 0) + 1;
+            db.collection('tenant_ctrl').doc(tenant.id).set({ billing: { paidCount: ke }, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+                .then(function () {
+                    let coa = []; try { coa = JSON.parse(localStorage.getItem('fm_provider_coa') || '[]'); } catch (e) {}
+                    if (!coa.length) coa = DEFAULT_PROVIDER_COA;
+                    const acc = coa.filter(function (c) { return c.code === 'P101'; })[0] || { code: 'P101', name: 'Pembayaran Layanan UMKM' };
+                    providerTx.unshift({ id: 'prov_tx_' + Date.now(), dateISO: new Date().toISOString().split('T')[0], accountCode: acc.code, accountName: acc.name, category: 'income', amount: n, desc: 'Billing ' + tenant.nama + ' [' + tenant.id + '] pembayaran ke-' + ke, timestamp: Date.now() });
+                    localStorage.setItem('fm_provider_tx', JSON.stringify(providerTx));
+                    ctAudit(tenant.id, 'CATAT_PEMBAYARAN', 'Pembayaran ke-' + ke + ' dicatat', '-', String(n));
+                    billPanelFor = null; loadProviderDashboard();
+                    alert('Pembayaran dicatat dan otomatis masuk ke pembukuan pribadi Anda.');
+                }).catch(function (e) { alert('Gagal: ' + e.message); });
+        }
+
+        function billingSyncTier(tenantId, tier) {
+            const b = getCtrl(tenantId).billing;
+            if (!(typeof db !== 'undefined' && db) || !FM_BILL.ok(b)) return;
+            const mp = modePriceFor(tier), a = FM_BILL.cycleTotal(b.base, mp, b.disc);
+            const segs = (b.segs || []).slice();
+            const last = segs.slice().sort(function (x, y) { return x.f - y.f; }).pop();
+            if (last && Math.abs(last.a - a) <= 0.001) return;
+            segs.push({ f: Date.now(), a: a });
+            db.collection('tenant_ctrl').doc(tenantId).set({ billing: { modePrice: mp, tier: tier, a: a, segs: segs } }, { merge: true }).catch(function () {});
+        }
+
+        function renderBillingNet() {
+            const t = Date.now(), list = billTenants();
+            let mrr = 0, tempo = 0, lewat = 0;
+            const rows = list.map(function (tn) {
+                const b = getCtrl(tn.id).billing, st = FM_BILL.status(b, t), a = FM_BILL.ok(b) ? FM_BILL.curA(b, t) : 0;
+                if (a > 0) mrr += a; if (st.state === 'tempo') tempo++; if (st.state === 'lewat') lewat++;
+                const cic = FM_BILL.ok(b) && b.installMonths > 0 ? Math.min(st.k < 0 ? 0 : st.k, b.installMonths) + '/' + b.installMonths : '-';
+                return '<tr class="border-b border-white/5 cursor-pointer" onclick="openInspectUMKM(\'' + escHtml(tn.id) + '\')"><td class="py-2.5 px-3"><b class="text-white">' + escHtml(tn.nama) + '</b><br><span class="font-mono text-[10px] text-slate-400">' + escHtml(tn.id) + '</span></td>' +
+                    '<td class="py-2.5 px-3">' + tierBadgeHtml(tn.tier) + '</td>' +
+                    '<td class="py-2.5 px-3 text-right font-mono text-slate-300">' + (a > 0 ? 'Rp ' + FM_BILL.fmt(a) : '-') + '</td>' +
+                    '<td class="py-2.5 px-3 text-right font-mono font-black text-emerald-300 bn-live" data-id="' + escHtml(tn.id) + '">-</td>' +
+                    '<td class="py-2.5 px-3 text-slate-300">' + (st.E && st.state !== 'none' ? FM_BILL.dateText(st.E) : '-') + '</td>' +
+                    '<td class="py-2.5 px-3 text-center">' + billBadge(st.state) + '</td>' +
+                    '<td class="py-2.5 px-3 text-center font-mono text-slate-300">' + cic + '</td></tr>';
+            }).join('');
+            document.getElementById('bn-body').innerHTML = rows || '<tr><td colspan="7" class="py-6 text-center text-slate-500">Belum ada toko.</td></tr>';
+            const card = function (lab, val, cls, id) { return '<div class="p-3 rounded-2xl bg-slate-900 border border-white/10"><span class="text-[10px] font-black text-slate-400 uppercase block">' + lab + '</span><b' + (id ? ' id="' + id + '"' : '') + ' class="text-sm font-mono ' + cls + '">' + val + '</b></div>'; };
+            document.getElementById('bn-summary').innerHTML = card('Estimasi berjalan (semua toko)', '-', 'text-emerald-300', 'bn-sum') + card('Estimasi per siklus (MRR)', 'Rp ' + FM_BILL.fmt(mrr), 'text-cyan-300') + card('Masa tenggang', tempo + ' toko', 'text-amber-300') + card('Lewat tenggang', lewat + ' toko', 'text-rose-300');
+            updateBillLive();
+        }
+
         function startRegistryListener() {
             if (!(typeof db !== 'undefined' && db)) return;
             db.collection('tenants_registry').onSnapshot(function (snap) {
@@ -1878,6 +2065,7 @@
                 hdr.appendChild(row);
             })();
             renderInspectPlan(tenant);
+            renderInspectBill(tenant);
             const sb = document.getElementById('btn-toggle-suspend');
             if (sb) sb.onclick = function () { setTenantSuspended(tenant.id, !isTenantSuspended(tenant.id)); };
 
@@ -2324,7 +2512,7 @@
 
         window.openModal = function(type) {
             if (type !== 'tenant_settings' && tsStore) { tsStore.stop(); tsStore = null; }
-            ['provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
+            ['billing_net', 'provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
@@ -2363,6 +2551,11 @@
                 document.getElementById('modal-subtitle').innerText = "Atur harga bulanan dan diskon tahunan";
                 fillPricingForm();
                 document.getElementById('popup-content-pricing').classList.remove('hidden');
+            } else if (type === 'billing_net') {
+                document.getElementById('modal-title').innerText = "Billing Jaringan (Estimasi)";
+                document.getElementById('modal-subtitle').innerText = "Estimasi biaya layanan berjalan per detik untuk semua toko";
+                renderBillingNet();
+                document.getElementById('popup-content-billing_net').classList.remove('hidden');
             } else if (type === 'former') {
                 document.getElementById('modal-title').innerText = "Toko Berhenti";
                 document.getElementById('modal-subtitle').innerText = "Arsip riwayat 90 hari, unduh 1 kali";

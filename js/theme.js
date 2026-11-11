@@ -15,6 +15,8 @@
       '[Perbaikan] Barcode kini dibaca dari alat scanner laser/infra merah (seperti di minimarket), bukan kamera',
       '[Perbaikan] Kartu Total Income/Outcome pemilik sama dengan manager, kartu Pajak tidak lagi duplikat pop-up karena sudah ada di dock',
       '[Perbaikan] Kasir: ketukan ganda pada tombol Simpan ke Antrean tidak lagi memunculkan peringatan "Nominal rupiah tidak valid"',
+      '[Tampilan] Kartu "Estimasi Biaya Layanan" di halaman manager dan owner: angka bergerak tiap detik dengan tanggal pembayaran, warna hijau, kuning, lalu merah menjelang jatuh tempo (hanya estimasi, bukan tagihan)',
+      '[Tampilan] Lencana paket kini cukup "Pro" (emas hanya warnanya) dan tombol Keluar hanya satu, di dock, di semua layar',
       '[Tampilan] Bar header dan dock kini sedikit tembus pandang dengan tulisan tetap jelas',
       '[Keamanan] Aplikasi tidak lagi meminta izin kamera karena pemindaian barcode memakai scanner; lokasi hanya dibaca di perangkat Anda'
     ]],
@@ -187,7 +189,7 @@
         '<p id="fm-logo-msg" style="font-size:12px;margin:8px 0 0;color:#fca5a5"></p></div></div>';
     }
     if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur &amp; Paket</button></div>';
-    if (window.FM_LOGOUT && window.innerWidth < 480) h += '<div class="fm-sec"><button class="fm-btn" data-logout style="width:100%;padding:13px;color:#fda4af">Keluar dari Akun</button></div>';
+    if (false) h += '<div class="fm-sec"><button class="fm-btn" data-logout style="width:100%;padding:13px;color:#fda4af">Keluar dari Akun</button></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>v' + APP_VERSION + ' · ' + BETA + '</b></div></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.slice(0, SHOW_LAST).map(function (n, i) {
       return '<details ' + (i === 0 ? 'open' : '') + '><summary>v' + n[0] + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { var m = /^\[(\w+)\]\s*/.exec(t); var tag = m ? m[1] : ''; return '<li>' + (tag ? '<i class="fm-tag fm-tag-' + tag.toLowerCase() + '">' + esc(tag) + '</i>' : '') + esc(t.replace(/^\[\w+\]\s*/, '')) + '</li>'; }).join('') + '</ul></details>';
