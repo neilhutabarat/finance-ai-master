@@ -21,18 +21,23 @@
   function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
 
   /* ============ suara (Web Audio, tanpa file) ============ */
-  var S = { ctx: null, on: store('tw_snd') !== '0', voice: store('tw_voice') !== '0', eco: store('tw_eco') === '1', last: 0 };
+  var S = { ctx: null, on: store('tw_snd') !== '0', voice: store('tw_voice') !== '0', eco: store('tw_eco') === '1', last: 0, vol: Math.max(1, Math.min(10, +store('tw_vol') || 5)), master: null };
   function ac() {
     if (!S.ctx) { try { S.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
     if (S.ctx.state === 'suspended') S.ctx.resume();
     return S.ctx;
   }
+  function master(c) {
+    if (!S.master) { S.master = c.createDynamicsCompressor(); S.master.threshold.value = -16; S.master.knee.value = 10; S.master.ratio.value = 8; S.master.attack.value = 0.002; S.master.release.value = 0.15; var o = c.createGain(); o.gain.value = 1.15; S.master.connect(o); o.connect(c.destination); }
+    return S.master;
+  }
   function tone(f, dur, type, vol, when, slideTo) {
     if (!S.on) return; var c = ac(); if (!c) return;
     var t = c.currentTime + (when || 0), o = c.createOscillator(), gn = c.createGain();
+    vol = Math.min(0.8, (vol || 0.05) * S.vol);
     o.type = type || 'square'; o.frequency.setValueAtTime(f, t); if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
     gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(vol || 0.05, t + 0.005); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(gn); gn.connect(c.destination); o.start(t); o.stop(t + dur + 0.02);
+    o.connect(gn); gn.connect(master(c)); o.start(t); o.stop(t + dur + 0.02);
   }
   var SND = {
     tick: function () { tone(1500, 0.03, 'square', 0.035); tone(1100, 0.04, 'square', 0.03, 0.035); },
@@ -43,13 +48,16 @@
     tab: function () { tone(660, 0.04, 'sine', 0.05); tone(990, 0.04, 'sine', 0.04, 0.045); },
     notif: function () { tone(740, 0.09, 'sine', 0.07); tone(988, 0.12, 'sine', 0.07, 0.1); },
     alarm: function () { for (var i = 0; i < 3; i++) { tone(620, 0.14, 'square', 0.06, i * 0.3); tone(880, 0.14, 'square', 0.06, i * 0.3 + 0.15); } },
+    flap: function () { tone(900, 0.02, 'square', 0.03); tone(600, 0.025, 'square', 0.03, 0.03); },
+    fanfare: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.16, 'triangle', 0.08, i * 0.11); }); tone(1319, 0.4, 'triangle', 0.08, 0.46); },
+    goal: function () { [392, 523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.14, 'sawtooth', 0.05, i * 0.09); }); },
     ok: function () { tone(520, 0.08, 'sine', 0.06); tone(780, 0.08, 'sine', 0.06, 0.09); tone(1040, 0.12, 'sine', 0.06, 0.18); }
   };
   var lastSpeak = 0;
   function speak(txt) {
     if (!S.on || !S.voice || !window.speechSynthesis || Date.now() - lastSpeak < 8000) return;
     lastSpeak = Date.now();
-    try { var u = new SpeechSynthesisUtterance(txt); u.lang = 'id-ID'; u.rate = 0.95; u.volume = 0.8; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+    try { var u = new SpeechSynthesisUtterance(txt); u.lang = 'id-ID'; u.rate = 0.95; u.volume = 1; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
   }
 
   /* ============ peta (garis pulau disederhanakan) ============ */
@@ -175,15 +183,17 @@
       if (!all.length && Date.now() - bootAt < 4000) return;
       all.slice(-25).forEach(function (o) { addLog(o.t.category === 'sales' ? 'sale' : 'cost', txText(o), true); });
       all.forEach(function (o) { seen[txKey(o.tn.id, o.t)] = 1; });
-      seeded = true; lastTickets = pendingCount();
+      seeded = true; computeRecords(); lastTickets = pendingCount();
       tenants().forEach(function (tn) { lastState[tn.id] = state(tn.id) + (suspended(tn.id) ? 'S' : ''); lastOnline[tn.id] = online(tn.id).length > 0; });
       briefing(all); return;
     }
+    var newTx = false;
     all.forEach(function (o) {
       var k = txKey(o.tn.id, o.t); if (seen[k]) return; seen[k] = 1;
       addLog(o.t.category === 'sales' ? 'sale' : 'cost', txText(o), false, o.t.category === 'sales' ? 'tick' : 'beep');
-      pinged[o.tn.id] = Date.now(); flash('tw-m-omzet');
+      pinged[o.tn.id] = Date.now(); flash('tw-m-omzet'); newTx = true;
     });
+    if (newTx) medals();
     tenants().forEach(function (tn) {
       var s = state(tn.id) + (suspended(tn.id) ? 'S' : '');
       if (lastState[tn.id] !== undefined && lastState[tn.id] !== s) {
@@ -239,7 +249,7 @@
   }
 
   /* ============ tab ============ */
-  var TABS = [['log', 'LOG'], ['alarm', 'ALARM'], ['tiket', 'TIKET'], ['billing', 'BILLING'], ['kotak', 'KOTAK HITAM'], ['konsol', 'KONSOL']], curTab = 'log';
+  var TABS = [['log', 'LOG'], ['alarm', 'ALARM'], ['tiket', 'TIKET'], ['billing', 'BILLING'], ['kotak', 'KOTAK'], ['konsol', 'KONSOL'], ['jam', 'JAM'], ['replay', 'REPLAY'], ['bola', 'BOLA']], curTab = 'log';
   function setTab(t) {
     if (curTab !== t) SND.tab();
     curTab = t;
@@ -259,15 +269,30 @@
       renderBillingTab();
     } else if (t === 'kotak') {
       loadBox();
+    } else if (t === 'jam') {
+      renderJam();
+    } else if (t === 'replay') {
+      renderReplay();
+    } else if (t === 'bola') {
+      renderBola();
     }
   }
   function renderBillingTab() {
     var box = $('tw-pg-billing'); if (!box) return; var now = Date.now();
     box.innerHTML = '<table class="tw-t"><thead><tr><th>Toko</th><th>Tipe</th><th>Estimasi</th><th>Jatuh tempo</th></tr></thead><tbody>' + tenants().map(function (tn) {
       var b = ctrl(tn.id).billing, ok = g(function () { return FM_BILL.ok(b); }, false), st = g(function () { return FM_BILL.status(b, now); }, {});
-      var left = ok && st.E ? cd(st.E - now) : '-';
+      var left = ok && st.E ? flapHtml(cd(st.E - now)) : '-';
       return '<tr><td>' + esc(tn.nama) + '</td><td class="' + (b && b.trial ? 'tr' : 'ru') + '">' + (ok ? (b.trial ? 'UJI' : 'JALAN') : '-') + '</td><td class="num" data-live="' + esc(tn.id) + '">' + (ok ? 'Rp ' + g(function () { return FM_BILL.fmt(FM_BILL.meter(b, now)); }, '-') : '-') + '</td><td class="num" data-cd="' + (ok && st.E ? st.E : '') + '">' + left + '</td></tr>';
     }).join('') + '</tbody></table>';
+  }
+  function flapHtml(str) { return '<span class="fp">' + String(str).split('').map(function (c) { return '<b class="fc">' + esc(c) + '</b>'; }).join('') + '</span>'; }
+  var flapAt = 0;
+  function setFlap(el, str) {
+    var cells = el.querySelectorAll('.fc'); str = String(str);
+    if (cells.length !== str.length) { el.innerHTML = flapHtml(str); return; }
+    var changed = 0;
+    for (var i = 0; i < cells.length; i++) if (cells[i].textContent !== str[i]) { cells[i].textContent = str[i]; if (!S.eco) { cells[i].classList.remove('fl'); void cells[i].offsetWidth; cells[i].classList.add('fl'); } if (i < str.length - 2) changed++; }
+    if (changed && curTab === 'billing' && Date.now() - flapAt > 1500) { flapAt = Date.now(); SND.flap(); }
   }
   function cd(ms) {
     var neg = ms < 0; ms = Math.abs(ms); var d = Math.floor(ms / 86400000), h = Math.floor(ms % 86400000 / 3600000), m = Math.floor(ms % 3600000 / 60000), s = Math.floor(ms % 60000 / 1000);
@@ -355,12 +380,141 @@
   var lastDef = null;
   function set(id, txt, cls) { var el = $(id); if (!el) return; el.textContent = txt; el.className = 'tw-b ' + cls; }
 
+
+  /* ============ medali & rekor ============ */
+  var rec = {};
+  function computeRecords() {
+    var d0 = ymd(new Date());
+    tenants().forEach(function (tn) {
+      var by = {}; txs(tn.id).forEach(function (t) { if (t.category === 'sales') { var d = t.dateISO || ''; by[d] = (by[d] || 0) + (t.amount || 0); } });
+      var mx = 0; Object.keys(by).forEach(function (d) { if (d !== d0 && by[d] > mx) mx = by[d]; });
+      rec[tn.id] = { mx: mx, flag: false, count: txs(tn.id).length };
+    });
+  }
+  function medals() {
+    var d0 = ymd(new Date());
+    tenants().forEach(function (tn) {
+      var r = rec[tn.id]; if (!r) { computeRecords(); r = rec[tn.id]; if (!r) return; }
+      var today = sumDay(tn.id, d0), n = txs(tn.id).length;
+      if (r.mx > 0 && today > r.mx && !r.flag) { r.flag = true; addLog('up', 'REKOR · ' + tn.id + ' · ' + tn.nama + ' · omzet harian tertinggi ' + rp(today) + ' (sebelumnya ' + rp(r.mx) + ')', false, 'fanfare'); speak('Rekor baru. ' + tn.nama + ' mencetak omzet harian tertinggi'); }
+      if (Math.floor(n / 100) > Math.floor(r.count / 100)) addLog('up', 'MEDALI · ' + tn.id + ' · ' + tn.nama + ' · transaksi ke-' + (Math.floor(n / 100) * 100), false, 'fanfare');
+      r.count = n;
+    });
+  }
+
+  /* ============ jam sibuk ============ */
+  function renderJam() {
+    var box = $('tw-pg-jam'); if (!box) return;
+    var hrs = [], i, since = Date.now() - 14 * 86400000, tot = 0;
+    for (i = 0; i < 24; i++) hrs.push(0);
+    tenants().forEach(function (tn) { txs(tn.id).forEach(function (t) { var ms = t.timestamp || 0; if (ms >= since) { hrs[new Date(ms + 7 * 3600000).getUTCHours()]++; tot++; } }); });
+    var mx = Math.max.apply(null, hrs.concat([1])), peak = hrs.indexOf(mx);
+    box.innerHTML = '<div class="tw-sub0">Jumlah transaksi per jam (WIB), 14 hari terakhir · seluruh jaringan</div><div class="tw-heat">' + hrs.map(function (v, h) { var a = v ? 0.15 + 0.85 * v / mx : 0.04; return '<div class="hc" style="background:rgba(61,255,160,' + a.toFixed(2) + ')" title="' + pad(h) + ':00 · ' + v + ' transaksi"><b>' + pad(h) + '</b><small>' + v + '</small></div>'; }).join('') + '</div>' +
+      '<div class="tw-sub0">' + (tot ? 'Jam tersibuk: <b>' + pad(peak) + ':00–' + pad((peak + 1) % 24) + ':00</b> (' + mx + ' transaksi) · total ' + tot + ' transaksi' : 'Belum ada transaksi dalam 14 hari terakhir.') + '</div>';
+  }
+
+  /* ============ replay ============ */
+  var RP = { run: false, timer: null, day: 0 };
+  function renderReplay() {
+    var box = $('tw-pg-replay'); if (!box || box.getAttribute('data-ready')) { if (box) updateRpBtn(); return; }
+    box.setAttribute('data-ready', '1');
+    box.innerHTML = '<div class="tw-rpbar"><select id="tw-rp-day"><option value="0">Hari ini</option><option value="1">Kemarin</option><option value="2">2 hari lalu</option></select><button id="tw-rp-go">▶ PUTAR</button><span id="tw-rp-clk" class="tw-clk">--:--:--</span></div><div class="tw-prog"><i id="tw-rp-bar"></i></div><div id="tw-rp-out" class="tw-logbox"><div class="tw-empty">Pilih hari lalu tekan PUTAR. Transaksi hari itu diputar ulang dengan bunyi dan titik di peta.</div></div>';
+    $('tw-rp-go').onclick = function () { SND.click(); RP.run ? stopReplay() : startReplay(+$('tw-rp-day').value); };
+  }
+  function updateRpBtn() { var b = $('tw-rp-go'); if (b) b.textContent = RP.run ? '■ STOP' : '▶ PUTAR'; }
+  function stopReplay() { RP.run = false; clearTimeout(RP.timer); updateRpBtn(); }
+  function startReplay(dayOff) {
+    var iso = ymd(new Date(Date.now() - dayOff * 86400000)), list = collectTx().filter(function (o) { return (o.t.dateISO || '') === iso; });
+    var out = $('tw-rp-out'); out.innerHTML = '';
+    if (!list.length) { out.innerHTML = '<div class="tw-empty">Tidak ada transaksi pada ' + iso + '.</div>'; return; }
+    RP.run = true; updateRpBtn(); var i = 0, prev = list[0].t.timestamp || 0;
+    (function step() {
+      if (!RP.run) return;
+      if (i >= list.length) { stopReplay(); var d = document.createElement('div'); d.className = 'tw-ln sys'; d.innerHTML = '<span class="m">— replay selesai · ' + list.length + ' transaksi —</span>'; out.appendChild(d); SND.ok(); return; }
+      var o = list[i], ms = o.t.timestamp || 0, sales = o.t.category === 'sales';
+      var ln = document.createElement('div'); ln.className = 'tw-ln ' + (sales ? 'sale' : 'cost'); ln.innerHTML = '<span class="t">' + clock(ms, 7) + '</span><span class="m">' + esc(txText(o)) + '</span>'; out.appendChild(ln); out.scrollTop = out.scrollHeight;
+      pinged[o.tn.id] = Date.now(); drawDots(); (sales ? SND.tick : SND.beep)();
+      var c = $('tw-rp-clk'); if (c) c.textContent = clock(ms, 7); var bar = $('tw-rp-bar'); if (bar) bar.style.width = Math.round((i + 1) / list.length * 100) + '%';
+      var gap = i + 1 < list.length ? ((list[i + 1].t.timestamp || ms) - ms) : 0; prev = ms; i++;
+      RP.timer = setTimeout(step, Math.max(140, Math.min(900, gap / 3000)));
+    })();
+  }
+
+  /* ============ Real Madrid (football-data.org) ============ */
+  var BOLA = { key: store('tw_fdkey') || '', data: null, at: 0, err: '', live: false, lastScore: null };
+  function bolaFetch(force) {
+    if (!BOLA.key || document.hidden) return;
+    if (!force && Date.now() - BOLA.at < (BOLA.live ? 25000 : 600000)) return;
+    BOLA.at = Date.now();
+    var from = ymd(new Date(Date.now() - 3 * 86400000)), to = ymd(new Date(Date.now() + 45 * 86400000));
+    fetch('https://api.football-data.org/v4/teams/86/matches?dateFrom=' + from + '&dateTo=' + to, { headers: { 'X-Auth-Token': BOLA.key } })
+      .then(function (r) { if (!r.ok) throw new Error(r.status === 403 || r.status === 401 ? 'kunci ditolak (HTTP ' + r.status + ')' : r.status === 429 ? 'terlalu sering (HTTP 429)' : 'HTTP ' + r.status); return r.json(); })
+      .then(function (j) { BOLA.data = j.matches || []; BOLA.err = ''; bolaGoalCheck(); if (curTab === 'bola') bolaPaint(); })
+      .catch(function (e) { BOLA.err = e.message || 'gagal'; if (curTab === 'bola') bolaPaint(); });
+  }
+  function bolaPick() {
+    var ms = (BOLA.data || []).slice().sort(function (a, b) { return Date.parse(a.utcDate) - Date.parse(b.utcDate); }), now = Date.now();
+    var live = ms.filter(function (m) { return /IN_PLAY|PAUSED|LIVE/.test(m.status); })[0] || null;
+    var next = ms.filter(function (m) { return /SCHEDULED|TIMED/.test(m.status) && Date.parse(m.utcDate) > now - 60000; })[0] || null;
+    var last = ms.filter(function (m) { return m.status === 'FINISHED'; }).pop() || null;
+    BOLA.live = !!live; return { live: live, next: next, last: last };
+  }
+  function scoreOf(m) { var f = m && m.score && m.score.fullTime || {}; return [f.home == null ? 0 : f.home, f.away == null ? 0 : f.away]; }
+  function bolaGoalCheck() {
+    var pk = bolaPick(); if (!pk.live) { BOLA.lastScore = null; return; }
+    var sc = scoreOf(pk.live), key = pk.live.id;
+    if (BOLA.lastScore && BOLA.lastScore.id === key && (sc[0] + sc[1] > BOLA.lastScore.s[0] + BOLA.lastScore.s[1])) {
+      var madHome = pk.live.homeTeam && pk.live.homeTeam.id === 86, mine = madHome ? sc[0] > BOLA.lastScore.s[0] : sc[1] > BOLA.lastScore.s[1];
+      addLog(mine ? 'up' : 'down', 'GOL! ' + shortName(pk.live.homeTeam) + ' ' + sc[0] + ' - ' + sc[1] + ' ' + shortName(pk.live.awayTeam), false, 'goal');
+      speak(mine ? 'Gol! Real Madrid mencetak gol' : 'Gol untuk lawan');
+    }
+    BOLA.lastScore = { id: key, s: sc };
+  }
+  function shortName(t) { return t ? (t.shortName || t.name || '?') : '?'; }
+  function liveMinute(m) {
+    var el = (Date.now() - Date.parse(m.utcDate)) / 60000;
+    if (m.status === 'PAUSED') return { txt: 'ISTIRAHAT', est: false };
+    var min = m.minute ? +m.minute : (el <= 47 ? el : Math.max(46, el - 15));
+    min = Math.max(0, Math.min(130, min)); var mm = Math.floor(min), ss = Math.floor((min - mm) * 60);
+    return { txt: pad(mm) + ':' + pad(ss), est: !m.minute };
+  }
+  function renderBola() {
+    var box = $('tw-pg-bola'); if (!box) return;
+    if (!BOLA.key) {
+      box.innerHTML = '<div class="tw-empty">Masukkan kunci API football-data.org (gratis) untuk jadwal dan skor Real Madrid.</div><div class="tw-rpbar"><input id="tw-fd-in" placeholder="tempel kunci API" autocomplete="off"><button id="tw-fd-ok">SIMPAN</button></div><div class="tw-sub0">Kunci disimpan di browser ini saja. Daftar gratis di football-data.org.</div>';
+      $('tw-fd-ok').onclick = function () { var v = $('tw-fd-in').value.trim(); if (!v) return; BOLA.key = v; store('tw_fdkey', v); SND.ok(); box.innerHTML = ''; renderBola(); };
+      return;
+    }
+    if (!$('tw-bola-box')) box.innerHTML = '<div id="tw-bola-box"></div><div class="tw-sub0" id="tw-bola-foot"></div>';
+    bolaPaint(); bolaFetch(true);
+  }
+  function bolaPaint() {
+    var bx = $('tw-bola-box'); if (!bx) return;
+    if (!BOLA.data) { bx.innerHTML = '<div class="tw-empty">' + (BOLA.err ? 'Gagal memuat: ' + esc(BOLA.err) : 'Memuat jadwal…') + '</div>'; return; }
+    var pk = bolaPick(), h = '';
+    if (pk.live) {
+      var m = pk.live, sc = scoreOf(m), mn = liveMinute(m);
+      h = '<div class="tw-bl live"><div class="cm">' + esc((m.competition && m.competition.name) || '') + ' · <b class="red">● LIVE</b></div><div class="tm"><span>' + esc(shortName(m.homeTeam)) + '</span><b class="sc">' + sc[0] + ' - ' + sc[1] + '</b><span>' + esc(shortName(m.awayTeam)) + '</span></div><div class="mn" id="tw-bola-min" data-id="' + m.id + '">' + mn.txt + '</div><small>' + (mn.est ? 'menit perkiraan, bisa terlambat dari siaran' : '') + '</small></div>';
+    } else if (pk.next) {
+      var n = pk.next, t = Date.parse(n.utcDate);
+      h = '<div class="tw-bl"><div class="cm">JADWAL BERIKUTNYA · ' + esc((n.competition && n.competition.name) || '') + '</div><div class="tm"><span>' + esc(shortName(n.homeTeam)) + '</span><b class="sc">vs</b><span>' + esc(shortName(n.awayTeam)) + '</span></div><div class="mn" id="tw-bola-cd" data-t="' + t + '">' + flapHtml(cd(t - Date.now())) + '</div><small>' + new Date(t + 7 * 3600000).toISOString().slice(0, 16).replace('T', ' ') + ' WIB</small></div>';
+    } else h = '<div class="tw-empty">Tidak ada pertandingan dalam 45 hari ke depan.</div>';
+    if (pk.last && !pk.live) { var l = pk.last, ls = scoreOf(l); h += '<div class="tw-bl last"><div class="cm">TERAKHIR · ' + esc((l.competition && l.competition.name) || '') + '</div><div class="tm"><span>' + esc(shortName(l.homeTeam)) + '</span><b class="sc">' + ls[0] + ' - ' + ls[1] + '</b><span>' + esc(shortName(l.awayTeam)) + '</span></div></div>'; }
+    bx.innerHTML = h;
+    var ft = $('tw-bola-foot'); if (ft) ft.textContent = BOLA.err ? 'Pembaruan terakhir gagal: ' + BOLA.err : 'Sumber: football-data.org' + (BOLA.live ? ' · diperbarui tiap 30 detik' : ' · diperbarui tiap 10 menit');
+  }
+  function bolaTick() {
+    if (curTab !== 'bola' || !BOLA.data) return;
+    var c = $('tw-bola-cd'); if (c) { var t = +c.getAttribute('data-t'); if (t - Date.now() < -60000) { bolaFetch(true); } else setFlap(c, cd(t - Date.now())); }
+    var m = $('tw-bola-min'); if (m) { var pk = bolaPick(); if (pk.live) m.textContent = liveMinute(pk.live).txt; }
+  }
+
   /* ============ konsol ============ */
   var hist = [], hi = 0;
   function out(txt, cls) { var box = $('tw-cout'); if (!box) return; var r = document.createElement('div'); r.className = 'tw-ln ' + (cls || 'sys'); r.innerHTML = '<span class="m"></span>'; box.appendChild(r); var m = r.firstChild; var i = 0; if (S.eco) { m.textContent = txt; return; } (function s() { i = Math.min(txt.length, i + 3); m.innerHTML = esc(txt.slice(0, i)) + (i < txt.length ? '<i class="tw-caret">_</i>' : ''); box.scrollTop = box.scrollHeight; SND.type(); if (i < txt.length) setTimeout(s, 14); })(); box.scrollTop = box.scrollHeight; }
   function find(q) { q = String(q || '').toLowerCase().trim(); if (!q) return null; return tenants().filter(function (t) { return t.id.toLowerCase() === q || t.id.toLowerCase().indexOf(q) >= 0 || String(t.nama || '').toLowerCase().indexOf(q) >= 0; })[0] || null; }
   var CMD = {
-    bantuan: function () { out('Perintah: status · toko · omzet · tiket · billing · pajak · alarm · buka <toko> · edit <toko> · bekukan <toko> · aktifkan <toko> · link <toko> · suara on/off · hemat on/off · bersih'); },
+    bantuan: function () { out('Perintah: status · toko · omzet · tiket · billing · pajak · alarm · buka <toko> · edit <toko> · bekukan <toko> · aktifkan <toko> · link <toko> · suara on/off · volume 1-10 · hemat on/off · bola kunci <kunci> · bersih'); },
     status: function () { var ts = tenants(); out('SIAGA ' + defcon() + ' · ' + ts.length + ' toko · ' + ts.filter(function (t) { return online(t.id).length; }).length + ' online · ' + alarms().length + ' alarm · ' + pendingCount() + ' tiket'); },
     toko: function () { tenants().forEach(function (t) { out(t.id + ' · ' + t.nama + ' · ' + (suspended(t.id) ? 'BEKU' : online(t.id).length ? 'ONLINE' : 'offline')); }); },
     omzet: function () { var d0 = ymd(new Date()), s = 0; tenants().forEach(function (t) { s += sumDay(t.id, d0); }); out('Omzet jaringan hari ini: ' + rp(s)); },
@@ -375,6 +529,8 @@
     aktifkan: function (a) { var t = find(a); if (!t) return out('Toko tidak ditemukan: ' + a, 'alarm'); setTenantSuspended(t.id, false); },
     link: function (a) { var t = find(a); if (!t) return out('Toko tidak ditemukan: ' + a, 'alarm'); out(tenantLink(t.id)); },
     suara: function (a) { S.on = a !== 'off'; store('tw_snd', S.on ? '1' : '0'); syncToggles(); out('Suara ' + (S.on ? 'menyala' : 'mati')); if (S.on) SND.ok(); },
+    volume: function (a) { var v = Math.max(1, Math.min(10, parseInt(a, 10) || 0)); if (!v) return out('Volume sekarang ' + S.vol + ' (1 sampai 10). Contoh: volume 7'); S.vol = v; store('tw_vol', String(v)); out('Volume diatur ke ' + v); SND.ok(); },
+    bola: function (a) { var p = String(a || '').split(/\s+/); if (p[0] === 'kunci' && p[1]) { BOLA.key = p[1]; store('tw_fdkey', p[1]); out('Kunci bola disimpan.'); bolaFetch(true); } else if (p[0] === 'hapus') { BOLA.key = ''; BOLA.data = null; store('tw_fdkey', ''); out('Kunci bola dihapus.'); } else { setTab('bola'); } },
     hemat: function (a) { S.eco = a !== 'off'; store('tw_eco', S.eco ? '1' : '0'); syncToggles(); out('Mode hemat ' + (S.eco ? 'menyala' : 'mati')); }
   };
   function runCmd(line) {
@@ -413,7 +569,7 @@
       '<div class="tw-pane tw-map"><div class="tw-ph"><span class="tw-l green"></span>PETA JARINGAN<span class="tw-sp"></span><small id="tw-noloc"></small></div><div class="tw-mapbox" id="tw-mapbox">' + mapSvg() + '<div class="tw-sweep"></div><div class="tw-zm"><button data-z="in">+</button><button data-z="out">−</button><button data-z="reset">⌂</button></div><div class="tw-leg"><span><i class="g"></i>online</span><span><i class="o"></i>offline</span><span><i class="a"></i>tenggang</span><span><i class="r"></i>beku/lewat</span></div></div></div>' +
       '<div class="tw-pane tw-board"><div class="tw-ph"><span class="tw-l green"></span>PAPAN TOKO<span class="tw-sp"></span><small>tuas: AKTIF · UJI COBA · PPN</small></div><div id="tw-rows" class="tw-rows"></div></div>' +
       '<div class="tw-pane tw-tabs"><div class="tw-tabbar">' + TABS.map(function (t) { return '<button class="tw-tab' + (t[0] === 'log' ? ' on' : '') + '" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
-      '<div class="tw-pgs"><div class="tw-pg" data-t="log"><div id="tw-log" class="tw-logbox"></div></div><div class="tw-pg" data-t="alarm" style="display:none" id="tw-pg-alarm"></div><div class="tw-pg" data-t="tiket" style="display:none" id="tw-pg-tiket"></div><div class="tw-pg" data-t="billing" style="display:none" id="tw-pg-billing"></div><div class="tw-pg" data-t="kotak" style="display:none" id="tw-pg-kotak"></div>' +
+      '<div class="tw-pgs"><div class="tw-pg" data-t="log"><div id="tw-log" class="tw-logbox"></div></div><div class="tw-pg" data-t="alarm" style="display:none" id="tw-pg-alarm"></div><div class="tw-pg" data-t="tiket" style="display:none" id="tw-pg-tiket"></div><div class="tw-pg" data-t="billing" style="display:none" id="tw-pg-billing"></div><div class="tw-pg" data-t="kotak" style="display:none" id="tw-pg-kotak"></div><div class="tw-pg" data-t="jam" style="display:none" id="tw-pg-jam"></div><div class="tw-pg" data-t="replay" style="display:none" id="tw-pg-replay"></div><div class="tw-pg" data-t="bola" style="display:none" id="tw-pg-bola"></div>' +
       '<div class="tw-pg" data-t="konsol" style="display:none"><div id="tw-cout" class="tw-logbox"></div><div class="tw-cinw"><span>›</span><input id="tw-cin" autocomplete="off" spellcheck="false" placeholder="ketik bantuan"></div></div></div></div>' +
       '</div>';
     main.insertBefore(sec, acts);
@@ -462,7 +618,7 @@
       var tag = (document.activeElement && document.activeElement.tagName) || '';
       var modalOpen = g(function () { return !$('main-modal-container').classList.contains('hidden'); }, false);
       if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
-      var fi = /^F([1-6])$/.exec(e.key);
+      var fi = /^F([1-9])$/.exec(e.key);
       if (fi && !modalOpen) { e.preventDefault(); setTab(TABS[+fi[1] - 1][0]); return; }
       if (e.key === '/' && !modalOpen) { e.preventDefault(); setTab('konsol'); return; }
       if (e.key === 'm' || e.key === 'M') { if (!modalOpen) $('tw-t-snd').click(); return; }
@@ -551,6 +707,14 @@
     '.tw-ar{display:flex;align-items:center;gap:8px;padding:5px 7px;margin-bottom:4px;border-radius:7px;border:1px solid rgba(255,255,255,.08);font-size:11px;justify-content:space-between}.tw-ar.lv2{border-color:rgba(255,90,90,.4);color:#ffb3b3}.tw-ar.lv1{border-color:rgba(255,194,71,.35);color:#ffe0a0}.tw-ar>span:first-child{flex:1}.tw-ar button.no{color:#ff8e8e}',
     '.tw-empty{color:#6f8794;font-size:11px;padding:12px 6px;text-align:center}.tw-sub{text-align:right;margin-top:6px}',
     '.tw-t{width:100%;border-collapse:collapse;font-size:10.5px}.tw-t th{text-align:left;color:#6f8794;font-weight:400;padding:3px 4px;border-bottom:1px solid rgba(255,255,255,.1)}.tw-t td{padding:4px;border-bottom:1px solid rgba(255,255,255,.05)}.tw-t .num{text-align:right;color:#5dffbe}.tw-t .tr{color:#e08bff}.tw-t .ru{color:#3dffa0}',
+    '.tw-tab{font-size:9px!important;letter-spacing:.03em!important}.tw-main{grid-template-columns:minmax(0,1.08fr) minmax(0,.95fr) minmax(0,1.25fr)!important}',
+    '.fp{display:inline-flex;gap:1px}.fc{display:inline-block;min-width:11px;text-align:center;background:linear-gradient(#10181d 49%,#04080b 51%);border:1px solid rgba(255,255,255,.08);border-radius:3px;padding:1px 2px;color:#ffd37a;font-weight:400}.fc.fl{animation:twfp .35s ease-out}@keyframes twfp{0%{transform:rotateX(-90deg);opacity:.2}100%{transform:rotateX(0);opacity:1}}',
+    '.tw-sub0{font-size:10.5px;color:#7f9aa8;padding:5px 2px}.tw-sub0 b{color:#5dffbe}.tw-heat{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}.hc{border-radius:5px;border:1px solid rgba(61,255,160,.12);text-align:center;padding:4px 0;line-height:1.15}.hc b{display:block;font-size:10px;color:#e6f5ef;font-weight:400}.hc small{font-size:9px;color:#9fe9cf}',
+    '.tw-rpbar{display:flex;gap:6px;align-items:center;padding:5px 7px}.tw-rpbar select,.tw-rpbar input{all:unset;box-sizing:border-box;padding:3px 7px;border:1px solid rgba(255,255,255,.16);border-radius:6px;color:#e6f5ef;font-size:11px;background:#02050a}.tw-rpbar input{flex:1}.tw-rpbar button{all:unset;cursor:pointer;padding:3px 10px;border-radius:6px;border:1px solid rgba(61,255,160,.45);color:#3dffa0;font-size:10.5px;letter-spacing:.06em}.tw-rpbar button:hover{background:rgba(61,255,160,.12)}',
+    '.tw-prog{height:3px;background:rgba(255,255,255,.07);margin:0 7px}.tw-prog i{display:block;height:100%;width:0;background:#3dffa0;box-shadow:0 0 6px #3dffa0;transition:width .15s}',
+    '.tw-pg[data-t="replay"]{display:flex;flex-direction:column;padding:0}',
+    '.tw-bl{border:1px solid rgba(94,255,190,.18);border-radius:10px;padding:10px;margin-bottom:8px;text-align:center;background:rgba(255,255,255,.02)}.tw-bl.live{border-color:rgba(255,90,90,.5);box-shadow:0 0 14px rgba(255,90,90,.12)}.tw-bl .cm{font-size:10px;color:#7f9aa8;letter-spacing:.05em}.tw-bl .red{color:#ff5a5a;animation:twbl 1s steps(2,start) infinite}',
+    '.tw-bl .tm{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0;font-size:13px;color:#e6f5ef}.tw-bl .tm span{flex:1;text-align:center}.tw-bl .sc{font-size:26px;color:#5dffbe;text-shadow:0 0 10px rgba(93,255,190,.5);font-weight:400}.tw-bl .mn{font-size:20px;color:#ffd37a;letter-spacing:.06em}.tw-bl small{display:block;color:#6f8794;font-size:10px;margin-top:4px}.tw-bl.last .sc{font-size:18px}',
     /* pra-terbang */
     '#tw-pre{position:fixed;inset:0;z-index:200;background:#000;display:flex;align-items:center;justify-content:center;font-family:"Share Tech Mono",ui-monospace,monospace;transition:opacity .4s}#tw-pre.out{opacity:0}',
     '.tw-pre-box{width:min(460px,90vw);text-align:center;color:#9fe9cf}.tw-pre-t{font-family:Orbitron,"Share Tech Mono",monospace;letter-spacing:.2em;font-size:13px;margin-bottom:18px;color:#3dffa0}',
@@ -571,8 +735,9 @@
   function tick1() { if (document.hidden) return; renderBoard(); drawDots(); updateBar(); updateMonitors(); if (curTab === 'alarm') renderTab('alarm'); if (curTab === 'tiket') renderTab('tiket'); }
   function tickCd() {
     if (document.hidden) return; var now = Date.now();
-    [].forEach.call(document.querySelectorAll('#tw-pg-billing [data-cd]'), function (el) { var e = +el.getAttribute('data-cd'); if (e) el.textContent = cd(e - now); });
+    [].forEach.call(document.querySelectorAll('#tw-pg-billing [data-cd]'), function (el) { var e = +el.getAttribute('data-cd'); if (e) setFlap(el, cd(e - now)); });
     [].forEach.call(document.querySelectorAll('#tw-pg-billing [data-live]'), function (el) { var b = ctrl(el.getAttribute('data-live')).billing; if (g(function () { return FM_BILL.ok(b); }, false)) el.textContent = 'Rp ' + FM_BILL.fmt(FM_BILL.meter(b, now)); });
+    bolaTick();
     var c = $('tw-b-clk'); if (c) c.textContent = 'WIB ' + clock(now, 7) + ' · WITA ' + clock(now, 8).slice(0, 5) + ' · WIT ' + clock(now, 9).slice(0, 5);
   }
   function start() {
@@ -586,7 +751,7 @@
         build();
         preflight(function () { setTab('log'); });
         tick1();
-        timers.push(setInterval(tick1, 1500), setInterval(tickCd, 1000), setInterval(function () { if (!document.hidden) scanEvents(); }, 2000), setInterval(function () { if (!document.hidden && seeded) trend(); }, 180000));
+        timers.push(setInterval(tick1, 1500), setInterval(tickCd, 1000), setInterval(function () { if (!document.hidden) scanEvents(); }, 2000), setInterval(function () { if (!document.hidden && seeded) trend(); }, 180000), setInterval(function () { bolaFetch(false); }, 20000));
         setTimeout(function () { if (seeded) trend(); }, 6000);
         var ca = window.ctAudit;
         if (typeof ca === 'function') window.ctAudit = function (tid, action, detail) { try { addLog('sys', 'AKSI TOWER · ' + (tid && tid !== '-' ? tid + ' · ' : '') + (detail || action), false, null); boxLoaded = 0; } catch (e) {} return ca.apply(this, arguments); };
