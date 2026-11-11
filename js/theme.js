@@ -10,6 +10,7 @@
   var RELEASE_NOTES = [
     ['1.0.0 (BETA 1.5)', '11 Nov 2026', [
       '[Tampilan] Fitur toko kini dirakit sesuai kebutuhan usaha: fitur yang tidak dipilih tidak ditampilkan, dan daftar fitur aktif ada di tombol Fitur Toko',
+      '[Tampilan] Owner kini bisa diberi akses Buku Besar serta Kelola COA & Produk (diatur penyedia sesuai kebutuhan usaha)',
       '[Tampilan] Peran "Kasir" kini bernama "Admin" (nama tetap bisa diubah oleh owner)',
       '[Tampilan] Panel Analisis diganti Analisa Keuangan untuk owner dan manager: ringkasan laba, perbandingan dengan bulan lalu, hari dan jam ramai, produk bermargin tipis, biaya yang naik, pengeluaran janggal, stok menipis, beserta saran. Dihitung dari data toko tanpa batas harian',
       '[Tampilan] Tombol, bar header, dan dock kini berbahan kaca hitam 3D yang mengambang dengan bayangan lembut, di semua halaman',

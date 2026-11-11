@@ -14,11 +14,11 @@
     { key: 'saldo', label: 'Saldo kas, total masuk dan keluar', r: { kasir: 'c', manager: 'c', owner: 'c' } },
     { key: 'closing', label: 'Closing kasir dan riwayatnya', r: { kasir: 'c', manager: 'c' } },
     { key: 'mutasi', label: 'Mutasi / buku kas', r: { kasir: 'c', manager: 'c', owner: 'c' } },
-    { key: 'coa', label: 'Kelola akun (COA) dan produk', r: { manager: 'c' } },
+    { key: 'coa', label: 'Kelola akun (COA) dan produk', r: { manager: 'c', owner: 'o' } },
     { key: 'kasir_baru', label: 'Pengajuan kasir baru', r: { manager: 'c', owner: 'c' } },
     { key: 'laba_rugi', label: 'Laba Rugi', r: { manager: 'c', owner: 'c' } },
     { key: 'pin', label: 'Kelola PIN dan nama peran', r: { owner: 'c' } },
-    { key: 'ledger', label: 'Buku Besar', r: { kasir: 'o', manager: 'c' } },
+    { key: 'ledger', label: 'Buku Besar', r: { kasir: 'o', manager: 'c', owner: 'o' } },
     { key: 'barcode', label: 'Scan barcode dan Produk Cepat', r: { kasir: 'o' } },
     { key: 'bukti', label: 'Foto bukti transaksi', r: { kasir: 'o' } },
     { key: 'wa_receipt', label: 'Struk lewat WhatsApp', r: { kasir: 'o' } },
@@ -31,12 +31,13 @@
     { key: 'clock', label: 'Jam', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'weather_rates', label: 'Cuaca dan Kurs', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'theme', label: 'Pilih tema, warna, dan logo', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'paket', label: 'Paket Basic, Plus, dan Pro', soon: true, r: { manager: 'o', owner: 'o' } },
     { key: 'mutasi_wa', label: 'Mutasi dikirim lewat WA dan dicetak', soon: true, r: { manager: 'o', owner: 'o' } },
     { key: 'gaji', label: 'Laporan gaji', soon: true, r: { manager: 'o', owner: 'o' } },
     { key: 'neraca', label: 'Neraca', soon: true, r: { manager: 'o', owner: 'o' } }
   ];
   // nilai untuk toko lama yang belum punya pilihan tersimpan
-  var LEGACY = { wa_receipt: 'plus', analisa: { owner: true } };
+  var LEGACY = { wa_receipt: 'plus', analisa: { owner: true }, coa: {}, ledger: { kasir: true } };
 
   function find(key) { return FEATURES.filter(function (f) { return f.key === key; })[0]; }
   function tenant() { try { return (typeof getActiveTenant === 'function') ? getActiveTenant() : null; } catch (e) { return null; } }
@@ -82,8 +83,8 @@
       ROLES.forEach(function (r) {
         var m = f.r[r], cell;
         if (!m) cell = '<span style="opacity:.3">–</span>';
-        else if (m === 'c') cell = '<input type="checkbox" checked disabled title="Inti: selalu aktif" class="w-4 h-4">';
-        else cell = '<input type="checkbox" id="' + prefix + '-f-' + f.key + '-' + r + '" ' + ((isNew ? false : has(f.key, r, tn)) ? 'checked ' : '') + ((f.soon || editable === false) ? 'disabled ' : '') + 'class="w-4 h-4">';
+        else if (m === 'c') cell = '<span title="Inti: selalu aktif" style="display:inline-flex;width:18px;height:18px;border-radius:5px;background:#22c55e;color:#04210f;font-weight:900;font-size:13px;line-height:18px;align-items:center;justify-content:center">&#10003;</span>';
+        else cell = '<input type="checkbox" id="' + prefix + '-f-' + f.key + '-' + r + '" ' + ((isNew ? false : has(f.key, r, tn)) ? 'checked ' : '') + ((f.soon || editable === false) ? 'disabled ' : '') + 'style="width:18px;height:18px;accent-color:#22c55e;cursor:pointer">';
         h += '<td style="text-align:center;padding:6px">' + cell + '</td>';
       });
       h += '</tr>';
@@ -114,6 +115,7 @@
   function applyDom() {
     var role = pageRole();
     if (!has('tax', role)) { drop('button[onclick*="openModal(\'tax\')"]'); hide(cardOf(document.getElementById('stat-total-pajak-sumbang'))); }
+    if (!has('coa', role)) drop('button[onclick*="openModal(\'coa_mgmt\')"]');
     if (!has('ledger', role)) drop('button[onclick*="openModal(\'ledger\')"]');
     if (!has('audit', role)) drop('button[onclick*="openModal(\'audit_trail\')"]');
     if (!has('export_csv', role)) drop('button[onclick*="exportCSV"]');
