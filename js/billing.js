@@ -79,7 +79,7 @@
   function toLocalInput(ms) { var w = wall(ms), p = function (x) { return String(x).padStart(2, '0'); }; return w.y + '-' + p(w.m + 1) + '-' + p(w.d) + 'T' + p(w.h) + ':' + p(w.mi); }
   function fromLocalInput(v) { var t = Date.parse(String(v) + ':00Z'); return isNaN(t) ? 0 : t - WIB; }
   /* total per siklus dari komponen */
-  function cycleTotal(base, modePrice, disc) { return Math.round(((Number(base) || 0) + Math.max(0, (Number(modePrice) || 0) - (Number(disc) || 0))) * PPN * 100) / 100; }
+  function cycleTotal(base, modePrice, disc, ppnOn) { return Math.round(((Number(base) || 0) + Math.max(0, (Number(modePrice) || 0) - (Number(disc) || 0))) * (ppnOn === false ? 1 : PPN) * 100) / 100; }
 
   window.FM_BILL = { meter: meter, status: status, cycle: cycle, dueAt: dueAt, curA: curA, ok: ok, freezeNow: freezeNow, color: color, fmt: fmt, fmt0: fmt0, dateText: dateText,
     toLocalInput: toLocalInput, fromLocalInput: fromLocalInput, cycleTotal: cycleTotal, PPN: PPN, DAY: DAY };

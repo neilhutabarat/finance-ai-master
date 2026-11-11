@@ -63,7 +63,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
         window.FM_DOCK_ITEMS = [
-            { label: 'Klien', icon: 'store', run: "openModal('add_tenant')" },
+            { label: 'Klien Baru', icon: 'store', run: "openModal('add_tenant')" },
             { label: 'Catat', icon: 'plus', run: "openModal('provider_input_tx')" },
             { label: 'Pesan', icon: 'send', run: "openModal('broadcast_modal')" }
         ];
@@ -438,17 +438,30 @@
                         <div id="al-result" class="hidden p-3 rounded-xl bg-emerald-950 border border-emerald-700 text-emerald-200 font-mono whitespace-pre-wrap"></div>
                     </div>
                 </div>
+                <div id="popup-content-tax_net" class="space-y-4 hidden">
+                    <div id="tx-summary" class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs"></div>
+                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
+                                <tr><th class="py-2.5 px-3">Toko</th><th class="py-2.5 px-3 text-center">Fitur pajak di toko</th><th class="py-2.5 px-3 text-right">Pengeluaran bulan ini</th><th class="py-2.5 px-3 text-right">Pajak bulan ini</th><th class="py-2.5 px-3 text-right">Pajak sepanjang masa</th></tr>
+                            </thead>
+                            <tbody id="tx-body"></tbody>
+                        </table>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Angka ini hitungan kontribusi pajak usaha (PPN 12% dari pengeluaran), bukan uang yang ditagih atau dibayarkan lewat aplikasi.</p>
+                </div>
+
                 <div id="popup-content-billing_net" class="space-y-4 hidden">
                     <div id="bn-summary" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs"></div>
                     <div class="overflow-x-auto border border-white/10 rounded-2xl">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
-                                <tr><th class="py-2.5 px-3">Toko</th><th class="py-2.5 px-3">Mode</th><th class="py-2.5 px-3 text-right">Total / Siklus</th><th class="py-2.5 px-3 text-right">Estimasi Berjalan</th><th class="py-2.5 px-3">Jatuh Tempo</th><th class="py-2.5 px-3 text-center">Status</th><th class="py-2.5 px-3 text-center">Cicilan</th></tr>
+                                <tr><th class="py-2.5 px-3">Toko</th><th class="py-2.5 px-3">Dihitung</th><th class="py-2.5 px-3 text-right">Total / Siklus</th><th class="py-2.5 px-3 text-right">Estimasi</th><th class="py-2.5 px-3">Mulai Hitung</th><th class="py-2.5 px-3">Jatuh Tempo</th><th class="py-2.5 px-3 text-center">Status</th><th class="py-2.5 px-3 text-center">Cicilan</th><th class="py-2.5 px-3 text-center">Aksi</th></tr>
                             </thead>
                             <tbody id="bn-body"></tbody>
                         </table>
                     </div>
-                    <p class="text-[11px] text-slate-400">Semua angka di sini hanya estimasi realtime (tarif dasar + mode &minus; diskon, termasuk PPN 12%), bukan tagihan.</p>
+                    <p class="text-[11px] text-slate-400">Semua angka di sini hanya estimasi realtime (tarif dasar, PPN 12% bila dicentang), bukan tagihan. Toko berstatus Uji Coba dihitung di kartu Estimasi Uji Coba, bukan di Estimasi Berjalan.</p>
                 </div>
                 <!-- 5. POPUP KELOLA COA PROVIDER -->
                 <div id="popup-content-provider_coa_mgmt" class="space-y-4 hidden">
@@ -501,7 +514,7 @@
                     </div>
 
                     <div class="p-4 rounded-2xl bg-purple-950/40 border border-purple-400/30 space-y-3 text-xs">
-                        <span class="font-black text-sm text-white block">Daftar Akun (COA)</span>
+                        <span class="font-black text-sm text-white block">Daftar Akun (COA) <span class="font-normal text-slate-400 text-[11px]">— klik dan seret baris untuk mengubah urutan</span></span>
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                             <input id="ts-coa-code" type="text" placeholder="Kode" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
                             <input id="ts-coa-name" type="text" placeholder="Nama akun" class="sm:col-span-2 w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
@@ -590,10 +603,10 @@
                             <input type="hidden" id="nt-tier" value="basic">
                             <div><label class="font-bold text-slate-300 block mb-1">Kuota Terminal Awal (Kasir / Manager / Owner)</label>
                                 <div class="grid grid-cols-3 gap-2"><input id="nt-kasir" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><input id="nt-mgr" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><input id="nt-own" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div></div>
-                            <div><label class="font-bold text-slate-300 block mb-1">Siklus Tagihan</label>
+                            <div style="display:none"><label class="font-bold text-slate-300 block mb-1">Siklus Tagihan</label>
                                 <select id="nt-cycle" onchange="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="monthly">Per Bulan</option><option value="yearly">Per Tahun (hemat)</option></select></div>
-                            <div><label class="font-bold text-slate-300 block mb-1">Harga Khusus (opsional, Rp)</label><input id="nt-custom" type="number" min="0" placeholder="Kosongkan = harga standar" oninput="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
-                            <div class="sm:col-span-2"><div id="nt-planprev" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div></div>
+                            <div style="display:none"><label class="font-bold text-slate-300 block mb-1">Harga Khusus (opsional, Rp)</label><input id="nt-custom" type="number" min="0" placeholder="Kosongkan = harga standar" oninput="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div class="sm:col-span-2" style="display:none"><div id="nt-planprev" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Alamat Usaha (untuk catatan lokasi)</label><input id="nt-alamat" type="text" placeholder="Contoh: Jl. Merdeka No. 5, Ketapang" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Warna Utama</label><input id="nt-warna" type="color" value="#0f172a" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
                         </div>
@@ -854,11 +867,7 @@
             return all;
         }
 
-        function tierBadgeHtml(tier) {
-            if (tier === 'pro') return '<span class="px-2 py-0.5 rounded text-[9px] font-black badge-pro-gold text-white uppercase">Pro</span>';
-            if (tier === 'plus') return '<span class="px-2 py-0.5 rounded text-[9px] font-black bg-cyan-600 text-white uppercase">Plus</span>';
-            return '<span class="px-2 py-0.5 rounded text-[9px] font-black bg-slate-600 text-white uppercase">Basic</span>';
-        }
+        function tierBadgeHtml() { return ''; } // paket Basic/Plus/Pro belum dipakai
 
         function finBadgeHtml(net, small) {
             const sz = small ? 'px-2.5 py-0.5 rounded text-[9px]' : 'px-2 py-0.5 rounded text-[10px]';
@@ -889,6 +898,7 @@
             if (isOpen('inspect') && currentInspectId) renderInspect(currentInspectId);
             if (isOpen('tickets') && typeof renderTicketsList === 'function') renderTicketsList();
             if (isOpen('billing_net')) renderBillingNet();
+            if (isOpen('tax_net')) renderTaxNet();
         }
 
         // ===== AKTIVITAS TOKO (PRESENCE) =====
@@ -1092,29 +1102,12 @@
             const cls = 'w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none';
             box.classList.remove('hidden');
             box.innerHTML =
-                '<span class="font-black text-sm text-white block">Paket & Tagihan</span>' +
-                '<p class="text-slate-400">Saat ini: <b class="text-white">' + TIER_LABEL[tier] + '</b> • ' + (cycle === 'yearly' ? 'Tahunan' : 'Bulanan') +
-                (c.billedAmount ? ' • ' + rp(c.billedAmount) + (cycle === 'yearly' ? '/thn' : '/bln') : '') + '</p>' +
-                '<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">' +
-                '<div><label class="font-bold text-slate-300 block mb-1">Paket</label><select id="ip-tier" class="' + cls + '"><option value="basic"' + sel('basic', tier) + '>Basic</option><option value="plus"' + sel('plus', tier) + '>Plus</option><option value="pro"' + sel('pro', tier) + '>Pro</option></select></div>' +
-                '<div><label class="font-bold text-slate-300 block mb-1">Siklus</label><select id="ip-cycle" class="' + cls + '"><option value="monthly"' + sel('monthly', cycle) + '>Per Bulan</option><option value="yearly"' + sel('yearly', cycle) + '>Per Tahun (hemat)</option></select></div>' +
-                '<div><label class="font-bold text-slate-300 block mb-1">Harga Khusus (opsional)</label><input id="ip-custom" type="number" min="0" placeholder="Kosong = harga standar" class="' + cls + '"></div>' +
-                '</div>' +
-                '<div id="ip-prev" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div>' +
-                '<button id="ip-save" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition">Simpan Paket</button>' +
-                '<div class="pt-3 mt-1 border-t border-white/10"><span class="font-black text-sm text-white block mb-2">Kuota Terminal (atur manual)</span>' +
+                '<div><span class="font-black text-sm text-white block mb-2">Kuota Terminal (atur manual)</span>' +
                 '<div class="grid grid-cols-3 gap-3">' +
                 '<div><label class="font-bold text-slate-300 block mb-1">Kasir</label><input id="iq-kasir" type="number" min="1" value="' + q('kasir') + '" class="' + cls + '"></div>' +
                 '<div><label class="font-bold text-slate-300 block mb-1">Manager</label><input id="iq-manager" type="number" min="1" value="' + q('manager') + '" class="' + cls + '"></div>' +
                 '<div><label class="font-bold text-slate-300 block mb-1">Owner</label><input id="iq-owner" type="number" min="1" value="' + q('owner') + '" class="' + cls + '"></div>' +
                 '</div><button id="iq-save" class="mt-3 w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-black text-xs transition">Simpan Kuota</button></div>';
-            const upd = function () { document.getElementById('ip-prev').innerHTML = planSummaryHtml(document.getElementById('ip-tier').value, document.getElementById('ip-cycle').value, document.getElementById('ip-custom').value); };
-            ['ip-tier', 'ip-cycle'].forEach(function (i) { document.getElementById(i).onchange = upd; });
-            document.getElementById('ip-custom').oninput = upd;
-            document.getElementById('ip-save').onclick = function () {
-                setTenantPlan(tenant.id, document.getElementById('ip-tier').value, document.getElementById('ip-cycle').value, document.getElementById('ip-custom').value);
-            };
-            upd();
             document.getElementById('iq-save').onclick = function () {
                 const g = function (id) { return Math.max(1, parseInt(document.getElementById(id).value) || 1); };
                 if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
@@ -1232,6 +1225,7 @@
                 }).catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
+        let tsDragCode = null;
         function renderTsTables() {
             if (!tsStore) return;
             const esc = escHtml;
@@ -1248,8 +1242,23 @@
                     const cell = tr.lastElementChild;
                     const ar = function (t, fn, dis) { const b = document.createElement('button'); b.className = 'px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-black text-[10px]'; b.textContent = t; b.disabled = !!dis; if (dis) b.style.opacity = '.3'; b.onclick = fn; return b; };
                     const ci = coa.indexOf(c);
-                    cell.appendChild(ar('▲', function () { tsStore.moveCOA(c.code, -1); }, ci === 0));
-                    cell.appendChild(ar('▼', function () { tsStore.moveCOA(c.code, 1); }, ci === coa.length - 1));
+                    tr.draggable = true; tr.style.cursor = 'grab'; tr.title = 'Klik dan seret untuk memindahkan urutan';
+                    tr.firstElementChild.insertAdjacentHTML('afterbegin', '<span class="text-slate-500 mr-1.5" aria-hidden="true">⠿</span>');
+                    tr.ondragstart = function (ev) { tsDragCode = c.code; tr.style.opacity = '.4'; try { ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', c.code); } catch (e) {} };
+                    tr.ondragend = function () { tr.style.opacity = ''; [].forEach.call(cbody.children, function (r) { r.style.boxShadow = ''; }); };
+                    tr.ondragover = function (ev) { if (!tsDragCode) return; ev.preventDefault(); [].forEach.call(cbody.children, function (r) { r.style.boxShadow = ''; }); tr.style.boxShadow = 'inset 0 2px 0 #22d3ee'; };
+                    tr.ondrop = function (ev) {
+                        ev.preventDefault();
+                        const from = tsDragCode; tsDragCode = null;
+                        if (!from || from === c.code) return;
+                        const list = tsStore.getCOA().slice();
+                        const fi = list.findIndex(function (x) { return x.code === from; });
+                        if (fi < 0) return;
+                        const item = list.splice(fi, 1)[0];
+                        const ti = list.findIndex(function (x) { return x.code === c.code; });
+                        list.splice(ti, 0, item);
+                        tsStore.saveCOA(list).then(function () { ctAudit(tsTenant.id, 'URUT_COA', 'Provider memindahkan urutan akun [' + from + ']', '-', 'sebelum [' + c.code + ']'); });
+                    };
                     const e = document.createElement('button'); e.className = 'px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-[10px]'; e.textContent = 'Edit'; e.onclick = function () { tsEditCOA(c.code); };
                     const d = document.createElement('button'); d.className = 'px-2 py-1 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white font-bold text-[10px]'; d.textContent = 'Hapus'; d.onclick = function () { tsDelCOA(c.code); };
                     cell.appendChild(e); cell.appendChild(d);
@@ -1338,7 +1347,7 @@
 
         // ===== TOKO KLIEN DINAMIS =====
         function appBaseUrl() { return window.location.href.split('?')[0].replace(/[^\/]*$/, ''); }
-        function tenantLink(id) { return appBaseUrl() + 'index.html?toko=' + String(id).toLowerCase(); }
+        function tenantLink(id) { return appBaseUrl() + String(id).toLowerCase(); }
 
         function nextTenantId() {
             const d = new Date();
@@ -1567,11 +1576,7 @@
 
         // ===== BILLING ESTIMASI PER DETIK =====
         const MODE_DEFAULT = { basic: 0, plus: 49000, pro: 129000 };
-        function modePriceFor(tier) {
-            if (tier === 'basic') return Number(pricing.basic && pricing.basic.monthly) || 0;
-            const v = Number(pricing[tier] && pricing[tier].monthly) || 0;
-            return v > 0 ? v : (MODE_DEFAULT[tier] || 0);
-        }
+        function modePriceFor(tier) { return 0; } // paket Basic/Plus/Pro belum dipakai
         const BILL_STATE = {
             lunas: ['Lunas', 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'],
             tempo: ['Masa tenggang', 'bg-amber-500/20 text-amber-300 border-amber-400/30'],
@@ -1587,37 +1592,37 @@
             const box = document.getElementById('inspect-bill-card'); if (!box) return;
             if (tenant.isSinglePage || tenant.deletedByTower) { box.classList.add('hidden'); box.innerHTML = ''; billPanelFor = null; return; }
             const b = getCtrl(tenant.id).billing || null;
-            const sig = tenant.id + '|' + (b ? (b.segs ? b.segs.length : 0) + '|' + (b.paidCount || 0) + '|' + b.startMs + '|' + (b.a || 0) : 'none') + '|' + (tenant.tier || '');
+            const sig = tenant.id + '|' + (b ? (b.segs ? b.segs.length : 0) + '|' + (b.paidCount || 0) + '|' + b.startMs + '|' + (b.a || 0) + '|' + (b.trial ? 't' : 'r') + (b.ppn === false ? 'n' : 'p') : 'none');
             if (billPanelFor === sig) return; // jangan menimpa isian yang sedang diketik
             billPanelFor = sig;
             box.classList.remove('hidden');
-            const tier = tenant.tier || 'basic', mp = modePriceFor(tier);
+            const tier = tenant.tier || 'basic', mp = 0;
             const cls = 'w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none';
             const startVal = FM_BILL.toLocalInput(b && b.startMs ? b.startMs : Date.now());
             box.innerHTML =
                 '<span class="font-black text-sm text-white block">Billing (Estimasi Realtime)</span>' +
-                '<p class="text-slate-400">Bukan tagihan: hanya gambaran biaya layanan per detik untuk Anda dan klien. Mode paket saat ini: <b class="text-white">' + escHtml(TIER_LABEL[tier]) + '</b> (' + rp(mp) + '/bln, ikut paket toko).</p>' +
+                '<p class="text-slate-400">Bukan tagihan: hanya gambaran biaya layanan per detik untuk Anda dan klien.</p>' +
                 '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' +
                 '<div><label class="font-bold text-slate-300 block mb-1">Biaya langganan dasar / bulan (Rp)</label><input id="ib-base" type="number" min="0" value="' + (b ? (b.base || 0) : '') + '" placeholder="Contoh: 150000" class="' + cls + '"></div>' +
-                '<div><label class="font-bold text-slate-300 block mb-1">Diskon untuk mode (Rp)</label><input id="ib-disc" type="number" min="0" value="' + (b ? (b.disc || 0) : 0) + '" class="' + cls + '"></div>' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Dihitung sebagai</label><div class="flex gap-2"><label class="flex-1 flex items-center gap-2 p-2.5 rounded-xl bg-slate-900 border border-white/15 font-bold text-slate-200"><input type="radio" name="ib-kind" value="run" ' + (b && b.trial ? '' : 'checked') + '> Estimasi Berjalan</label><label class="flex-1 flex items-center gap-2 p-2.5 rounded-xl bg-slate-900 border border-white/15 font-bold text-slate-200"><input type="radio" name="ib-kind" value="trial" ' + (b && b.trial ? 'checked' : '') + '> Estimasi Uji Coba</label></div></div>' +
                 '<div><label class="font-bold text-slate-300 block mb-1">Mulai dihitung (tanggal &amp; jam WIB)</label><input id="ib-start" type="datetime-local" value="' + startVal + '" class="' + cls + '"></div>' +
                 '<div><label class="font-bold text-slate-300 block mb-1">Masa tenggang (hari)</label><input id="ib-grace" type="number" min="0" value="' + (b && typeof b.graceDays === 'number' ? b.graceDays : 3) + '" class="' + cls + '"></div>' +
                 '<div><label class="font-bold text-slate-300 block mb-1">Lama cicilan (bulan, 0 = tanpa)</label><input id="ib-inst" type="number" min="0" value="' + (b && typeof b.installMonths === 'number' ? b.installMonths : 36) + '" class="' + cls + '"></div>' +
                 '<label class="flex items-center gap-2 pt-6 font-bold text-slate-300"><input id="ib-freeze" type="checkbox" ' + (!b || b.autoFreeze !== false ? 'checked' : '') + '> Bekukan otomatis setelah masa tenggang</label>' +
+                '<label class="flex items-center gap-2 pt-2 font-bold text-slate-300"><input id="ib-ppn" type="checkbox" ' + (!b || b.ppn !== false ? 'checked' : '') + '> Hitung PPN 12%</label>' +
                 '</div>' +
                 '<div id="ib-prev" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300 leading-relaxed"></div>' +
                 '<div class="grid grid-cols-2 gap-2"><button id="ib-save" class="py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition">Simpan Billing</button>' +
                 '<button id="ib-pay" class="py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs transition">Catat Pembayaran</button></div>';
             const prev = function () {
-                const base = Math.max(0, parseInt(document.getElementById('ib-base').value) || 0), disc = Math.max(0, parseInt(document.getElementById('ib-disc').value) || 0);
-                const sub = base + Math.max(0, mp - disc), ppn = sub * 0.12, tot = FM_BILL.cycleTotal(base, mp, disc);
+                const base = Math.max(0, parseInt(document.getElementById('ib-base').value) || 0), pOn = document.getElementById('ib-ppn').checked;
+                const ppn = pOn ? base * 0.12 : 0, tot = FM_BILL.cycleTotal(base, 0, 0, pOn);
                 document.getElementById('ib-prev').innerHTML =
-                    'Dasar ' + rp(base) + ' + mode ' + rp(Math.max(0, mp - disc)) + (disc ? ' <span class="text-slate-500">(diskon ' + rp(Math.min(disc, mp)) + ')</span>' : '') + ' = ' + rp(sub) +
-                    '<br>PPN 12% ' + rp(ppn) + ' &rarr; <b class="text-white">Total per siklus Rp ' + FM_BILL.fmt(tot) + '</b>' +
+                    'Dasar ' + rp(base) + '<br>PPN 12% ' + (pOn ? rp(ppn) : '<span class="text-slate-500">tidak dihitung</span>') + ' &rarr; <b class="text-white">Total per siklus Rp ' + FM_BILL.fmt(tot) + '</b>' +
                     '<div id="ib-live" class="mt-2 pt-2 border-t border-white/10"></div>';
                 updateBillLive();
             };
-            ['ib-base', 'ib-disc'].forEach(function (i) { document.getElementById(i).oninput = prev; });
+            document.getElementById('ib-base').oninput = prev; document.getElementById('ib-ppn').onchange = prev;
             document.getElementById('ib-save').onclick = function () { saveBilling(tenant); };
             document.getElementById('ib-pay').onclick = function () { recordBillingPayment(tenant); };
             prev();
@@ -1649,21 +1654,35 @@
                 const b = getCtrl(n.getAttribute('data-id')).billing;
                 n.textContent = FM_BILL.ok(b) ? 'Rp ' + FM_BILL.fmt(FM_BILL.meter(b, t)) : '-';
             });
-            const sum = document.getElementById('bn-sum');
-            if (sum) { let s = 0; billTenants().forEach(function (tn) { const b = getCtrl(tn.id).billing; if (FM_BILL.ok(b)) s += FM_BILL.meter(b, t); }); sum.textContent = 'Rp ' + FM_BILL.fmt(s); }
+            const sum = document.getElementById('bn-sum'), tsum = document.getElementById('bn-trial');
+            if (sum || tsum) {
+                let s = 0, u = 0;
+                billTenants().forEach(function (tn) { const b = getCtrl(tn.id).billing; if (FM_BILL.ok(b)) { if (b.trial) u += FM_BILL.meter(b, t); else s += FM_BILL.meter(b, t); } });
+                if (sum) sum.textContent = 'Rp ' + FM_BILL.fmt(s);
+                if (tsum) tsum.textContent = 'Rp ' + FM_BILL.fmt(u);
+            }
         }
         setInterval(function () { if (!document.hidden) updateBillLive(); }, 250);
 
         function saveBilling(tenant) {
-            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const g = function (id) { return document.getElementById(id); };
-            const base = Math.max(0, parseInt(g('ib-base').value) || 0), disc = Math.max(0, parseInt(g('ib-disc').value) || 0);
-            const startMs = FM_BILL.fromLocalInput(g('ib-start').value);
+            const kind = document.querySelector('input[name="ib-kind"]:checked');
+            saveBillingFields(tenant, {
+                base: Math.max(0, parseInt(g('ib-base').value) || 0),
+                startMs: FM_BILL.fromLocalInput(g('ib-start').value),
+                graceDays: Math.max(0, parseInt(g('ib-grace').value) || 0), installMonths: Math.max(0, parseInt(g('ib-inst').value) || 0),
+                autoFreeze: g('ib-freeze').checked, trial: !!(kind && kind.value === 'trial'), ppn: g('ib-ppn').checked
+            });
+        }
+
+        function saveBillingFields(tenant, f, quiet) {
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+            const startMs = f.startMs;
             if (!startMs) return alert('Isi tanggal dan jam mulai billing.');
             const old = getCtrl(tenant.id).billing || null;
             const sameStart = !!(old && old.startMs === startMs);
             if (old && !sameStart && !confirm('Tanggal/jam mulai berubah. Hitungan siklus diulang dari awal dan catatan pembayaran di billing ini di-reset. Lanjut?')) return;
-            const tier = tenant.tier || 'basic', mp = modePriceFor(tier), a = FM_BILL.cycleTotal(base, mp, disc);
+            const a = FM_BILL.cycleTotal(f.base, 0, 0, f.ppn);
             let segs;
             if (sameStart && old.segs && old.segs.length) {
                 segs = old.segs.slice();
@@ -1671,12 +1690,12 @@
                 if (!last || Math.abs(last.a - a) > 0.001) segs.push({ f: Date.now(), a: a });
             } else segs = [{ f: startMs, a: a }];
             const billing = {
-                base: base, modePrice: mp, disc: disc, tier: tier, a: a, segs: segs, startMs: startMs,
-                graceDays: Math.max(0, parseInt(g('ib-grace').value) || 0), installMonths: Math.max(0, parseInt(g('ib-inst').value) || 0),
-                autoFreeze: g('ib-freeze').checked, paidCount: sameStart ? (old.paidCount || 0) : 0
+                base: f.base, modePrice: 0, disc: 0, tier: tenant.tier || 'basic', a: a, segs: segs, startMs: startMs,
+                graceDays: f.graceDays, installMonths: f.installMonths,
+                autoFreeze: f.autoFreeze, trial: !!f.trial, ppn: f.ppn !== false, paidCount: sameStart ? (old.paidCount || 0) : 0
             };
             db.collection('tenant_ctrl').doc(tenant.id).set({ billing: billing, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
-                .then(function () { billPanelFor = null; ctAudit(tenant.id, 'UBAH_BILLING', 'Provider mengatur billing estimasi', old ? String(old.a || 0) : '-', String(a)); alert('Billing tersimpan. Meter mulai berjalan dari ' + FM_BILL.dateText(startMs) + '.'); })
+                .then(function () { billPanelFor = null; bnEditing = null; ctAudit(tenant.id, 'UBAH_BILLING', 'Provider mengatur billing estimasi' + (billing.trial ? ' (uji coba)' : ''), old ? String(old.a || 0) : '-', String(a)); if (!quiet) alert('Billing tersimpan. Meter mulai berjalan dari ' + FM_BILL.dateText(startMs) + '.'); refreshProviderViews(); })
                 .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
@@ -1703,36 +1722,90 @@
                 }).catch(function (e) { alert('Gagal: ' + e.message); });
         }
 
-        function billingSyncTier(tenantId, tier) {
-            const b = getCtrl(tenantId).billing;
-            if (!(typeof db !== 'undefined' && db) || !FM_BILL.ok(b)) return;
-            const mp = modePriceFor(tier), a = FM_BILL.cycleTotal(b.base, mp, b.disc);
-            const segs = (b.segs || []).slice();
-            const last = segs.slice().sort(function (x, y) { return x.f - y.f; }).pop();
-            if (last && Math.abs(last.a - a) <= 0.001) return;
-            segs.push({ f: Date.now(), a: a });
-            db.collection('tenant_ctrl').doc(tenantId).set({ billing: { modePrice: mp, tier: tier, a: a, segs: segs } }, { merge: true }).catch(function () {});
+        function billingSyncTier() { /* paket belum dipakai: harga tidak lagi ikut paket */ }
+
+        function renderTaxNet() {
+            const now = new Date(), first = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-01';
+            let allM = 0, allT = 0, allTax = 0, monTax = 0;
+            const rows = billTenants().map(function (tn) {
+                let out = 0, taxM = 0, taxAll = 0;
+                getTenantTxList(tn.id).forEach(function (x) {
+                    if (x.category === 'sales') return;
+                    const tax = x.tax12 || Math.round((x.amount || 0) * 0.12);
+                    taxAll += tax;
+                    if (txDateISO(x) >= first) { out += x.amount || 0; taxM += tax; }
+                });
+                monTax += taxM; allTax += taxAll;
+                let on = false; try { on = FM_PLANS.has('tax', 'owner', tn) || FM_PLANS.has('tax', 'manager', tn); } catch (e) {}
+                return '<tr class="border-b border-white/5"><td class="py-2.5 px-3"><b class="text-white">' + escHtml(tn.nama) + '</b><br><span class="font-mono text-[10px] text-slate-400">' + escHtml(tn.id) + '</span></td>' +
+                    '<td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-black border ' + (on ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-slate-500/20 text-slate-400 border-slate-400/20') + '">' + (on ? 'Aktif' : 'Mati') + '</span></td>' +
+                    '<td class="py-2.5 px-3 text-right font-mono text-slate-300">' + formatThousand(out) + '</td>' +
+                    '<td class="py-2.5 px-3 text-right font-mono font-black text-amber-300">' + formatThousand(taxM) + '</td>' +
+                    '<td class="py-2.5 px-3 text-right font-mono text-amber-200">' + formatThousand(taxAll) + '</td></tr>';
+            }).join('');
+            document.getElementById('tx-body').innerHTML = rows || '<tr><td colspan="5" class="py-6 text-center text-slate-500">Belum ada toko.</td></tr>';
+            const card = function (lab, val, cls) { return '<div class="p-3 rounded-2xl bg-slate-900 border border-white/10"><span class="text-[10px] font-black text-slate-400 uppercase block">' + lab + '</span><b class="text-sm font-mono ' + cls + '">' + val + '</b></div>'; };
+            document.getElementById('tx-summary').innerHTML = card('Pajak bulan ini (jaringan)', formatThousand(monTax), 'text-amber-300') + card('Pajak sepanjang masa', formatThousand(allTax), 'text-amber-200') + card('Toko dihitung', billTenants().length + ' toko', 'text-cyan-300');
         }
 
+        let bnEditing = null;
         function renderBillingNet() {
+            if (bnEditing && document.getElementById('bn-edit-row')) return; // jangan menimpa isian yang sedang diketik
             const t = Date.now(), list = billTenants();
-            let mrr = 0, tempo = 0, lewat = 0;
+            let tempo = 0, lewat = 0;
             const rows = list.map(function (tn) {
                 const b = getCtrl(tn.id).billing, st = FM_BILL.status(b, t), a = FM_BILL.ok(b) ? FM_BILL.curA(b, t) : 0;
-                if (a > 0) mrr += a; if (st.state === 'tempo') tempo++; if (st.state === 'lewat') lewat++;
+                if (st.state === 'tempo') tempo++; if (st.state === 'lewat') lewat++;
+                const trial = !!(b && b.trial);
                 const cic = FM_BILL.ok(b) && b.installMonths > 0 ? Math.min(st.k < 0 ? 0 : st.k, b.installMonths) + '/' + b.installMonths : '-';
-                return '<tr class="border-b border-white/5 cursor-pointer" onclick="openInspectUMKM(\'' + escHtml(tn.id) + '\')"><td class="py-2.5 px-3"><b class="text-white">' + escHtml(tn.nama) + '</b><br><span class="font-mono text-[10px] text-slate-400">' + escHtml(tn.id) + '</span></td>' +
-                    '<td class="py-2.5 px-3">' + tierBadgeHtml(tn.tier) + '</td>' +
-                    '<td class="py-2.5 px-3 text-right font-mono text-slate-300">' + (a > 0 ? 'Rp ' + FM_BILL.fmt(a) : '-') + '</td>' +
-                    '<td class="py-2.5 px-3 text-right font-mono font-black text-emerald-300 bn-live" data-id="' + escHtml(tn.id) + '">-</td>' +
+                const kind = !FM_BILL.ok(b) ? '<span class="text-slate-500">-</span>' : (trial
+                    ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-black border whitespace-nowrap bg-fuchsia-500/20 text-fuchsia-200 border-fuchsia-400/30">Uji Coba</span>'
+                    : '<span class="px-2 py-0.5 rounded-full text-[10px] font-black border whitespace-nowrap bg-emerald-500/20 text-emerald-300 border-emerald-400/30">Berjalan</span>');
+                return '<tr class="border-b border-white/5"><td class="py-2.5 px-3"><b class="text-white">' + escHtml(tn.nama) + '</b><br><span class="font-mono text-[10px] text-slate-400">' + escHtml(tn.id) + '</span></td>' +
+                    '<td class="py-2.5 px-3">' + kind + '</td>' +
+                    '<td class="py-2.5 px-3 text-right font-mono text-slate-300">' + (a > 0 ? 'Rp ' + FM_BILL.fmt(a) : '-') + (b && b.ppn === false ? '<br><span class="text-[9px] text-slate-500">tanpa PPN</span>' : '') + '</td>' +
+                    '<td class="py-2.5 px-3 text-right font-mono font-black ' + (trial ? 'text-fuchsia-300' : 'text-emerald-300') + ' bn-live" data-id="' + escHtml(tn.id) + '">-</td>' +
+                    '<td class="py-2.5 px-3 text-slate-300">' + (FM_BILL.ok(b) ? FM_BILL.dateText(b.startMs) : '-') + '</td>' +
                     '<td class="py-2.5 px-3 text-slate-300">' + (st.E && st.state !== 'none' ? FM_BILL.dateText(st.E) : '-') + '</td>' +
                     '<td class="py-2.5 px-3 text-center">' + billBadge(st.state) + '</td>' +
-                    '<td class="py-2.5 px-3 text-center font-mono text-slate-300">' + cic + '</td></tr>';
+                    '<td class="py-2.5 px-3 text-center font-mono text-slate-300">' + cic + '</td>' +
+                    '<td class="py-2.5 px-3 text-center whitespace-nowrap"><button class="px-2.5 py-1 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-[10px]" onclick="bnEdit(\'' + escHtml(tn.id) + '\')">Edit</button> <button class="px-2.5 py-1 rounded-xl bg-cyan-700 hover:bg-cyan-600 text-white font-bold text-[10px]" onclick="openInspectUMKM(\'' + escHtml(tn.id) + '\')">Inspeksi</button></td></tr>';
             }).join('');
-            document.getElementById('bn-body').innerHTML = rows || '<tr><td colspan="7" class="py-6 text-center text-slate-500">Belum ada toko.</td></tr>';
+            document.getElementById('bn-body').innerHTML = rows || '<tr><td colspan="9" class="py-6 text-center text-slate-500">Belum ada toko.</td></tr>';
             const card = function (lab, val, cls, id) { return '<div class="p-3 rounded-2xl bg-slate-900 border border-white/10"><span class="text-[10px] font-black text-slate-400 uppercase block">' + lab + '</span><b' + (id ? ' id="' + id + '"' : '') + ' class="text-sm font-mono ' + cls + '">' + val + '</b></div>'; };
-            document.getElementById('bn-summary').innerHTML = card('Estimasi berjalan (semua toko)', '-', 'text-emerald-300', 'bn-sum') + card('Estimasi per siklus (MRR)', 'Rp ' + FM_BILL.fmt(mrr), 'text-cyan-300') + card('Masa tenggang', tempo + ' toko', 'text-amber-300') + card('Lewat tenggang', lewat + ' toko', 'text-rose-300');
+            document.getElementById('bn-summary').innerHTML = card('Estimasi berjalan', '-', 'text-emerald-300', 'bn-sum') + card('Estimasi uji coba', '-', 'text-fuchsia-300', 'bn-trial') + card('Masa tenggang', tempo + ' toko', 'text-amber-300') + card('Lewat tenggang', lewat + ' toko', 'text-rose-300');
             updateBillLive();
+        }
+
+        function bnEdit(id) {
+            const tn = TENANTS_CONFIG[String(id).toLowerCase()]; if (!tn) return;
+            bnEditing = tn.id;
+            const b = getCtrl(tn.id).billing || null;
+            const cls = 'bg-slate-900 border border-white/15 rounded-xl p-2 text-xs text-white outline-none';
+            const old = document.getElementById('bn-edit-row'); if (old) old.remove();
+            const rowsEl = [].slice.call(document.querySelectorAll('#bn-body tr')).filter(function (r) { return r.textContent.indexOf(tn.id) >= 0; })[0];
+            if (!rowsEl) return;
+            const tr = document.createElement('tr'); tr.id = 'bn-edit-row'; tr.className = 'bg-slate-900/70';
+            tr.innerHTML = '<td colspan="9" class="p-3"><div class="flex flex-wrap items-end gap-3 text-xs">' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Mulai dihitung (WIB)</label><input id="be-start" type="datetime-local" value="' + FM_BILL.toLocalInput(b && b.startMs ? b.startMs : Date.now()) + '" class="' + cls + '"></div>' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Dihitung sebagai</label><div class="flex gap-2">' +
+                '<label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-950 border border-white/15 font-bold"><input type="radio" name="be-kind" value="run" ' + (b && b.trial ? '' : 'checked') + '> Berjalan</label>' +
+                '<label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-950 border border-white/15 font-bold"><input type="radio" name="be-kind" value="trial" ' + (b && b.trial ? 'checked' : '') + '> Uji Coba</label></div></div>' +
+                '<label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-950 border border-white/15 font-bold"><input id="be-ppn" type="checkbox" ' + (!b || b.ppn !== false ? 'checked' : '') + '> PPN 12%</label>' +
+                '<button id="be-save" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black">Simpan</button>' +
+                '<button id="be-cancel" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold">Batal</button>' +
+                (FM_BILL.ok(b) ? '' : '<span class="text-amber-300">Billing toko ini belum diatur: isi biaya dasar dulu lewat Inspeksi.</span>') + '</div></td>';
+            rowsEl.parentNode.insertBefore(tr, rowsEl.nextSibling);
+            document.getElementById('be-cancel').onclick = function () { bnEditing = null; renderBillingNet(); };
+            document.getElementById('be-save').onclick = function () {
+                if (!FM_BILL.ok(b)) return alert('Atur biaya dasar toko ini dulu lewat Inspeksi.');
+                const kind = document.querySelector('input[name="be-kind"]:checked');
+                saveBillingFields(tn, {
+                    base: b.base || 0, startMs: FM_BILL.fromLocalInput(document.getElementById('be-start').value),
+                    graceDays: typeof b.graceDays === 'number' ? b.graceDays : 3, installMonths: typeof b.installMonths === 'number' ? b.installMonths : 36,
+                    autoFreeze: b.autoFreeze !== false, trial: !!(kind && kind.value === 'trial'), ppn: document.getElementById('be-ppn').checked
+                }, true);
+            };
         }
 
         function startRegistryListener() {
@@ -2500,11 +2573,36 @@
                         </button>
                     </div>
                     ` : `
-                    <span class="text-[10px] text-slate-400 font-bold">Diproses pada ${t.processedAt || ''}</span>
+                    <div class="flex items-center gap-2"><span class="text-[10px] text-slate-400 font-bold">Diproses pada ${t.processedAt || ''}</span>
+                    <button data-del="${idx}" class="px-2.5 py-1 rounded-xl bg-slate-700 hover:bg-rose-600 text-white font-bold text-[10px] transition">Hapus</button></div>
                     `}
                 `;
+                const dbtn = card.querySelector('[data-del]');
+                if (dbtn) dbtn.onclick = function () { deleteTickets([allTickets[idx]]); };
                 container.appendChild(card);
             });
+            const done = allTickets.filter(function (x) { return x.status !== 'PENDING'; });
+            if (done.length) {
+                const bar = document.createElement('div');
+                bar.className = 'flex justify-end';
+                bar.innerHTML = '<button class="px-3 py-1.5 rounded-xl bg-rose-600/30 hover:bg-rose-600 text-rose-100 font-bold text-[11px] transition">Hapus semua riwayat yang sudah diproses (' + done.length + ')</button>';
+                bar.firstChild.onclick = function () { deleteTickets(done); };
+                container.insertBefore(bar, container.firstChild);
+            }
+        }
+
+        function deleteTickets(list) {
+            list = (list || []).filter(function (x) { return x && x.status !== 'PENDING'; });
+            if (!list.length) return;
+            if (!confirm('Hapus ' + list.length + ' riwayat permohonan? Tindakan ini tidak bisa dibatalkan.')) return;
+            if (!(typeof db !== 'undefined' && db)) {
+                allTickets = allTickets.filter(function (x) { return list.indexOf(x) < 0; });
+                try { localStorage.setItem('fm_cashier_license_requests', JSON.stringify(allTickets)); } catch (e) {}
+                renderTicketsList(); return;
+            }
+            Promise.all(list.filter(function (x) { return x.docId; }).map(function (x) { return db.collection('provider_tickets').doc(x.docId).delete(); }))
+                .then(function () { ctAudit('-', 'HAPUS_RIWAYAT_TIKET', 'Tower menghapus ' + list.length + ' riwayat permohonan kasir', String(list.length), '0'); })
+                .catch(function (e) { alert('Gagal menghapus: ' + e.message); });
         }
 
         function approveTicket(idx) {
@@ -2613,7 +2711,7 @@
 
         window.openModal = function(type) {
             if (type !== 'tenant_settings' && tsStore) { tsStore.stop(); tsStore = null; }
-            ['akun_login', 'billing_net', 'provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
+            ['akun_login', 'billing_net', 'tax_net', 'provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
@@ -2658,6 +2756,11 @@
                 document.getElementById('al-form').classList.add('hidden');
                 renderAkunLogin();
                 document.getElementById('popup-content-akun_login').classList.remove('hidden');
+            } else if (type === 'tax_net') {
+                document.getElementById('modal-title').innerText = "Pajak Jaringan";
+                document.getElementById('modal-subtitle').innerText = "Kontribusi pajak usaha tiap klien. Selalu terlihat di sini, meski fitur pajak dimatikan di toko";
+                renderTaxNet();
+                document.getElementById('popup-content-tax_net').classList.remove('hidden');
             } else if (type === 'billing_net') {
                 document.getElementById('modal-title').innerText = "Billing Jaringan (Estimasi)";
                 document.getElementById('modal-subtitle').innerText = "Estimasi biaya layanan berjalan per detik untuk semua toko";
