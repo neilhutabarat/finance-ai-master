@@ -1224,6 +1224,7 @@
                 cfg.locations[r] = Object.assign({ lat: 0, lon: 0 }, cfg.locations[r] || {}, { name: alamat });
             });
             db.collection('tenants_registry').doc(key).set({ id: cfg.id, nama: nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+                .then(function () { return db.collection('tenant_ctrl').doc(cfg.id).set({ gajiOwner: !!(cfg.features.gaji && cfg.features.gaji.owner) }, { merge: true }); })
                 .then(function () {
                     ctAudit(tn.id, 'UBAH_PROFIL_TOKO', 'Provider mengubah profil/tampilan toko', tn.nama + ' | ' + tn.slogan, nama + ' | ' + cfg.slogan);
                     alert('Profil toko tersimpan. Tampilan di toko berubah saat halaman toko dibuka kembali (otomatis memuat ulang sekali).');
@@ -1402,7 +1403,7 @@
             const batch = db.batch();
             batch.set(db.collection('tenants_registry').doc(key), { id: id, nama: nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
             batch.set(db.collection('tenant_settings').doc(id), { coa: cfg.customCOA, templateKey: document.getElementById('nt-type').value || 'umum', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-            batch.set(db.collection('tenant_ctrl').doc(id), { suspended: false, suspendReason: '', allowedCashiers: kasir, allowedManagers: Math.max(1, parseInt(document.getElementById('nt-mgr').value) || 1), allowedOwners: Math.max(1, parseInt(document.getElementById('nt-own').value) || 1), tier: cfg.tier, billingCycle: cycle, priceMonthlyAtPurchase: plan.monthly, billedAmount: plan.amount, customPrice: plan.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+            batch.set(db.collection('tenant_ctrl').doc(id), { gajiOwner: !!(cfg.features.gaji && cfg.features.gaji.owner), suspended: false, suspendReason: '', allowedCashiers: kasir, allowedManagers: Math.max(1, parseInt(document.getElementById('nt-mgr').value) || 1), allowedOwners: Math.max(1, parseInt(document.getElementById('nt-own').value) || 1), tier: cfg.tier, billingCycle: cycle, priceMonthlyAtPurchase: plan.monthly, billedAmount: plan.amount, customPrice: plan.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             batch.commit().then(function () {
                 registryMergeLocal(cfg);
                 const link = tenantLink(id);

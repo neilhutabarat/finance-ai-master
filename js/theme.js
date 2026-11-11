@@ -10,6 +10,9 @@
   var RELEASE_NOTES = [
     ['1.0.0 (BETA 1.5)', '11 Nov 2026', [
       '[Tampilan] Fitur toko kini dirakit sesuai kebutuhan usaha: fitur yang tidak dipilih tidak ditampilkan, dan daftar fitur aktif ada di tombol Fitur Toko',
+      '[Tampilan] Mutasi kini bisa dikirim lewat WhatsApp dan dicetak (hari ini, 7 hari, bulan ini, atau rentang tanggal) bila fiturnya diaktifkan untuk toko',
+      '[Tampilan] Laporan Gaji: Manager mencatat gaji per karyawan per bulan, menandai dibayar, dan mencetak slip atau laporan; Owner bisa diberi akses lihat saja',
+      '[Keamanan] Data gaji hanya bisa dibaca Manager (dan Owner bila diizinkan penyedia), tidak bisa dibaca Admin',
       '[Tampilan] Owner kini bisa diberi akses Buku Besar serta Kelola COA & Produk (diatur penyedia sesuai kebutuhan usaha)',
       '[Tampilan] Peran "Kasir" kini bernama "Admin" (nama tetap bisa diubah oleh owner)',
       '[Tampilan] Panel Analisis diganti Analisa Keuangan untuk owner dan manager: ringkasan laba, perbandingan dengan bulan lalu, hari dan jam ramai, produk bermargin tipis, biaya yang naik, pengeluaran janggal, stok menipis, beserta saran. Dihitung dari data toko tanpa batas harian',

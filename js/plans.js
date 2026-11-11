@@ -31,13 +31,14 @@
     { key: 'clock', label: 'Jam', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'weather_rates', label: 'Cuaca dan Kurs', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'theme', label: 'Pilih tema, warna, dan logo', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'mutasi_wa', label: 'Mutasi dikirim lewat WA dan dicetak', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'gaji', label: 'Laporan gaji (Manager mencatat; Owner hanya melihat)', r: { manager: 'o', owner: 'o' } },
+    { key: 'gaji_auto', label: 'Gaji yang dibayar otomatis tercatat sebagai pengeluaran', r: { manager: 'o' } },
     { key: 'paket', label: 'Paket Basic, Plus, dan Pro', soon: true, r: { manager: 'o', owner: 'o' } },
-    { key: 'mutasi_wa', label: 'Mutasi dikirim lewat WA dan dicetak', soon: true, r: { manager: 'o', owner: 'o' } },
-    { key: 'gaji', label: 'Laporan gaji', soon: true, r: { manager: 'o', owner: 'o' } },
     { key: 'neraca', label: 'Neraca', soon: true, r: { manager: 'o', owner: 'o' } }
   ];
   // nilai untuk toko lama yang belum punya pilihan tersimpan
-  var LEGACY = { wa_receipt: 'plus', analisa: { owner: true }, coa: {}, ledger: { kasir: true } };
+  var LEGACY = { wa_receipt: 'plus', analisa: { owner: true }, coa: {}, ledger: { kasir: true }, mutasi_wa: {}, gaji: {}, gaji_auto: {} };
 
   function find(key) { return FEATURES.filter(function (f) { return f.key === key; })[0]; }
   function tenant() { try { return (typeof getActiveTenant === 'function') ? getActiveTenant() : null; } catch (e) { return null; } }
@@ -116,6 +117,7 @@
     var role = pageRole();
     if (!has('tax', role)) { drop('button[onclick*="openModal(\'tax\')"]'); hide(cardOf(document.getElementById('stat-total-pajak-sumbang'))); }
     if (!has('coa', role)) drop('button[onclick*="openModal(\'coa_mgmt\')"]');
+    if (!has('gaji', role)) drop('button[onclick*="FM_GAJI"]');
     if (!has('ledger', role)) drop('button[onclick*="openModal(\'ledger\')"]');
     if (!has('audit', role)) drop('button[onclick*="openModal(\'audit_trail\')"]');
     if (!has('export_csv', role)) drop('button[onclick*="exportCSV"]');

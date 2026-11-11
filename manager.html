@@ -175,6 +175,7 @@
         <div id="fm-actions" class="fm-actions">
             <button data-fm-action data-ic="plus" onclick="openModal('add_cashier_request')">Buka Kasir Baru</button>
             <button data-fm-action data-ic="box" onclick="openModal('coa_mgmt')">Kelola COA &amp; Produk</button>
+            <button data-fm-action data-ic="users" onclick="FM_GAJI.open()">Laporan Gaji</button>
             <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur Toko</button>
         </div>
 
@@ -553,6 +554,12 @@
     <script src="js/tenants.js"></script>
     <script src="js/auth.js?v=1.5.8"></script>
     <script src="js/plans.js?v=1.5.8"></script>
+    <script src="js/mutasi-share.js?v=1.5.8"></script>
+    <script src="js/gaji.js?v=1.5.8"></script>
+    <script>
+        (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); if (window.FM_GAJI) FM_GAJI.mount({ addTx: function (tx) { txList.unshift(tx); persistData(); if (typeof db !== 'undefined' && db) { db.collection(tenantFirestoreCol).add(Object.assign({}, tx, { timestamp: firebase.firestore.FieldValue.serverTimestamp() })).catch(console.error); } renderAllReports(); } }); }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
+    </script>
     <script src="js/insights.js?v=1.5.8"></script>
     <script src="js/analisa.js?v=1.5.8"></script>
     <script>
