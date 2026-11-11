@@ -6,6 +6,9 @@
     <title>Oneilverse - Otorisasi Sistem Enterprise</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -103,9 +106,9 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/theme.js?v=1.5.7"></script>
-    <script src="js/logo.js?v=1.5.7"></script>
-    <script src="js/skin.js?v=1.5.7"></script>
+    <script src="js/theme.js?v=1.5.8"></script>
+    <script src="js/logo.js?v=1.5.8"></script>
+    <script src="js/skin.js?v=1.5.8"></script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 antialiased selection:bg-cyan-500 selection:text-white">
 
@@ -239,7 +242,7 @@
                 <label class="text-[11px] font-black text-slate-700 uppercase tracking-wider block mb-1.5">
                     Password / PIN Keamanan:
                 </label>
-                <input type="password" id="input-pin" maxlength="8" placeholder="• • • •" class="w-full glass-input text-center tracking-[0.4em] text-2xl font-black rounded-2xl p-3 outline-none text-slate-900 placeholder-slate-400 font-mono" autofocus>
+                <input type="password" id="input-pin" maxlength="32" placeholder="• • • • • •" class="w-full glass-input text-center tracking-[0.4em] text-2xl font-black rounded-2xl p-3 outline-none text-slate-900 placeholder-slate-400 font-mono" autofocus>
             </div>
 
             <!-- TOMBOL SUBMIT -->
@@ -271,7 +274,8 @@
                 <p class="text-xs text-slate-500 mt-0.5 font-medium">Otorisasi Master Platform Engine</p>
             </div>
             <div>
-                <input type="password" id="input-prov-secret" maxlength="6" placeholder="Kode 6 Digit" class="w-full glass-input text-center tracking-[0.5em] text-xl font-black rounded-2xl p-3 outline-none font-mono text-slate-900">
+                <input type="email" id="input-prov-email" autocomplete="username" placeholder="Email Tower" class="w-full glass-input text-center text-sm font-bold rounded-2xl p-3 outline-none text-slate-900 mb-2">
+                <input type="password" id="input-prov-secret" autocomplete="current-password" placeholder="Sandi Tower" class="w-full glass-input text-center text-sm font-bold rounded-2xl p-3 outline-none text-slate-900">
             </div>
             <div class="flex space-x-2 pt-1">
                 <button onclick="verifyProviderSecret()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black py-2.5 rounded-xl text-xs transition active:scale-95 shadow-md">
@@ -286,6 +290,8 @@
 
 
     <script src="js/tenants.js"></script>
+    <script src="js/config.js?v=18.0"></script>
+    <script src="js/auth.js?v=1.5.8"></script>
     <script>
         let currentRole = 'staff';
         const urlParams = new URLSearchParams(window.location.search);
@@ -487,6 +493,42 @@
             checkLockoutStatus();
         }
 
+        function completeLogin(userObj, targetUrl, param) {
+            const state = getSecurityState();
+            state.fails = 0; state.tier = 0; state.lockUntil = 0;
+            setSecurityState(state);
+            localStorage.setItem('currentUser', JSON.stringify(userObj));
+            localStorage.setItem('auth_role', userObj.role);
+            localStorage.setItem('auth_title', userObj.title);
+            window.location.href = targetUrl + param;
+        }
+
+        // Login lama (sementara): hanya untuk toko yang akunnya belum diaktifkan Tower
+        function legacyLogin(pin, singlePageMode, currentTokoParam) {
+            const storedPw = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
+            const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
+            let userObj = null, targetUrl = "kasir.html";
+            if (singlePageMode) {
+                const validPins = [storedPw.staff || "1234", storedPw.owner || "9999", "0000", "5678", "1234"];
+                if (!validPins.includes(pin)) return registerFailedAttempt();
+                userObj = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey };
+                targetUrl = "partner.html";
+            } else if (currentRole === 'staff') {
+                if (!(pin === (storedPw.staff || "1234") || pin === "1234" || pin === "0000")) return registerFailedAttempt();
+                userObj = { role: 'staff', title: customRoles.staff || 'Staf Kasir', permissions: ['kasir'] };
+            } else if (currentRole === 'manager') {
+                if (!(pin === (storedPw.manager || "5678") || pin === "5678" || pin === "1234")) return registerFailedAttempt();
+                userObj = { role: 'manager', title: customRoles.manager || 'Supervisor / Manager', permissions: ['manager'] };
+                targetUrl = "manager.html";
+            } else {
+                if (!(pin === (storedPw.owner || "9999") || pin === "9999" || pin === "0000" || pin === "1234")) return registerFailedAttempt();
+                userObj = { role: 'owner', title: customRoles.owner || 'Owner Eksekutif', permissions: ['all'] };
+                targetUrl = "dashboard.html";
+            }
+            localStorage.setItem('fm_legacy_tenant', tenantKey);
+            completeLogin(userObj, targetUrl, currentTokoParam);
+        }
+
         function handleLogin() {
             const picker = document.getElementById('tenant-picker');
             const selectedKey = resolveTenantKey(picker);
@@ -501,69 +543,31 @@
             const pin = document.getElementById('input-pin').value.trim();
             if (!pin) return alert("Masukkan Password / PIN!");
 
-            // JIKA TOKO PARTNER 1-LAMAN (ID261110A / ID261110B)
-            if (singlePageMode) {
-                const pwObj = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
-                const validPins = [pwObj.staff || "1234", pwObj.owner || "9999", "0000", "5678", "1234"];
-                if (validPins.includes(pin)) {
-                    const partnerUser = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey };
-                    localStorage.setItem('currentUser', JSON.stringify(partnerUser));
-                    localStorage.setItem('auth_role', 'partner');
-                    window.location.href = `partner.html${currentTokoParam}`;
-                    return;
-                } else {
-                    return registerFailedAttempt();
+            const role = singlePageMode ? 'partner' : currentRole;
+            const btn = document.getElementById('btn-login-submit');
+            if (btn.disabled) return;
+            btn.disabled = true;
+            const done = function () { btn.disabled = false; };
+            if (!window.FM_AUTH) { done(); return alert("Modul keamanan belum termuat. Periksa internet lalu muat ulang halaman."); }
+
+            FM_AUTH.login(tenantKey, role, pin).then(function (r) {
+                done();
+                if (r.legacy) {
+                    if (!FM_AUTH.LEGACY) return alert("Akun login untuk peran ini belum diaktifkan. Hubungi provider (Tower Kontrol).");
+                    return legacyLogin(pin, singlePageMode, currentTokoParam);
                 }
-            }
-
-            // AMBIL PASSWORD KUSTOM DARI OWNER JIKA ADA
-            const storedPw = JSON.parse(localStorage.getItem(`fm_passwords_${tenantKey}`) || "{}");
-            const staffTargetPin = storedPw.staff || "1234";
-            const mgrTargetPin = storedPw.manager || "5678";
-            const ownerTargetPin = storedPw.owner || "9999";
-
-            const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
-            const staffTitle = customRoles.staff || 'Staf Kasir';
-            const managerTitle = customRoles.manager || 'Supervisor / Manager';
-            const ownerTitle = customRoles.owner || 'Owner Eksekutif';
-
-            let userObj = null;
-            let targetUrl = "kasir.html";
-
-            if (currentRole === 'staff') {
-                if (pin === staffTargetPin || pin === "1234" || pin === "0000") {
-                    userObj = { role: 'staff', title: staffTitle, permissions: ['kasir'] };
-                    targetUrl = "kasir.html";
-                } else {
-                    return registerFailedAttempt();
+                if (!r.ok) {
+                    if (r.reason === 'bad') return registerFailedAttempt();
+                    return alert(FM_AUTH.errText(r.reason));
                 }
-            } else if (currentRole === 'manager') {
-                if (pin === mgrTargetPin || pin === "5678" || pin === "1234") {
-                    userObj = { role: 'manager', title: managerTitle, permissions: ['manager'] };
-                    targetUrl = "manager.html";
-                } else {
-                    return registerFailedAttempt();
-                }
-            } else if (currentRole === 'owner') {
-                if (pin === ownerTargetPin || pin === "9999" || pin === "0000" || pin === "1234") {
-                    userObj = { role: 'owner', title: ownerTitle, permissions: ['all'] };
-                    targetUrl = "dashboard.html";
-                } else {
-                    return registerFailedAttempt();
-                }
-            }
-
-            const state = getSecurityState();
-            state.fails = 0;
-            state.tier = 0;
-            state.lockUntil = 0;
-            setSecurityState(state);
-
-            localStorage.setItem('currentUser', JSON.stringify(userObj));
-            localStorage.setItem('auth_role', userObj.role);
-            localStorage.setItem('auth_title', userObj.title);
-
-            window.location.href = targetUrl + currentTokoParam;
+                const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
+                let userObj, targetUrl;
+                if (role === 'partner') { userObj = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey }; targetUrl = "partner.html"; }
+                else if (role === 'staff') { userObj = { role: 'staff', title: customRoles.staff || 'Staf Kasir', permissions: ['kasir'] }; targetUrl = "kasir.html"; }
+                else if (role === 'manager') { userObj = { role: 'manager', title: customRoles.manager || 'Supervisor / Manager', permissions: ['manager'] }; targetUrl = "manager.html"; }
+                else { userObj = { role: 'owner', title: customRoles.owner || 'Owner Eksekutif', permissions: ['all'] }; targetUrl = "dashboard.html"; }
+                completeLogin(userObj, targetUrl, currentTokoParam);
+            });
         }
 
         // EASTER EGG: 7X TAP PADA LOGO ON UNTUK BUKA SUPERADMIN (TERSEMBUNYI)
@@ -582,7 +586,7 @@
                     tapCount = 0;
                     document.getElementById('modal-provider-override').classList.remove('hidden');
                     document.getElementById('input-prov-secret').value = "";
-                    document.getElementById('input-prov-secret').focus();
+                    document.getElementById('input-prov-email').focus();
                     return;
                 }
 
@@ -591,16 +595,25 @@
         }
 
         function verifyProviderSecret() {
+            const em = document.getElementById('input-prov-email').value.trim();
             const secret = document.getElementById('input-prov-secret').value.trim();
-            if (secret === "930223") {
+            const enter = function () {
                 const prov = { role: 'superadmin', title: 'Platform Provider' };
                 localStorage.setItem('currentUser', JSON.stringify(prov));
                 localStorage.setItem('auth_role', 'superadmin');
                 window.location.replace("provider.html");
-            } else {
-                alert("Kode Akses Superadmin Tidak Valid.");
-                closeProviderModal();
+            };
+            if (!em) {
+                // kode lama (sementara; dihapus di pembaruan berikutnya)
+                if (window.FM_AUTH && FM_AUTH.LEGACY && secret === "930223") return enter();
+                alert("Masukkan email dan sandi Tower.");
+                return;
             }
+            if (!window.FM_AUTH) return alert("Modul keamanan belum termuat. Periksa internet lalu muat ulang halaman.");
+            FM_AUTH.loginTower(em, secret).then(function (r) {
+                if (r.ok) return enter();
+                alert(FM_AUTH.errText(r.reason));
+            });
         }
 
         function closeProviderModal() {

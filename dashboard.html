@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -58,9 +59,9 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/theme.js?v=1.5.7"></script>
-    <script src="js/logo.js?v=1.5.7"></script>
-    <script src="js/skin.js?v=1.5.7"></script>
+    <script src="js/theme.js?v=1.5.8"></script>
+    <script src="js/logo.js?v=1.5.8"></script>
+    <script src="js/skin.js?v=1.5.8"></script>
 </head>
 <body class="text-white min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
@@ -471,17 +472,17 @@
                         </div>
                         <div class="space-y-3">
                             <div>
-                                <label class="font-bold text-slate-300 block mb-1">Password / PIN Baru Kasir (Default: 1234):</label>
-                                <input type="password" id="owner-set-pin-kasir" maxlength="8" placeholder="Masukkan PIN baru kasir" class="w-full bg-slate-900 border border-purple-300 rounded-xl p-2.5 font-mono font-bold tracking-widest outline-none">
+                                <label class="font-bold text-slate-300 block mb-1">PIN Baru Kasir (minimal 6 karakter, disarankan 6 angka):</label>
+                                <input type="password" id="owner-set-pin-kasir" maxlength="32" placeholder="Masukkan PIN baru kasir" class="w-full bg-slate-900 border border-purple-300 rounded-xl p-2.5 font-mono font-bold tracking-widest outline-none">
                             </div>
                             <div>
-                                <label class="font-bold text-slate-300 block mb-1">Password / PIN Baru Manager (Default: 5678):</label>
-                                <input type="password" id="owner-set-pin-mgr" maxlength="8" placeholder="Masukkan PIN baru manager" class="w-full bg-slate-900 border border-purple-300 rounded-xl p-2.5 font-mono font-bold tracking-widest outline-none">
+                                <label class="font-bold text-slate-300 block mb-1">PIN Baru Manager (minimal 6 karakter):</label>
+                                <input type="password" id="owner-set-pin-mgr" maxlength="32" placeholder="Masukkan PIN baru manager" class="w-full bg-slate-900 border border-purple-300 rounded-xl p-2.5 font-mono font-bold tracking-widest outline-none">
                             </div>
 
                             <div>
-                                <label class="font-bold text-slate-300 block mb-1 text-white">Password / PIN Baru Owner (Default: 9999):</label>
-                                <input type="password" id="owner-set-pin-owner" maxlength="8" placeholder="Masukkan PIN baru Owner (Privat)" class="w-full bg-slate-900 text-white border border-purple-300 rounded-xl p-2.5 font-mono font-bold tracking-widest outline-none">
+                                <label class="font-bold text-slate-300 block mb-1 text-white">PIN Baru Owner (PIN Anda sendiri, minimal 6 karakter):</label>
+                                <input type="password" id="owner-set-pin-owner" maxlength="32" placeholder="Masukkan PIN baru Owner (Privat)" class="w-full bg-slate-900 text-white border border-purple-300 rounded-xl p-2.5 font-mono font-bold tracking-widest outline-none">
                             </div>
                         </div>
                         <div class="flex justify-end pt-1">
@@ -582,15 +583,16 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/plans.js?v=1.5.7"></script>
-    <script src="js/insights.js?v=1.5.7"></script>
-    <script src="js/labarugi.js?v=1.5.7"></script>
-    <script src="js/widgets.js?v=1.5.7"></script>
+    <script src="js/auth.js?v=1.5.8"></script>
+    <script src="js/plans.js?v=1.5.8"></script>
+    <script src="js/insights.js?v=1.5.8"></script>
+    <script src="js/labarugi.js?v=1.5.8"></script>
+    <script src="js/widgets.js?v=1.5.8"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/billing.js?v=1.5.7"></script>
-    <script src="js/ctrl.js?v=1.5.7"></script>
-    <script src="js/store.js?v=1.5.7"></script>
+    <script src="js/billing.js?v=1.5.8"></script>
+    <script src="js/ctrl.js?v=1.5.8"></script>
+    <script src="js/store.js?v=1.5.8"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -617,16 +619,8 @@
 
             if (role === 'owner') return userObj || { role: 'owner', title: ownerTitle };
 
-            const pin = prompt("Halaman Khusus Owner Eksekutif.\nMasukkan PIN Owner (Default: 9999 / 0000 / 1234):");
-            if (pin === "9999" || pin === "0000" || pin === "1234" || pin === "5678") {
-                const owner = { role: 'owner', title: ownerTitle };
-                localStorage.setItem('currentUser', JSON.stringify(owner));
-                localStorage.setItem('auth_role', 'owner');
-                return owner;
-            } else {
-                window.location.replace("index.html");
-                throw new Error("Unauthorized");
-            }
+            window.location.replace("index.html" + (location.search || ''));
+            throw new Error("Unauthorized");
         }
         const user = checkOwnerAuth();
 
@@ -913,18 +907,32 @@
 
         // POIN TAMBAHAN: GANTI PASSWORD KASIR & MANAGER OLEH OWNER
         function saveStaffPasswordsByOwner() {
-            const kasirPin = document.getElementById('owner-set-pin-kasir').value.trim();
-            const mgrPin = document.getElementById('owner-set-pin-mgr').value.trim();
-
-            const pwObj = JSON.parse(localStorage.getItem(`fm_passwords_${(activeTenant && activeTenant.id) ? activeTenant.id : 'ID26110901'}`) || "{}");
-            if (kasirPin) pwObj.staff = kasirPin;
-            if (mgrPin) pwObj.manager = mgrPin;
-
-            localStorage.setItem(`fm_passwords_${(activeTenant && activeTenant.id) ? activeTenant.id : 'ID26110901'}`, JSON.stringify(pwObj));
-            alert("Password baru Kasir dan Manager berhasil disimpan!");
-            document.getElementById('owner-set-pin-kasir').value = "";
-            document.getElementById('owner-set-pin-mgr').value = "";
-            closeModal();
+            const ids = ['owner-set-pin-kasir', 'owner-set-pin-mgr', 'owner-set-pin-owner'];
+            const kasirPin = document.getElementById(ids[0]).value.trim();
+            const mgrPin = document.getElementById(ids[1]).value.trim();
+            const ownerPin = document.getElementById(ids[2]) ? document.getElementById(ids[2]).value.trim() : '';
+            if (!kasirPin && !mgrPin && !ownerPin) return alert('Isi minimal satu PIN baru.');
+            const bad = [kasirPin, mgrPin, ownerPin].some(function (p) { return p && p.length < 6; });
+            if (bad) return alert('PIN minimal 6 karakter (disarankan 6 angka).');
+            if (!window.FM_AUTH) return alert('Modul keamanan belum termuat. Periksa internet lalu muat ulang halaman.');
+            const tid = (activeTenant && activeTenant.id) ? activeTenant.id : 'ID26110901';
+            const btn = document.querySelector('#popup-content-manage_passwords button[onclick*="saveStaffPasswordsByOwner"]');
+            if (btn) btn.disabled = true;
+            FM_AUTH.status(tid).then(function (cfg) {
+                if (!cfg) throw new Error('Akun login toko ini belum diaktifkan oleh provider (Tower Kontrol). Hubungi provider terlebih dahulu.');
+                const map = {}; if (kasirPin) map.staff = kasirPin; if (mgrPin) map.manager = mgrPin;
+                const names = { staff: 'Kasir', manager: 'Manager' };
+                return FM_AUTH.provisionMany(tid, map).then(function (r) {
+                    const done = r.map(function (x) { return names[x]; });
+                    return ownerPin ? FM_AUTH.changeOwnPin(ownerPin).then(function () { done.push('Owner'); return done; }) : done;
+                });
+            }).then(function (done) {
+                alert('PIN baru berhasil disimpan untuk: ' + done.join(', ') + '.\nBerlaku di semua perangkat. Perangkat yang sedang login dengan PIN lama perlu masuk ulang.');
+                ids.forEach(function (i) { const el = document.getElementById(i); if (el) el.value = ''; });
+                closeModal();
+            }).catch(function (e) {
+                alert('Gagal menyimpan PIN: ' + ((e && e.message) || e));
+            }).then(function () { if (btn) btn.disabled = false; });
         }
 
         // FITUR AI ANALITIS SATU-KLIK (ONE-CLICK INSIGHT)

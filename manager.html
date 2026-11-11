@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -58,9 +59,9 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/theme.js?v=1.5.7"></script>
-    <script src="js/logo.js?v=1.5.7"></script>
-    <script src="js/skin.js?v=1.5.7"></script>
+    <script src="js/theme.js?v=1.5.8"></script>
+    <script src="js/logo.js?v=1.5.8"></script>
+    <script src="js/skin.js?v=1.5.8"></script>
 </head>
 <body class="text-white min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white pb-6">
 
@@ -549,15 +550,16 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/plans.js?v=1.5.7"></script>
-    <script src="js/insights.js?v=1.5.7"></script>
-    <script src="js/labarugi.js?v=1.5.7"></script>
-    <script src="js/widgets.js?v=1.5.7"></script>
+    <script src="js/auth.js?v=1.5.8"></script>
+    <script src="js/plans.js?v=1.5.8"></script>
+    <script src="js/insights.js?v=1.5.8"></script>
+    <script src="js/labarugi.js?v=1.5.8"></script>
+    <script src="js/widgets.js?v=1.5.8"></script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/billing.js?v=1.5.7"></script>
-    <script src="js/ctrl.js?v=1.5.7"></script>
-    <script src="js/store.js?v=1.5.7"></script>
+    <script src="js/billing.js?v=1.5.8"></script>
+    <script src="js/ctrl.js?v=1.5.8"></script>
+    <script src="js/store.js?v=1.5.8"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -583,17 +585,8 @@
             const mgrTitle = customRoles.manager || 'Supervisor / Manager';
 
             if (role === 'manager' || role === 'owner') return userObj || { role: 'manager', title: mgrTitle };
-
-            const pin = prompt("Otorisasi Manager.\nMasukkan PIN Manager (Default: 5678 / 1234):");
-            if (pin === "5678" || pin === "1234") {
-                const mgr = { role: 'manager', title: mgrTitle };
-                localStorage.setItem('currentUser', JSON.stringify(mgr));
-                localStorage.setItem('auth_role', 'manager');
-                return mgr;
-            } else {
-                window.location.replace("index.html");
-                throw new Error("Unauthorized");
-            }
+            window.location.replace("index.html" + (location.search || ''));
+            throw new Error("Unauthorized");
         }
         const user = checkManagerAuth();
 

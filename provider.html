@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -67,10 +68,10 @@
             { label: 'Pesan', icon: 'send', run: "openModal('broadcast_modal')" }
         ];
     </script>
-    <script src="js/billing.js?v=1.5.7"></script>
-    <script src="js/theme.js?v=1.5.7"></script>
-    <script src="js/logo.js?v=1.5.7"></script>
-    <script src="js/skin.js?v=1.5.7"></script>
+    <script src="js/billing.js?v=1.5.8"></script>
+    <script src="js/theme.js?v=1.5.8"></script>
+    <script src="js/logo.js?v=1.5.8"></script>
+    <script src="js/skin.js?v=1.5.8"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
@@ -239,6 +240,7 @@
             <button data-fm-action data-ic="tag" onclick="openModal('pricing')"><span>Harga Paket</span></button>
             <button data-fm-action data-ic="archive" onclick="openModal('former')"><span>Toko Berhenti</span><span id="former-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-black"></span></button>
             <button data-fm-action data-ic="chart" onclick="openModal('billing_net')"><span>Billing Jaringan</span></button>
+            <button data-fm-action data-ic="key" onclick="openModal('akun_login')"><span>Akun Login</span></button>
             <button data-fm-action data-ic="coins" onclick="openModal('rates')"><span>Kurs &amp; Emas</span></button>
             <button data-fm-action data-ic="book" onclick="openModal('release_notes')"><span>Catatan Rilis</span></button>
         </div>
@@ -414,6 +416,26 @@
 
                 <div id="popup-content-provider_tx_list" class="hidden"></div>
                 <!-- POPUP BILLING JARINGAN -->
+                <div id="popup-content-akun_login" class="space-y-4 hidden">
+                    <p class="text-[11px] text-slate-400">Akun login aman (Firebase Auth) per toko dan peran. Setiap peran punya PIN minimal 6 karakter. Mengatur ulang PIN membuat akun baru dan mencabut PIN lama. PIN hanya tampil sekali saat dibuat, jadi catat lalu berikan ke klien.</p>
+                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
+                                <tr><th class="py-2.5 px-3">Toko</th><th class="py-2.5 px-3 text-center">Kasir</th><th class="py-2.5 px-3 text-center">Manager</th><th class="py-2.5 px-3 text-center">Owner</th><th class="py-2.5 px-3 text-center">Partner</th><th class="py-2.5 px-3 text-center">Aksi</th></tr>
+                            </thead>
+                            <tbody id="al-body"></tbody>
+                        </table>
+                    </div>
+                    <div id="al-form" class="hidden p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-3 text-xs">
+                        <div class="font-black text-white" id="al-title"></div>
+                        <div id="al-fields" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" onclick="alFillRandom()" class="px-3 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold">Isi PIN Acak</button>
+                            <button type="button" id="al-save" onclick="alSave()" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-black">Buat / Atur Ulang Akun</button>
+                        </div>
+                        <div id="al-result" class="hidden p-3 rounded-xl bg-emerald-950 border border-emerald-700 text-emerald-200 font-mono whitespace-pre-wrap"></div>
+                    </div>
+                </div>
                 <div id="popup-content-billing_net" class="space-y-4 hidden">
                     <div id="bn-summary" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs"></div>
                     <div class="overflow-x-auto border border-white/10 rounded-2xl">
@@ -695,11 +717,12 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/widgets.js?v=1.5.7"></script>
+    <script src="js/auth.js?v=1.5.8"></script>
+    <script src="js/widgets.js?v=1.5.8"></script>
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/store.js?v=1.5.7"></script>
+    <script src="js/store.js?v=1.5.8"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -2510,9 +2533,60 @@
             });
         }
 
+        /* ===== AKUN LOGIN (Firebase Auth) ===== */
+        let alCfg = {}, alUnsub = null, alTid = '';
+        const AL_ROLES = { staff: 'Kasir', manager: 'Manager', owner: 'Owner', partner: 'Partner' };
+        function alStart() {
+            if (alUnsub || !(typeof db !== 'undefined' && db)) return;
+            alUnsub = db.collection('tenant_access_cfg').onSnapshot(function (snap) {
+                alCfg = {}; snap.forEach(function (d) { alCfg[d.id] = d.data(); });
+                if (document.getElementById('popup-content-akun_login') && !document.getElementById('popup-content-akun_login').classList.contains('hidden')) renderAkunLogin();
+            }, function (e) { console.error('akun login:', e); alUnsub = null; });
+        }
+        function alTenants() { return Object.keys(TENANTS_CONFIG).map(function (k) { return TENANTS_CONFIG[k]; }).filter(function (t) { return !t.deletedByTower && !t.notFound; }); }
+        function alRolesOf(tn) { return tn.isSinglePage ? ['partner'] : ['staff', 'manager', 'owner']; }
+        function renderAkunLogin() {
+            alStart();
+            const rows = alTenants().map(function (tn) {
+                const cfg = alCfg[tn.id] || null, roles = alRolesOf(tn);
+                const cell = function (r) {
+                    if (roles.indexOf(r) < 0) return '<td class="py-2.5 px-3 text-center text-slate-600">-</td>';
+                    return (cfg && cfg.gen && cfg.gen[r]) ? '<td class="py-2.5 px-3 text-center text-emerald-300 font-black">Aktif</td>' : '<td class="py-2.5 px-3 text-center text-amber-300">Belum</td>';
+                };
+                return '<tr class="border-b border-white/5"><td class="py-2.5 px-3"><b class="text-white">' + escHtml(tn.nama) + '</b><br><span class="font-mono text-[10px] text-slate-400">' + escHtml(tn.id) + '</span></td>' +
+                    cell('staff') + cell('manager') + cell('owner') + cell('partner') +
+                    '<td class="py-2.5 px-3 text-center"><button type="button" class="px-3 py-1.5 rounded-lg bg-cyan-700 hover:bg-cyan-600 text-white font-bold" onclick="alOpen(\'' + escHtml(tn.id) + '\')">Atur</button></td></tr>';
+            }).join('');
+            document.getElementById('al-body').innerHTML = rows || '<tr><td colspan="6" class="py-6 text-center text-slate-500">Belum ada toko.</td></tr>';
+        }
+        function alOpen(id) {
+            const tn = alTenants().filter(function (t) { return t.id === id; })[0]; if (!tn) return;
+            alTid = id;
+            document.getElementById('al-title').innerText = 'Akun login: ' + tn.nama + ' (' + tn.id + ')';
+            document.getElementById('al-fields').innerHTML = alRolesOf(tn).map(function (r) {
+                return '<label class="block"><span class="font-bold text-slate-300 block mb-1">PIN ' + AL_ROLES[r] + '</span><input type="text" inputmode="numeric" maxlength="32" data-alrole="' + r + '" placeholder="kosong = tidak diubah" class="w-full bg-slate-950 border border-white/15 rounded-xl p-2.5 font-mono font-bold text-white"></label>';
+            }).join('');
+            document.getElementById('al-result').classList.add('hidden');
+            document.getElementById('al-form').classList.remove('hidden');
+        }
+        function alFillRandom() { [].forEach.call(document.querySelectorAll('#al-fields [data-alrole]'), function (i) { if (!i.value) i.value = FM_AUTH.randomPin(); }); }
+        function alSave() {
+            const map = {}; let any = false;
+            [].forEach.call(document.querySelectorAll('#al-fields [data-alrole]'), function (i) { const v = i.value.trim(); if (v) { map[i.getAttribute('data-alrole')] = v; any = true; } });
+            if (!any) return alert('Isi minimal satu PIN (atau tekan "Isi PIN Acak").');
+            if (Object.keys(map).some(function (r) { return map[r].length < 6; })) return alert('PIN minimal 6 karakter.');
+            const tn = alTenants().filter(function (t) { return t.id === alTid; })[0], btn = document.getElementById('al-save'), box = document.getElementById('al-result');
+            btn.disabled = true; btn.innerText = 'Memproses...';
+            FM_AUTH.provisionMany(alTid, map).then(function (done) {
+                box.innerText = 'Akun siap: ' + (tn ? tn.nama : alTid) + '\nLink: ' + location.origin + location.pathname.replace(/[^/]*$/, '') + 'index.html?toko=' + alTid + '\n' + done.map(function (r) { return AL_ROLES[r] + ': ' + map[r]; }).join('\n') + '\n(PIN hanya tampil di sini. Catat sekarang.)';
+                box.classList.remove('hidden');
+                try { ctAudit(alTid, 'AKUN_LOGIN', 'Tower membuat/mengatur ulang akun login: ' + done.map(function (r) { return AL_ROLES[r]; }).join(', '), '-', 'PIN BARU'); } catch (e) {}
+            }).catch(function (e) { alert('Gagal: ' + ((e && e.message) || e)); }).then(function () { btn.disabled = false; btn.innerText = 'Buat / Atur Ulang Akun'; });
+        }
+
         window.openModal = function(type) {
             if (type !== 'tenant_settings' && tsStore) { tsStore.stop(); tsStore = null; }
-            ['billing_net', 'provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
+            ['akun_login', 'billing_net', 'provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
@@ -2551,6 +2625,12 @@
                 document.getElementById('modal-subtitle').innerText = "Atur harga bulanan dan diskon tahunan";
                 fillPricingForm();
                 document.getElementById('popup-content-pricing').classList.remove('hidden');
+            } else if (type === 'akun_login') {
+                document.getElementById('modal-title').innerText = "Akun Login Toko";
+                document.getElementById('modal-subtitle').innerText = "Buat atau atur ulang PIN login aman per toko dan peran";
+                document.getElementById('al-form').classList.add('hidden');
+                renderAkunLogin();
+                document.getElementById('popup-content-akun_login').classList.remove('hidden');
             } else if (type === 'billing_net') {
                 document.getElementById('modal-title').innerText = "Billing Jaringan (Estimasi)";
                 document.getElementById('modal-subtitle').innerText = "Estimasi biaya layanan berjalan per detik untuk semua toko";
