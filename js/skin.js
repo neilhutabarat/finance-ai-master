@@ -380,6 +380,7 @@
     curPanel = el; body.appendChild(el); el.style.display = '';
     m.style.display = 'flex';
   }
+  window.FM_OPEN_PANEL = openPanel;
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePanel(); });
 
   function actionTile(label, ic, onclick) {

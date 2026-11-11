@@ -18,6 +18,8 @@
       '[Tampilan] Kartu "Estimasi Biaya Layanan" di halaman manager dan owner: angka bergerak tiap detik dengan tanggal pembayaran, warna hijau, kuning, lalu merah menjelang jatuh tempo (hanya estimasi, bukan tagihan)',
       '[Tampilan] Lencana paket kini cukup "Pro" (emas hanya warnanya) dan tombol Keluar hanya satu, di dock, di semua layar',
       '[Tampilan] Bar header dan dock kini sedikit tembus pandang dengan tulisan tetap jelas',
+      '[Tampilan] Kartu "Laba Rugi" di halaman manager dan owner: laba bersih bulan ini dan margin; ketuk untuk laporan per hari, minggu, bulan, tahun, atau tanggal bebas, lengkap dengan unduhan PDF dan CSV',
+      '[Perbaikan] Prive (penarikan pribadi owner) kini ditampilkan terpisah di laporan dan tidak lagi mengurangi laba',
       '[Keamanan] Aplikasi tidak lagi meminta izin kamera karena pemindaian barcode memakai scanner; lokasi hanya dibaca di perangkat Anda'
     ]],
     ['1.0.0 (BETA 1.4)', '11 Nov 2026', [
