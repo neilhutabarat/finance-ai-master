@@ -122,14 +122,16 @@ function getActiveTenant() {
   const urlParams = new URLSearchParams(window.location.search);
   const tenantKey = (urlParams.get("toko") || "").toLowerCase().trim();
   if (tenantKey && TENANTS_CONFIG[tenantKey]) {
-    return TENANTS_CONFIG[tenantKey];
+    return TENANTS_CONFIG[tenantKey].deletedByTower ? TENANT_NOT_FOUND : TENANTS_CONFIG[tenantKey];
   }
   // Ada parameter ?toko= tetapi tokonya tidak dikenal: jangan jatuh ke Oneilverse.
   if (tenantKey && tenantKey !== "oneilverse") {
     return TENANT_NOT_FOUND;
   }
-  return TENANTS_CONFIG["id26110901"];
+  return (TENANTS_CONFIG["id26110901"] && TENANTS_CONFIG["id26110901"].deletedByTower) ? TENANT_NOT_FOUND : TENANTS_CONFIG["id26110901"];
 }
+// toko yang boleh diatur penuh dari Tower: toko klien buatan Tower + toko master (untuk uji coba fitur)
+function isManaged(tn) { return !!(tn && (tn.fromRegistry || tn.isMaster)); }
 
 function formatIdAge(createdAtMs) {
   if (!createdAtMs) return "1 menit";
@@ -205,7 +207,7 @@ const COA_TEMPLATES = {
   kosong: { label: "Kosong (isi sendiri)", coa: [] }
 };
 
-function registrySig(c) { return c ? [c.tier, c.nama, c.slogan, c.warna, c.warnaAksen, c.logoText, JSON.stringify(c.features || {})].join("|") : ""; }
+function registrySig(c) { return c ? [c.tier, c.nama, c.slogan, c.warna, c.warnaAksen, c.logoText, JSON.stringify(c.features || {}), c.deleted ? 'x' : ''].join("|") : ""; }
 
 // Fitur per toko (diatur dari Tower). Jika belum diatur, fitur dianggap aktif.
 function tenantHasFeature(tn, key) { return !(tn && tn.features && tn.features[key] === false); }
@@ -217,7 +219,14 @@ const REGISTRY_CACHE_KEY = "fm_registry_cache_v1";
 function registryMerge(cfg) {
   if (!cfg || !cfg.id) return null;
   const k = String(cfg.id).toLowerCase();
-  if (TENANTS_CONFIG[k] && !TENANTS_CONFIG[k].fromRegistry) return null; // toko bawaan file tidak boleh ditimpa
+  if (TENANTS_CONFIG[k] && !TENANTS_CONFIG[k].fromRegistry) {
+    // toko bawaan file tidak boleh ditimpa, KECUALI toko master (uji coba): hanya field yang boleh diatur Tower
+    if (!TENANTS_CONFIG[k].isMaster) return null;
+    var m = TENANTS_CONFIG[k];
+    ["nama", "slogan", "warna", "warnaAksen", "logoText", "tier", "features", "customCOA", "locations"].forEach(function (f) { if (cfg[f] !== undefined) m[f] = cfg[f]; });
+    m.deletedByTower = cfg.deleted === true;
+    return k;
+  }
   cfg.fromRegistry = true;
   if (!cfg.customCOA || !cfg.customCOA.length) cfg.customCOA = DEFAULT_UMKM_COA;
   TENANTS_CONFIG[k] = cfg;
@@ -263,7 +272,8 @@ function registryFetch(key, isAsync, done) {
 (function loadRegistryForCurrentUrl() {
   try {
     const key = (new URLSearchParams(window.location.search).get("toko") || "").toLowerCase().trim();
-    if (!key || (TENANTS_CONFIG[key] && !TENANTS_CONFIG[key].fromRegistry)) return;
+    if (!key) key = "id26110901";
+    if (TENANTS_CONFIG[key] && !TENANTS_CONFIG[key].fromRegistry && !TENANTS_CONFIG[key].isMaster) return;
     const cached = registryReadCache()[key];
     if (cached) {
       registryMerge(cached);            // pakai cache supaya halaman langsung siap

@@ -298,7 +298,7 @@
         if (presenceState === 'started') return;
         if (ctrl && ctrl.suspended === true) return;
         var field = QUOTA_FIELD[ROLE];
-        if (field && !tenant.isMaster) {
+        if (field) {
             var allowed = (ctrl && typeof ctrl[field] === 'number' && ctrl[field] > 0) ? ctrl[field] : 1;
             checkQuota(tenant, allowed, function () { startPresence(tenant); }, function (n) {
                 presenceState = 'blocked';
@@ -333,7 +333,6 @@
         if (!tenant || !tenant.id) return;
         attachNotices(tenant);
         if (tenant.fromRegistry) watchDeletion(tenant);
-        if (tenant.isMaster) { proceedPresence(tenant, null); return; } // master tidak dikunci / tidak dibatasi
         db.collection('tenant_ctrl').doc(tenant.id).onSnapshot(function (snap) {
             var d = snap.exists ? snap.data() : null;
             window.TENANT_CTRL = d || {};

@@ -62,23 +62,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
         window.FM_DOCK_ITEMS = [
-            { label: 'Pendapatan', icon: 'chart', run: "openModal('provider_monthly_history')" },
-            { label: 'Jaringan', icon: 'building', run: "openModal('network_monthly_history')" },
-            { label: 'Peringkat', icon: 'trophy', run: "openModal('leaderboard')" },
-            { label: 'Tiket', icon: 'ticket', run: "openModal('tickets')" },
             { label: 'Klien', icon: 'store', run: "openModal('add_tenant')" },
             { label: 'Catat', icon: 'plus', run: "openModal('provider_input_tx')" },
-            { label: 'COA Provider', icon: 'list', run: "openModal('provider_coa_mgmt')" },
-            { label: 'Harga Paket', icon: 'tag', run: "openModal('pricing')" },
-            { label: 'Toko Berhenti', icon: 'archive', run: "openModal('former')" },
-            { label: 'Kurs & Emas', icon: 'coins', run: "openModal('rates')" },
+            { label: 'COA', icon: 'list', run: "openModal('provider_coa_mgmt')" },
+            { label: 'Harga', icon: 'tag', run: "openModal('pricing')" },
+            { label: 'Berhenti', icon: 'archive', run: "openModal('former')" },
+            { label: 'Kurs', icon: 'coins', run: "openModal('rates')" },
             { label: 'Kirim Pesan', icon: 'send', run: "openModal('broadcast_modal')" },
             { label: 'Catatan Rilis', icon: 'book', run: "openModal('release_notes')" }
         ];
     </script>
-    <script src="js/theme.js?v=1.5.3"></script>
-    <script src="js/logo.js?v=1.5.3"></script>
-    <script src="js/skin.js?v=1.5.3"></script>
+    <script src="js/theme.js?v=1.5.4"></script>
+    <script src="js/logo.js?v=1.5.4"></script>
+    <script src="js/skin.js?v=1.5.4"></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
 
@@ -242,18 +238,12 @@
         </div>
 
         <!-- TOMBOL AKSI CEPAT PROVIDER -->
+        <div id="tw-mini" class="ios-glass"></div>
         <div id="fm-actions" class="fm-actions">
-            <button data-fm-action data-ic="plus" onclick="openModal('provider_input_tx')"><span>Catat Transaksi</span></button>
-            <button data-fm-action data-ic="list" onclick="openModal('provider_coa_mgmt')"><span>COA Provider</span></button>
-            <button data-fm-action data-ic="tag" onclick="openModal('pricing')"><span>Harga Paket</span></button>
-            <button data-fm-action data-ic="archive" onclick="openModal('former')"><span>Toko Berhenti</span><span id="former-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-black"></span></button>
-            <button data-fm-action data-ic="coins" onclick="openModal('rates')"><span>Kurs &amp; Emas</span></button>
-            <button data-fm-action data-ic="store" onclick="openModal('add_tenant')"><span>Klien Baru</span></button>
-            <button data-fm-action data-ic="send" onclick="openModal('broadcast_modal')"><span>Kirim Pesan</span></button>
         </div>
 
         <!-- TABEL DIREKTORI MITRA UMKM -->
-        <div class="ios-glass p-6 space-y-4">
+        <div class="ios-glass p-6 space-y-4" data-fm-panel data-wide data-title="Direktori Mitra" data-sub="Usia ID, mode, terminal, income, outcome, status, dan inspeksi" data-ic="building">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <div>
                     <h2 class="text-base font-black text-white flex items-center space-x-2">
@@ -415,8 +405,13 @@
                             </button>
                         </div>
                     </div>
+                    <div class="p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-2 text-xs">
+                        <span class="font-black text-white block">Riwayat Catatan Pribadi (bisa dihapus):</span>
+                        <div id="prov-tx-history" class="space-y-1.5"></div>
+                    </div>
                 </div>
 
+                <div id="popup-content-provider_tx_list" class="hidden"></div>
                 <!-- 5. POPUP KELOLA COA PROVIDER -->
                 <div id="popup-content-provider_coa_mgmt" class="space-y-4 hidden">
                     <div class="p-4 rounded-2xl bg-purple-950/40 border border-purple-400/30 space-y-3 text-xs">
@@ -685,11 +680,11 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/widgets.js?v=1.5.3"></script>
+    <script src="js/widgets.js?v=1.5.4"></script>
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/store.js?v=1.5.3"></script>
+    <script src="js/store.js?v=1.5.4"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -829,8 +824,8 @@
 
         function finBadgeHtml(net, small) {
             const sz = small ? 'px-2.5 py-0.5 rounded text-[9px]' : 'px-2 py-0.5 rounded text-[10px]';
-            if (net < 0) return '<span class="' + sz + ' font-black bg-rose-600 text-white">Defisit Merah</span>';
-            return '<span class="' + sz + ' font-black badge-sapphire text-white">💎 Blue Sapphire</span>';
+            if (net < 0) return '<span class="' + sz + ' font-black bg-rose-600 text-white whitespace-nowrap inline-block">Defisit Merah</span>';
+            return '<span class="' + sz + ' font-black badge-sapphire text-white whitespace-nowrap inline-block">💎 Blue Sapphire</span>';
         }
 
         function tenantIdAgeText(tn) {
@@ -1036,7 +1031,7 @@
         function renderInspectPlan(tenant) {
             const box = document.getElementById('inspect-plan-card');
             if (!box) return;
-            if (!tenant.fromRegistry) { box.classList.add('hidden'); box.innerHTML = ''; planPanelFor = null; return; }
+            if (!isManaged(tenant)) { box.classList.add('hidden'); box.innerHTML = ''; planPanelFor = null; return; }
             if (planPanelFor === tenant.id) return; // jangan menimpa isian yang sedang diketik
             planPanelFor = tenant.id;
             const c = getCtrl(tenant.id);
@@ -1084,7 +1079,7 @@
         function setTenantPlan(tenantId, tier, cycle, custom) {
             const key = String(tenantId).toLowerCase();
             const tn = TENANTS_CONFIG[key];
-            if (!tn || !tn.fromRegistry) return alert('Paket hanya dapat diubah untuk toko klien buatan Tower.');
+            if (!isManaged(tn)) return alert('Paket hanya dapat diubah untuk toko yang dikelola Tower.');
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const r = computePlan(tier, cycle, custom);
             if (!r.amount) return alert('Harga paket ' + TIER_LABEL[tier] + ' belum diatur. Atur dulu lewat tombol Harga Paket, atau isi Harga Khusus.');
@@ -1132,7 +1127,7 @@
         }
 
         function fillTsShell(tn) {
-            const editable = !!tn.fromRegistry;
+            const editable = isManaged(tn);
             const note = document.getElementById('ts-profile-note');
             note.classList.toggle('hidden', editable);
             note.innerText = editable ? '' : 'Toko bawaan sistem: nama, slogan, dan warna diatur lewat file tenants.js. COA dan produk tetap bisa diatur di bawah.';
@@ -1164,7 +1159,7 @@
         function saveTenantProfile(tenantId) {
             const key = String(tenantId).toLowerCase();
             const tn = TENANTS_CONFIG[key];
-            if (!tn || !tn.fromRegistry) return;
+            if (!isManaged(tn)) return;
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const nama = document.getElementById('ts-nama').value.trim();
             if (!nama) return alert('Nama toko wajib diisi.');
@@ -1384,18 +1379,33 @@
             }
         }
 
+        function restoreMasterTenant(tenantId) {
+            const key = String(tenantId).toLowerCase();
+            if (!confirm('Pulihkan toko ' + tenantId + '? Link toko aktif kembali dengan data lamanya.')) return;
+            const batch = db.batch();
+            batch.delete(db.collection('tenants_registry').doc(key));
+            batch.delete(db.collection('former_tenants').doc(key));
+            batch.commit().then(function () { const tn = TENANTS_CONFIG[key]; if (tn) tn.deletedByTower = false; ctAudit(tenantId, 'PULIHKAN_TOKO', 'Toko master dipulihkan', 'DIHAPUS', 'AKTIF'); refreshProviderViews(); })
+                .catch(function (e) { alert('Gagal: ' + e.message); });
+        }
+
         function deleteTenantRegistry(tenantId) {
             const key = String(tenantId).toLowerCase();
             const tn = TENANTS_CONFIG[key];
-            if (!tn || !tn.fromRegistry) return alert('Hanya toko klien buatan Tower yang dapat diberhentikan dari sini.');
+            if (!isManaged(tn)) return alert('Toko ini tidak dapat diberhentikan dari sini.');
             if (!confirm('Hentikan kerja sama dengan ' + tn.nama + ' [' + tenantId + ']?\n\n• Link toko langsung tidak bisa dipakai.\n• Data riwayat toko DISIMPAN 90 hari, bisa diminta toko lewat link tokonya, lalu dihapus otomatis.\n• ID ini tidak bisa dipakai lagi.')) return;
             const now = Date.now();
             const batch = db.batch();
-            batch.set(db.collection('former_tenants').doc(key), { id: tn.id, nama: tn.nama, endedAt: now, purgeAt: now + 90 * 86400000, status: 'archived', downloadRequested: false, cfg: JSON.stringify(tn) });
-            batch.delete(db.collection('tenants_registry').doc(key));
+            if (tn.isMaster) {
+                // toko master tidak bisa hilang dari file; ditandai "dihapus" lewat registry (bisa dipulihkan dari Tower)
+                batch.set(db.collection('tenants_registry').doc(key), { id: tn.id, nama: tn.nama, json: JSON.stringify({ id: tn.id, deleted: true }), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            } else {
+                batch.set(db.collection('former_tenants').doc(key), { id: tn.id, nama: tn.nama, endedAt: now, purgeAt: now + 90 * 86400000, status: 'archived', downloadRequested: false, cfg: JSON.stringify(tn) });
+                batch.delete(db.collection('tenants_registry').doc(key));
+            }
             batch.commit().then(function () {
                 ctAudit(tn.id, 'HENTIKAN_KERJA_SAMA', 'Provider menghentikan kerja sama dan mengarsipkan toko ' + tn.nama, 'AKTIF', 'ARSIP 90 HARI');
-                delete TENANTS_CONFIG[key];
+                if (tn.isMaster) tn.deletedByTower = true; else delete TENANTS_CONFIG[key];
                 if (tenantUnsubs[tenantId]) { tenantUnsubs[tenantId](); delete tenantUnsubs[tenantId]; }
                 delete tenantTxMap[tenantId];
                 closeModal();
@@ -1508,17 +1518,20 @@
             if (!(typeof db !== 'undefined' && db)) return;
             db.collection('tenants_registry').onSnapshot(function (snap) {
                 const seen = {};
+                let masterSeen = false;
                 snap.forEach(function (doc) {
                     try {
                         const cfg = JSON.parse(doc.data().json);
                         seen[doc.id] = true;
                         const had = !!TENANTS_CONFIG[doc.id];
-                        if (!had) { registryMergeLocal(cfg); }
+                        if (had && TENANTS_CONFIG[doc.id].isMaster) { registryMerge(cfg); masterSeen = true; }
+                        else if (!had) { registryMergeLocal(cfg); }
                         else if (TENANTS_CONFIG[doc.id].fromRegistry) { cfg.fromRegistry = true; if (!cfg.customCOA || !cfg.customCOA.length) cfg.customCOA = DEFAULT_UMKM_COA; TENANTS_CONFIG[doc.id] = cfg; }
                     } catch (e) { console.error('registry rusak', doc.id, e); }
                 });
                 Object.keys(TENANTS_CONFIG).forEach(function (k) {
                     if (TENANTS_CONFIG[k].fromRegistry && !seen[k]) { delete TENANTS_CONFIG[k]; }
+                    else if (TENANTS_CONFIG[k].isMaster && !seen[k]) { TENANTS_CONFIG[k].deletedByTower = false; }
                 });
                 refreshProviderViews();
             }, function (e) { console.error('Provider: gagal membaca tenants_registry', e); });
@@ -1547,7 +1560,6 @@
 
         function setTenantSuspended(tenantId, suspend) {
             const tn = (typeof TENANTS_CONFIG !== 'undefined') ? TENANTS_CONFIG[String(tenantId).toLowerCase()] : null;
-            if (tn && tn.isMaster) return alert('Toko master tidak dapat dibekukan.');
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung, status beku tidak dapat disimpan.');
             let reason = '';
             if (suspend) {
@@ -1645,7 +1657,25 @@
         }
         function setDirFilter(v) { dirFilter = v || ''; renderUMKMDirectory(); }
 
+        function renderMiniNetwork() {
+            const box = document.getElementById('tw-mini'); if (!box) return;
+            const now = new Date();
+            const first = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-01';
+            const list = listNetworkTenants();
+            const rows = list.map(function (t) {
+                let inc = 0;
+                getTenantTxList(t.id).forEach(function (x) { if (txDateISO(x) >= first && x.category === 'sales') inc += x.amount; });
+                const on = onlineSessions(t.id).length;
+                return '<div class="flex items-center justify-between gap-3 py-2 border-b border-white/10 cursor-pointer" onclick="openInspectUMKM(\'' + escHtml(t.id) + '\')">' +
+                    '<div class="min-w-0"><div class="text-xs font-black text-white truncate">' + escHtml(t.nama) + ' ' + tierBadgeHtml(t.tier) + '</div>' +
+                    '<div class="text-[10px] text-slate-400 font-mono">' + escHtml(t.id) + ' · ' + (t.deletedByTower ? 'DIHAPUS' : (isTenantSuspended(t.id) ? 'BEKU' : (on ? '● online ' + on : '○ offline'))) + '</div></div>' +
+                    '<div class="text-xs font-black text-emerald-400 font-mono shrink-0">' + formatThousand(inc) + '</div></div>';
+            }).join('');
+            box.innerHTML = '<div class="p-4 flex flex-col min-h-0 h-full"><div class="flex items-center justify-between mb-1"><b class="text-sm font-black text-white">Jaringan Mitra UMKM</b><span class="text-[10px] text-slate-400">' + list.length + ' toko · income bulan ini</span></div><div class="tw-mini-rows">' + (rows || '<div class="text-xs text-slate-400 py-4">Belum ada toko.</div>') + '</div></div>';
+        }
+
         function renderUMKMDirectory() {
+            try { renderMiniNetwork(); } catch (e) { console.warn(e); }
             const tbody = document.getElementById('umkm-table-body');
             tbody.innerHTML = "";
 
@@ -1705,7 +1735,7 @@
                     <td class="py-3.5 px-4 text-center">${finBadgeHtml(netOmzet, false)}</td>
                     <td class="py-3.5 px-4 text-center">
                         <span class="px-2.5 py-0.5 rounded-full text-[9px] font-black ${isSuspended ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}">
-                            ${isSuspended ? 'BEKU' : 'AKTIF'}
+                            ${tenant.deletedByTower ? 'DIHAPUS' : (isSuspended ? 'BEKU' : 'AKTIF')}
                         </span>
                     </td>
                     <td class="py-3.5 px-4 text-center">
@@ -1803,14 +1833,14 @@
                 <div class="text-right">
                     <span class="text-emerald-400 font-bold block font-mono">${list.length} Transaksi Sah Tercatat</span>
                     <span class="text-[10px] ${live ? 'text-slate-400' : 'text-amber-300'}">${live ? 'Sinkronisasi Cloud Live Terhubung' : 'Mode lokal: Firestore belum aktif, data dari browser ini'}</span>
-                    ${tenant.isMaster ? '' : `<button id="btn-toggle-suspend" class="mt-2 px-3 py-1 rounded-xl ${isTenantSuspended(tenant.id) ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'} text-white font-bold text-[10px] transition">${isTenantSuspended(tenant.id) ? 'Aktifkan Kembali Toko' : 'Bekukan Toko'}</button>`}
+                    ${tenant.deletedByTower ? '' : `<button id="btn-toggle-suspend" class="mt-2 px-3 py-1 rounded-xl ${isTenantSuspended(tenant.id) ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'} text-white font-bold text-[10px] transition">${isTenantSuspended(tenant.id) ? 'Aktifkan Kembali Toko' : 'Bekukan Toko'}</button>`}
                 </div>
             `;
-            if (tenant.fromRegistry) {
+            if (isManaged(tenant)) {
                 const hb = document.createElement('button');
                 hb.className = 'mt-2 ml-2 px-3 py-1 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-[10px] transition';
-                hb.innerText = 'Hapus Klien';
-                hb.onclick = function () { deleteTenantRegistry(tenant.id); };
+                hb.innerText = tenant.deletedByTower ? 'Pulihkan Toko' : (tenant.isMaster ? 'Hapus Toko Master (uji)' : 'Hapus Klien');
+                hb.onclick = function () { tenant.deletedByTower ? restoreMasterTenant(tenant.id) : deleteTenantRegistry(tenant.id); };
                 const sbx = document.getElementById('btn-toggle-suspend');
                 if (sbx && sbx.parentNode) sbx.parentNode.appendChild(hb);
             }
@@ -1820,7 +1850,7 @@
                 const row = document.createElement('div');
                 row.className = 'w-full basis-full text-[11px] pt-2 mt-1 border-t border-white/10';
                 row.innerHTML = '<b class="text-slate-300">Sedang online:</b> ' + (on.length
-                    ? on.map(function (x) { return '<span class="inline-block mr-2 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">● ' + escHtml(ROLE_LABEL[x.role] || x.role) + ' (' + escHtml(x.who) + ') • ' + agoText(x.startedAt) + '</span>'; }).join('')
+                    ? on.map(function (x) { return '<span class="inline-block mr-2 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">● ' + escHtml(ROLE_LABEL[x.role] || x.role) + ' (' + escHtml(x.who) + ') • masuk ' + agoText(x.startedAt) + ' • sinyal ' + agoText(x.ms) + (x.geo ? ' • ' + escHtml((x.geo.name || '').split(',')[0]) + (x.geo.src === 'GPS' ? '' : ' (perkiraan)') : ' • lokasi belum terkirim') + '</span>'; }).join('')
                     : '<span class="text-slate-500">tidak ada. Aktivitas terakhir: ' + agoText(lastActiveMs(tenant.id)) + '</span>');
                 hdr.appendChild(row);
             })();
@@ -1998,6 +2028,25 @@
             loadProviderDashboard();
         }
 
+        function renderProviderTxHistory() {
+            const box = document.getElementById('prov-tx-history'); if (!box) return;
+            if (!providerTx.length) { box.innerHTML = '<div class="text-slate-400 py-2">Belum ada catatan.</div>'; return; }
+            box.innerHTML = providerTx.slice(0, 30).map(function (t) {
+                return '<div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-950 border border-white/10">' +
+                    '<div class="min-w-0"><div class="font-bold text-white truncate">[' + escHtml(t.accountCode) + '] ' + escHtml(t.accountName) + '</div><div class="text-[10px] text-slate-400 truncate">' + escHtml(t.dateISO || '') + ' · ' + escHtml(t.desc || '') + '</div></div>' +
+                    '<div class="flex items-center gap-2 shrink-0"><b class="font-mono ' + (t.category === 'income' ? 'text-emerald-400' : 'text-rose-400') + '">' + (t.category === 'income' ? '+' : '-') + formatThousand(t.amount) + '</b>' +
+                    '<button class="px-2 py-1 rounded-lg bg-rose-600 text-white font-bold text-[10px]" data-ptx="' + escHtml(t.id) + '">Hapus</button></div></div>';
+            }).join('');
+            [].slice.call(box.querySelectorAll('[data-ptx]')).forEach(function (b) {
+                b.onclick = function () {
+                    if (!confirm('Hapus catatan ini dari pembukuan pribadi?')) return;
+                    providerTx = providerTx.filter(function (x) { return x.id !== b.getAttribute('data-ptx'); });
+                    localStorage.setItem('fm_provider_tx', JSON.stringify(providerTx));
+                    renderProviderTxHistory(); loadProviderDashboard();
+                };
+            });
+        }
+
         function populateProviderCOASelect() {
             let coa = JSON.parse(localStorage.getItem('fm_provider_coa') || "[]");
             if (coa.length === 0) coa = DEFAULT_PROVIDER_COA;
@@ -2172,7 +2221,7 @@
                     <td class="py-2.5 px-3 font-bold text-white">${k}</td>
                     <td class="py-2.5 px-3 text-right text-emerald-400 font-mono">${formatThousand(item.inc)}</td>
                     <td class="py-2.5 px-3 text-right text-rose-400 font-mono">${formatThousand(item.out)}</td>
-                    <td class="py-2.5 px-3 text-right font-black font-mono text-indigo-300">${formatThousand(net)}</td><td class="py-2.5 px-3 text-center"><button class="text-cyan-400 hover:text-cyan-300 font-bold text-[10px]">Edit/Hapus via DB</button></td>
+                    <td class="py-2.5 px-3 text-right font-black font-mono text-indigo-300">${formatThousand(net)}</td><td class="py-2.5 px-3 text-center"><button class="text-cyan-400 hover:text-cyan-300 font-bold text-[10px]" onclick="openModal(\'provider_input_tx\')">Kelola / Hapus</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -2301,6 +2350,7 @@
                 document.getElementById('prov-tx-date').value = new Date().toISOString().split('T')[0];
                 populateProviderCOASelect();
                 document.getElementById('popup-content-provider_input_tx').classList.remove('hidden');
+                renderProviderTxHistory();
             } else if (type === 'provider_coa_mgmt') {
                 document.getElementById('modal-title').innerText = "Pengelolaan Akun COA Provider";
                 document.getElementById('modal-subtitle').innerText = "Tambah atau sesuaikan pos pendapatan dan beban internal Provider";

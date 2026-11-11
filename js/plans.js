@@ -37,7 +37,6 @@
     try {
       var tn = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
       if (!tn) return 'basic';
-      if (tn.isMaster) return 'pro';
       return ORDER[tn.tier] != null ? tn.tier : 'basic';
     } catch (e) { return 'basic'; }
   }
