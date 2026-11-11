@@ -53,6 +53,12 @@
     '.tw-pill{margin-left:auto;flex:none;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(188,201,230,.16);color:#cdd6ea}',
     '.tw-cnt{margin-left:auto;flex:none;min-width:22px;text-align:center;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:#c9706f;color:#fff}',
     '.tw-rowbtns button{white-space:nowrap}',
+    '@media(min-width:1024px){html[data-tw-ck] #fm-actions.tw-grouped{flex:none!important;flex-direction:row!important;gap:10px!important;padding:0!important;overflow:visible!important;align-items:flex-start}',
+    'html[data-tw-ck] .tw-group[data-g="klien"]{flex:1 1 0;min-width:0}html[data-tw-ck] .tw-group[data-g="uang"]{flex:1.45 1 0;min-width:0}html[data-tw-ck] .tw-group[data-g="sistem"]{flex:2.7 1 0;min-width:0}',
+    'html[data-tw-ck] .tw-group[data-g="klien"] .tw-grid{grid-template-columns:minmax(0,1fr)}html[data-tw-ck] .tw-group[data-g="uang"] .tw-grid{grid-template-columns:repeat(2,minmax(0,1fr))}html[data-tw-ck] .tw-group[data-g="sistem"] .tw-grid{grid-template-columns:repeat(4,minmax(0,1fr))}',
+    'html[data-tw-ck] #fm-actions.tw-grouped .fm-act{min-height:34px!important;padding:3px 9px!important;font-size:11px!important;gap:7px!important;border-radius:9px!important;background:#03060a!important}',
+    'html[data-tw-ck] #fm-actions.tw-grouped .fm-act i{width:22px!important;height:22px!important;border-radius:7px!important}html[data-tw-ck] #fm-actions.tw-grouped .fm-act svg{width:13px!important;height:13px!important}',
+    'html[data-tw-ck] .tw-head{font-family:Orbitron,"Share Tech Mono",monospace}html[data-tw-ck] .tw-head b{font-size:10px;letter-spacing:.14em;text-transform:none}html[data-tw-ck] .tw-head span{display:none}html[data-tw-ck] .tw-pill{font-size:8.5px;padding:1px 6px}}',
     '@media(max-width:640px){.tw-grid{grid-template-columns:repeat(2,minmax(0,1fr))}html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act{padding:8px 10px!important;font-size:12.5px!important;gap:8px!important}html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act i{width:30px!important;height:30px!important}}'
   ].join('\n');
 
@@ -78,7 +84,7 @@
     var dirTile = byText('Jaringan Mitra');
     var frag = document.createDocumentFragment();
     GROUPS.forEach(function (g) {
-      var sec = document.createElement('section'); sec.className = 'tw-group'; sec.style.setProperty('--g', g.c);
+      var sec = document.createElement('section'); sec.className = 'tw-group'; sec.setAttribute('data-g', g.id); sec.style.setProperty('--g', g.c);
       sec.innerHTML = '<div class="tw-head"><b>' + esc(g.title) + '</b><span>' + esc(g.hint) + '</span></div>';
       var grid = document.createElement('div'); grid.className = 'tw-grid'; sec.appendChild(grid);
       g.items.forEach(function (it) {
