@@ -6,26 +6,25 @@
 
   var GROUPS = [
     { id: 'klien', title: 'Klien', hint: 'Toko mitra', c: '#6fc7c0', items: [
-      { t: 'Jaringan Mitra', ic: 'building', find: 'Jaringan Mitra' },
-      { t: 'Toko Berhenti', ic: 'archive', find: 'Toko Berhenti' },
-      { t: 'Kendali Massal', ic: 'users', soon: true }
+      { t: 'Klien Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko baru dan buat ID-nya' },
+      { t: 'Jaringan Mitra', ic: 'building', find: 'Jaringan Mitra', d: 'Daftar toko, edit, inspeksi, bekukan' },
+      { t: 'Permohonan Kasir', ic: 'users', run: "openModal('tickets')", badge: 'stat-pending-tickets', d: 'Setujui atau tolak tambahan terminal' },
+      { t: 'Toko Berhenti', ic: 'archive', find: 'Toko Berhenti', d: 'Toko yang dibekukan atau berhenti' },
+      { t: 'Kendali Massal', ic: 'users', soon: true, d: 'Segera: ubah banyak toko sekaligus' }
     ] },
     { id: 'uang', title: 'Uang', hint: 'Tagihan, pajak, dan pembukuan', c: '#d9b872', items: [
-      { t: 'Billing Jaringan', ic: 'chart', find: 'Billing Jaringan' },
-      { t: 'Pajak Jaringan', ic: 'tax', run: "openModal('tax_net')" },
-      { t: 'COA Provider', ic: 'list', find: 'COA Provider' },
-      { t: 'Harga Paket', ic: 'tag', soon: true }
+      { t: 'Billing Jaringan', ic: 'chart', find: 'Billing Jaringan', d: 'Tagihan, jatuh tempo, cicilan, uji coba' },
+      { t: 'Pajak Jaringan', ic: 'tax', run: "openModal('tax_net')", d: 'Pajak yang sudah disumbangkan tiap toko' },
+      { t: 'Catat Pembukuan', dup: true, ic: 'swap', run: "openModal('provider_input_tx')", d: 'Catat pemasukan dan pengeluaran Tower' },
+      { t: 'COA Provider', ic: 'list', find: 'COA Provider', d: 'Daftar akun, bisa diseret untuk urutan' },
+      { t: 'Harga Paket', ic: 'tag', soon: true, d: 'Segera: paket Basic, Plus, Pro' }
     ] },
     { id: 'sistem', title: 'Sistem', hint: 'Akun dan pengaturan platform', c: '#9fa8e6', items: [
-      { t: 'Akun Login', ic: 'key', find: 'Akun Login' },
-      { t: 'Kurs & Emas', ic: 'coins', find: 'Kurs' },
-      { t: 'Catatan Rilis', ic: 'book', find: 'Catatan Rilis' },
-      { t: 'Kesehatan Sistem', ic: 'shield', soon: true },
-      { t: 'Riwayat Aksi Tower', ic: 'list', soon: true },
-      { t: 'Cadangan Data Toko', ic: 'download', soon: true },
-      { t: 'Reset PIN & Paksa Keluar', ic: 'key', soon: true },
-      { t: 'Hapus Akun Login Server', ic: 'user', soon: true },
-      { t: 'Email Otomatis', ic: 'bell', soon: true }
+      { t: 'Akun Login', ic: 'key', find: 'Akun Login', d: 'Email dan sandi masuk Tower' },
+      { t: 'Pesan Siaran', dup: true, ic: 'send', run: "openModal('broadcast_modal')", d: 'Kirim pengumuman ke semua toko' },
+      { t: 'Kurs & Emas', ic: 'coins', find: 'Kurs', d: 'Kurs dan harga emas terkini' },
+      { t: 'Catatan Rilis', ic: 'book', find: 'Catatan Rilis', d: 'Riwayat pembaruan untuk klien' },
+      { t: 'Kesehatan Sistem', ic: 'shield', soon: true, d: 'Segera: cek server dan database' }
     ] }
   ];
 
@@ -53,12 +52,7 @@
     '.tw-pill{margin-left:auto;flex:none;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(188,201,230,.16);color:#cdd6ea}',
     '.tw-cnt{margin-left:auto;flex:none;min-width:22px;text-align:center;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:#c9706f;color:#fff}',
     '.tw-rowbtns button{white-space:nowrap}',
-    '@media(min-width:1024px){html[data-tw-ck] #fm-actions.tw-grouped{flex:none!important;flex-direction:row!important;gap:10px!important;padding:0!important;overflow:visible!important;align-items:flex-start}',
-    'html[data-tw-ck] .tw-group[data-g="klien"]{flex:1 1 0;min-width:0}html[data-tw-ck] .tw-group[data-g="uang"]{flex:1.45 1 0;min-width:0}html[data-tw-ck] .tw-group[data-g="sistem"]{flex:2.7 1 0;min-width:0}',
-    'html[data-tw-ck] .tw-group[data-g="klien"] .tw-grid{grid-template-columns:minmax(0,1fr)}html[data-tw-ck] .tw-group[data-g="uang"] .tw-grid{grid-template-columns:repeat(2,minmax(0,1fr))}html[data-tw-ck] .tw-group[data-g="sistem"] .tw-grid{grid-template-columns:repeat(4,minmax(0,1fr))}',
-    'html[data-tw-ck] #fm-actions.tw-grouped .fm-act{min-height:34px!important;padding:3px 9px!important;font-size:11px!important;gap:7px!important;border-radius:9px!important;background:#03060a!important}',
-    'html[data-tw-ck] #fm-actions.tw-grouped .fm-act i{width:22px!important;height:22px!important;border-radius:7px!important}html[data-tw-ck] #fm-actions.tw-grouped .fm-act svg{width:13px!important;height:13px!important}',
-    'html[data-tw-ck] .tw-head{font-family:Orbitron,"Share Tech Mono",monospace}html[data-tw-ck] .tw-head b{font-size:10px;letter-spacing:.14em;text-transform:none}html[data-tw-ck] .tw-head span{display:none}html[data-tw-ck] .tw-pill{font-size:8.5px;padding:1px 6px}}',
+    '.fm-act small{display:none}@media(max-width:1023px){.tw-dup{display:none!important}}',
     '@media(max-width:640px){.tw-grid{grid-template-columns:repeat(2,minmax(0,1fr))}html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act{padding:8px 10px!important;font-size:12.5px!important;gap:8px!important}html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act i{width:30px!important;height:30px!important}}'
   ].join('\n');
 
@@ -66,8 +60,8 @@
 
   function tile(it, g) {
     var b = document.createElement('button');
-    b.type = 'button'; b.className = 'fm-act' + (it.soon ? ' tw-soon' : ''); b.setAttribute('data-tw', it.t);
-    b.innerHTML = '<i>' + (window.FM_SVG ? FM_SVG(it.ic) : '') + '</i><span>' + esc(it.t) + '</span>' + (it.soon ? '<em class="tw-pill" style="font-style:normal">segera</em>' : '');
+    b.type = 'button'; b.className = 'fm-act' + (it.soon ? ' tw-soon' : '') + (it.dup ? ' tw-dup' : ''); b.setAttribute('data-tw', it.t);
+    b.innerHTML = '<i>' + (window.FM_SVG ? FM_SVG(it.ic) : '') + '</i><span>' + esc(it.t) + '</span>' + (it.soon ? '<em class="tw-pill" style="font-style:normal">segera</em>' : '') + (it.d ? '<small>' + esc(it.d) + '</small>' : '');
     if (it.soon) { b.title = 'Segera hadir'; b.setAttribute('aria-disabled', 'true'); b.onclick = function (e) { e.preventDefault(); }; }
     return b;
   }
@@ -91,7 +85,7 @@
         var el;
         if (it.find) {
           var src = byText(it.find);
-          if (src) { el = src; var sp = el.querySelector('span'); if (sp && it.t) sp.textContent = it.t; }
+          if (src) { el = src; var sp = el.querySelector('span'); if (sp && it.t) sp.textContent = it.t; if (it.d && !el.querySelector('small')) { var sm = document.createElement('small'); sm.textContent = it.d; el.appendChild(sm); } }
         }
         if (!el && it.edit) {
           el = tile(it, g);
