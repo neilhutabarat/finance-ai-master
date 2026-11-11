@@ -1,140 +1,148 @@
-/* plans.js — daftar fitur per paket (Basic / Plus / Pro), pengunci (gembok), dan kartu "Segera tersedia".
-   Satu sumber kebenaran: ubah status 'soon' -> 'ready' saat fiturnya sudah dibangun. */
+/* plans.js — fitur rakitan per toko dan per mode (Admin = kasir, Manager, Owner).
+   - Fitur INTI selalu aktif dan tidak bisa dicabut (bahkan oleh Tower).
+   - Fitur TAMBAHAN hanya tampil bila dicentang Tower (saat buka toko atau diubah kapan saja).
+   - tenant.features[key] = { kasir: bool, manager: bool, owner: bool }
+   - Toko lama yang belum punya pilihan tersimpan otomatis mendapat fitur yang sudah mereka pakai. */
 (function () {
+  'use strict';
+  var ROLES = ['kasir', 'manager', 'owner'];
+  var RLABEL = { kasir: 'Admin', manager: 'Manager', owner: 'Owner' };
   var ORDER = { basic: 0, plus: 1, pro: 2 };
-  var LABEL = { basic: 'Basic', plus: 'Plus', pro: 'Pro' };
-
-  // status: 'ready' = sudah ada di aplikasi; 'soon' = belum (tampil redup "Segera tersedia"); need: 'server' = menunggu server (Blaze)
+  // c = inti (core), o = tambahan (opt); soon = belum tersedia
   var FEATURES = [
-    { key: 'export_raw', tier: 'basic', status: 'ready', icon: '📤', label: 'Ekspor data mentah (CSV/Excel)', desc: 'Unduh seluruh transaksi kapan saja. Data milik Anda.' },
-
-    { key: 'today_summary', tier: 'plus', status: 'ready', icon: '📊', label: 'Ringkasan Hari Ini', desc: 'Omzet, laba kotor, produk terlaris, dan jam ramai dalam satu kartu.' },
-    { key: 'margin_product', tier: 'plus', status: 'ready', icon: '💹', label: 'Laba & margin per produk', desc: 'Tahu produk mana yang benar-benar untung dan mana yang tipis.' },
-    { key: 'low_stock', tier: 'plus', status: 'ready', icon: '📦', label: 'Peringatan stok menipis', desc: 'Daftar belanja otomatis sebelum barang laris habis.' },
-    { key: 'pay_methods', tier: 'plus', status: 'ready', icon: '💳', label: 'Rekap metode bayar', desc: 'Tunai, QRIS, dan transfer terpisah agar kas selalu cocok.' },
-    { key: 'wa_receipt', tier: 'plus', status: 'ready', icon: '💬', label: 'Struk lewat WhatsApp', desc: 'Kirim struk digital ke pelanggan tanpa kertas.' },
-    { key: 'weather_rates', tier: 'plus', status: 'ready', icon: '🌤️', label: 'Kurs & Cuaca di dashboard', desc: 'Kurs dan prakiraan cuaca tampil langsung di layar toko.' },
-    { key: 'targets', tier: 'plus', status: 'ready', icon: '🎯', label: 'Target harian & bulanan', desc: 'Pantau progres omzet terhadap target Anda.' },
-    { key: 'ar_debt', tier: 'plus', status: 'soon', icon: '🧾', label: 'Piutang & kasbon pelanggan', desc: 'Catat utang pelanggan dan pengingat jatuh tempo.' },
-    { key: 'promo', tier: 'plus', status: 'soon', icon: '🏷️', label: 'Diskon & promo', desc: 'Diskon persen, nominal, dan paket langsung di kasir.' },
-    { key: 'pdf_report', tier: 'plus', status: 'soon', icon: '📄', label: 'Laporan PDF/Excel berlogo', desc: 'Laporan rapi siap kirim ke bank atau akuntan.' },
-    { key: 'ai_5q', tier: 'plus', status: 'soon', need: 'server', icon: '🤖', label: 'Analisis AI (5 pertanyaan)', desc: 'Jawaban otomatis atas pertanyaan penting tentang usaha Anda.' },
-
-    { key: 'roles_detail', tier: 'pro', status: 'soon', icon: '🛡️', label: 'Izin rinci per peran', desc: 'Atur batas diskon, void, dan persetujuan manager.' },
-    { key: 'anomaly', tier: 'pro', status: 'soon', icon: '🚨', label: 'Deteksi anomali', desc: 'Void berlebihan, harga diubah, dan selisih kas ketahuan.' },
-    { key: 'forecast_stock', tier: 'pro', status: 'soon', icon: '🔮', label: 'Prediksi stok habis', desc: 'Perkiraan kapan barang habis dan rekomendasi belanja.' },
-    { key: 'finance_full', tier: 'pro', status: 'soon', icon: '📚', label: 'Laporan keuangan lengkap', desc: 'Arus kas, neraca sederhana, dan estimasi pajak final UMKM.' },
-    { key: 'budget', tier: 'pro', status: 'soon', icon: '🧮', label: 'Anggaran per akun', desc: 'Peringatan saat pengeluaran melewati anggaran.' },
-    { key: 'price_history', tier: 'pro', status: 'soon', icon: '🕘', label: 'Riwayat perubahan harga', desc: 'Siapa mengubah harga apa dan kapan.' },
-    { key: 'drive_backup', tier: 'pro', status: 'soon', need: 'server', icon: '☁️', label: 'Cadangan ke Google Drive', desc: 'Cadangan terjadwal ke penyimpanan Anda sendiri.' },
-    { key: 'ai_free', tier: 'pro', status: 'soon', need: 'server', icon: '🧠', label: 'Tanya AI bebas', desc: 'Tanya apa saja tentang usaha Anda, dengan kuota bulanan.' },
-    { key: 'tg_report', tier: 'pro', status: 'soon', need: 'server', icon: '✈️', label: 'Laporan otomatis ke Telegram', desc: 'Ringkasan harian dan mingguan masuk sendiri ke ponsel.' },
-    { key: 'multi_outlet', tier: 'pro', status: 'soon', icon: '🏬', label: 'Banyak outlet satu laporan', desc: 'Pantau semua cabang sekaligus.' },
-    { key: 'stock_opname', tier: 'pro', status: 'soon', icon: '🗂️', label: 'Stok opname & pembelian', desc: 'Pembelian ke pemasok dan penyesuaian stok.' },
-    { key: 'loyalty', tier: 'pro', status: 'soon', icon: '⭐', label: 'Member & poin loyalitas', desc: 'Pelanggan kembali karena poin.' }
+    { key: 'input', label: 'Input transaksi, draft, metode bayar, cetak struk, stok', r: { kasir: 'c' } },
+    { key: 'saldo', label: 'Saldo kas, total masuk dan keluar', r: { kasir: 'c', manager: 'c', owner: 'c' } },
+    { key: 'closing', label: 'Closing kasir dan riwayatnya', r: { kasir: 'c', manager: 'c' } },
+    { key: 'mutasi', label: 'Mutasi / buku kas', r: { kasir: 'c', manager: 'c', owner: 'c' } },
+    { key: 'coa', label: 'Kelola akun (COA) dan produk', r: { manager: 'c' } },
+    { key: 'kasir_baru', label: 'Pengajuan kasir baru', r: { manager: 'c', owner: 'c' } },
+    { key: 'laba_rugi', label: 'Laba Rugi', r: { manager: 'c', owner: 'c' } },
+    { key: 'pin', label: 'Kelola PIN dan nama peran', r: { owner: 'c' } },
+    { key: 'ledger', label: 'Buku Besar', r: { kasir: 'o', manager: 'c' } },
+    { key: 'barcode', label: 'Scan barcode dan Produk Cepat', r: { kasir: 'o' } },
+    { key: 'bukti', label: 'Foto bukti transaksi', r: { kasir: 'o' } },
+    { key: 'wa_receipt', label: 'Struk lewat WhatsApp', r: { kasir: 'o' } },
+    { key: 'tax', label: 'Pajak PPN 12%', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'dashboard', label: 'Dashboard ringkasan (target, stok menipis, margin)', r: { manager: 'o', owner: 'o' } },
+    { key: 'analisa', label: 'Analisa Keuangan', r: { manager: 'o', owner: 'o' } },
+    { key: 'instruksi', label: 'Instruksi dan pengawasan admin', r: { manager: 'o' } },
+    { key: 'audit', label: 'Riwayat audit manager', r: { owner: 'o' } },
+    { key: 'export_csv', label: 'Ekspor CSV', r: { owner: 'o' } },
+    { key: 'clock', label: 'Jam', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'weather_rates', label: 'Cuaca dan Kurs', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'theme', label: 'Pilih tema, warna, dan logo', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'mutasi_wa', label: 'Mutasi dikirim lewat WA dan dicetak', soon: true, r: { manager: 'o', owner: 'o' } },
+    { key: 'gaji', label: 'Laporan gaji', soon: true, r: { manager: 'o', owner: 'o' } },
+    { key: 'neraca', label: 'Neraca', soon: true, r: { manager: 'o', owner: 'o' } }
   ];
+  // nilai untuk toko lama yang belum punya pilihan tersimpan
+  var LEGACY = { wa_receipt: 'plus', analisa: { owner: true } };
 
-  function tenantTier() {
-    try {
-      var tn = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
-      if (!tn) return 'basic';
-      return ORDER[tn.tier] != null ? tn.tier : 'basic';
-    } catch (e) { return 'basic'; }
+  function find(key) { return FEATURES.filter(function (f) { return f.key === key; })[0]; }
+  function tenant() { try { return (typeof getActiveTenant === 'function') ? getActiveTenant() : null; } catch (e) { return null; } }
+  function pageRole() {
+    var p = (location.pathname.split('/').pop() || '').toLowerCase();
+    return p === 'kasir.html' ? 'kasir' : p === 'manager.html' ? 'manager' : p === 'dashboard.html' ? 'owner' : 'kasir';
   }
-  function find(key) { return FEATURES.find(function (f) { return f.key === key; }); }
-  // true jika paket toko sudah mencukupi DAN fiturnya sudah ada
-  function has(key) {
-    var f = find(key); if (!f) return false;
-    return f.status === 'ready' && ORDER[tenantTier()] >= ORDER[f.tier];
-  }
-  function tierOf(key) { var f = find(key); return f ? f.tier : 'pro'; }
-  function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
-
-
-  /* ---- tampilan terkunci: tetap tampil penuh, redup, bergembok ---- */
-  function injectCss() {
-    if (document.getElementById('fm-lk-css')) return;
-    var s = document.createElement('style'); s.id = 'fm-lk-css';
-    s.textContent = '.fm-lk{position:relative!important;cursor:pointer!important;overflow:hidden}' +
-      '.fm-lk>*{filter:brightness(.5) saturate(.6);pointer-events:none!important;user-select:none!important}' +
-      '.fm-lk::after{content:attr(data-lk);text-shadow:0 1px 6px #000;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px;text-align:center;font:800 12px/1.2 inherit;letter-spacing:.02em;color:#fde68a;background:rgba(2,6,23,.38);z-index:5;pointer-events:none}' +
-      '.fm-lk:hover::after{background:rgba(2,6,23,.22)}' +
-      '.fm-lk-soft{padding-right:24px!important}.fm-lk-soft>*{filter:brightness(.6) saturate(.6)}.fm-lk-soft::after{inset:50% 6px auto auto;transform:translateY(-50%);width:auto;height:auto;padding:0;background:none;content:"🔒";font-size:11px}.fm-lk-soft:hover::after{background:none}';
-    document.head.appendChild(s);
-  }
-  function maskDigits(el) {
-    var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, list = [];
-    while ((n = w.nextNode())) list.push(n);
-    list.forEach(function (t) { t.nodeValue = t.nodeValue.replace(/[0-9]/g, '8'); });
-    [].slice.call(el.querySelectorAll('input,button,select,textarea')).forEach(function (i) { i.disabled = true; if (i.value) i.value = ''; });
-  }
-  // Tandai elemen sebagai terkunci (hanya jika paket belum cukup). opts.mask = samarkan angka di dalamnya.
-  function lock(el, key, opts) {
-    if (!el || has(key)) return false;
-    injectCss(); opts = opts || {};
-    var f = find(key) || { tier: 'plus', label: key };
-    el.classList.add('fm-lk'); if (opts.short) el.classList.add('fm-lk-soft');
-    el.setAttribute('data-lk', opts.short ? '🔒' : '🔒 Paket ' + LABEL[f.tier]);
-    el.setAttribute('data-lk-key', key);
-    if (opts.mask) maskDigits(el);
-    if (!el.__lkBound) {
-      el.__lkBound = true;
-      el.addEventListener('click', function (e) { if (!el.classList.contains('fm-lk')) return; e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); openModal(el.getAttribute('data-lk-key')); }, true);
-    }
+  function legacyValue(f, role, tn) {
+    var L = LEGACY[f.key];
+    if (L === 'plus') { var t = tn && ORDER[tn.tier] != null ? tn.tier : 'basic'; return ORDER[t] >= ORDER.plus; }
+    if (L && typeof L === 'object') return L[role] === true;
     return true;
   }
-
-  // HTML kotak terkunci dengan teaser dari data toko sendiri
-  function lockedHtml(key, teaser) {
-    var f = find(key) || { label: key, tier: 'plus' };
-    return '<div style="border:1px dashed rgba(148,163,184,.5);border-radius:16px;padding:14px;background:rgba(100,116,139,.12);text-align:left">' +
-      '<div style="font-weight:800;font-size:13px">🔒 ' + esc(f.label) + ' <span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(245,158,11,.2);color:#f59e0b;margin-left:4px">' + LABEL[f.tier] + '</span></div>' +
-      (teaser ? '<div style="font-size:12px;margin-top:6px;line-height:1.5;opacity:.9">' + teaser + '</div>' : '') +
-      '<div style="font-size:11px;margin-top:6px;opacity:.7">Tersedia di paket ' + LABEL[f.tier] + '. Hubungi penyedia aplikasi untuk mengaktifkan.</div></div>';
+  function has(key, role, tn) {
+    var f = find(key); if (!f) return false;
+    role = role || pageRole();
+    var m = f.r[role]; if (!m) return false;
+    if (m === 'c') return true;
+    if (f.soon) return false;
+    tn = tn || tenant();
+    var v = tn && tn.features ? tn.features[key] : undefined;
+    if (v === true || v === false) return v;                       // format lama (berlaku untuk semua mode)
+    if (v && typeof v === 'object' && typeof v[role] === 'boolean') return v[role];
+    return legacyValue(f, role, tn);
   }
+  function activeList(role, tn) { role = role || pageRole(); return FEATURES.filter(function (f) { return f.r[role] && !f.soon && has(f.key, role, tn); }); }
 
-  function cardHtml(f) {
-    var cur = ORDER[tenantTier()], need = ORDER[f.tier];
-    var state, badge, op = 1;
-    if (f.status === 'soon') { state = 'soon'; badge = 'Segera tersedia'; op = .9; }
-    else if (cur >= need) { state = 'on'; badge = '✓ Aktif'; }
-    else { state = 'lock'; badge = '🔒 ' + LABEL[f.tier]; }
-    var bg = state === 'soon' ? 'rgba(15,23,42,.55)' : 'rgba(255,255,255,.06)';
-    var bc = state === 'on' ? 'rgba(52,211,153,.5)' : 'rgba(255,255,255,.12)';
-    var bgc = state === 'on' ? 'rgba(52,211,153,.2)' : state === 'lock' ? 'rgba(245,158,11,.2)' : 'rgba(148,163,184,.22)';
-    var tc = state === 'on' ? 'text-emerald-600' : state === 'lock' ? 'text-amber-600' : 'text-slate-500';
-    return '<div style="border:1px ' + (state === 'soon' ? 'dashed' : 'solid') + ' ' + bc + ';background:' + bg + ';border-radius:16px;padding:12px;opacity:' + op + '">' +
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><b style="font-size:13px">' + f.icon + ' ' + esc(f.label) + '</b>' +
-      '<span class="' + tc + '" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;background:' + bgc + '">' + badge + '</span></div>' +
-      '<div style="font-size:11.5px;margin-top:5px;line-height:1.5;opacity:.88">' + esc(f.desc) + '</div></div>';
+  /* ---- tabel centang untuk Tower: prefix 'nt' (toko baru) atau 'ts' (ubah toko) ---- */
+  function checklistHtml(prefix, features, editable, tnFull) {
+    var tn = tnFull || { features: features || null }, isNew = !features;
+    var th = 'text-align:center;padding:4px 6px;font-weight:800;white-space:nowrap';
+    var h = '<div style="font-weight:800;margin-bottom:2px">Fitur toko</div>' +
+      '<div style="opacity:.65;margin-bottom:6px">Fitur inti selalu aktif. Fitur tambahan hanya tampil bila dicentang.</div>' +
+      '<div style="display:flex;gap:6px;margin-bottom:6px"><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',true)" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:11px">Centang semua tambahan</button>' +
+      '<button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',false)" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:11px">Kosongkan tambahan</button></div>' +
+      '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:4px 6px">Fitur</th>' +
+      ROLES.map(function (r) { return '<th style="' + th + '">' + RLABEL[r] + '</th>'; }).join('') + '</tr></thead><tbody>';
+    var order = FEATURES.filter(function (f) { return !f.soon && Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); })
+      .concat(FEATURES.filter(function (f) { return !f.soon && !Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); }))
+      .concat(FEATURES.filter(function (f) { return f.soon; }));
+    order.forEach(function (f) {
+      h += '<tr style="border-top:1px solid rgba(255,255,255,.08);' + (f.soon ? 'opacity:.5' : '') + '"><td style="padding:6px">' + f.label + (f.soon ? ' <i>(segera)</i>' : '') + '</td>';
+      ROLES.forEach(function (r) {
+        var m = f.r[r], cell;
+        if (!m) cell = '<span style="opacity:.3">–</span>';
+        else if (m === 'c') cell = '<input type="checkbox" checked disabled title="Inti: selalu aktif" class="w-4 h-4">';
+        else cell = '<input type="checkbox" id="' + prefix + '-f-' + f.key + '-' + r + '" ' + ((isNew ? false : has(f.key, r, tn)) ? 'checked ' : '') + ((f.soon || editable === false) ? 'disabled ' : '') + 'class="w-4 h-4">';
+        h += '<td style="text-align:center;padding:6px">' + cell + '</td>';
+      });
+      h += '</tr>';
+    });
+    return h + '</tbody></table></div>';
   }
-
-  function renderSections(filterSoonOnly) {
-    var out = '';
-    ['basic', 'plus', 'pro'].forEach(function (t) {
-      var list = FEATURES.filter(function (f) { return f.tier === t && (!filterSoonOnly || f.status === 'soon'); });
-      if (!list.length) return;
-      out += '<div style="margin:16px 0 8px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.65">Fitur ' + LABEL[t] + (t === 'plus' ? ' · Paling Dipilih' : '') + '</div>' +
-        '<div style="display:grid;gap:8px">' + list.map(cardHtml).join('') + '</div>';
+  function setAll(prefix, on) {
+    FEATURES.forEach(function (f) { if (f.soon) return; ROLES.forEach(function (r) { if (f.r[r] === 'o') { var el = document.getElementById(prefix + '-f-' + f.key + '-' + r); if (el && !el.disabled) el.checked = !!on; } }); });
+  }
+  // hasil centang -> { key: { kasir:bool, manager:bool, owner:bool } } (hanya fitur tambahan yang sudah tersedia)
+  function readChecklist(prefix) {
+    var out = {};
+    FEATURES.forEach(function (f) {
+      if (f.soon) return;
+      ROLES.forEach(function (r) {
+        if (f.r[r] !== 'o') return;
+        var el = document.getElementById(prefix + '-f-' + f.key + '-' + r);
+        if (el) { out[f.key] = out[f.key] || {}; out[f.key][r] = !!el.checked; }
+      });
     });
     return out;
   }
 
-  function openModal(focusKey) {
+  /* ---- sembunyikan fitur yang tidak aktif (dijalankan sebelum tampilan dirakit) ---- */
+  function cardOf(el) { return el ? (el.closest('.ios-glass') || (el.parentElement && el.parentElement.parentElement)) : null; }
+  function hide(el) { if (el) el.style.setProperty('display', 'none', 'important'); }
+  function drop(sel) { [].slice.call(document.querySelectorAll(sel)).forEach(function (b) { if (b.parentNode) b.parentNode.removeChild(b); }); }
+  function applyDom() {
+    var role = pageRole();
+    if (!has('tax', role)) { drop('button[onclick*="openModal(\'tax\')"]'); hide(cardOf(document.getElementById('stat-total-pajak-sumbang'))); }
+    if (!has('ledger', role)) drop('button[onclick*="openModal(\'ledger\')"]');
+    if (!has('audit', role)) drop('button[onclick*="openModal(\'audit_trail\')"]');
+    if (!has('export_csv', role)) drop('button[onclick*="exportCSV"]');
+    if (!has('instruksi', role)) drop('section[data-fm-panel="instruksi"]');
+    if (!has('analisa', role)) drop('[data-fm-panel="analisa"]');
+    if (!has('wa_receipt', role)) hide(document.getElementById('btn-wa-receipt'));
+    if (!has('clock', role)) { var c = document.getElementById('realtime-clock-display'); if (c) hide(c.parentElement); }
+    if (!has('bukti', role)) {
+      [].slice.call(document.querySelectorAll('label')).forEach(function (l) { if (/Bukti Struk/i.test(l.textContent) && l.parentElement) hide(l.parentElement); });
+    }
+  }
+  if (!/provider\.html$/i.test(location.pathname)) applyDom();
+
+  /* ---- jendela "Fitur Toko" (daftar yang aktif di mode ini) ---- */
+  function openModal() {
     var m = document.getElementById('fm-plans-modal');
     if (!m) {
       m = document.createElement('div'); m.id = 'fm-plans-modal';
-      m.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482500;background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:14px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif';
-      m.innerHTML = '<div style="width:100%;max-width:520px;max-height:90vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:17px">Fitur & Paket</b><button data-x style="border:0;border-radius:10px;background:#2a2a33;color:#fff;padding:8px 12px;font-weight:800;font-size:12px;cursor:pointer">Tutup</button></div><div data-sum style="font-size:12px;opacity:.75;margin-top:6px"></div><div data-body></div></div>';
+      m.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482500;background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:14px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif';
+      m.innerHTML = '<div style="width:100%;max-width:520px;max-height:90vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:18px;font-weight:800">Fitur toko ini</div><div data-sum style="font-size:12px;opacity:.7;margin-top:2px"></div></div><button data-x type="button" style="border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:99px;width:32px;height:32px;cursor:pointer">✕</button></div><div data-body style="margin-top:12px"></div></div>';
       m.addEventListener('click', function (e) { if (e.target === m || e.target.hasAttribute('data-x')) m.style.display = 'none'; });
       document.body.appendChild(m);
     }
-    m.querySelector('[data-sum]').textContent = 'Paket toko Anda: ' + LABEL[tenantTier()] + '. Fitur yang terkunci tetap terlihat agar Anda tahu apa yang tersedia.';
-    m.querySelector('[data-body]').innerHTML = renderSections(false);
+    var list = activeList();
+    m.querySelector('[data-sum]').textContent = list.length + ' fitur aktif di mode ' + RLABEL[pageRole()] + '. Untuk menambah fitur, hubungi penyedia aplikasi.';
+    m.querySelector('[data-body]').innerHTML = list.map(function (f) { return '<div style="padding:9px 2px;border-top:1px solid rgba(255,255,255,.08);font-size:13px"><b>✓ ' + f.label + '</b></div>'; }).join('');
     m.style.display = 'flex';
-    var ff = focusKey && find(focusKey);
-    if (ff) m.querySelector('[data-sum]').textContent = '"' + ff.label + '" tersedia di paket ' + LABEL[ff.tier] + '. Paket toko Anda: ' + LABEL[tenantTier()] + '. Hubungi penyedia aplikasi untuk mengaktifkan.';
   }
 
-  window.FM_PLANS = { FEATURES: FEATURES, LABEL: LABEL, tier: tenantTier, has: has, tierOf: tierOf, lockedHtml: lockedHtml, lock: lock, renderSections: renderSections, openModal: openModal, cardHtml: cardHtml };
+  window.FM_PLANS = { FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml,
+    readChecklist: readChecklist, setAll: setAll, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();

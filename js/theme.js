@@ -9,7 +9,9 @@
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
     ['1.0.0 (BETA 1.5)', '11 Nov 2026', [
-      '[Tampilan] Fitur yang belum termasuk paket toko tetap tampil, tetapi redup dan bergembok; ketuk untuk melihat paket yang dibutuhkan',
+      '[Tampilan] Fitur toko kini dirakit sesuai kebutuhan usaha: fitur yang tidak dipilih tidak ditampilkan, dan daftar fitur aktif ada di tombol Fitur Toko',
+      '[Tampilan] Peran "Kasir" kini bernama "Admin" (nama tetap bisa diubah oleh owner)',
+      '[Tampilan] Panel Analisis diganti Analisa Keuangan untuk owner dan manager: ringkasan laba, perbandingan dengan bulan lalu, hari dan jam ramai, produk bermargin tipis, biaya yang naik, pengeluaran janggal, stok menipis, beserta saran. Dihitung dari data toko tanpa batas harian',
       '[Tampilan] Tombol, bar header, dan dock kini berbahan kaca hitam 3D yang mengambang dengan bayangan lembut, di semua halaman',
       '[Tampilan] Di HP dan tablet halaman tidak lagi bergulir: laporan dan isian panjang dibuka lewat pop-up',
       '[Perbaikan] Lokasi kini memakai GPS perangkat dan menampilkan nama desa/kelurahan, bukan lagi perkiraan kota dari jaringan',
@@ -181,20 +183,21 @@
     var pick = pref.accent || '#2563eb';
     box.style.setProperty('--fm-pick', pick);
     var h = '<div style="display:flex;justify-content:space-between;align-items:center"><h3>Pengaturan</h3><button class="fm-btn" data-close>Tutup</button></div>';
-    h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
+    var THEME_ON = !(window.FM_PLANS && !FM_PLANS.has('theme'));
+    if (THEME_ON) h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (mode === 'light' ? 'on' : '') + '" data-mode="light"><div class="fm-prev" style="background:linear-gradient(135deg,#ffffff,#e2e8f0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (mode === 'dark' ? 'on' : '') + '" data-mode="dark"><div class="fm-prev" style="background:#000"></div>Gelap Pekat</button></div></div>';
-    h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
+    if (THEME_ON) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
       ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +
       '</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px"><label style="font-size:12px;color:#c7cbd6">Warna bebas</label><input type="color" id="fm-acc-custom" value="' + esc(pick) + '" style="width:44px;height:30px;border:0;background:none;padding:0"><button class="fm-btn" data-accreset style="margin-left:auto">Kembali ke Bawaan</button></div></div></div>';
-    if (CAN_LOGO) {
+    if (CAN_LOGO && THEME_ON) {
       h += '<div class="fm-sec"><div class="fm-lab">Logo Usaha</div><div class="fm-card">' +
         '<div style="display:flex;gap:12px;align-items:center"><div id="fm-logo-prev" style="width:64px;height:64px;border-radius:16px;background:#22222b;display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:800;color:#aab2c5;font-size:12px">' + (logoData ? '<img src="' + esc(logoData) + '" style="width:100%;height:100%;object-fit:contain">' : 'Inisial') + '</div>' +
         '<div style="flex:1;font-size:12px;line-height:1.55;color:#c7cbd6">Unggah logo (JPG, PNG, atau WebP). <b style="color:#fff">Ukuran logo dibatasi maksimal 100 KB.</b> Gambar yang lebih besar akan diperkecil otomatis; disarankan bentuk persegi. Jika tidak ada logo, tampil inisial nama usaha.</div></div>' +
         '<div style="display:flex;gap:8px;margin-top:10px"><label class="fm-btn pri" style="cursor:pointer">Pilih Gambar<input type="file" id="fm-logo-file" accept="image/*" style="display:none"></label>' + (logoData ? '<button class="fm-btn" data-logodel>Hapus Logo</button>' : '') + '</div>' +
         '<p id="fm-logo-msg" style="font-size:12px;margin:8px 0 0;color:#fca5a5"></p></div></div>';
     }
-    if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur &amp; Paket</button></div>';
+    if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur Toko</button></div>';
     if (false) h += '<div class="fm-sec"><button class="fm-btn" data-logout style="width:100%;padding:13px;color:#fda4af">Keluar dari Akun</button></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>v' + APP_VERSION + ' · ' + BETA + '</b></div></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.slice(0, SHOW_LAST).map(function (n, i) {

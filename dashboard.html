@@ -190,59 +190,7 @@
 
         <div id="fm-insights" class="space-y-4"></div>
 
-        <!-- FITUR AI ANALITIS TERARAH & KONTROL OWNER -->
-        <div data-fm-panel="ai" data-title="Analisis AI" data-sub="Analisis cepat untuk usaha Anda" data-ic="spark" class="ios-glass p-5 space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10/60 pb-2.5">
-                <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center">
-                        <i data-lucide="brain-circuit" class="w-4 h-4"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-black text-sm text-white">AI Business Analyst & Decision Support</h3>
-                        <p class="text-[10px] text-slate-500">Kecerdasan buatan analitis instan satu-klik (Mode Pro Aktif)</p>
-                    </div>
-                </div>
-                <span class="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 self-start sm:self-auto">
-                    Kuota Hari Ini: 25 / 25
-                </span>
-            </div>
-
-            <!-- Tombol Pemicu AI Instan (One-Click Insight) -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <button onclick="triggerAIAnalysis('health')" class="p-3 rounded-2xl bg-slate-900 border border-indigo-200 hover:border-indigo-400 text-left transition active:scale-98 shadow-xs space-y-1">
-                    <div class="flex items-center justify-between">
-                        <span class="font-black text-xs text-indigo-900">Analisis Kesehatan Kas</span>
-                        <i data-lucide="activity" class="w-3.5 h-3.5 text-indigo-600"></i>
-                    </div>
-                    <p class="text-[10px] text-slate-500">Evaluasi rasio pemasukan vs belanja tools</p>
-                </button>
-
-                <button onclick="triggerAIAnalysis('forecast')" class="p-3 rounded-2xl bg-slate-900 border border-purple-200 hover:border-purple-400 text-left transition active:scale-98 shadow-xs space-y-1">
-                    <div class="flex items-center justify-between">
-                        <span class="font-black text-xs text-purple-900">Prediksi Arus Kas 30 Hari</span>
-                        <i data-lucide="trending-up" class="w-3.5 h-3.5 text-purple-600"></i>
-                    </div>
-                    <p class="text-[10px] text-slate-500">Proyeksi surplus/defisit bulan depan</p>
-                </button>
-
-                <button onclick="triggerAIAnalysis('cost')" class="p-3 rounded-2xl bg-slate-900 border border-cyan-200 hover:border-cyan-400 text-left transition active:scale-98 shadow-xs space-y-1">
-                    <div class="flex items-center justify-between">
-                        <span class="font-black text-xs text-cyan-900">Efisiensi Pajak & Beban</span>
-                        <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-cyan-600"></i>
-                    </div>
-                    <p class="text-[10px] text-slate-500">Rekomendasi pemangkasan biaya operasional</p>
-                </button>
-            </div>
-
-            <!-- Hasil Output AI -->
-            <div id="ai-insight-box" class="hidden p-4 rounded-2xl bg-slate-900 border border-indigo-300 space-y-2 text-xs shadow-sm">
-                <div class="flex items-center justify-between border-b pb-2">
-                    <span id="ai-insight-title" class="font-black text-indigo-950">Hasil Analisis AI</span>
-                    <span class="text-[10px] font-mono text-slate-400">Gemini Pro Enterprise</span>
-                </div>
-                <p id="ai-insight-text" class="text-slate-300 leading-relaxed"></p>
-            </div>
-        </div>
+        <div data-fm-panel="analisa" data-title="Analisa Keuangan" data-sub="Temuan dan saran dari data toko Anda" data-ic="spark" class="ios-glass p-5"><div id="fm-analisa-box"></div></div>
 
         <!-- AKSI (tombol tindakan seragam) -->
         <div id="fm-actions" class="fm-actions">
@@ -250,7 +198,7 @@
             <button data-fm-action data-ic="user" onclick="openModal('customize_roles')">Ubah Nama Peran</button>
             <button data-fm-action data-ic="plus" onclick="openModal('add_cashier_request')">Buka Kasir Baru</button>
             <button data-fm-action data-ic="download" onclick="FM_INSIGHTS.exportCSV()">Ekspor CSV</button>
-            <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur &amp; Paket</button>
+            <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur Toko</button>
         </div>
 
         <div>
@@ -443,7 +391,7 @@
                         </div>
                         <div class="space-y-2.5">
                             <div>
-                                <label class="font-bold text-slate-300 block mb-1">Nama Staf Kasir (Default: Staf Kasir):</label>
+                                <label class="font-bold text-slate-300 block mb-1">Nama Admin (Default: Admin):</label>
                                 <input type="text" id="custom-role-staff" placeholder="Misal: Budi (Kasir Meja 1)" class="w-full bg-slate-900 border rounded-xl p-2.5 font-semibold outline-none">
                             </div>
                             <div>
@@ -472,7 +420,7 @@
                         </div>
                         <div class="space-y-3">
                             <div>
-                                <label class="font-bold text-slate-300 block mb-1">PIN Baru Kasir (minimal 6 karakter, disarankan 6 angka):</label>
+                                <label class="font-bold text-slate-300 block mb-1">PIN Baru Admin (minimal 6 karakter, disarankan 6 angka):</label>
                                 <input type="password" id="owner-set-pin-kasir" maxlength="32" placeholder="Masukkan PIN baru kasir" class="w-full bg-slate-900 border border-purple-300 rounded-xl p-2.5 font-mono font-bold tracking-widest outline-none">
                             </div>
                             <div>
@@ -586,6 +534,12 @@
     <script src="js/auth.js?v=1.5.8"></script>
     <script src="js/plans.js?v=1.5.8"></script>
     <script src="js/insights.js?v=1.5.8"></script>
+    <script src="js/analisa.js?v=1.5.8"></script>
+    <script>
+        (function(){ function go(){ if (window.FM_ANALISA && document.getElementById('fm-analisa-box')) FM_ANALISA.mount({ el: 'fm-analisa-box', tx: function(){ return txList; } }); }
+          if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(go,0); }); else setTimeout(go,0);
+          if (window.STORE) STORE.onChange(function(){ if (window.FM_ANALISA) FM_ANALISA.render(); }); })();
+    </script>
     <script src="js/labarugi.js?v=1.5.8"></script>
     <script src="js/widgets.js?v=1.5.8"></script>
     <script src="js/config.js?v=18.0"></script>
@@ -672,6 +626,7 @@
         }
 
         function renderAllDashboardReports() {
+            try { if (window.FM_ANALISA) FM_ANALISA.render(); } catch (e) { console.warn("analisa", e); }
             try { if (window.FM_INSIGHTS) FM_INSIGHTS.render(); } catch (e) { console.warn('insights', e); }
             renderLabaRugi();
             renderTaxTable();
@@ -894,7 +849,7 @@
 
         // KUSTOMISASI NAMA PERAN OLEH OWNER
         function saveCustomRoleNames() {
-            const staff = document.getElementById('custom-role-staff').value.trim() || 'Staf Kasir';
+            const staff = document.getElementById('custom-role-staff').value.trim() || 'Admin';
             const manager = document.getElementById('custom-role-manager').value.trim() || 'Supervisor / Manager';
             const owner = document.getElementById('custom-role-owner').value.trim() || 'Owner Eksekutif';
 
@@ -921,7 +876,7 @@
             FM_AUTH.status(tid).then(function (cfg) {
                 if (!cfg) throw new Error('Akun login toko ini belum diaktifkan oleh provider (Tower Kontrol). Hubungi provider terlebih dahulu.');
                 const map = {}; if (kasirPin) map.staff = kasirPin; if (mgrPin) map.manager = mgrPin;
-                const names = { staff: 'Kasir', manager: 'Manager' };
+                const names = { staff: 'Admin', manager: 'Manager' };
                 return FM_AUTH.provisionMany(tid, map).then(function (r) {
                     const done = r.map(function (x) { return names[x]; });
                     return ownerPin ? FM_AUTH.changeOwnPin(ownerPin).then(function () { done.push('Owner'); return done; }) : done;
@@ -933,40 +888,6 @@
             }).catch(function (e) {
                 alert('Gagal menyimpan PIN: ' + ((e && e.message) || e));
             }).then(function () { if (btn) btn.disabled = false; });
-        }
-
-        // FITUR AI ANALITIS SATU-KLIK (ONE-CLICK INSIGHT)
-        function triggerAIAnalysis(type) {
-            const box = document.getElementById('ai-insight-box');
-            const titleEl = document.getElementById('ai-insight-title');
-            const textEl = document.getElementById('ai-insight-text');
-
-            let totalIn = 0;
-            let totalOut = 0;
-            txList.forEach(t => {
-                if (t.category === 'sales') totalIn += t.amount;
-                else totalOut += t.amount;
-            });
-            const net = totalIn - totalOut;
-
-            box.classList.remove('hidden');
-
-            if (type === 'health') {
-                titleEl.innerText = "Evaluasi Kesehatan Kas & Profitabilitas";
-                if (net >= 0) {
-                    textEl.innerText = `Kondisi kas toko terpantau SEHAT dengan net profit Rp ${formatThousandSeparator(net)}. Rasio pengeluaran operasional berada di angka aman (${totalIn > 0 ? Math.round((totalOut/totalIn)*100) : 0}% dari omzet). Disarankan mengalokasikan 20% laba untuk cadangan modal ekspansi.`;
-                } else {
-                    textEl.innerText = `Peringatan Defisit: Pengeluaran tercatat lebih tinggi dibanding kas masuk sebesar -Rp ${formatThousandSeparator(Math.abs(net))}. Periksa pos outcome tools dan produksi untuk memulihkan arus kas positif.`;
-                }
-            } else if (type === 'forecast') {
-                titleEl.innerText = "Prediksi Tren Arus Kas 30 Hari Kedepan";
-                const projected = Math.round(net * 1.15);
-                textEl.innerText = `Berdasarkan pola transaksi harian, diproyeksikan pertumbuhan kas bulan depan berada pada kisaran Rp ${formatThousandSeparator(projected)}. Tingkatkan penjualan software POS dan video production pada minggu ke-2 untuk mencapai target laba maksimal.`;
-            } else if (type === 'cost') {
-                titleEl.innerText = "Rekomendasi Efisiensi Beban & Fiskal PPN";
-                const tax = Math.round(totalOut * 0.12);
-                textEl.innerText = `Total sumbangan pajak negara tercatat Rp ${formatThousandSeparator(tax)}. Disarankan mengevaluasi langganan tools operasional yang frekuensi penggunaannya rendah untuk menghemat beban hingga 15% setiap bulan.`;
-            }
         }
 
         function renderTaxTable() {
@@ -996,7 +917,7 @@
         function submitCashierRequestFromOwner() {
             const qty = document.getElementById('owner-req-cashier-qty').value;
             const role = document.getElementById('owner-req-role').value;
-            const roleLabel = { kasir: 'Kasir', manager: 'Manager', owner: 'Owner' }[role] || 'Kasir';
+            const roleLabel = { kasir: 'Admin', manager: 'Manager', owner: 'Owner' }[role] || 'Kasir';
             const name = document.getElementById('owner-req-cashier-name').value.trim() || `${roleLabel} Tambahan (+${qty})`;
 
             const ticket = {

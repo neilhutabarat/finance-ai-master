@@ -230,7 +230,7 @@
                 </div>
 
                 <div class="ios-pill px-3 py-1.5 text-xs font-bold bg-white/10 border border-white/15 flex items-center shadow-sm">
-                    <span id="user-role-display">Role: Staf Kasir</span>
+                    <span id="user-role-display">Role: Admin</span>
                 </div>
                 <button onclick="logoutKasirSession()" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
@@ -756,7 +756,6 @@
     <script src="js/auth.js?v=1.5.8"></script>
     <script src="js/plans.js?v=1.5.8"></script>
     <script src="js/widgets.js?v=1.5.8"></script>
-    <script>window.addEventListener('load',function(){var b=document.querySelector('button[onclick="sendReceiptWA()"]');if(b&&window.FM_PLANS)FM_PLANS.lock(b,'wa_receipt',{short:true});});</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
     <script src="js/billing.js?v=1.5.8"></script>
@@ -816,7 +815,7 @@
 
         let activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
         const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
-        const user = { role: 'staff', title: customRoles.staff || 'Staf Kasir' };
+        const user = { role: 'staff', title: customRoles.staff || 'Admin' };
 
         if (document.getElementById('user-role-display')) {
             document.getElementById('user-role-display').innerText = `Role: ${user.title}`;
@@ -1657,7 +1656,7 @@
             if (!wrap || !grid) return;
             const q = (document.getElementById('product-grid-search').value || '').toLowerCase().trim();
             const all = STORE.getProducts();
-            wrap.classList.toggle('hidden', all.length === 0);
+            wrap.classList.toggle('hidden', all.length === 0 || !BARCODE_ON);
             grid.innerHTML = '';
             const hues = [221, 262, 160, 340, 25, 190, 45, 280];
             all.filter(p => !q || p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)).forEach(p => {
@@ -1688,7 +1687,7 @@
         });
 
         // ===== SCAN BARCODE =====
-        const BARCODE_ON = (typeof tenantHasFeature === 'function') ? tenantHasFeature(activeTenant, 'barcode') : true;
+        const BARCODE_ON = (window.FM_PLANS && FM_PLANS.has) ? FM_PLANS.has('barcode', 'kasir') : true;
 
         function bcStatus(msg, ok) {
             const el = document.getElementById('barcode-status');
@@ -1738,7 +1737,7 @@
             const locked = document.getElementById('barcode-locked');
             if (!block || !locked) return;
             block.classList.toggle('hidden', !BARCODE_ON);
-            locked.classList.toggle('hidden', BARCODE_ON);
+            locked.classList.add('hidden');
             if (!BARCODE_ON) return;
             const input = document.getElementById('barcode-input');
             input.addEventListener('keydown', (e) => {

@@ -221,7 +221,7 @@
                 </label>
                 <div class="grid grid-cols-3 gap-2" id="role-buttons-grid">
                     <button type="button" onclick="selectRole('staff')" id="role-btn-staff" class="py-2.5 px-2 rounded-2xl text-xs font-black border-2 border-cyan-500 bg-cyan-50 text-cyan-900 shadow-sm transition active:scale-95">
-                        Kasir
+                        Admin
                     </button>
                     <button type="button" onclick="selectRole('manager')" id="role-btn-manager" class="py-2.5 px-2 rounded-2xl text-xs font-bold border-2 border-slate-200 bg-white/70 text-slate-600 hover:border-purple-400 transition active:scale-95">
                         Manager
@@ -534,7 +534,7 @@
                 const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
                 let userObj, targetUrl;
                 if (role === 'partner') { userObj = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey }; targetUrl = "partner.html"; }
-                else if (role === 'staff') { userObj = { role: 'staff', title: customRoles.staff || 'Staf Kasir', permissions: ['kasir'] }; targetUrl = "kasir.html"; }
+                else if (role === 'staff') { userObj = { role: 'staff', title: customRoles.staff || 'Admin', permissions: ['kasir'] }; targetUrl = "kasir.html"; }
                 else if (role === 'manager') { userObj = { role: 'manager', title: customRoles.manager || 'Supervisor / Manager', permissions: ['manager'] }; targetUrl = "manager.html"; }
                 else { userObj = { role: 'owner', title: customRoles.owner || 'Owner Eksekutif', permissions: ['all'] }; targetUrl = "dashboard.html"; }
                 completeLogin(userObj, targetUrl, currentTokoParam);

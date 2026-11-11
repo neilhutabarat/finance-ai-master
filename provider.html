@@ -494,7 +494,7 @@
                             <div><label class="font-bold text-slate-300 block mb-1">Inisial Logo (maks. 3 huruf)</label><input id="ts-logo" type="text" maxlength="3" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="grid grid-cols-2 gap-2"><div><label class="font-bold text-slate-300 block mb-1">Warna Utama</label><input id="ts-warna" type="color" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
                                 <div><label class="font-bold text-slate-300 block mb-1">Warna Aksen</label><input id="ts-aksen" type="color" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div></div>
-                            <label class="sm:col-span-2 flex items-center gap-2 p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-200 font-bold cursor-pointer"><input id="ts-barcode" type="checkbox" checked class="w-4 h-4"> Fitur Scan Barcode kasir (untuk minimarket)</label>
+                            <div id="ts-features" class="sm:col-span-2 p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-200 text-xs"></div>
                         </div>
                         <button id="ts-profile-save" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs transition">Simpan Profil Toko</button>
                     </div>
@@ -594,7 +594,7 @@
                             <div><label class="font-bold text-slate-300 block mb-1">Harga Khusus (opsional, Rp)</label><input id="nt-custom" type="number" min="0" placeholder="Kosongkan = harga standar" oninput="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="sm:col-span-2"><div id="nt-planprev" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Alamat Usaha (untuk catatan lokasi)</label><input id="nt-alamat" type="text" placeholder="Contoh: Jl. Merdeka No. 5, Ketapang" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
-                            <label class="sm:col-span-2 flex items-center gap-2 p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-200 font-bold cursor-pointer"><input id="nt-barcode" type="checkbox" checked class="w-4 h-4"> Fitur Scan Barcode kasir (untuk minimarket)</label>
+                            <div id="nt-features" class="sm:col-span-2 p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-200 text-xs"></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Warna Utama</label><input id="nt-warna" type="color" value="#0f172a" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Warna Aksen</label><input id="nt-aksen" type="color" value="#22d3ee" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
                         </div>
@@ -718,6 +718,7 @@
 
     <script src="js/tenants.js"></script>
     <script src="js/auth.js?v=1.5.8"></script>
+    <script src="js/plans.js?v=1.5.8"></script>
     <script src="js/widgets.js?v=1.5.8"></script>
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
@@ -894,7 +895,7 @@
         // ===== AKTIVITAS TOKO (PRESENCE) =====
         let presenceMap = {};
         const PRESENCE_ACTIVE_MS = 150000;
-        const ROLE_LABEL = { kasir: 'Kasir', manager: 'Manager', owner: 'Owner' };
+        const ROLE_LABEL = { kasir: 'Admin', manager: 'Manager', owner: 'Owner' };
 
         function tsMs(v) { return (v && typeof v.toMillis === 'function') ? v.toMillis() : (typeof v === 'number' ? v : 0); }
 
@@ -1175,8 +1176,7 @@
             set('ts-nama', tn.nama); set('ts-slogan', tn.slogan); set('ts-alamat', loc); set('ts-logo', tn.logoText);
             set('ts-warna', /^#[0-9a-f]{6}$/i.test(tn.warna || '') ? tn.warna : '#0f172a');
             set('ts-aksen', /^#[0-9a-f]{6}$/i.test(tn.warnaAksen || '') ? tn.warnaAksen : '#22d3ee');
-            const bc = document.getElementById('ts-barcode');
-            bc.checked = !(tn.features && tn.features.barcode === false); bc.disabled = !editable;
+            document.getElementById('ts-features').innerHTML = FM_PLANS.checklistHtml('ts', tn.features || {}, editable, tn);
             const sv = document.getElementById('ts-profile-save');
             sv.disabled = !editable; sv.classList.toggle('opacity-40', !editable);
             sv.onclick = function () { saveTenantProfile(tn.id); };
@@ -1209,7 +1209,7 @@
             cfg.logoText = (document.getElementById('ts-logo').value.trim() || nama.slice(0, 2)).toUpperCase().slice(0, 3);
             cfg.warna = document.getElementById('ts-warna').value;
             cfg.warnaAksen = document.getElementById('ts-aksen').value;
-            cfg.features = Object.assign({}, cfg.features || {}, { barcode: !!document.getElementById('ts-barcode').checked });
+            cfg.features = Object.assign({}, cfg.features || {}, FM_PLANS.readChecklist('ts'));
             ['kasir', 'manager', 'owner'].forEach(function (r) {
                 cfg.locations = cfg.locations || {};
                 cfg.locations[r] = Object.assign({ lat: 0, lon: 0 }, cfg.locations[r] || {}, { name: alamat });
@@ -1380,7 +1380,7 @@
                 isMaster: false,
                 isSinglePage: false,
                 isProviderID: false,
-                features: { barcode: !!document.getElementById('nt-barcode').checked },
+                features: FM_PLANS.readChecklist('nt'),
                 customCOA: JSON.parse(JSON.stringify(COA_TEMPLATES[document.getElementById('nt-type').value || 'umum'].coa)),
                 locations: { kasir: loc, manager: loc, owner: loc },
                 createdAtMs: Date.now()
@@ -2535,7 +2535,7 @@
 
         /* ===== AKUN LOGIN (Firebase Auth) ===== */
         let alCfg = {}, alUnsub = null, alTid = '';
-        const AL_ROLES = { staff: 'Kasir', manager: 'Manager', owner: 'Owner', partner: 'Partner' };
+        const AL_ROLES = { staff: 'Admin', manager: 'Manager', owner: 'Owner', partner: 'Partner' };
         function alStart() {
             if (alUnsub || !(typeof db !== 'undefined' && db)) return;
             alUnsub = db.collection('tenant_access_cfg').onSnapshot(function (snap) {
@@ -2650,6 +2650,7 @@
                 previewNewTenantPlan();
                 previewNewTenantId();
                 fillBusinessTypes();
+                document.getElementById('nt-features').innerHTML = FM_PLANS.checklistHtml('nt', null, true);
                 document.getElementById('modal-title').innerText = "Tambah Klien Baru";
                 document.getElementById('modal-subtitle').innerText = "Toko langsung aktif dan bisa dibuka lewat link khusus";
                 document.getElementById('nt-result').classList.add('hidden');

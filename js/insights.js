@@ -42,6 +42,7 @@
     if (!cfg) return;
     var box = document.getElementById(cfg.el); if (!box) return;
     var P = window.FM_PLANS; if (!P || !window.STORE) return;
+    if (!P.has('dashboard')) { box.innerHTML = ''; return; }
     sync();
     var txList = cfg.tx() || [];
     var prods = STORE.getProducts(); var pm = {}; prods.forEach(function (p) { pm[p.code] = p; });
@@ -86,9 +87,7 @@
         '</tbody></table></div>' : '<div class="fm-sub">Belum ada penjualan produk.</div>') + '</div>';
     }
     box.innerHTML = h;
-    var KEYS = { 'Ringkasan Hari Ini': 'today_summary', 'Metode Bayar Hari Ini': 'pay_methods', 'Target Omzet': 'targets', 'Stok Menipis': 'low_stock', 'Laba & Margin per Produk': 'margin_product' };
-    [].slice.call(box.querySelectorAll('[data-fm-i]')).forEach(function (el) { var k = KEYS[el.getAttribute('data-fm-i')]; if (k) P.lock(el, k, { mask: true }); });
-    var sb = box.querySelector('[data-save-tg]'); if (sb && !sb.disabled) sb.onclick = saveTargets;
+    var sb = box.querySelector('[data-save-tg]'); if (sb) sb.onclick = saveTargets;
   }
 
   window.FM_INSIGHTS = {
