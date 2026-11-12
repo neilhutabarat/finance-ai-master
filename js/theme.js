@@ -3,11 +3,18 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.11';
+  var BETA = 'BETA 1.12';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.12)', '12 Nov 2026', [
+      '[Tampilan] Latar baru bergaya ilustrasi hujan gerimis (pohon rindang, kolam, bunga matahari); kartu, menu bawah, dan semua pop-up dibuat tembus pandang dengan tulisan tetap jelas',
+      '[Tampilan] Istilah di layar Kasir disederhanakan (Closing, Riwayat Closing, Saldo); menu bawah dirapikan agar garis tepinya presisi',
+      '[Perbaikan] Pemberitahuan versi baru kini hilang sendiri setelah sekitar 5 detik; catatan lengkap tetap ada di Pengaturan > Catatan Rilis',
+      '[Perbaikan] Aplikasi kini bisa dipasang ke Chrome (tombol Pasang aplikasi tampil bila Chrome mengizinkan); pilihan Atur Warna Halaman dihapus dari Pengaturan',
+      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 1.11)', '12 Nov 2026', [
       '[Perbaikan] Halaman Kasir, Manager, dan Owner kini memakai seluruh tinggi layar; sisa ruang kosong di bawah dan bilah tombol Tutup yang tidak berfungsi dihapus',
       '[Perbaikan] Menu bawah tidak lagi bertabrakan dengan konten; jarak bawah halaman disesuaikan',
@@ -234,7 +241,7 @@
     h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (mode === 'light' ? 'on' : '') + '" data-mode="light"><div class="fm-prev" style="background:linear-gradient(135deg,#ffffff,#e2e8f0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (mode === 'dark' ? 'on' : '') + '" data-mode="dark"><div class="fm-prev" style="background:#000"></div>Gelap Pekat</button></div></div>';
-    if (THEME_ON) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
+    if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
       ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +
       '</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px"><label style="font-size:12px;color:#c7cbd6">Warna bebas</label><input type="color" id="fm-acc-custom" value="' + esc(pick) + '" style="width:44px;height:30px;border:0;background:none;padding:0"><button class="fm-btn" data-accreset style="margin-left:auto">Kembali ke Bawaan</button></div></div></div>';
     if (CAN_LOGO && THEME_ON) {

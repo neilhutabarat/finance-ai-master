@@ -59,7 +59,11 @@
     ov.innerHTML = '<b style="display:block;margin-bottom:4px">Yang baru di v' + n[0] + '</b><ul style="margin:0;padding-left:18px;color:#bbb;font-size:12px">' + items + '</ul>' +
       '<button id="fm-whatsnew-ok" style="all:unset;cursor:pointer;display:block;margin-top:10px;text-align:center;background:#2563eb;color:#fff;border-radius:10px;padding:6px 0;font-weight:700;font-size:12.5px">Mengerti</button>';
     document.body.appendChild(ov);
-    document.getElementById('fm-whatsnew-ok').onclick = function () { try { localStorage.setItem('fm_seen_version', versiBerjalan); } catch (e) {} ov.remove(); };
+    function tutup() { try { localStorage.setItem('fm_seen_version', versiBerjalan); } catch (e) {} if (!ov.parentNode) return; ov.style.transition = 'opacity .5s'; ov.style.opacity = '0'; setTimeout(function () { ov.remove(); }, 520); }
+    document.getElementById('fm-whatsnew-ok').onclick = tutup;
+    /* cukup tampil sekitar 5 detik, lalu hilang sendiri; catatan lengkap ada di Pengaturan > Catatan Rilis */
+    try { localStorage.setItem('fm_seen_version', versiBerjalan); } catch (e) {}
+    setTimeout(tutup, 5000);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tampilkanCatatanBaru); else tampilkanCatatanBaru();
 })();

@@ -56,7 +56,7 @@
   function buildButton(label, onClick) {
     if (btn) btn.remove();
     btn = document.createElement('button'); btn.type = 'button'; btn.id = 'pwa-install-btn'; btn.textContent = label;
-    btn.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:2147481000;background:#111;color:#fff;border:0;border-radius:99px;padding:9px 18px;font:600 12.5px system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer';
+    btn.style.cssText = 'position:fixed;right:16px;bottom:96px;z-index:2147481000;background:rgba(255,255,255,.75);color:#1e293b;border:1px solid rgba(71,85,105,.35);border-radius:99px;padding:9px 18px;font:700 12.5px system-ui,sans-serif;box-shadow:0 6px 20px rgba(51,65,85,.2);cursor:pointer';
     btn.onclick = onClick;
     document.body.appendChild(btn);
   }
@@ -64,8 +64,10 @@
   function applyManifest(tn, id, warna, icons) {
     var manifest = {
       name: tn.nama || 'Oneilverse', short_name: (tn.nama || 'Oneilverse').slice(0, 14),
-      start_url: location.pathname.split('/').pop() + '?toko=' + encodeURIComponent(id),
-      scope: './', display: 'standalone', orientation: 'any',
+      /* manifest dimuat dari blob: Chrome hanya menganggapnya bisa dipasang bila alamat di dalamnya MUTLAK (bukan relatif) */
+      id: location.origin + '/' + (location.pathname.split('/').pop() || 'index.html') + '?toko=' + encodeURIComponent(id),
+      start_url: location.origin + location.pathname + '?toko=' + encodeURIComponent(id),
+      scope: location.origin + location.pathname.replace(/[^\/]*$/, ''), display: 'standalone', orientation: 'any',
       background_color: '#0b1020', theme_color: warna,
       icons: [{ src: icons[0], sizes: '192x192', type: 'image/png' }, { src: icons[1], sizes: '512x512', type: 'image/png' }]
     };
