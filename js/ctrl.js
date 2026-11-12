@@ -59,12 +59,11 @@
             if (document.title) document.title = document.title.replace(/^Oneilverse/, tn.nama);
 
             var tierEl = document.getElementById('tier-badge-indicator');
-            if (tierEl) {
-                var t = tn.tier || 'basic';
-                var base = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ';
-                if (t === 'pro') { tierEl.textContent = 'Pro'; }
-                else if (t === 'plus') { tierEl.textContent = 'Plus'; tierEl.className = base + 'bg-cyan-500/30 border-cyan-400/60 text-cyan-200'; }
-                else { tierEl.textContent = 'Basic'; tierEl.className = base + 'bg-slate-500/30 border-slate-400/50 text-slate-200'; }
+            var t = (tn.tier === 'pro') ? 'plus' : (tn.tier || 'basic');
+            if (tierEl) tierEl.style.display = 'none'; // Basic tanpa lencana; Plus ditandai "+" di ujung nama
+            if (nameEl) {
+                var oldPl = nameEl.querySelector('.fm-plus'); if (oldPl) oldPl.remove();
+                if (t === 'plus') nameEl.insertAdjacentHTML('beforeend', (window.FM_LOGO && FM_LOGO.plus) ? FM_LOGO.plus() : '<span class="fm-plus" style="display:inline-block;transform:skewX(-14deg);font-weight:800">+</span>');
             }
 
             // logo: ganti kristal Oneilverse dengan inisial toko
@@ -316,6 +315,18 @@
     function watchDeletion(tenant) {
         var key = String(tenant.id).toLowerCase();
         db.collection('tenants_registry').doc(key).onSnapshot(function (snap) {
+            if (snap.exists && !snap.metadata.fromCache) {
+                // paket/nama dari Tower berubah: perbarui header tanpa menunggu muat ulang
+                try {
+                    var cfg0 = JSON.parse((snap.data() || {}).json || 'null');
+                    if (cfg0 && typeof registryMerge === 'function') {
+                        var k0 = registryMerge(cfg0);
+                        if (k0 && typeof registryWriteCache === 'function') registryWriteCache(k0, cfg0);
+                        applyHeaderBranding(getActiveTenant());
+                    }
+                } catch (e0) {}
+                return;
+            }
             if (snap.exists || snap.metadata.fromCache) return;
             if (typeof registryDropCache === 'function') registryDropCache(key);
             try { sessionStorage.clear(); } catch (e) {}

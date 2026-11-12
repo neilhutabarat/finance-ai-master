@@ -70,8 +70,8 @@
     </script>
     <script src="js/billing.js?v=4.1"></script>
     <script src="js/dialog.js?v=1.13"></script>
-    <script src="js/theme.js?v=4.1"></script>
-    <script src="js/logo.js?v=1.5.8"></script>
+    <script src="js/theme.js?v=4.1b"></script>
+    <script src="js/logo.js?v=1.6.0"></script>
     <script src="js/skin.js?v=1.5.8"></script>
     <script src="js/tower-menu.js?v=4.3"></script>
     <script src="js/chat.js?v=4.1"></script>
@@ -1176,22 +1176,22 @@
         }
 
         // ===== HARGA PAKET & TAGIHAN =====
-        let pricing = { basic: { monthly: 0 }, plus: { monthly: 0 }, yearlyDiscountPct: 20 };
+        let pricing = { basic: { monthly: 0 }, plus: { monthly: 119000 }, yearlyDiscountPct: 20 };
         const TIER_LABEL = { basic: 'Basic', plus: 'Plus', pro: 'Plus' };
 
         function rp(n) { return formatThousand(Math.round(n || 0)); }
 
-        function computePlan(tier, cycle, custom) {
+        function computePlan(tier, cycle, custom, discOverride) {
             const m = Number(pricing[tier] && pricing[tier].monthly) || 0;
-            const disc = (typeof pricing.yearlyDiscountPct === 'number') ? pricing.yearlyDiscountPct : 20;
+            const disc = (discOverride !== undefined && discOverride !== '' && discOverride !== null && !isNaN(Number(discOverride))) ? Math.min(90, Math.max(0, Number(discOverride))) : ((typeof pricing.yearlyDiscountPct === 'number') ? pricing.yearlyDiscountPct : 20);
             const full = cycle === 'yearly' ? m * 12 : m;
             const standard = cycle === 'yearly' ? Math.round(m * 12 * (1 - disc / 100)) : m;
             const c = Number(custom) > 0 ? Number(custom) : 0;
             return { monthly: m, disc: disc, standard: standard, amount: c || standard, custom: !!c, saving: cycle === 'yearly' ? full - standard : 0 };
         }
 
-        function planSummaryHtml(tier, cycle, custom) {
-            const r = computePlan(tier, cycle, custom);
+        function planSummaryHtml(tier, cycle, custom, disc) {
+            const r = computePlan(tier, cycle, custom, disc);
             if (!r.monthly && !r.custom && tier !== 'basic') return '<span class="text-amber-300">Harga paket ' + TIER_LABEL[tier] + ' belum diatur. Atur dulu lewat tombol Harga Paket.</span>';
             const unit = cycle === 'yearly' ? 'per tahun' : 'per bulan';
             let h = '<b class="text-white">' + TIER_LABEL[tier] + ' • ' + rp(r.amount) + ' ' + unit + '</b>';
@@ -1274,7 +1274,7 @@
                     const d = doc.data();
                     pricing = {
                         basic: { monthly: Number(d.basic && d.basic.monthly) || 0 },
-                        plus: { monthly: Number(d.plus && d.plus.monthly) || 0 },
+                        plus: { monthly: Number(d.plus && d.plus.monthly) || 119000 },
                         yearlyDiscountPct: (typeof d.yearlyDiscountPct === 'number') ? d.yearlyDiscountPct : 20
                     };
                 }
@@ -1331,13 +1331,13 @@
             };
         }
 
-        function setTenantPlan(tenantId, tier, cycle, custom) {
+        function setTenantPlan(tenantId, tier, cycle, custom, disc) {
             const key = String(tenantId).toLowerCase();
             const tn = TENANTS_CONFIG[key];
             if (!isManaged(tn)) return alert('Paket hanya dapat diubah untuk toko yang dikelola Tower.');
             if (tier === 'pro') tier = 'plus';
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
-            const r = computePlan(tier, cycle, custom);
+            const r = computePlan(tier, cycle, custom, disc);
             if (!r.amount && tier !== 'basic') return alert('Harga paket ' + TIER_LABEL[tier] + ' belum diatur. Isi Harga Khusus, atau atur dulu harga bulanan Plus.');
             if (!confirm('Ubah paket ' + tn.nama + ' menjadi ' + TIER_LABEL[tier] + ' (' + (cycle === 'yearly' ? 'Tahunan' : 'Bulanan') + ') seharga ' + rp(r.amount) + '?\n\nFitur tambahan toko akan diatur ulang ke bawaan paket ini.')) return;
             const cfg = Object.assign({}, tn); delete cfg.fromRegistry; cfg.tier = tier;
@@ -1346,7 +1346,7 @@
             batch.set(db.collection('tenants_registry').doc(key), { id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             batch.set(db.collection('tenant_ctrl').doc(tn.id), {
                 tier: tier, billingCycle: cycle, priceMonthlyAtPurchase: r.monthly, billedAmount: r.amount,
-                customPrice: r.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                customPrice: r.custom, yearlyDiscountPct: (disc === '' || disc === undefined || disc === null) ? firebase.firestore.FieldValue.delete() : r.disc, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
             batch.commit().then(function () { planPanelFor = null; tierPanelFor = null; billingSyncTier(tn.id, tier); alert('Paket tersimpan. Fitur baru aktif di toko klien saat halaman toko dibuka kembali.'); })
                 .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
@@ -1909,7 +1909,7 @@
 
 
         // ===== BILLING ESTIMASI PER DETIK =====
-        const MODE_DEFAULT = { basic: 0, plus: 49000, pro: 129000 };
+        const MODE_DEFAULT = { basic: 0, plus: 119000 };
         function modePriceFor(tier) { return 0; } // paket Basic/Plus/Pro belum dipakai
         const BILL_STATE = {
             lunas: ['Lunas', 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'],
@@ -2441,7 +2441,7 @@
         }
 
         let inspectPart = 'lokasi';
-        const INSPECT_TITLE = { lokasi: ['Lokasi & Aktivitas', 'Lokasi terminal, yang sedang online, dan mutasi live (hanya lihat)'], kuota: ['Kuota Terminal', 'Jumlah terminal Kasir, Manager, dan Owner'], paket: ['Paket', 'Basic, Plus, atau Pro'], billing: ['Billing', 'Biaya layanan dan pembayaran'], versi: ['Versi Toko', 'Kunci toko ke versi aplikasi tertentu'] };
+        const INSPECT_TITLE = { lokasi: ['Lokasi & Aktivitas', 'Lokasi terminal, yang sedang online, dan mutasi live (hanya lihat)'], kuota: ['Kuota Terminal', 'Jumlah terminal Kasir, Manager, dan Owner'], paket: ['Paket', 'Basic atau Plus'], billing: ['Billing', 'Biaya layanan dan pembayaran'], versi: ['Versi Toko', 'Kunci toko ke versi aplikasi tertentu'] };
         function applyInspectPart() {
             const map = { 'inspect-header-card': 'lokasi', 'inspect-gps-card': 'lokasi', 'inspect-tx-card': 'lokasi', 'inspect-plan-card': 'kuota', 'inspect-tier-card': 'paket', 'inspect-bill-card': 'billing', 'inspect-rollout-card': 'versi' };
             Object.keys(map).forEach(function (id) { const el = document.getElementById(id); if (el) el.style.display = map[id] === inspectPart ? '' : 'none'; });
@@ -2460,13 +2460,14 @@
                 '<p class="text-slate-400">Paket saat ini: <b class="text-white">' + (TIER_LABEL[tier === 'pro' ? 'plus' : tier] || tier) + '</b> (' + (cycle === 'yearly' ? 'tahunan' : 'bulanan') + ')</p>' +
                 '<div class="grid grid-cols-2 gap-3"><div><label class="font-bold text-slate-300 block mb-1">Paket</label><select id="ip-tier" class="' + cls + '"><option value="basic"' + sel('basic', tier) + '>Basic</option><option value="plus"' + sel('plus', tier === 'pro' ? 'plus' : tier) + '>Plus</option></select></div>' +
                 '<div><label class="font-bold text-slate-300 block mb-1">Siklus</label><select id="ip-cycle" class="' + cls + '"><option value="monthly"' + sel('monthly', cycle) + '>Bulanan</option><option value="yearly"' + sel('yearly', cycle) + '>Tahunan</option></select></div>' +
+                '<div class="col-span-2"><label class="font-bold text-slate-300 block mb-1">Diskon tahunan (%) — kosongkan bila ikut standar ' + pricing.yearlyDiscountPct + '%</label><input id="ip-disc" type="number" min="0" max="90" value="' + (typeof c.yearlyDiscountPct === 'number' ? c.yearlyDiscountPct : '') + '" class="' + cls + '"></div>' +
                 '<div class="col-span-2"><label class="font-bold text-slate-300 block mb-1">Harga khusus (Rp, kosongkan bila standar)</label><input id="ip-custom" type="number" min="0" value="' + (c.customPrice || '') + '" class="' + cls + '"></div></div>' +
                 '<div id="ip-sum" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div>' +
                 '<button id="ip-save" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs transition">Simpan Paket</button>';
             const g = function (id) { return document.getElementById(id).value; };
-            const sum = function () { document.getElementById('ip-sum').innerHTML = planSummaryHtml(g('ip-tier'), g('ip-cycle'), g('ip-custom')); };
-            ['ip-tier', 'ip-cycle'].forEach(function (i) { document.getElementById(i).onchange = sum; }); document.getElementById('ip-custom').oninput = sum; sum();
-            document.getElementById('ip-save').onclick = function () { setTenantPlan(tenant.id, g('ip-tier'), g('ip-cycle'), g('ip-custom')); };
+            const sum = function () { document.getElementById('ip-sum').innerHTML = planSummaryHtml(g('ip-tier'), g('ip-cycle'), g('ip-custom'), g('ip-disc')); };
+            ['ip-tier', 'ip-cycle'].forEach(function (i) { document.getElementById(i).onchange = sum; }); document.getElementById('ip-custom').oninput = sum; document.getElementById('ip-disc').oninput = sum; sum();
+            document.getElementById('ip-save').onclick = function () { setTenantPlan(tenant.id, g('ip-tier'), g('ip-cycle'), g('ip-custom'), g('ip-disc')); };
         }
 
         function renderInspect(tenantId) {

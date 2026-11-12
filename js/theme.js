@@ -11,7 +11,8 @@
     ['1.0.0 (BETA 4.1)', '13 Nov 2026', [
       '[Fitur] Tampilan halaman kini lebih fleksibel per toko: jam, cuaca, kurs dan emas, kartu estimasi biaya layanan, chat, dan pilihan latar belakang dapat disesuaikan untuk Admin, Manager, dan Owner sesuai kebutuhan usaha',
       '[Perbaikan] Fitur yang tidak dipakai toko kini hilang sepenuhnya dari tampilan, tidak sekadar disembunyikan sebagian',
-      '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru'
+      '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru',
+      '[Tampilan] Logo Oneilverse baru. Toko berpaket Plus kini ditandai tanda "+" miring di ujung nama toko',
     ]],
     ['1.0.0 (BETA 4.0)', '12 Nov 2026', [
       '[Perbaikan] Versi stabil: seluruh menu Admin, Manager, dan Owner diperiksa ulang dan dirapikan',
