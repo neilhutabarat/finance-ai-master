@@ -8,13 +8,23 @@
     { id: 'klien', title: 'Klien', hint: 'Toko mitra', c: '#6fc7c0', items: [
       { t: 'Klien Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko baru dan buat ID-nya' },
       { t: 'Jaringan Mitra', ic: 'building', find: 'Jaringan Mitra', d: 'Pantau daftar toko (hanya lihat)' },
-      { t: 'Edit Toko', ic: 'gear', run: "towerPick('edit')", d: 'Atur profil, fitur, COA, dan produk satu toko' },
-      { t: 'Inspeksi Toko', ic: 'shield', run: "towerPick('inspect')", d: 'Periksa data dan kunci versi satu toko' },
-      { t: 'Bekukan / Aktifkan', ic: 'moon', run: "towerPick('freeze')", d: 'Bekukan atau aktifkan kembali toko' },
-      { t: 'Salin Link Toko', ic: 'send', run: "towerPick('link')", d: 'Salin link login toko' },
       { t: 'Permohonan Kasir', ic: 'users', run: "openModal('tickets')", badge: 'stat-pending-tickets', d: 'Setujui atau tolak tambahan terminal' },
       { t: 'Toko Berhenti', ic: 'archive', find: 'Toko Berhenti', d: 'Toko yang dibekukan atau berhenti' },
       { t: 'Kendali Massal', ic: 'users', soon: true, d: 'Segera: ubah banyak toko sekaligus' }
+    ] },
+    { id: 'toko', title: 'Toko', hint: 'Pilih toko, lalu langsung ke isinya', c: '#8fb8e8', items: [
+      { t: 'Profil Toko', ic: 'store', run: "towerPick('profil')", d: 'Nama, slogan, warna, logo' },
+      { t: 'Fitur Toko', ic: 'grid', run: "towerPick('fitur')", d: 'Centang fitur per peran' },
+      { t: 'COA Toko', ic: 'list', run: "towerPick('coa')", d: 'Daftar akun toko' },
+      { t: 'Produk Toko', ic: 'box', run: "towerPick('produk')", d: 'Produk dan stok toko' },
+      { t: 'Kuota Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Kasir, Manager, Owner' },
+      { t: 'Paket', ic: 'tag', run: "towerPick('paket')", d: 'Basic, Plus, Pro' },
+      { t: 'Billing', ic: 'chart', run: "towerPick('billing')", d: 'Biaya dan pembayaran toko' },
+      { t: 'Lokasi & Aktivitas', ic: 'shield', run: "towerPick('lokasi')", d: 'GPS, online, mutasi live' },
+      { t: 'Versi Toko', ic: 'swap', run: "towerPick('versi')", d: 'Kunci versi aplikasi' },
+      { t: 'Link Toko', ic: 'send', run: "towerPick('link')", d: 'Salin link login' },
+      { t: 'Bekukan / Aktifkan', ic: 'moon', run: "towerPick('freeze')", d: 'Bekukan atau aktifkan toko' },
+      { t: 'Hapus / Pulihkan Klien', ic: 'trash', run: "towerPick('hapus')", d: 'Hapus klien atau pulihkan' }
     ] },
     { id: 'uang', title: 'Uang', hint: 'Tagihan, pajak, dan pembukuan', c: '#d9b872', items: [
       { t: 'Billing Jaringan', ic: 'chart', find: 'Billing Jaringan', d: 'Tagihan, jatuh tempo, cicilan, uji coba' },

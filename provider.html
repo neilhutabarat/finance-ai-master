@@ -73,9 +73,9 @@
     <script src="js/theme.js?v=4.1"></script>
     <script src="js/logo.js?v=1.5.8"></script>
     <script src="js/skin.js?v=1.5.8"></script>
-    <script src="js/tower-menu.js?v=4.1"></script>
+    <script src="js/tower-menu.js?v=4.2"></script>
     <script src="js/chat.js?v=4.1"></script>
-    <script src="js/tower-cockpit.js?v=4.1"></script>
+    <script src="js/tower-cockpit.js?v=4.2"></script>
     <style>#main-modal-container{z-index:70 !important}</style>
     <script src="js/sw-register.js" defer></script>
 </head>
@@ -242,10 +242,6 @@
 
         <!-- TOMBOL AKSI CEPAT PROVIDER -->
         <div id="fm-actions" class="fm-actions">
-            <button data-fm-action data-ic="gear" onclick="towerPick('edit')"><span>Edit Toko</span></button>
-            <button data-fm-action data-ic="shield" onclick="towerPick('inspect')"><span>Inspeksi Toko</span></button>
-            <button data-fm-action data-ic="moon" onclick="towerPick('freeze')"><span>Bekukan / Aktifkan</span></button>
-            <button data-fm-action data-ic="send" onclick="towerPick('link')"><span>Salin Link Toko</span></button>
             <button data-fm-action data-ic="list" onclick="openModal('provider_coa_mgmt')"><span>COA Provider</span></button>
             <button data-fm-action data-ic="tag" onclick="openModal('pricing')"><span>Harga Paket</span></button>
             <button data-fm-action data-ic="archive" onclick="openModal('former')"><span>Toko Berhenti</span><span id="former-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-black"></span></button>
@@ -506,11 +502,11 @@
 
                 <!-- 6. POPUP KIRIM PESAN KE USER -->
                 <div id="popup-content-tenant_settings" class="space-y-4 hidden">
-                    <div class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-400/30 space-y-3 text-xs">
-                        <span class="font-black text-sm text-white block">Profil & Tampilan Toko</span>
+                    <div id="ts-card-profil" class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-400/30 space-y-3 text-xs">
+                        <span id="ts-card-title" class="font-black text-sm text-white block">Profil & Tampilan Toko</span>
                         <p id="ts-profile-note" class="text-amber-300 hidden"></p>
                         <div id="ts-features" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-200 text-xs"></div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div id="ts-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Nama Toko</label><input id="ts-nama" type="text" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Slogan (teks di bawah nama toko)</label><input id="ts-slogan" type="text" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Alamat Usaha</label><input id="ts-alamat" type="text" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
@@ -520,7 +516,7 @@
                         <button id="ts-profile-save" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs transition">Simpan Profil Toko</button>
                     </div>
 
-                    <div class="p-4 rounded-2xl bg-purple-950/40 border border-purple-400/30 space-y-3 text-xs">
+                    <div id="ts-card-coa" class="p-4 rounded-2xl bg-purple-950/40 border border-purple-400/30 space-y-3 text-xs">
                         <span class="font-black text-sm text-white block">Daftar Akun (COA) <span class="font-normal text-slate-400 text-[11px]">— klik dan seret baris untuk mengubah urutan</span></span>
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                             <input id="ts-coa-code" type="text" placeholder="Kode" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
@@ -538,7 +534,7 @@
                         </div>
                     </div>
 
-                    <div class="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-400/30 space-y-3 text-xs">
+                    <div id="ts-card-prod" class="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-400/30 space-y-3 text-xs">
                         <span class="font-black text-sm text-white block">Produk & Stok</span>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
                             <input id="ts-p-code" type="text" placeholder="Kode" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
@@ -666,12 +662,13 @@
                 <!-- 7. POPUP DETAIL INSPEKSI LOKASI 3 AKUN & CERMIN LIVE -->
                 <div id="popup-content-inspect" class="space-y-4 hidden">
                     <div id="inspect-header-card" class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-400/30 space-y-3 text-xs"></div>
+                    <div id="inspect-tier-card" class="hidden p-4 rounded-2xl bg-sky-950/30 border border-sky-400/30 space-y-3 text-xs"></div>
                     <div id="inspect-plan-card" class="hidden p-4 rounded-2xl bg-amber-950/30 border border-amber-400/30 space-y-3 text-xs"></div>
                     <div id="inspect-rollout-card" class="hidden p-4 rounded-2xl bg-violet-950/30 border border-violet-400/30 space-y-3 text-xs"></div>
                     <div id="inspect-bill-card" class="hidden p-4 rounded-2xl bg-emerald-950/30 border border-emerald-400/30 space-y-3 text-xs"></div>
 
                     <!-- KOTAK LOKASI GPS PRESISI 3 AKUN: KASIR, MANAGER, OWNER -->
-                    <div class="p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-2.5 text-xs">
+                    <div id="inspect-gps-card" class="p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-2.5 text-xs">
                         <span class="font-black text-cyan-300 uppercase tracking-wider block flex items-center">
                             <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1.5 text-cyan-400"></i>
                             Lokasi Terminal (GPS live bila tersedia):
@@ -696,7 +693,7 @@
                     </div>
 
                     <!-- TABEL CERMIN LIVE KASIR TOKO -->
-                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
+                    <div id="inspect-tx-card" class="overflow-x-auto border border-white/10 rounded-2xl">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
                                 <tr>
@@ -705,7 +702,6 @@
                                     <th class="py-2.5 px-3 text-right">Debit</th>
                                     <th class="py-2.5 px-3 text-right">Kredit</th>
                                     <th class="py-2.5 px-3 text-center">Petugas</th>
-                                    <th class="py-2.5 px-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="inspect-tx-body"></tbody>
@@ -835,7 +831,22 @@
 
         /* Pemilih toko untuk tile Kendali: popup daftar toko -> aksi langsung */
         function towerPick(kind) {
-            var T = { edit: ['Edit Toko', 'Pilih toko yang mau diubah profil, fitur, COA, dan produknya'], inspect: ['Inspeksi Toko', 'Pilih toko yang mau diperiksa'], freeze: ['Bekukan / Aktifkan', 'Pilih toko untuk dibekukan atau diaktifkan kembali'], link: ['Salin Link Toko', 'Pilih toko, link login langsung tersalin'] }[kind];
+            var T = {
+                profil: ['Profil Toko', 'Pilih toko: nama, slogan, warna, logo'],
+                fitur: ['Fitur Toko', 'Pilih toko: centang fitur per peran'],
+                coa: ['COA Toko', 'Pilih toko untuk mengatur COA-nya'],
+                produk: ['Produk Toko', 'Pilih toko untuk mengatur produknya'],
+                kuota: ['Kuota Terminal', 'Pilih toko untuk mengatur jumlah terminal'],
+                paket: ['Paket', 'Pilih toko untuk mengubah paketnya'],
+                billing: ['Billing', 'Pilih toko untuk mengatur billing'],
+                lokasi: ['Lokasi & Aktivitas', 'Pilih toko untuk melihat lokasi dan aktivitasnya'],
+                versi: ['Versi Toko', 'Pilih toko untuk mengunci versinya'],
+                link: ['Salin Link Toko', 'Pilih toko, link login langsung tersalin'],
+                freeze: ['Bekukan / Aktifkan', 'Pilih toko untuk dibekukan atau diaktifkan kembali'],
+                hapus: ['Hapus / Pulihkan Klien', 'Pilih klien untuk dihapus atau dipulihkan']
+            }[kind];
+            if (!T) return;
+            var NEED_MANAGED = { kuota: 1, paket: 1, versi: 1, hapus: 1 };
             var old = document.getElementById('tw-pick'); if (old) old.remove();
             var o = document.createElement('div'); o.id = 'tw-pick';
             o.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px';
@@ -850,13 +861,13 @@
             var q = document.getElementById('tw-pick-q'), L = document.getElementById('tw-pick-l');
             function draw() {
                 var k = q.value.trim().toLowerCase();
-                var list = listNetworkTenants().filter(function (t) { return !t.deletedByTower && (!k || String(t.id).toLowerCase().indexOf(k) >= 0 || String(t.nama || '').toLowerCase().indexOf(k) >= 0); });
+                var list = listNetworkTenants().filter(function (t) { return (kind === 'hapus' || !t.deletedByTower) && (!NEED_MANAGED[kind] || isManaged(t)) && (!k || String(t.id).toLowerCase().indexOf(k) >= 0 || String(t.nama || '').toLowerCase().indexOf(k) >= 0); });
                 L.innerHTML = '';
                 if (!list.length) { L.innerHTML = '<div style="padding:18px;text-align:center;opacity:.6;font-size:13px">Tidak ada toko yang cocok</div>'; return; }
                 list.forEach(function (t) {
                     var sus = isTenantSuspended(t.id), b = document.createElement('button');
                     b.style.cssText = 'display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:11px 12px;margin-bottom:6px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)';
-                    var act = kind === 'freeze' ? (sus ? 'Aktifkan' : 'Bekukan') : '';
+                    var act = kind === 'freeze' ? (sus ? 'Aktifkan' : 'Bekukan') : (kind === 'hapus' ? (t.deletedByTower ? 'Pulihkan' : 'Hapus') : '');
                     b.innerHTML = '<span><span style="font-weight:800;font-size:13px">' + escHtml(t.nama || t.id) + '</span><span style="display:block;opacity:.6;font-size:11px;font-family:monospace">' + escHtml(t.id) + '</span></span>' +
                         '<span style="font-size:10px;font-weight:900;padding:3px 9px;border-radius:99px;' + (sus ? 'background:rgba(244,63,94,.2);color:#fda4af' : 'background:rgba(16,185,129,.2);color:#6ee7b7') + '">' + (act || (sus ? 'BEKU' : 'AKTIF')) + '</span>';
                     b.onclick = function () {
@@ -867,8 +878,9 @@
                             return;
                         }
                         close();
-                        if (kind === 'edit') openTenantSettings(t.id);
-                        else if (kind === 'inspect') openInspectUMKM(t.id);
+                        if (kind === 'profil' || kind === 'fitur' || kind === 'coa' || kind === 'produk') openTenantSettings(t.id, kind);
+                        else if (kind === 'kuota' || kind === 'paket' || kind === 'billing' || kind === 'lokasi' || kind === 'versi') openInspectUMKM(t.id, kind);
+                        else if (kind === 'hapus') { if (t.deletedByTower) restoreMasterTenant(t.id); else if (confirm('Yakin menghapus klien ' + (t.nama || t.id) + ' [' + t.id + ']? Ada satu konfirmasi lagi setelah ini.')) deleteTenantRegistry(t.id); }
                         else setTenantSuspended(t.id, !sus);
                     };
                     L.appendChild(b);
@@ -1187,7 +1199,7 @@
                 tier: tier, billingCycle: cycle, priceMonthlyAtPurchase: r.monthly, billedAmount: r.amount,
                 customPrice: r.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
-            batch.commit().then(function () { planPanelFor = null; billingSyncTier(tn.id, tier); alert('Paket tersimpan. Fitur baru aktif di toko klien saat halaman toko dibuka kembali.'); })
+            batch.commit().then(function () { planPanelFor = null; tierPanelFor = null; billingSyncTier(tn.id, tier); alert('Paket tersimpan. Fitur baru aktif di toko klien saat halaman toko dibuka kembali.'); })
                 .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
@@ -1311,19 +1323,28 @@
             }).catch(function () {});
         }
 
-        function openTenantSettings(tenantId) {
+        let tsPart = 'profil';
+        const TS_TITLE = { profil: 'Profil Toko', fitur: 'Fitur Toko', coa: 'COA Toko', produk: 'Produk Toko' };
+        function applyTsPart() {
+            const sh = function (id, on) { const el = document.getElementById(id); if (el) el.style.display = on ? '' : 'none'; };
+            sh('ts-card-profil', tsPart === 'profil' || tsPart === 'fitur'); sh('ts-card-coa', tsPart === 'coa'); sh('ts-card-prod', tsPart === 'produk');
+            sh('ts-features', tsPart === 'fitur'); sh('ts-fields', tsPart === 'profil');
+            const t = document.getElementById('ts-card-title'); if (t) t.innerText = tsPart === 'fitur' ? 'Fitur Toko: centang per peran (merah = inti, terkunci)' : 'Profil Toko';
+            const b = document.getElementById('ts-profile-save'); if (b) b.innerText = tsPart === 'fitur' ? 'Simpan Fitur Toko' : 'Simpan Profil Toko';
+        }
+        function openTenantSettings(tenantId, part) {
+            tsPart = TS_TITLE[part] ? part : 'profil';
             const tn = TENANTS_CONFIG[String(tenantId).toLowerCase()];
             if (!tn) return;
             if (tsStore) { tsStore.stop(); }
             tsTenant = tn;
             tsStore = createStore(tn);
             tsStore.onChange(renderTsTables);
-            document.getElementById('modal-title').innerText = 'Pengaturan Toko';
-            document.getElementById('modal-subtitle').innerText = tn.nama + ' [' + tn.id + ']';
             openModal('tenant_settings');
-            document.getElementById('modal-title').innerText = 'Pengaturan Toko';
+            document.getElementById('modal-title').innerText = TS_TITLE[tsPart];
             document.getElementById('modal-subtitle').innerText = tn.nama + ' [' + tn.id + ']';
             fillTsShell(tn);
+            applyTsPart();
             tsStore.start();
         }
 
@@ -1361,25 +1382,29 @@
             const tn = TENANTS_CONFIG[key];
             if (!isManaged(tn)) return;
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
-            const nama = document.getElementById('ts-nama').value.trim();
-            if (!nama) return alert('Nama toko wajib diisi.');
-            const alamat = document.getElementById('ts-alamat').value.trim() || 'Alamat belum diisi';
             const cfg = JSON.parse(JSON.stringify(tn)); delete cfg.fromRegistry;
-            cfg.nama = nama;
-            cfg.slogan = document.getElementById('ts-slogan').value.trim() || 'Mitra UMKM Oneilverse';
-            cfg.logoText = (document.getElementById('ts-logo').value.trim() || nama.slice(0, 2)).toUpperCase().slice(0, 3);
-            cfg.warna = document.getElementById('ts-warna').value;
-            cfg.warnaAksen = (cfg.warna === window.__tsWarnaOld && window.__tsAksenOld) ? window.__tsAksenOld : accentFrom(cfg.warna);
-            cfg.features = Object.assign({}, cfg.features || {}, FM_PLANS.readChecklist('ts'));
-            ['kasir', 'manager', 'owner'].forEach(function (r) {
-                cfg.locations = cfg.locations || {};
-                cfg.locations[r] = Object.assign({ lat: 0, lon: 0 }, cfg.locations[r] || {}, { name: alamat });
-            });
+            let nama = cfg.nama;
+            if (tsPart === 'fitur') {
+                cfg.features = Object.assign({}, cfg.features || {}, FM_PLANS.readChecklist('ts'));
+            } else {
+                nama = document.getElementById('ts-nama').value.trim();
+                if (!nama) return alert('Nama toko wajib diisi.');
+                const alamat = document.getElementById('ts-alamat').value.trim() || 'Alamat belum diisi';
+                cfg.nama = nama;
+                cfg.slogan = document.getElementById('ts-slogan').value.trim() || 'Mitra UMKM Oneilverse';
+                cfg.logoText = (document.getElementById('ts-logo').value.trim() || nama.slice(0, 2)).toUpperCase().slice(0, 3);
+                cfg.warna = document.getElementById('ts-warna').value;
+                cfg.warnaAksen = (cfg.warna === window.__tsWarnaOld && window.__tsAksenOld) ? window.__tsAksenOld : accentFrom(cfg.warna);
+                ['kasir', 'manager', 'owner'].forEach(function (r) {
+                    cfg.locations = cfg.locations || {};
+                    cfg.locations[r] = Object.assign({ lat: 0, lon: 0 }, cfg.locations[r] || {}, { name: alamat });
+                });
+            }
             db.collection('tenants_registry').doc(key).set({ id: cfg.id, nama: nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
                 .then(function () { return db.collection('tenant_ctrl').doc(cfg.id).set({ gajiOwner: !!(cfg.features.gaji && cfg.features.gaji.owner) }, { merge: true }); })
                 .then(function () {
-                    ctAudit(tn.id, 'UBAH_PROFIL_TOKO', 'Provider mengubah profil/tampilan toko', tn.nama + ' | ' + tn.slogan, nama + ' | ' + cfg.slogan);
-                    alert('Profil toko tersimpan. Tampilan di toko berubah saat halaman toko dibuka kembali (otomatis memuat ulang sekali).');
+                    ctAudit(tn.id, tsPart === 'fitur' ? 'UBAH_FITUR_TOKO' : 'UBAH_PROFIL_TOKO', tsPart === 'fitur' ? 'Provider mengubah fitur toko' : 'Provider mengubah profil/tampilan toko', tn.nama + ' | ' + tn.slogan, nama + ' | ' + cfg.slogan);
+                    alert((tsPart === 'fitur' ? 'Fitur toko' : 'Profil toko') + ' tersimpan. Tampilan di toko berubah saat halaman toko dibuka kembali (otomatis memuat ulang sekali).');
                 }).catch(function (e) { fmPermAlert(e); });
         }
 
@@ -2266,6 +2291,35 @@
             });
         }
 
+        let inspectPart = 'lokasi';
+        const INSPECT_TITLE = { lokasi: ['Lokasi & Aktivitas', 'Lokasi terminal, yang sedang online, dan mutasi live (hanya lihat)'], kuota: ['Kuota Terminal', 'Jumlah terminal Kasir, Manager, dan Owner'], paket: ['Paket', 'Basic, Plus, atau Pro'], billing: ['Billing', 'Biaya layanan dan pembayaran'], versi: ['Versi Toko', 'Kunci toko ke versi aplikasi tertentu'] };
+        function applyInspectPart() {
+            const map = { 'inspect-header-card': 'lokasi', 'inspect-gps-card': 'lokasi', 'inspect-tx-card': 'lokasi', 'inspect-plan-card': 'kuota', 'inspect-tier-card': 'paket', 'inspect-bill-card': 'billing', 'inspect-rollout-card': 'versi' };
+            Object.keys(map).forEach(function (id) { const el = document.getElementById(id); if (el) el.style.display = map[id] === inspectPart ? '' : 'none'; });
+        }
+        let tierPanelFor = null;
+        function renderInspectTier(tenant) {
+            const box = document.getElementById('inspect-tier-card'); if (!box) return;
+            if (!isManaged(tenant)) { box.classList.add('hidden'); box.innerHTML = ''; tierPanelFor = null; return; }
+            if (tierPanelFor === tenant.id) return;
+            tierPanelFor = tenant.id;
+            const c = getCtrl(tenant.id), tier = tenant.tier || 'basic', cycle = c.billingCycle || 'monthly';
+            const sel = function (v, cur) { return v === cur ? ' selected' : ''; };
+            const cls = 'w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none';
+            box.classList.remove('hidden');
+            box.innerHTML = '<span class="font-black text-sm text-white block">Paket Toko</span>' +
+                '<p class="text-slate-400">Paket saat ini: <b class="text-white">' + (TIER_LABEL[tier] || tier) + '</b> (' + (cycle === 'yearly' ? 'tahunan' : 'bulanan') + ')</p>' +
+                '<div class="grid grid-cols-2 gap-3"><div><label class="font-bold text-slate-300 block mb-1">Paket</label><select id="ip-tier" class="' + cls + '"><option value="basic"' + sel('basic', tier) + '>Basic</option><option value="plus"' + sel('plus', tier) + '>Plus</option><option value="pro"' + sel('pro', tier) + '>Pro</option></select></div>' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Siklus</label><select id="ip-cycle" class="' + cls + '"><option value="monthly"' + sel('monthly', cycle) + '>Bulanan</option><option value="yearly"' + sel('yearly', cycle) + '>Tahunan</option></select></div>' +
+                '<div class="col-span-2"><label class="font-bold text-slate-300 block mb-1">Harga khusus (Rp, kosongkan bila standar)</label><input id="ip-custom" type="number" min="0" value="' + (c.customPrice || '') + '" class="' + cls + '"></div></div>' +
+                '<div id="ip-sum" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div>' +
+                '<button id="ip-save" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs transition">Simpan Paket</button>';
+            const g = function (id) { return document.getElementById(id).value; };
+            const sum = function () { document.getElementById('ip-sum').innerHTML = planSummaryHtml(g('ip-tier'), g('ip-cycle'), g('ip-custom')); };
+            ['ip-tier', 'ip-cycle'].forEach(function (i) { document.getElementById(i).onchange = sum; }); document.getElementById('ip-custom').oninput = sum; sum();
+            document.getElementById('ip-save').onclick = function () { setTenantPlan(tenant.id, g('ip-tier'), g('ip-cycle'), g('ip-custom')); };
+        }
+
         function renderInspect(tenantId) {
             const tenant = (typeof TENANTS_CONFIG !== 'undefined' && tenantId && TENANTS_CONFIG[String(tenantId).toLowerCase()])
                 || ((typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse" });
@@ -2282,17 +2336,8 @@
                 <div class="text-right">
                     <span class="text-emerald-400 font-bold block font-mono">${list.length} Transaksi Sah Tercatat</span>
                     <span class="text-[10px] ${live ? 'text-slate-400' : 'text-amber-300'}">${live ? 'Sinkronisasi Cloud Live Terhubung' : 'Mode lokal: Firestore belum aktif, data dari browser ini'}</span>
-                    ${tenant.deletedByTower ? '' : `<button id="btn-toggle-suspend" class="mt-2 px-3 py-1 rounded-xl ${isTenantSuspended(tenant.id) ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'} text-white font-bold text-[10px] transition">${isTenantSuspended(tenant.id) ? 'Aktifkan Kembali Toko' : 'Bekukan Toko'}</button>`}
                 </div>
             `;
-            if (isManaged(tenant)) {
-                const hb = document.createElement('button');
-                hb.className = 'mt-2 ml-2 px-3 py-1 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-[10px] transition';
-                hb.innerText = tenant.deletedByTower ? 'Pulihkan Toko' : (tenant.isMaster ? 'Hapus Toko Master (uji)' : 'Hapus Klien');
-                hb.onclick = function () { tenant.deletedByTower ? restoreMasterTenant(tenant.id) : deleteTenantRegistry(tenant.id); };
-                const sbx = document.getElementById('btn-toggle-suspend');
-                if (sbx && sbx.parentNode) sbx.parentNode.appendChild(hb);
-            }
             (function () {
                 const on = onlineSessions(tenant.id);
                 const hdr = document.getElementById('inspect-header-card');
@@ -2303,34 +2348,11 @@
                     : '<span class="text-slate-500">tidak ada. Aktivitas terakhir: ' + agoText(lastActiveMs(tenant.id)) + '</span>');
                 hdr.appendChild(row);
             })();
-            (function () {
-                if (tenant.isSinglePage) return;
-                const hdr = document.getElementById('inspect-header-card');
-                const link = tenantLink(tenant.id);
-                const row = document.createElement('div');
-                row.className = 'w-full text-[11px] pt-2 mt-1 border-t border-white/10';
-                row.innerHTML = '<b class="text-slate-300 block mb-1">Link login toko:</b>' +
-                    '<div class="flex items-center gap-2"><input readonly value="' + escHtml(link) + '" class="flex-1 min-w-0 bg-slate-900 border border-white/15 rounded-xl p-2 text-[11px] text-cyan-300 font-mono outline-none">' +
-                    '<button class="px-3 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-[11px] shrink-0">Salin</button></div>';
-                const inp = row.querySelector('input'), btn = row.querySelector('button');
-                btn.onclick = function () {
-                    inp.select();
-                    const done = function () { btn.innerText = 'Tersalin ✓'; setTimeout(function () { btn.innerText = 'Salin'; }, 1800); };
-                    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { document.execCommand('copy'); done(); });
-                    else { try { document.execCommand('copy'); done(); } catch (e) {} }
-                };
-                const sbtn = document.createElement('button');
-                sbtn.className = 'mt-2 w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-[11px] transition';
-                sbtn.innerText = 'Pengaturan Toko: Profil, COA & Produk';
-                sbtn.onclick = function () { openTenantSettings(tenant.id); };
-                row.appendChild(sbtn);
-                hdr.appendChild(row);
-            })();
             renderInspectPlan(tenant);
             renderInspectRollout(tenant);
             renderInspectBill(tenant);
-            const sb = document.getElementById('btn-toggle-suspend');
-            if (sb) sb.onclick = function () { setTenantSuspended(tenant.id, !isTenantSuspended(tenant.id)); };
+            renderInspectTier(tenant);
+            applyInspectPart();
 
             const loc = tenant.locations || {};
             const liveGeo = function (role) {
@@ -2354,7 +2376,7 @@
             const tbody = document.getElementById('inspect-tx-body');
             tbody.innerHTML = "";
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs">Belum ada transaksi untuk tenant ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">Belum ada transaksi untuk tenant ini.</td></tr>`;
                 return;
             }
             list.slice(0, 15).forEach(function (tx) {
@@ -2366,10 +2388,7 @@
                     <td class="py-2 px-3 text-right font-black text-emerald-400 font-mono">${tx.category === 'sales' ? formatThousand(tx.amount) : '-'}</td>
                     <td class="py-2 px-3 text-right font-black text-rose-400 font-mono">${tx.category !== 'sales' ? formatThousand(tx.amount) : '-'}</td>
                     <td class="py-2 px-3 text-center text-slate-400 text-[10px]">${escHtml(tx.staff || 'Kasir')}</td>
-                    <td class="py-2 px-3 text-center"><button class="px-2 py-0.5 rounded bg-rose-600/80 hover:bg-rose-600 text-white font-bold text-[10px]" data-del="${escHtml(tx.docId || tx.id || '')}">Hapus</button></td>
                 `;
-                const btn = tr.querySelector('button[data-del]');
-                if (btn) btn.onclick = function () { deleteTenantTx(tenant.id, btn.getAttribute('data-del')); };
                 tbody.appendChild(tr);
             });
         }
@@ -2410,10 +2429,14 @@
             refreshProviderViews();
         }
 
-        function openInspectUMKM(tenantId) {
-            planPanelFor = null;
+        function openInspectUMKM(tenantId, part) {
+            inspectPart = INSPECT_TITLE[part] ? part : 'lokasi';
+            planPanelFor = null; tierPanelFor = null; rolloutPanelFor = null; billPanelFor = null;
             renderInspect(tenantId);
             openModal('inspect');
+            const tn = TENANTS_CONFIG[String(tenantId).toLowerCase()];
+            document.getElementById('modal-title').innerText = INSPECT_TITLE[inspectPart][0];
+            document.getElementById('modal-subtitle').innerText = (tn ? tn.nama + ' [' + tn.id + '] — ' : '') + INSPECT_TITLE[inspectPart][1];
         }
         // <<< JARINGAN-END
 
