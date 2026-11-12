@@ -77,7 +77,7 @@
     return gs.map(function (g) {
       var items = ofGroup(g), tot = items.reduce(function (a, p) { return a + p.stock; }, 0);
       return '<div class="sk-gh"><span>' + esc(gLabel(g)) + '</span><span>' + items.length + ' jenis</span></div>' + items.map(function (p) {
-        return '<div class="sk-row"><div class="nm">' + esc(vLabel(p)) + ' <span class="cd">' + esc(p.code) + '</span></div><div class="sk-st' + (low(p) ? ' low' : '') + '">' + p.stock + ' ' + esc(unit(p)) + '</div>' +
+        return '<div class="sk-row"><div class="nm">' + esc(vLabel(p)) + ' <span class="cd">' + esc(p.code) + '</span></div><div class="cd" style="white-space:nowrap;text-align:right">' + (p.hpp ? 'Rp ' + fmt(p.hpp) + '/' + esc(unit(p)) + ' · nilai Rp ' + fmt(p.hpp * p.stock) : 'harga beli belum diisi') + '</div><div class="sk-st' + (low(p) ? ' low' : '') + '">' + p.stock + ' ' + esc(unit(p)) + '</div>' +
           (withDel ? '<button type="button" class="sk-del" data-del="' + esc(p.code) + '">Hapus</button>' : '') + '</div>';
       }).join('');
     }).join('');
@@ -98,12 +98,14 @@
       '<div class="sk-grid"><div><label>Induk</label><select id="sk-g">' + gs.map(function (g) { return '<option value="' + esc(g) + '"' + (g === selG ? ' selected' : '') + '>' + esc(gLabel(g)) + '</option>'; }).join('') + '</select></div>' +
       '<div><label>Jenis</label><select id="sk-c">' + items.map(function (p) { return '<option value="' + esc(p.code) + '"' + (p.code === selC ? ' selected' : '') + '>' + esc(vLabel(p)) + ' (stok ' + p.stock + ' ' + esc(unit(p)) + ')</option>'; }).join('') + '</select></div>' +
       '<div><label>' + (mode === 'tambah' ? 'Jumlah masuk' : 'Jumlah stok yang benar') + (cur ? ' (' + esc(unit(cur)) + ')' : '') + '</label><input id="sk-q" type="number" min="' + (mode === 'tambah' ? 1 : 0) + '" step="1" inputmode="numeric" placeholder="0"></div>' +
+      '<div><label>Harga beli per satuan (Rp)</label><input id="sk-h" type="text" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (cur && cur.hpp ? fmt(cur.hpp) : '') + '"></div>' +
       '<div><label>Keterangan (opsional)</label><input id="sk-n" placeholder="mis. nota supplier" value="' + esc(note) + '"></div></div>' +
       '<div style="margin-bottom:6px"><button type="button" class="sk-go" id="sk-go">' + (mode === 'tambah' ? 'Tambah Stok' : 'Simpan Koreksi') + '</button></div>' +
       '<div style="margin-top:10px;font-size:12px;font-weight:800;color:#475569">Stok saat ini</div>' + listHtml(false);
     [].forEach.call(box.querySelectorAll('[data-mode]'), function (b) { b.onclick = function () { mode = b.getAttribute('data-mode'); render(); }; });
     box.querySelector('#sk-g').onchange = function (e) { selG = e.target.value; selC = ''; renderMasuk(); };
-    box.querySelector('#sk-c').onchange = function (e) { selC = e.target.value; };
+    box.querySelector('#sk-c').onchange = function (e) { selC = e.target.value; renderMasuk(); };
+    money('sk-h');
     box.querySelector('#sk-n').oninput = function (e) { note = e.target.value; };
     box.querySelector('#sk-go').onclick = applyMasuk;
     box.querySelector('#sk-q').onkeydown = function (e) { if (e.key === 'Enter') applyMasuk(); };
@@ -116,7 +118,7 @@
     var n = Math.floor(Number(inp.value));
     if (inp.value === '' || !isFinite(n)) { msg('Isi jumlahnya dulu.', true); inp.focus(); return; }
     var before = p.stock, after, job;
-    if (mode === 'tambah') { if (n < 1) { msg('Jumlah masuk minimal 1.', true); return; } after = before + n; job = STORE.incrementStock(p.code, n); }
+    if (mode === 'tambah') { if (n < 1) { msg('Jumlah masuk minimal 1.', true); return; } after = before + n; var hb = rawNum((document.getElementById('sk-h') || {}).value); job = (hb && hb !== (p.hpp || 0)) ? STORE.saveProduct({ code: p.code, name: p.name, sellPrice: p.sellPrice, hpp: hb, stock: after, barcode: p.barcode, minStock: p.minStock, group: p.group, variant: p.variant, unit: p.unit }) : STORE.incrementStock(p.code, n); }
     else { if (n < 0) { msg('Jumlah stok tidak boleh minus.', true); return; } after = n; job = STORE.saveProduct({ code: p.code, name: p.name, sellPrice: p.sellPrice, hpp: p.hpp, stock: n, barcode: p.barcode, minStock: p.minStock, group: p.group, variant: p.variant, unit: p.unit }); }
     Promise.resolve(job).then(function (ok) {
       if (ok === false) { msg('Gagal menyimpan stok. Periksa koneksi lalu coba lagi.', true); return; }
@@ -204,7 +206,7 @@
       groups().map(function (g) {
         return '<div class="sk-gh"><span>' + esc(gLabel(g)) + '</span><span></span></div>' + ofGroup(g).map(function (p) {
           var o = typeof p.openStock === 'number' ? p.openStock : p.stock;
-          return '<div class="sk-row"><div class="nm">' + esc(vLabel(p)) + ' <span class="cd">awal ' + o + ' ' + esc(unit(p)) + ' · Rp ' + fmt(p.hpp) + '</span></div><div style="width:110px"><input id="cl-' + esc(p.code) + '" type="number" min="0" step="1" inputmode="numeric" placeholder="sisa" value="' + (typeof p.endStock === 'number' ? p.endStock : '') + '"></div></div>';
+          return '<div class="sk-row"><div class="nm">' + esc(vLabel(p)) + ' <span class="cd">awal ' + o + ' ' + esc(unit(p)) + ' × Rp ' + fmt(p.hpp) + ' = Rp ' + fmt(o * (p.hpp || 0)) + '</span></div><div style="width:110px"><input id="cl-' + esc(p.code) + '" type="number" min="0" step="1" inputmode="numeric" placeholder="sisa" value="' + (typeof p.endStock === 'number' ? p.endStock : '') + '"></div></div>';
         }).join('');
       }).join('') +
       '<div id="cl-sum" style="margin:14px 0 8px;padding:12px 14px;border-radius:14px;background:rgba(47,85,212,.08);font-size:13px;font-weight:700;line-height:1.8"></div>' +

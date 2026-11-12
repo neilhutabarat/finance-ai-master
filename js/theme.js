@@ -3,14 +3,18 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 2.5';
+  var BETA = 'BETA 2.6';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 2.6)', '12 Nov 2026', [
+      '[Perbaikan] Menu Stok & Closing dirapikan: tiap jenis menampilkan harga beli dan nilainya; harga beli bisa diperbarui saat stok masuk; tidak ada tombol ganda di dock',
+      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 2.5)', '12 Nov 2026', [
       '[Perbaikan] Tombol Closing di dock Manager kembali berfungsi (Rekap Closing Kasir bisa dibuka lagi)',
-      '[Fitur] Tombol "Closing Stok" di menu dan dock Manager/Owner untuk mengisi sisa stok mingguan; layar closing kini menampilkan Barang tersedia untuk dijual sebelum HPP',
+      '[Fitur] Menu Stok & Closing: tiap jenis menampilkan harga beli dan nilainya; harga beli bisa diperbarui saat stok masuk; layar closing menampilkan Barang tersedia untuk dijual sebelum HPP',
       '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
     ]],
     ['1.0.0 (BETA 2.4)', '12 Nov 2026', [

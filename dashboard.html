@@ -204,8 +204,7 @@
             <button data-fm-action data-ic="user" onclick="openModal('customize_roles')">Ubah Nama Peran</button>
             <button data-fm-action data-ic="plus" onclick="openModal('add_cashier_request')">Buka Kasir Baru</button>
             <button data-fm-action data-ic="download" onclick="FM_INSIGHTS.exportCSV()">Ekspor CSV</button>
-            <button data-fm-action data-ic="box" onclick="FM_STOK.open()">Tambah Stok</button>
-            <button data-fm-action data-ic="clock" onclick="FM_STOK.open('closing')">Closing Stok (isi sisa stok)</button>
+            <button data-fm-action data-ic="box" onclick="FM_STOK.open()">Stok &amp; Closing</button>
             <button data-fm-action data-ic="users" onclick="FM_GAJI.open()">Laporan Gaji</button>
             <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur Toko</button>
         </div>
@@ -564,7 +563,7 @@
     <script src="js/plans.js?v=1.5.8"></script>
     <script src="js/mutasi-share.js?v=1.5.8"></script>
     <script src="js/gaji.js?v=1.5.8"></script>
-    <script src="js/stok.js?v=2.4"></script>
+    <script src="js/stok.js?v=2.6"></script>
     <script src="js/coa-drag.js?v=2.4"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); }
