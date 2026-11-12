@@ -55,7 +55,9 @@
   /* Default per paket: Basic = hanya fitur inti (merah). Plus = fitur tambahan berikut sudah tercentang (hijau, boleh dicabut). */
   var PLUS_KEYS = ['dashboard', 'analisa', 'audit', 'export_csv', 'ledger', 'stok', 'stok_input:manager', 'stok_closing:manager', 'gaji', 'mutasi_wa', 'wa_receipt', 'bukti'];
   function tierOf(tn) { var t = tn && tn.tier; return ORDER[t] != null && ORDER[t] >= 1 ? 'plus' : 'basic'; }
+  var ALWAYS_ON = ['wallpaper', 'theme']; /* tampilan dasar: menyala di semua paket */
   function defaultFor(key, role, tier) {
+    if (ALWAYS_ON.indexOf(key) >= 0) return true;
     if (tier !== 'plus') return false;
     return PLUS_KEYS.indexOf(key) >= 0 || PLUS_KEYS.indexOf(key + ':' + role) >= 0;
   }
@@ -82,6 +84,7 @@
     var m = f.r[role]; if (!m) return false;
     if (m === 'c') return true;
     if (f.soon) return false;
+    if (ALWAYS_ON.indexOf(key) >= 0) return true; /* wallpaper & warna halaman selalu ada */
     tn = tn || tenant();
     var v = tn && tn.features ? tn.features[key] : undefined;
     if (v === undefined && ALIAS[key] && tn && tn.features) v = tn.features[ALIAS[key]];

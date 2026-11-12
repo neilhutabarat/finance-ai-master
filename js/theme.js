@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 5.3';
+  var BETA = 'BETA 5.4';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 5.4)', '13 Nov 2026', [
+      '[Tampilan] Latar belakang baru bergaya komik: Perbukitan Pagi, Pantai Senja, Kota Malam, Sawah Berundak, dan Gunung & Danau. Perbukitan Pagi menjadi latar bawaan',
+      '[Perbaikan] Pilihan latar belakang dan warna halaman kini selalu tersedia di Pengaturan, tidak hilang lagi saat paket toko diubah',
+      '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 5.3)', '13 Nov 2026', [
       '[Perbaikan] Kirim struk lewat WhatsApp diperbaiki: sebelumnya WhatsApp bisa tidak terbuka karena diblokir browser. Kini nomor pelanggan diisi di kotak khusus, nomor terakhir diingat, dan WhatsApp langsung terbuka',
       '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru'
@@ -178,14 +183,16 @@
   }
   /* Latar belakang bawaan (gambar buatan sendiri, bergaya Oneilverse). Tambahan baru hanya saat versi besar. */
   var WALLPAPERS = [
-    { id: 'hujan', name: 'Hujan Gerimis', file: 'img/hujan.svg' },
-    { id: 'senja', name: 'Senja Orbit', file: 'img/wp-senja.svg' },
-    { id: 'malam', name: 'Malam Rasi N', file: 'img/wp-malam.svg' }
+    { id: 'bukit', name: 'Perbukitan Pagi', file: 'img/wp-bukit.svg' },
+    { id: 'pantai', name: 'Pantai Senja', file: 'img/wp-pantai.svg' },
+    { id: 'kota', name: 'Kota Malam', file: 'img/wp-kota.svg' },
+    { id: 'sawah', name: 'Sawah Berundak', file: 'img/wp-sawah.svg' },
+    { id: 'gunung', name: 'Gunung & Danau', file: 'img/wp-gunung.svg' }
   ];
   function wpOf(id) { return WALLPAPERS.filter(function (w) { return w.id === id; })[0] || WALLPAPERS[0]; }
   function apply() {
     var h = document.documentElement;
-    try { var w = wpOf(pref.wp); if (w.id === 'hujan' || (window.FM_PLANS && !FM_PLANS.has('wallpaper'))) h.style.removeProperty('--fm-wp'); else h.style.setProperty('--fm-wp', 'url("' + w.file + '")'); } catch (e) {}
+    try { var w = wpOf(pref.wp); if (w.id === 'bukit' || (window.FM_PLANS && !FM_PLANS.has('wallpaper'))) h.style.removeProperty('--fm-wp'); else h.style.setProperty('--fm-wp', 'url("' + w.file + '")'); } catch (e) {}
     var mode = pref.mode || DEFAULT_MODE;     // 'light' | 'dark'
     h.setAttribute('data-fm-native', NATIVE);
     ['data-fm-black', 'data-fm-invert', 'data-fm-accent'].forEach(function (a) { h.removeAttribute(a); });
