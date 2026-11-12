@@ -3,132 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.16';
+  var BETA = 'BETA 2';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
-    ['1.0.0 (BETA 1.16)', '12 Nov 2026', [
-      '[Perbaikan] Tulisan di halaman Manager dan Owner dibuat lebih gelap dan kontras sehingga nyaman dibaca; kartu sedikit lebih pekat',
-      '[Perbaikan] Tampilan awal semua halaman kembali ke mode terang (pilihan tema lama direset sekali)',
-      '[Perbaikan] Pemberitahuan versi baru kini terlihat jelas di Manager dan Owner (tidak menimpa menu bawah) dan dicek lebih cepat saat halaman dibuka kembali',
-      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.15)', '12 Nov 2026', [
-      '[Perbaikan] Tampilan Manager dan Owner dirapikan: tulisan kartu, menu, dan pop-up terbaca jelas di mode terang maupun gelap; bawaan tetap mode terang',
-      '[Perbaikan] Pop-up lebih mudah dibaca; menu bawah otomatis tersembunyi saat pop-up terbuka agar tidak menimpa isinya',
-      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.14)', '12 Nov 2026', [
-      '[Perbaikan] Kotak konfirmasi dan pemberitahuan kini tampil di tengah layar dengan desain baru yang rapi dan tembus pandang',
-      '[Perbaikan] Tombol Tema kini ada di menu bawah, sekali tekan langsung berganti terang atau gelap; keterangan tema di Pengaturan dihapus',
-      '[Perbaikan] Pop-up lebih tembus pandang tetap terbaca; jendela Chat dibuat lebih gelap agar jelas; bilah gulir pada form Input Transaksi dihilangkan',
-      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.13)', '12 Nov 2026', [
-      '[Perbaikan] Mode gelap: bagian atas dan menu bawah kini ikut gelap tembus pandang (sebelumnya tampak putih)',
-      '[Perbaikan] Tombol Closing, Konfirmasi, dan tombol berwarna lain kini berikon dan bertulisan putih yang jelas di mode terang maupun gelap',
-      '[Perbaikan] Tombol Pasang aplikasi tidak lagi menutupi isi halaman kerja; muncul rapi di bagian atas dan hilang otomatis setelah aplikasi terpasang',
-      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.12)', '12 Nov 2026', [
-      '[Tampilan] Latar baru bergaya ilustrasi hujan gerimis (pohon rindang, kolam, bunga matahari); kartu, menu bawah, dan semua pop-up dibuat tembus pandang dengan tulisan tetap jelas',
-      '[Tampilan] Istilah di layar Kasir disederhanakan (Closing, Riwayat Closing, Saldo); menu bawah dirapikan agar garis tepinya presisi',
-      '[Perbaikan] Pemberitahuan versi baru kini hilang sendiri setelah sekitar 5 detik; catatan lengkap tetap ada di Pengaturan > Catatan Rilis',
-      '[Perbaikan] Aplikasi kini bisa dipasang ke Chrome (tombol Pasang aplikasi tampil bila Chrome mengizinkan); pilihan Atur Warna Halaman dihapus dari Pengaturan',
-      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.11)', '12 Nov 2026', [
-      '[Perbaikan] Halaman Kasir, Manager, dan Owner kini memakai seluruh tinggi layar; sisa ruang kosong di bawah dan bilah tombol Tutup yang tidak berfungsi dihapus',
-      '[Perbaikan] Menu bawah tidak lagi bertabrakan dengan konten; jarak bawah halaman disesuaikan',
-      '[Tampilan] Tulisan di lencana paket, jam, dan jendela info dibuat lebih jelas; saldo dan nominal transaksi dibuat lebih besar; daun pada latar kini berwarna hijau alami',
-      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.10)', '12 Nov 2026', [
-      '[Tampilan] Latar mendung bergambar daun dan gerimis kini benar-benar tampil di Kasir, Manager, dan Owner; header, menu bawah, dan kartu Saldo Kas Sah ikut transparan dan senada, tanpa warna hitam',
-      '[Perbaikan] Aturan tampilan yang tertimpa gaya lama diperbaiki sehingga tema baru tidak lagi tertutup',
-      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.9)', '12 Nov 2026', [
-      '[Perbaikan] Halaman toko tidak lagi memuat ulang terus-menerus saat sistem pembaruan mengarahkan ke versi yang belum tersedia; kini dicek dulu sebelum dialihkan',
-      '[Perbaikan] Tombol pengaturan (gear) dan panel pengaturan di halaman login kembali tampil rapi; tampilan yang sempat rusak akibat pembaruan sebelumnya diperbaiki',
-      '[Perbaikan] Pemeriksaan menyeluruh atas gaya tampilan di semua halaman setelah penghapusan efek blur; tidak ada lagi elemen yang bergeser atau terpotong',
-      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.8)', '12 Nov 2026', [
-      '[Tampilan] Tampilan Kasir, Manager, dan Owner diperbarui: nuansa warna disatukan dan diberi latar lembut, kartu dan tombol dibuat lebih tembus pandang namun tulisan tetap jelas dan mudah dibaca',
-      '[Perbaikan] Aplikasi dibuat jauh lebih ringan dan responsif di komputer dengan spesifikasi terbatas, dengan menghapus efek kaca-buram yang berat di seluruh halaman',
-      '[Perbaikan] Area yang bisa digulir pada layar Kasir (Input Transaksi dan Draft Transaksi Berjalan) kini diberi penanda gulir yang jelas, sehingga tidak terlihat seperti konten yang hilang atau terpotong',
-      '[Perbaikan] Jendela obrolan kini tembus pandang dan, saat ditutup, bergeser rapi ke sisi layar alih-alih menghilang mendadak',
-      '[Perbaikan] Perbaikan kestabilan pada pengiriman pesan obrolan untuk mengurangi kegagalan kirim',
-      '[Keamanan] Pengecekan ulang aturan akses database untuk fitur obrolan; celah kecil pada aturan pemblokiran tautan diperbaiki agar konsisten dengan perilaku aplikasi',
-      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server secara umum; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.7)', '12 Nov 2026', [
-      '[Perbaikan] Sistem pembaruan diperkuat: rilis baru kini bisa diuji secara terbatas sebelum menyebar ke seluruh pengguna, mengurangi risiko gangguan saat ada pembaruan',
-      '[Keamanan] Pengecekan ulang aturan akses database untuk konfigurasi sistem baru; akses dibatasi hanya baca, dan hanya Tower yang bisa mengubah',
-      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server secara umum; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.6)', '12 Nov 2026', [
-      '[Fitur] Obrolan ringan antar ID toko di jaringan Oneilverse (hanya teks; identitas toko tetap tersembunyi)',
-      '[Fitur] Aplikasi kini bisa dipasang seperti aplikasi dari layar login (nama dan ikon mengikuti toko Anda), dan tetap bisa dibuka sebentar walau internet terputus',
-      '[Perbaikan] Layar Admin yang disegarkan (refresh) tidak lagi keluar sendiri dengan pesan \'sudah aktif di perangkat lain\'',
-      '[Perbaikan] Catatan rilis kini satu sumber data di semua halaman, menghilangkan daftar lama yang tidak lagi diperbarui',
-      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server; tidak ditemukan celah baru'
-    ]],
-    ['1.0.0 (BETA 1.5)', '11 Nov 2026', [
-      '[Tampilan] Fitur toko kini dirakit sesuai kebutuhan usaha: fitur yang tidak dipilih tidak ditampilkan, dan daftar fitur aktif ada di tombol Fitur Toko',
-      '[Tampilan] Tampilan bawaan kini terang untuk semua toko dan akun; pilihan Terang atau Gelap selalu ada di Pengaturan',
-      '[Tampilan] Kartu dan tombol menata diri otomatis seperti ubin Windows Phone: bentuk dan ukurannya menyesuaikan jumlah fitur dan ruang layar, sehingga tidak ada ruang kosong',
-      '[Perbaikan] Tombol Keluar di Admin, Manager, dan Owner kini selalu kembali ke halaman login toko yang sama, bukan ke toko uji coba',
-      '[Perbaikan] Menu Pengaturan kini selalu bisa dibuka, termasuk di toko yang fitur tema-nya belum diaktifkan; kartu Permohonan Kasir Baru di Tower kini bisa diketuk; teks pop-up Analisa tidak lagi terpotong',
-      '[Tampilan] Mutasi kini bisa dikirim lewat WhatsApp dan dicetak (hari ini, 7 hari, bulan ini, atau rentang tanggal) bila fiturnya diaktifkan untuk toko',
-      '[Tampilan] Laporan Gaji: Manager mencatat gaji per karyawan per bulan, menandai dibayar, dan mencetak slip atau laporan; Owner bisa diberi akses lihat saja',
-      '[Keamanan] Data gaji hanya bisa dibaca Manager (dan Owner bila diizinkan penyedia), tidak bisa dibaca Admin',
-      '[Tampilan] Owner kini bisa diberi akses Buku Besar serta Kelola COA & Produk (diatur penyedia sesuai kebutuhan usaha)',
-      '[Tampilan] Peran "Kasir" kini bernama "Admin" (nama tetap bisa diubah oleh owner)',
-      '[Tampilan] Panel Analisis diganti Analisa Keuangan untuk owner dan manager: ringkasan laba, perbandingan dengan bulan lalu, hari dan jam ramai, produk bermargin tipis, biaya yang naik, pengeluaran janggal, stok menipis, beserta saran. Dihitung dari data toko tanpa batas harian',
-      '[Tampilan] Tombol, bar header, dan dock kini berbahan kaca hitam 3D yang mengambang dengan bayangan lembut, di semua halaman',
-      '[Tampilan] Di HP dan tablet halaman tidak lagi bergulir: laporan dan isian panjang dibuka lewat pop-up',
-      '[Perbaikan] Lokasi kini memakai GPS perangkat dan menampilkan nama desa/kelurahan, bukan lagi perkiraan kota dari jaringan',
-      '[Perbaikan] Barcode kini dibaca dari alat scanner laser/infra merah (seperti di minimarket), bukan kamera',
-      '[Perbaikan] Kartu Total Income/Outcome pemilik sama dengan manager, kartu Pajak tidak lagi duplikat pop-up karena sudah ada di dock',
-      '[Perbaikan] Kasir: ketukan ganda pada tombol Simpan ke Antrean tidak lagi memunculkan peringatan "Nominal rupiah tidak valid"',
-      '[Tampilan] Kartu "Estimasi Biaya Layanan" di halaman manager dan owner: angka bergerak tiap detik dengan tanggal pembayaran, warna hijau, kuning, lalu merah menjelang jatuh tempo (hanya estimasi, bukan tagihan)',
-      '[Tampilan] Lencana paket kini cukup "Pro" (emas hanya warnanya) dan tombol Keluar hanya satu, di dock, di semua layar',
-      '[Tampilan] Bar header dan dock kini sedikit tembus pandang dengan tulisan tetap jelas',
-      '[Tampilan] Kartu "Laba Rugi" di halaman manager dan owner: laba bersih bulan ini dan margin; ketuk untuk laporan per hari, minggu, bulan, tahun, atau tanggal bebas, lengkap dengan unduhan PDF dan CSV',
-      '[Perbaikan] Prive (penarikan pribadi owner) kini ditampilkan terpisah di laporan dan tidak lagi mengurangi laba',
-      '[Perbaikan] Owner kini bisa mengganti PIN kasir, manager, dan PIN sendiri, dan PIN baru berlaku di semua perangkat (sebelumnya hanya di perangkat yang dipakai mengganti)',
-      '[Keamanan] Login kini memakai Firebase Authentication: PIN minimal 6 karakter disimpan terenkripsi di server, PIN bawaan lama (1234, 5678, 9999) tidak lagi berlaku, dan halaman kasir, manager, dan owner tidak bisa dibuka tanpa login yang sah',
-      '[Keamanan] Data toko kini hanya bisa dibaca dan diubah oleh akun toko itu sendiri; pengaturan layanan dan tagihan hanya bisa diubah oleh penyedia',
-      '[Keamanan] Aplikasi tidak lagi meminta izin kamera karena pemindaian barcode memakai scanner; lokasi hanya dibaca di perangkat Anda'
-    ]],
-    ['1.0.0 (BETA 1.4)', '11 Nov 2026', [
-      '[Tampilan] Logo Oneilverse baru: cincin orbit emas dengan planet dan huruf N di pusatnya',
-      '[Tampilan] Portal login, partner, dan semua halaman kini satu gaya: font, kartu kaca, tombol, dan dock',
-      '[Perbaikan] Kontras teks disempurnakan di mode terang, gelap, dan gelap pekat (termasuk kartu Pajak dan semua pop-up)',
-      '[Perbaikan] Tampilan kasir di HP: kartu saldo kini selebar layar dan tidak lagi terpotong',
-      '[Perbaikan] Catatan rilis kini ringkas: hanya 10 rilis terakhir yang ditampilkan',
-      '[Keamanan] Nama produk, nama akun, keterangan nota, dan nama petugas kini ditampilkan sebagai teks murni sehingga tidak bisa disusupi kode berbahaya'
-    ]],
-    ['1.0.0 (BETA 1.3)', '11 Nov 2026', [
-      '[Tampilan] Gaya One UI berbalut kaca: header ringkas, kartu rata tanpa gradasi, tombol pil seragam',
-      '[Tampilan] Halaman desktop pas satu layar tanpa gulir; tombol tindakan dalam grid; instruksi kasir dan analisis AI dibuka lewat pop-up',
-      '[Perbaikan] Form kasir tidak lagi terpotong di layar laptop yang pendek; scrollbar pop-up disembunyikan',
-      '[Keamanan] Tombol Keluar selalu tersedia (dock atau Pengaturan) agar perangkat bersama mudah dikunci'
-    ]],
-    ['1.0.0 (BETA 1.2)', '11 Nov 2026', [
-      '[Tampilan] Kulit "Glass 2026": kartu, tombol, dan pop-up bergaya kaca seragam; dock di bawah layar membuka pop-up tanpa pindah halaman',
-      '[Perbaikan] Judul pop-up yang kosong diperbaiki di semua halaman'
-    ]],
-    ['1.0.0 (BETA 1.1)', '11 Nov 2026', [
-      '[Fitur] Fitur & Paket: lihat fitur Basic, Plus, Pro (yang terkunci tetap terlihat)',
-      '[Fitur] Dashboard owner: ringkasan hari ini, laba per produk, stok menipis, metode bayar, target omzet, ekspor CSV',
-      '[Fitur] Kasir: scan barcode, jumlah (pcs), metode bayar, struk WhatsApp (Plus)',
-      '[Fitur] Tema terang/gelap pekat, warna halaman, logo usaha',
-      '[Perbaikan] Tanggal nota memakai waktu setempat sehingga tidak bergeser sehari di malam hari',
-      '[Keamanan] Data tiap toko terisolasi per ID; aturan database diperbarui untuk logo toko dan riwayat toko'
+    ['1.0.0 (BETA 2)', '12 Nov 2026', [
+      '[Tampilan] Latar ilustrasi hujan gerimis; kartu, menu bawah, dan pop-up tembus pandang tetapi tulisan tetap jelas, dengan mode terang sebagai tampilan awal',
+      '[Tampilan] Tombol Tema ada di menu bawah: sekali tekan langsung berganti terang atau gelap',
+      '[Perbaikan] Halaman memakai seluruh tinggi layar tanpa gulir yang tidak perlu; kotak konfirmasi dan pemberitahuan tampil di tengah layar dengan desain rapi',
+      '[Perbaikan] Pemberitahuan versi baru muncul jelas lalu hilang sendiri; aplikasi bisa dipasang ke Chrome dari tombol Pasang aplikasi',
+      '[Keamanan] Pengecekan ulang aturan akses database dan sesi login; tidak ditemukan celah baru'
     ]]
   ];
   var SHOW_LAST = 10;
