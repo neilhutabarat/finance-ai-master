@@ -203,7 +203,7 @@
             <button data-fm-action data-ic="key" onclick="openModal('manage_passwords')">Kelola Password Staf</button>
             <button data-fm-action data-ic="user" onclick="openModal('customize_roles')">Ubah Nama Peran</button>
             <button data-fm-action data-ic="plus" onclick="openModal('add_cashier_request')">Buka Kasir Baru</button>
-            <button data-fm-action data-ic="download" onclick="FM_INSIGHTS.exportCSV()">Ekspor CSV</button>
+            <button data-fm-action data-ic="download" onclick="FM_LAPORAN.open()">Unduh PDF</button>
             <button data-fm-action data-ic="box" onclick="FM_STOK.open()">Stok &amp; Closing</button>
             <button data-fm-action data-ic="users" onclick="FM_GAJI.open()">Laporan Gaji</button>
             <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur Toko</button>
@@ -564,7 +564,8 @@
     <script src="js/mutasi-share.js?v=1.5.8"></script>
     <script src="js/gaji.js?v=1.5.8"></script>
     <script src="js/stok.js?v=2.9"></script>
-    <script src="js/coa-drag.js?v=2.4"></script>
+    <script src="js/coa-drag.js?v=2.9"></script>
+    <script src="js/laporan-pdf.js?v=3.0"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();

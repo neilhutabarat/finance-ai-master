@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 2.9';
+  var BETA = 'BETA 3.0';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 3.0)', '12 Nov 2026', [
+      '[Fitur] Pilihan Latar Belakang di Pengaturan: Hujan Gerimis, Senja Orbit, dan Malam Rasi N (gambar orisinal Oneilverse)',
+      '[Fitur] Unduh PDF di laman Owner menggantikan Ekspor CSV: laporan berkop dengan ringkasan dan rincian transaksi, pilihan periode hari ini sampai kustom; CSV untuk Excel tetap tersedia di jendela yang sama',
+      '[Perbaikan] Tulisan tombol konfirmasi di Kasir dirapikan (tidak lagi menyebut potong stok)',
+      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 2.9)', '12 Nov 2026', [
       '[Fitur] Izin Stok kini bisa diatur per peran: lihat stok, input stok, dan closing stok. Peran yang hanya boleh melihat tidak melihat form input dan tombol closing',
       '[Perbaikan] Susunan fitur toko bisa disimpan sebagai paket dan dipakai ulang',
@@ -147,8 +153,16 @@
     var L = 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
     return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.0543) ? '#fff' : '#0b0d12';
   }
+  /* Latar belakang bawaan (gambar buatan sendiri, bergaya Oneilverse). Tambahan baru hanya saat versi besar. */
+  var WALLPAPERS = [
+    { id: 'hujan', name: 'Hujan Gerimis', file: 'img/hujan.svg' },
+    { id: 'senja', name: 'Senja Orbit', file: 'img/wp-senja.svg' },
+    { id: 'malam', name: 'Malam Rasi N', file: 'img/wp-malam.svg' }
+  ];
+  function wpOf(id) { return WALLPAPERS.filter(function (w) { return w.id === id; })[0] || WALLPAPERS[0]; }
   function apply() {
     var h = document.documentElement;
+    try { var w = wpOf(pref.wp); if (w.id === 'hujan') h.style.removeProperty('--fm-wp'); else h.style.setProperty('--fm-wp', 'url("' + w.file + '")'); } catch (e) {}
     var mode = pref.mode || DEFAULT_MODE;     // 'light' | 'dark'
     h.setAttribute('data-fm-native', NATIVE);
     ['data-fm-black', 'data-fm-invert', 'data-fm-accent'].forEach(function (a) { h.removeAttribute(a); });
@@ -194,6 +208,8 @@
     if (!document.documentElement.hasAttribute('data-fm-dock')) h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (mode === 'light' ? 'on' : '') + '" data-mode="light"><div class="fm-prev" style="background:linear-gradient(135deg,#ffffff,#e2e8f0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (mode === 'dark' ? 'on' : '') + '" data-mode="dark"><div class="fm-prev" style="background:#000"></div>Gelap Pekat</button></div></div>';
+    if (ROLE !== 'lain' && ROLE !== 'login' && ROLE !== 'tower' && ROLE !== 'provider') h += '<div class="fm-sec"><div class="fm-lab">Latar Belakang</div><div class="fm-modes" style="grid-template-columns:1fr 1fr 1fr">' +
+      WALLPAPERS.map(function (w) { return '<button class="fm-mode ' + (wpOf(pref.wp).id === w.id ? 'on' : '') + '" data-wp="' + w.id + '" style="padding:8px"><div class="fm-prev" style="height:54px;background:url(' + w.file + ') center/cover"></div><span style="font-size:11.5px">' + w.name + '</span></button>'; }).join('') + '</div></div>';
     if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
       ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +
       '</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px"><label style="font-size:12px;color:#c7cbd6">Warna bebas</label><input type="color" id="fm-acc-custom" value="' + esc(pick) + '" style="width:44px;height:30px;border:0;background:none;padding:0"><button class="fm-btn" data-accreset style="margin-left:auto">Kembali ke Bawaan</button></div></div></div>';
@@ -216,6 +232,7 @@
     var pb = box.querySelector('[data-plans]'); if (pb) pb.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_PLANS) FM_PLANS.openModal(); };
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
     box.querySelectorAll('[data-mode]').forEach(function (b) { b.onclick = function () { pref.mode = b.getAttribute('data-mode'); savePref(pref); apply(); render(); }; });
+    box.querySelectorAll('[data-wp]').forEach(function (b) { b.onclick = function () { pref.wp = b.getAttribute('data-wp'); savePref(pref); apply(); render(); }; });
     box.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { pref.accent = b.getAttribute('data-acc'); savePref(pref); apply(); render(); }; });
     var ac = box.querySelector('#fm-acc-custom');
     if (ac) { ac.oninput = function (e) { pref.accent = e.target.value; savePref(pref); apply(); }; ac.onchange = function () { render(); }; }

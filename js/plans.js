@@ -29,7 +29,7 @@
     { key: 'analisa', label: 'Analisa Keuangan', r: { manager: 'o', owner: 'o' } },
     { key: 'instruksi', label: 'Instruksi dan pengawasan admin', r: { manager: 'o' } },
     { key: 'audit', label: 'Riwayat audit manager', r: { owner: 'o' } },
-    { key: 'export_csv', label: 'Ekspor CSV', r: { owner: 'o' } },
+    { key: 'export_csv', label: 'Unduh laporan (PDF dan CSV)', r: { owner: 'o' } },
     { key: 'clock', label: 'Jam', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'weather_rates', label: 'Cuaca dan Kurs', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'theme', label: 'Pilih warna halaman dan logo usaha', r: { kasir: 'o', manager: 'o', owner: 'o' } },
@@ -172,7 +172,7 @@
     if (!has('gaji', role)) drop('button[onclick*="FM_GAJI"]');
     if (!has('ledger', role)) drop('button[onclick*="openModal(\'ledger\')"]');
     if (!has('audit', role)) drop('button[onclick*="openModal(\'audit_trail\')"]');
-    if (!has('export_csv', role)) drop('button[onclick*="exportCSV"]');
+    if (!has('export_csv', role)) drop('button[onclick*="exportCSV"], button[onclick*="FM_LAPORAN"]');
     if (!has('instruksi', role)) drop('section[data-fm-panel="instruksi"]');
     if (!has('analisa', role)) drop('[data-fm-panel="analisa"]');
     if (!has('wa_receipt', role)) hide(document.getElementById('btn-wa-receipt'));
