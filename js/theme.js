@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.10';
+  var BETA = 'BETA 1.11';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.11)', '12 Nov 2026', [
+      '[Perbaikan] Halaman Kasir, Manager, dan Owner kini memakai seluruh tinggi layar; sisa ruang kosong di bawah dan bilah tombol Tutup yang tidak berfungsi dihapus',
+      '[Perbaikan] Menu bawah tidak lagi bertabrakan dengan konten; jarak bawah halaman disesuaikan',
+      '[Tampilan] Tulisan di lencana paket, jam, dan jendela info dibuat lebih jelas; saldo dan nominal transaksi dibuat lebih besar; daun pada latar kini berwarna hijau alami',
+      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 1.10)', '12 Nov 2026', [
       '[Tampilan] Latar mendung bergambar daun dan gerimis kini benar-benar tampil di Kasir, Manager, dan Owner; header, menu bawah, dan kartu Saldo Kas Sah ikut transparan dan senada, tanpa warna hitam',
       '[Perbaikan] Aturan tampilan yang tertimpa gaya lama diperbaiki sehingga tema baru tidak lagi tertutup',
