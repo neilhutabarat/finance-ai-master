@@ -83,10 +83,20 @@
     /* ---- latar halaman ---- */
     'html[data-fm-native] body{background:var(--s-bg)!important;background-image:radial-gradient(55% 40% at 6% 0%,color-mix(in srgb,' + A + ' 15%,transparent),transparent 70%),radial-gradient(50% 40% at 100% 100%,color-mix(in srgb,' + A + ' 10%,transparent),transparent 70%)!important;background-attachment:fixed!important;padding-bottom:104px}',
 
+    /* ---- halaman klien (kasir/manager/dashboard): 1 warna senada, transparan, tanpa hitam,
+       dengan latar "mendung + gerimis dedaunan" ringan (SVG statis, tanpa blur/animasi supaya tetap ringan).
+       Tower (provider.html) dan partner.html TIDAK disentuh — tetap memakai warna asal. ---- */
+    'html[data-fm-page="kasir"],html[data-fm-page="manager"],html[data-fm-page="owner"]{--s-surf:rgba(255,255,255,.34)!important;--s-line:rgba(71,85,105,.22)!important;--s-hi:rgba(255,255,255,.55)!important;--s-shadow:rgba(51,65,85,.22)!important;--s-gloss:rgba(255,255,255,.4)!important;--s-bg:#aab8c7!important;--s-b2:rgba(255,255,255,.4)!important;--s-b2l:rgba(71,85,105,.25)!important;--s-b2t:#1e293b!important}',
+    'html[data-fm-page="kasir"] body,html[data-fm-page="manager"] body,html[data-fm-page="owner"] body{background-color:var(--s-bg)!important;background-image:url("' + 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22240%22%20height%3D%22240%22%3E%0A%3Cg%20fill%3D%22rgba%2871%2C85%2C105%2C0.16%29%22%3E%0A%3Cellipse%20cx%3D%2238%22%20cy%3D%2248%22%20rx%3D%2224%22%20ry%3D%2211%22%20transform%3D%22rotate%2834%2038%2048%29%22%2F%3E%0A%3Cellipse%20cx%3D%22150%22%20cy%3D%2226%22%20rx%3D%2221%22%20ry%3D%229%22%20transform%3D%22rotate%28-24%20150%2026%29%22%2F%3E%0A%3Cellipse%20cx%3D%22206%22%20cy%3D%22132%22%20rx%3D%2226%22%20ry%3D%2212%22%20transform%3D%22rotate%2858%20206%20132%29%22%2F%3E%0A%3Cellipse%20cx%3D%2266%22%20cy%3D%22178%22%20rx%3D%2222%22%20ry%3D%2210%22%20transform%3D%22rotate%28-42%2066%20178%29%22%2F%3E%0A%3Cellipse%20cx%3D%22128%22%20cy%3D%22206%22%20rx%3D%2219%22%20ry%3D%229%22%20transform%3D%22rotate%2818%20128%20206%29%22%2F%3E%0A%3Cellipse%20cx%3D%224%22%20cy%3D%22150%22%20rx%3D%2218%22%20ry%3D%228%22%20transform%3D%22rotate%2870%204%20150%29%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20stroke%3D%22rgba%2871%2C85%2C105%2C0.22%29%22%20stroke-width%3D%221.4%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22%3E%0A%3Cpath%20d%3D%22M38%2036%20L30%2060%22%2F%3E%0A%3Cpath%20d%3D%22M150%2015%20L143%2037%22%2F%3E%0A%3Cpath%20d%3D%22M206%20118%20L197%20146%22%2F%3E%0A%3Cpath%20d%3D%22M66%20164%20L58%20192%22%2F%3E%0A%3Cpath%20d%3D%22M128%20196%20L121%20216%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20stroke%3D%22rgba%28226%2C232%2C240%2C0.5%29%22%20stroke-width%3D%221%22%20stroke-linecap%3D%22round%22%3E%0A%3Cline%20x1%3D%2220%22%20y1%3D%220%22%20x2%3D%228%22%20y2%3D%2230%22%2F%3E%0A%3Cline%20x1%3D%2295%22%20y1%3D%2210%22%20x2%3D%2283%22%20y2%3D%2240%22%2F%3E%0A%3Cline%20x1%3D%22175%22%20y1%3D%2260%22%20x2%3D%22163%22%20y2%3D%2290%22%2F%3E%0A%3Cline%20x1%3D%22225%22%20y1%3D%2220%22%20x2%3D%22213%22%20y2%3D%2250%22%2F%3E%0A%3Cline%20x1%3D%2255%22%20y1%3D%22100%22%20x2%3D%2243%22%20y2%3D%22130%22%2F%3E%0A%3Cline%20x1%3D%22140%22%20y1%3D%22130%22%20x2%3D%22128%22%20y2%3D%22160%22%2F%3E%0A%3Cline%20x1%3D%22190%22%20y1%3D%22180%22%20x2%3D%22178%22%20y2%3D%22210%22%2F%3E%0A%3Cline%20x1%3D%2210%22%20y1%3D%22190%22%20x2%3D%22-2%22%20y2%3D%22220%22%2F%3E%0A%3Cline%20x1%3D%22110%22%20y1%3D%22190%22%20x2%3D%2298%22%20y2%3D%22220%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E' + '"),radial-gradient(60% 45% at 50% -10%,rgba(255,255,255,.3),transparent 70%)!important;background-size:240px 240px,auto!important;background-repeat:repeat,no-repeat!important;background-attachment:fixed!important;padding-bottom:104px}',
+    /* kartu & tombol jadi lebih transparan di halaman klien (tulisan tetap gelap/jelas di atas) */
+    'html[data-fm-page="kasir"] .ios-glass,html[data-fm-page="kasir"] .white-ice-glass-card,html[data-fm-page="manager"] .ios-glass,html[data-fm-page="manager"] .white-ice-glass-card,html[data-fm-page="owner"] .ios-glass,html[data-fm-page="owner"] .white-ice-glass-card{background:var(--s-surf)!important;border-color:var(--s-line)!important;color:#1e293b}',
+    'html[data-fm-page="kasir"] .ios-glass *,html[data-fm-page="kasir"] .white-ice-glass-card *,html[data-fm-page="manager"] .ios-glass *,html[data-fm-page="manager"] .white-ice-glass-card *,html[data-fm-page="owner"] .ios-glass *,html[data-fm-page="owner"] .white-ice-glass-card *{color:inherit}',
+    'html[data-fm-page="kasir"] header.oneui-hero,html[data-fm-page="manager"] header.oneui-hero,html[data-fm-page="owner"] header.oneui-hero{background:rgba(255,255,255,.3)!important;border-color:rgba(71,85,105,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)!important}',
+    'html[data-fm-page="kasir"] header.oneui-hero *,html[data-fm-page="manager"] header.oneui-hero *,html[data-fm-page="owner"] header.oneui-hero *{color:#1e293b!important}',
+    'html[data-fm-page="kasir"] #fm-dock,html[data-fm-page="manager"] #fm-dock,html[data-fm-page="owner"] #fm-dock{background:rgba(255,255,255,.3)!important;border-color:rgba(71,85,105,.22)!important;color:#1e293b!important}',
+
     /* ---- header: bilah kaca ringkas ---- */
-    'html[data-fm-native] header.oneui-hero{margin:10px 12px 0!important;padding:8px 16px!important;border-radius:26px!important;background:linear-gradient(180deg,rgba(255,255,255,.22) 0,rgba(255,255,255,.06) 42%,rgba(255,255,255,0) 56%),linear-gradient(180deg,rgba(28,32,44,.55),rgba(5,7,12,.74))!important;border:1px solid rgba(255,255,255,.2)!important;border-top-color:rgba(255,255,255,.42)!important;border-bottom-color:rgba(255,255,255,.05)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.5),inset 0 -18px 28px -22px rgba(0,0,0,.6),0 3px 5px rgba(0,0,0,.2),0 16px 30px -12px rgba(0,0,0,.5),0 34px 54px -30px rgba(0,0,0,.55)!important;-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%)}',
-    '.oneui-hero>div{gap:8px 16px!important}',
-    '@media(min-width:640px){.oneui-hero [class*="w-12"][class*="h-12"]{width:40px!important;height:40px!important}}',
+    'html[data-fm-native] header.oneui-hero{margin:10px 12px 0!important;padding:8px 16px!important;border-radius:26px!important;background:linear-gradient(180deg,rgba(255,255,255,.22) 0,rgba(255,255,255,.06) 42%,rgba(255,255,255,0) 56%),linear-gradient(180deg,rgba(28,32,44,.55),rgba(5,7,12,.74))!important;border:1px solid rgba(255,255,255,.2)!important;border-top-color:rgba(255,255,255,.42)!important;border-bottom-color:rgba(255,255,255,.05)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.5),inset 0 -18px 28px -22px rgba(0,0,0,.6),0 3px 5px rgba(0,0,0,.2),0 16px 30px -12px rgba(0,0,0,.5),0 34px 54px -30px rgba(0,0,0,.55)!important;height:40px!important}}',
     '.oneui-hero h1{font-size:20px!important;line-height:1.15}',
     '.oneui-hero [id="topbar-store-slogan"]{font-size:11.5px!important;margin-top:1px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34ch}',
     '.oneui-hero button,.oneui-hero :has(> #user-role-display){background:rgba(255,255,255,.07)!important;background-image:none!important;color:#e5e7eb!important;border:1px solid rgba(255,255,255,.15)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.1)!important}',
@@ -95,8 +105,11 @@
     '.oneui-hero [class*="rounded-xl"][onclick],.oneui-hero [class*="glass-capsule"],.oneui-hero [class*="ios-pill"]{padding-top:5px!important;padding-bottom:5px!important}',
     '@media(max-width:1100px){.oneui-hero [id="topbar-store-slogan"]{display:none}}',
 
-    /* ---- bahan kartu kaca (rata, tanpa gradasi abu) ---- */
-    '.ios-glass,.white-ice-glass-card{position:relative;background:var(--s-surf)!important;background-image:none!important;border:1px solid var(--s-line)!important;border-radius:24px!important;box-shadow:inset 0 1px 0 var(--s-hi),0 18px 36px -26px var(--s-shadow)!important;-webkit-backdrop-filter:blur(26px) saturate(165%);backdrop-filter:blur(26px) saturate(165%);overflow:hidden}',
+    /* ---- bahan kartu kaca (rata, tanpa gradasi abu) ----
+       Catatan performa: backdrop-filter(blur) sengaja TIDAK dipakai di sini. Efek kaca-buram itu berat untuk
+       GPU/CPU perangkat lemah ketika dipakai di banyak kartu sekaligus; warna transparan rata (rgba) di bawah
+       ini memberi kesan serupa jauh lebih ringan. */
+    '.ios-glass,.white-ice-glass-card{position:relative;background:var(--s-surf)!important;background-image:none!important;border:1px solid var(--s-line)!important;border-radius:24px!important;box-shadow:inset 0 1px 0 var(--s-hi),0 18px 36px -26px var(--s-shadow)!important;overflow:hidden}',
     '.ios-glass::before,.white-ice-glass-card::before{content:"";position:absolute;left:0;right:0;top:0;height:38%;background:linear-gradient(180deg,var(--s-gloss),transparent);border-radius:24px 24px 50% 50%/24px 24px 16px 16px;pointer-events:none;z-index:-1}',
     /* kartu gelap berkilau penanda (Saldo Kas Sah) */
     '.white-ice-glass-card[style*="0f172a"]{background:linear-gradient(180deg,rgba(255,255,255,.2) 0,rgba(255,255,255,.05) 44%,rgba(255,255,255,0) 58%),linear-gradient(180deg,rgba(28,32,44,.55),rgba(5,7,12,.74))!important;border:1px solid rgba(255,255,255,.2)!important;border-top-color:rgba(255,255,255,.42)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.5),0 3px 5px rgba(0,0,0,.2),0 18px 30px -12px rgba(0,0,0,.5),0 32px 48px -28px rgba(0,0,0,.5)!important}',
@@ -122,7 +135,7 @@
     /* ---- tombol tindakan (grid seragam) ---- */
     '.fm-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}',
     '.fm-actions:empty{display:none}',
-    '.fm-actions .fm-act{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:11px;min-height:54px;padding:10px 14px;border-radius:20px;cursor:pointer;background:var(--s-surf);border:1px solid var(--s-line);box-shadow:inset 0 1px 0 var(--s-hi),0 14px 28px -22px var(--s-shadow);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);font:700 13px/1.2 ' + FONT + ';letter-spacing:-.005em;transition:transform .2s,filter .2s;-webkit-tap-highlight-color:transparent}',
+    '.fm-actions .fm-act{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:11px;min-height:54px;padding:10px 14px;border-radius:20px;cursor:pointer;background:var(--s-surf);border:1px solid var(--s-line);box-shadow:inset 0 1px 0 var(--s-hi),0 14px 28px -22px var(--s-shadow);font:700 13px/1.2 ' + FONT + ';letter-spacing:-.005em;transition:transform .2s,filter .2s;-webkit-tap-highlight-color:transparent}',
     '.fm-actions .fm-act:hover{transform:translateY(-2px);filter:brightness(1.05)}.fm-actions .fm-act:active{transform:scale(.97)}',
     '.fm-actions .fm-act i{width:34px;height:34px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,' + A + ' 16%,transparent);color:' + A + '}',
     '.fm-actions .fm-act svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}',
@@ -151,8 +164,7 @@
     '@media(max-width:640px){html[data-fm-page] main>.grid:first-child{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px!important}html[data-fm-page="owner"] main>.grid:first-child .ios-glass p.text-\\[10px\\],html[data-fm-page] main>.grid:first-child .ios-glass:nth-child(4):not(#fm-bill)>div:last-child{display:none}html[data-fm-page] main>.grid:first-child .ios-glass{padding:12px 14px!important}html[data-fm-page] main>.grid:first-child h3[class*="text-2xl"]{font-size:19px!important}.fm-ins-grid{gap:8px}}',
     /* ---- pop-up kaca ---- */
     '@media screen{',
-    '.fixed.inset-0[id*="modal"]{background:rgba(6,8,14,.4)!important;-webkit-backdrop-filter:blur(22px) saturate(140%)!important;backdrop-filter:blur(22px) saturate(140%)!important}',
-    '.fixed.inset-0[id*="modal"]>div{border-radius:30px!important;animation:fmPop .42s cubic-bezier(.2,.9,.25,1.12) both;-webkit-backdrop-filter:blur(34px) saturate(180%);backdrop-filter:blur(34px) saturate(180%);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 40px 90px -30px rgba(0,0,0,.7)!important;border:1px solid rgba(255,255,255,.16)!important}',
+    '.fixed.inset-0[id*="modal"]{background:rgba(6,8,14,.4)!important;animation:fmPop .42s cubic-bezier(.2,.9,.25,1.12) both;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 40px 90px -30px rgba(0,0,0,.7)!important;border:1px solid rgba(255,255,255,.16)!important}',
     'html[data-fm-native="dark"]:not([data-fm-invert]) .fixed.inset-0[id*="modal"]>div{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03)),rgba(16,18,25,.84)!important}',
     'html[data-fm-native="light"]:not([data-fm-invert]) .fixed.inset-0[id*="modal"]>div{background:rgba(255,255,255,.86)!important;border-color:rgba(255,255,255,.95)!important}',
     '@keyframes fmPop{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}',
@@ -161,8 +173,7 @@
     '}',
 
     /* ---- dock ---- */
-    '#fm-dock{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:45;display:flex;align-items:flex-end;gap:2px;padding:7px 9px;max-width:calc(100vw - 16px);border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.2) 0,rgba(255,255,255,.05) 44%,rgba(255,255,255,0) 58%),linear-gradient(180deg,rgba(28,32,44,.55),rgba(5,7,12,.72));border:1px solid rgba(255,255,255,.2);border-top-color:rgba(255,255,255,.42);border-bottom-color:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.45),inset 0 -16px 24px -20px rgba(0,0,0,.55),0 3px 5px rgba(0,0,0,.22),0 18px 30px -12px rgba(0,0,0,.55),0 36px 56px -30px rgba(0,0,0,.55);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%)}',
-    '#fm-dock .fm-dk{all:unset;box-sizing:border-box;white-space:nowrap;width:58px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 5px;border-radius:19px;cursor:pointer;color:#e9ebf1;font:600 10.5px/1.1 ' + FONT + ';transition:transform .28s cubic-bezier(.2,.9,.25,1.2),background .2s;-webkit-tap-highlight-color:transparent}',
+    '#fm-dock{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:45;display:flex;align-items:flex-end;gap:2px;padding:7px 9px;max-width:calc(100vw - 16px);border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.2) 0,rgba(255,255,255,.05) 44%,rgba(255,255,255,0) 58%),linear-gradient(180deg,rgba(28,32,44,.55),rgba(5,7,12,.72));border:1px solid rgba(255,255,255,.2);border-top-color:rgba(255,255,255,.42);border-bottom-color:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.45),inset 0 -16px 24px -20px rgba(0,0,0,.55),0 3px 5px rgba(0,0,0,.22),0 18px 30px -12px rgba(0,0,0,.55),0 36px 56px -30px rgba(0,0,0,.55);box-sizing:border-box;white-space:nowrap;width:58px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 5px;border-radius:19px;cursor:pointer;color:#e9ebf1;font:600 10.5px/1.1 ' + FONT + ';transition:transform .28s cubic-bezier(.2,.9,.25,1.2),background .2s;-webkit-tap-highlight-color:transparent}',
     '#fm-dock .fm-dk svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}',
     '#fm-dock .fm-dk:hover{background:rgba(255,255,255,.1);transform:translateY(-6px) scale(1.12)}#fm-dock .fm-dk:active{transform:translateY(-2px) scale(.96)}',
     '#fm-dock .fm-dk.danger{color:#fda4af}',
@@ -170,8 +181,7 @@
     'html[data-fm-dock] #fm-gear{display:none!important}',
     '@media(max-width:420px){#fm-dock .fm-dk{width:52px;font-size:10px}#fm-dock{padding:6px 7px;gap:1px}}',
     '@media print{#fm-dock{display:none!important}}',
-    '#fm-more{position:fixed;inset:0;z-index:2147481500;display:none;align-items:flex-end;justify-content:center;background:rgba(6,8,14,.4);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}',
-    '#fm-more .fm-ms{width:100%;max-width:420px;margin:0 10px calc(92px + env(safe-area-inset-bottom));padding:10px;border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03)),rgba(16,18,25,.88);border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 40px 80px -30px #000;animation:fmPop .36s cubic-bezier(.2,.9,.25,1.12) both}',
+    '#fm-more{position:fixed;inset:0;z-index:2147481500;display:none;align-items:flex-end;justify-content:center;background:rgba(6,8,14,.4);max-width:420px;margin:0 10px calc(92px + env(safe-area-inset-bottom));padding:10px;border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03)),rgba(16,18,25,.88);border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 40px 80px -30px #000;animation:fmPop .36s cubic-bezier(.2,.9,.25,1.12) both}',
     '#fm-more button{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border-radius:18px;color:#f3f4f6;font:600 14px ' + FONT + ';cursor:pointer}#fm-more button:hover{background:rgba(255,255,255,.09)}',
     '#fm-more svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}',
 
@@ -184,15 +194,7 @@
     '#fm-panel-modal .fm-ph h3{margin:0;font-size:17px;font-weight:800;letter-spacing:-.01em}#fm-panel-modal .fm-ph p{margin:2px 0 0;font-size:12px;opacity:.65}',
     '#fm-panel-modal .fm-px{all:unset;box-sizing:border-box;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--s-b2,rgba(148,163,184,.2));font-size:16px;font-weight:700}',
     '#fm-panel-modal .fm-pb{padding:4px 22px 22px;overflow:auto;min-height:0}',
-    '#fm-panel-modal .fm-pb>*{margin:0!important;box-shadow:none!important;background:transparent!important;border:0!important;padding:0!important;backdrop-filter:none!important}',
-    '#fm-panel-modal .fm-pb>*::before{display:none!important}',
-    '#fm-panel-modal .fm-pb>*>.border-b:first-child,#fm-panel-modal .fm-pb>*>h2:first-child{display:none!important}',
-    '.fixed [class*="bg-purple-50"],.fixed [class*="bg-indigo-50"],.fixed [class*="bg-rose-50"],.fixed [class*="bg-emerald-50"],.fixed [class*="bg-amber-50"],.fixed [class*="bg-slate-50"]:not(button){background:var(--s-line)!important}',
-    '#fm-stash{display:none!important}',
-
-    /* ===== desktop: pas satu layar (tanpa gulir halaman) ===== */
-    '@media (min-width:1024px) and (min-height:540px){',
-    'html[data-fm-fit] .oneui-hero{max-width:1448px;margin-left:auto!important;margin-right:auto!important;width:calc(100% - 24px)}',
+    '#fm-panel-modal .fm-pb>*{margin:0!important;box-shadow:none!important;background:transparent!important;border:0!important;padding:0!important;margin-left:auto!important;margin-right:auto!important;width:calc(100% - 24px)}',
     'html[data-fm-fit] body{height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding-bottom:0!important}',
     'html[data-fm-fit] main{flex:1 1 0;min-height:0;display:flex!important;flex-direction:column;gap:10px;padding:10px 16px 78px!important;margin:0 auto!important;max-width:1480px!important}',
     'html[data-fm-fit] main>*{margin:0!important}',
@@ -200,7 +202,7 @@
     'html[data-fm-fit] main h3[class*="text-2xl"],html[data-fm-fit] main h3[class*="text-3xl"]{font-size:clamp(20px,3.4vh,28px)!important;line-height:1.1;margin:2px 0!important}',
     /* kasir */
     'html[data-fm-page="kasir"] main>.grid:first-child{flex:none}',
-    'html[data-fm-page="kasir"] .fm-saldo{grid-column:1/-1!important;padding:8px 18px!important;display:grid!important;grid-template-columns:minmax(0,1.2fr) minmax(0,1.2fr) auto auto;grid-template-rows:auto auto;align-items:center;gap:0 22px}',
+    'html[data-fm-page="kasir"] .fm-saldo{grid-column:1/-1!important;padding:6px 18px!important;display:grid!important;grid-template-columns:minmax(0,1.2fr) minmax(0,1.2fr) auto auto;grid-template-rows:auto auto;align-items:center;gap:0 22px}',
     'html[data-fm-page="kasir"] .fm-saldo>div{display:contents!important}',
     'html[data-fm-page="kasir"] .fm-saldo>*,html[data-fm-page="kasir"] .fm-saldo>div>*{margin:0!important;border:0!important;padding:0!important}',
     'html[data-fm-page="kasir"] .fm-saldo>div:nth-child(1)>div:first-child{grid-column:1;grid-row:1}',
@@ -226,7 +228,7 @@
     'html[data-fm-page="kasir"] main>.grid:nth-child(2)>section:first-child>.border-b p{display:none}',
     'html[data-fm-page="kasir"] main>.grid:nth-child(2)>section.lg\\:col-span-5{grid-column:span 6/span 6!important}',
     'html[data-fm-page="kasir"] main>.grid:nth-child(2)>section.lg\\:col-span-7{grid-column:span 6/span 6!important}',
-    'html[data-fm-page="kasir"] main>.grid:nth-child(2)>section:first-child>.space-y-3\\.5,html[data-fm-page="kasir"] main>.grid:nth-child(2)>section:first-child>div:last-child{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}',
+    'html[data-fm-page="kasir"] main>.grid:nth-child(2)>section:first-child>.space-y-3\\.5,html[data-fm-page="kasir"] main>.grid:nth-child(2)>section:first-child>div:last-child{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}',
     'html[data-fm-page="kasir"] section:first-child>div.space-y-3\\.5>*{margin:0!important}',
     'html[data-fm-page="kasir"] #barcode-block,html[data-fm-page="kasir"] #barcode-locked,html[data-fm-page="kasir"] #product-grid-wrap,html[data-fm-page="kasir"] #btn-save-draft{grid-column:1/-1}',
     'html[data-fm-page="kasir"] #product-grid{max-height:92px!important}',
@@ -234,6 +236,11 @@
     'html[data-fm-page="kasir"] main>.grid:nth-child(2)>section:last-child>*{margin:0!important}',
     'html[data-fm-page="kasir"] main>.grid:nth-child(2)>section:last-child>.white-ice-glass-card:first-child{flex:1 1 0;min-height:0;display:flex;flex-direction:column}',
     'html[data-fm-page="kasir"] #draft-items-container{flex:1 1 0;max-height:none!important;min-height:0;overflow:auto}',
+    /* area yang bisa digulir di dalam kartu kasir (bukan terpotong) diberi penanda jelas: bilah gulir
+       yang terlihat, bukan tipis/auto-sembunyi, supaya pengguna tahu ada konten lanjutan di bawah, bukan hilang. */
+    'html[data-fm-page="kasir"] main>.grid:nth-child(2)>section:first-child,html[data-fm-page="kasir"] #draft-items-container{scrollbar-width:auto!important;scrollbar-color:rgba(71,85,105,.5) transparent!important}',
+    'html[data-fm-page="kasir"] main>.grid:nth-child(2)>section:first-child::-webkit-scrollbar,html[data-fm-page="kasir"] #draft-items-container::-webkit-scrollbar{width:8px!important;display:block!important}',
+    'html[data-fm-page="kasir"] main>.grid:nth-child(2)>section:first-child::-webkit-scrollbar-thumb,html[data-fm-page="kasir"] #draft-items-container::-webkit-scrollbar-thumb{background:rgba(71,85,105,.5)!important;border-radius:9px!important;border:2px solid transparent!important;background-clip:padding-box!important}',
     /* manager & owner */
     'html[data-fm-page="owner"] main>.grid:first-child,html[data-fm-page="manager"] main>.grid:first-child{flex:none}',
     'html[data-fm-page="owner"] main>.grid:first-child .ios-glass p.text-\\[10px\\]{display:none}',

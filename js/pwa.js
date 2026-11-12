@@ -61,25 +61,36 @@
     document.body.appendChild(btn);
   }
 
+  function applyManifest(tn, id, warna, icons) {
+    var manifest = {
+      name: tn.nama || 'Oneilverse', short_name: (tn.nama || 'Oneilverse').slice(0, 14),
+      start_url: location.pathname.split('/').pop() + '?toko=' + encodeURIComponent(id),
+      scope: './', display: 'standalone', orientation: 'any',
+      background_color: '#0b1020', theme_color: warna,
+      icons: [{ src: icons[0], sizes: '192x192', type: 'image/png' }, { src: icons[1], sizes: '512x512', type: 'image/png' }]
+    };
+    var blobUrl = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
+    var link = document.querySelector('link[rel="manifest"]'); if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
+    link.href = blobUrl;
+    var apple = document.querySelector('link[rel="apple-touch-icon"]'); if (!apple) { apple = document.createElement('link'); apple.rel = 'apple-touch-icon'; document.head.appendChild(apple); }
+    apple.href = icons[1];
+    var tc = document.querySelector('meta[name="theme-color"]'); if (!tc) { tc = document.createElement('meta'); tc.name = 'theme-color'; document.head.appendChild(tc); }
+    tc.content = warna;
+  }
+
+  /* Supaya canvas ikon (192px+512px) tidak digambar ulang di setiap pembukaan/refresh halaman —
+     lumayan membebani perangkat lemah — hasilnya disimpan per sesi tab, dibuatkan sekali saja. */
+  function iconCacheKey(id, warna, text, logo) { return 'fm_pwa_icon_' + id + '_' + warna + '_' + text + '_' + (logo ? logo.length : 0); }
   function setup() {
     var tn = tenant(); if (!tn || !tn.id) return;
     var id = String(tn.id).toUpperCase(), warna = tn.warna || '#2563eb', text = initials(tn.nama);
     fetchLogo(id).then(function (logo) {
+      var key = iconCacheKey(id, warna, text, logo);
+      var cached = null; try { cached = JSON.parse(sessionStorage.getItem(key) || 'null'); } catch (e) {}
+      if (cached && cached[0] && cached[1]) { applyManifest(tn, id, warna, cached); return; }
       Promise.all([drawIcon(192, warna, text, logo), drawIcon(512, warna, text, logo)]).then(function (icons) {
-        var manifest = {
-          name: tn.nama || 'Oneilverse', short_name: (tn.nama || 'Oneilverse').slice(0, 14),
-          start_url: location.pathname.split('/').pop() + '?toko=' + encodeURIComponent(id),
-          scope: './', display: 'standalone', orientation: 'any',
-          background_color: '#0b1020', theme_color: warna,
-          icons: [{ src: icons[0], sizes: '192x192', type: 'image/png' }, { src: icons[1], sizes: '512x512', type: 'image/png' }]
-        };
-        var blobUrl = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
-        var link = document.querySelector('link[rel="manifest"]'); if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
-        link.href = blobUrl;
-        var apple = document.querySelector('link[rel="apple-touch-icon"]'); if (!apple) { apple = document.createElement('link'); apple.rel = 'apple-touch-icon'; document.head.appendChild(apple); }
-        apple.href = icons[1];
-        var tc = document.querySelector('meta[name="theme-color"]'); if (!tc) { tc = document.createElement('meta'); tc.name = 'theme-color'; document.head.appendChild(tc); }
-        tc.content = warna;
+        try { sessionStorage.setItem(key, JSON.stringify(icons)); } catch (e) {}
+        applyManifest(tn, id, warna, icons);
       });
     });
   }

@@ -50,7 +50,7 @@
     S.last = Date.now();
     db.collection(COL).add({ tid: m.tid, role: m.role, label: m.label, text: text, ms: Date.now(), at: firebase.firestore.FieldValue.serverTimestamp() })
       .then(function () { done && done(''); })
-      .catch(function () { done && done('Gagal mengirim. Coba lagi.'); });
+      .catch(function (e) { done && done('Gagal mengirim' + (e && e.code ? ' (' + e.code + ')' : '') + '. Coba lagi.'); });
   }
 
   /* ---------- berlangganan data ---------- */
@@ -91,22 +91,24 @@
   function stickScroll(el) { if (el) el.scrollTop = el.scrollHeight; }
 
   /* ---------- widget klien (kasir / owner) ---------- */
+  /* Palet "mendung" senada dengan tampilan kasir/owner/manager: satu warna biru-abu, transparan,
+     tanpa hitam pekat. Tulisan tetap gelap pekat (#1f2937) di atasnya supaya mudah dibaca. */
   var CSS = [
     '.fmc-m{display:flex;gap:7px;align-items:baseline;line-height:1.35;word-break:break-word}',
-    '.fmc-t{flex:none;font-size:10px;color:#666}.fmc-id{flex:none;font-weight:700;font-size:11px;color:#9a9a9a;pointer-events:none;user-select:none;-webkit-user-select:none;cursor:default}',
-    '.fmc-x{color:#e6e6e6;font-size:12.5px}.fmc-m.me .fmc-id{color:#3ddc84}.fmc-m.dev .fmc-id{color:#f5c542;background:rgba(245,197,66,.14);padding:0 6px;border-radius:5px}',
-    '.fmc-empty{color:#777;font-size:12px;padding:14px 4px;text-align:center}',
-    '#fmc-tab{position:fixed;z-index:44;bottom:12px;display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:99px;background:#121212;color:#ddd;border:1px solid #2a2a2a;font:600 12px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.35)}',
-    '#fmc-tab.kasir{left:12px}#fmc-tab.owner{right:12px}#fmc-tab i{font-style:normal;min-width:18px;text-align:center;padding:0 5px;border-radius:99px;background:#ff5252;color:#fff;font-size:10.5px;display:none}#fmc-tab i.on{display:inline-block}',
-    '#fmc-panel{position:fixed;z-index:45;bottom:56px;width:310px;height:390px;display:none;flex-direction:column;background:#0d0d0d;color:#e6e6e6;border:1px solid #2a2a2a;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.5);font-family:system-ui,sans-serif;overflow:hidden}',
-    '#fmc-panel.kasir{left:12px}#fmc-panel.owner{right:12px}#fmc-panel.open{display:flex}',
-    '#fmc-hd{flex:none;display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid #1f1f1f;font-size:12px;font-weight:700}#fmc-hd small{font-weight:400;color:#777;font-size:10.5px}#fmc-hd .sp{flex:1}',
-    '#fmc-hd button{all:unset;cursor:pointer;color:#999;padding:2px 7px;font-size:15px}',
-    '#fmc-opt{flex:none;display:none;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid #1f1f1f;font-size:11.5px;color:#aaa}#fmc-opt.on{display:flex}#fmc-opt input{accent-color:#3ddc84}',
+    '.fmc-t{flex:none;font-size:10px;color:#64748b}.fmc-id{flex:none;font-weight:700;font-size:11px;color:#475569;pointer-events:none;user-select:none;-webkit-user-select:none;cursor:default}',
+    '.fmc-x{color:#1f2937;font-size:12.5px}.fmc-m.me .fmc-id{color:#2563eb}.fmc-m.dev .fmc-id{color:#92400e;background:rgba(251,191,36,.35);padding:0 6px;border-radius:5px}',
+    '.fmc-empty{color:#64748b;font-size:12px;padding:14px 4px;text-align:center}',
+    '#fmc-tab{position:fixed;z-index:44;bottom:12px;display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:99px;background:rgba(75,87,104,.55);color:#fff;border:1px solid rgba(255,255,255,.35);font:600 12px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 18px rgba(30,41,59,.25)}',
+    '#fmc-tab.kasir{left:12px}#fmc-tab.owner{right:12px}#fmc-tab i{font-style:normal;min-width:18px;text-align:center;padding:0 5px;border-radius:99px;background:#dc2626;color:#fff;font-size:10.5px;display:none}#fmc-tab i.on{display:inline-block}',
+    '#fmc-panel{position:fixed;z-index:45;bottom:56px;width:310px;height:390px;display:flex;flex-direction:column;background:rgba(241,245,249,.72);color:#1f2937;border:1px solid rgba(255,255,255,.5);border-radius:18px;box-shadow:0 10px 40px rgba(30,41,59,.3);font-family:system-ui,sans-serif;overflow:hidden;transition:transform .22s ease,opacity .22s ease;pointer-events:none;opacity:0}',
+    '#fmc-panel.kasir{left:12px;transform:translateX(-18px)}#fmc-panel.owner{right:12px;transform:translateX(18px)}#fmc-panel.open{pointer-events:auto;opacity:1;transform:translateX(0)}',
+    '#fmc-hd{flex:none;display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid rgba(100,116,139,.25);font-size:12px;font-weight:700}#fmc-hd small{font-weight:400;color:#64748b;font-size:10.5px}#fmc-hd .sp{flex:1}',
+    '#fmc-hd button{all:unset;cursor:pointer;color:#475569;padding:2px 7px;font-size:15px}',
+    '#fmc-opt{flex:none;display:none;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid rgba(100,116,139,.25);font-size:11.5px;color:#475569}#fmc-opt.on{display:flex}#fmc-opt input{accent-color:#2563eb}',
     '#fmc-feed{flex:1 1 0;min-height:0;overflow:auto;padding:8px 12px;display:flex;flex-direction:column;gap:4px}',
-    '#fmc-note{flex:none;min-height:16px;padding:0 12px;font-size:11px;color:#f5c542}',
-    '#fmc-in{flex:none;display:flex;gap:6px;padding:8px 10px;border-top:1px solid #1f1f1f}#fmc-in input{flex:1;min-width:0;background:#161616;border:1px solid #2a2a2a;border-radius:99px;padding:7px 12px;color:#eee;font-size:13px;outline:none}#fmc-in button{all:unset;cursor:pointer;padding:6px 14px;border-radius:99px;background:#1f7a4a;color:#fff;font:700 12px system-ui}',
-    '@media(max-width:1023px){#fmc-tab{bottom:88px;padding:11px 16px}#fmc-tab.kasir{left:auto;right:12px}#fmc-panel,#fmc-panel.kasir,#fmc-panel.owner{inset:0;bottom:0;left:0;right:0;width:auto;height:auto;border-radius:0;z-index:2147482000}}'
+    '#fmc-note{flex:none;min-height:16px;padding:0 12px;font-size:11px;color:#b45309}',
+    '#fmc-in{flex:none;display:flex;gap:6px;padding:8px 10px;border-top:1px solid rgba(100,116,139,.25)}#fmc-in input{flex:1;min-width:0;background:rgba(255,255,255,.6);border:1px solid rgba(100,116,139,.3);border-radius:99px;padding:7px 12px;color:#1f2937;font-size:13px;outline:none}#fmc-in button{all:unset;cursor:pointer;padding:6px 14px;border-radius:99px;background:#4b5768;color:#fff;font:700 12px system-ui}',
+    '@media(max-width:1023px){#fmc-tab{bottom:88px;padding:11px 16px}#fmc-tab.kasir{left:auto;right:12px}#fmc-panel,#fmc-panel.kasir,#fmc-panel.owner{inset:0;bottom:0;left:0;right:0;width:auto;height:auto;border-radius:0;z-index:2147482000;transform:none;transition:opacity .2s ease}#fmc-panel.kasir,#fmc-panel.owner{transform:none}#fmc-panel:not(.open){opacity:0}}'
   ].join('\n');
   var built = false;
   function build() {
@@ -191,6 +193,23 @@
     if ($('fmc-mod')) paintMod();
   }
 
+  /* Hapus seluruh isi Chat Universe, dipanggil langsung dari tile KENDALI (tanpa buka panel moderasi dulu) */
+  function clearAll() {
+    if (!IS_TOWER) return;
+    if (!confirm('Hapus SEMUA pesan di Chat Universe? Tindakan ini tidak bisa dibatalkan.')) return;
+    db.collection(COL).get().then(function (snap) {
+      if (snap.empty) { alert('Chat sudah kosong.'); return; }
+      var docs = snap.docs, i = 0;
+      function next() {
+        if (i >= docs.length) { alert('Semua pesan (' + docs.length + ') sudah dihapus.'); return; }
+        var b = db.batch(); docs.slice(i, i + 400).forEach(function (d) { b.delete(d.ref); });
+        i += 400;
+        b.commit().then(next).catch(function (e) { alert('Gagal menghapus semua: ' + (e && e.code || e.message)); });
+      }
+      next();
+    }).catch(function (e) { alert('Gagal membaca chat: ' + (e && e.code || e.message)); });
+  }
+
   var started = false;
   function start() {
     if (started) return; started = true;
@@ -200,6 +219,6 @@
       if (++tries < 80) setTimeout(wait, 500);
     })();
   }
-  window.FM_CHAT = { mountTower: mountTower, openModeration: openModeration, send: send, state: S };
+  window.FM_CHAT = { mountTower: mountTower, openModeration: openModeration, send: send, state: S, clearAll: clearAll };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
