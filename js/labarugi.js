@@ -35,12 +35,21 @@
     var r = range(period), from = r[0], to = r[1];
     var G = { sales: {}, cogs: {}, expense: {}, prive: {} };
     var T = { sales: 0, cogs: 0, expense: 0, prive: 0 };
+    var cls = []; try { cls = (window.STORE && STORE.getStockClosings && STORE.getStockClosings()) || []; } catch (e) {}
+    var pakaiClosing = cls.length > 0;
     txs().forEach(function (t) {
       var c = G[t.category]; if (!c) return;
+      /* setelah ada closing stok, pembelian tidak dihitung langsung: HPP diambil dari closing (stok awal + pembelian - sisa) */
+      if (pakaiClosing && t.category === 'cogs' && (String(t.accountCode) === '201' || /pembelian/i.test(t.accountName || ''))) return;
       var d = txDate(t); if (!d || d < from || d > to) return;
       var k = t.accountCode || t.accountName || '-';
       var g = c[k] = c[k] || { name: t.accountName || k, count: 0, total: 0 };
       g.count++; g.total += (t.amount || 0); T[t.category] += (t.amount || 0);
+    });
+    cls.forEach(function (h) {
+      if (!h.dateISO || h.dateISO < from || h.dateISO > to) return;
+      var g = G.cogs['closing:' + h.id] = { name: 'HPP closing stok ' + h.label + ' (awal + pembelian - sisa)', count: 0, total: h.hpp || 0 };
+      T.cogs += (h.hpp || 0);
     });
     var gross = T.sales - T.cogs, net = gross - T.expense;
     return { from: from, to: to, label: r[2], G: G, T: T, gross: gross, net: net, afterPrive: net - T.prive };
@@ -171,6 +180,6 @@
       if (decorate() || ++tries > 40) { clearInterval(iv); refreshCard(); setInterval(refreshCard, 1500); }
     }, 250);
   }
-  window.FM_LR = { open: openReport, compute: compute };
+  window.FM_LR = { open: openReport, compute: compute, refresh: refreshCard };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 2.3';
+  var BETA = 'BETA 2.4';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 2.4)', '12 Nov 2026', [
+      '[Fitur] Closing Mingguan di menu Stok (Manager dan Owner): isi sisa stok, sisa jadi stok awal minggu berikutnya, HPP dihitung otomatis (stok awal + pembelian - sisa stok) dan masuk ke Laporan Laba Rugi',
+      '[Perbaikan] Form jenis stok: harga beli (bukan harga jual), kolom Stok akhir, dan angka Rupiah otomatis bertitik ribuan agar tidak salah input',
+      '[Perbaikan] Urutan akun di Kelola Akun kini cukup klik dan seret; bagian Produk yang dobel dengan Stok dihapus, dan Kasir tidak lagi menjual produk stok',
+      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 2.3)', '12 Nov 2026', [
       '[Fitur] Form Stok di Manager dan Owner kini berbentuk Induk dan Jenis seperti COA: input semua jenis stok sekali di awal (mis. induk Kain, jenis Katun, Satin), lalu saat stok masuk tinggal pilih induk dan jenisnya',
       '[Perbaikan] Data jenis stok (induk, jenis, satuan) kini tersimpan permanen dan tidak hilang saat produk diedit',

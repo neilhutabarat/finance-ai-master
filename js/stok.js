@@ -50,7 +50,7 @@
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-stok';
     ov.innerHTML = '<div class="sk-box"><div class="sk-h"><h3>Stok</h3><button type="button" class="sk-x" data-x aria-label="Tutup">✕</button></div>' +
-      '<div class="sk-tabs"><button type="button" class="sk-chip on" data-tab="masuk">Stok Masuk</button><button type="button" class="sk-chip" data-tab="jenis">Daftar Jenis Stok</button></div>' +
+      '<div class="sk-tabs"><button type="button" class="sk-chip on" data-tab="masuk">Stok Masuk</button><button type="button" class="sk-chip" data-tab="jenis">Daftar Jenis Stok</button><button type="button" class="sk-chip" data-tab="closing">Closing Mingguan</button></div>' +
       '<div class="sk-body" id="sk-body"></div><div class="sk-msg" id="sk-msg"></div></div>';
     document.body.appendChild(ov);
     ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
@@ -59,6 +59,12 @@
       b.onclick = function () { tab = b.getAttribute('data-tab'); msg(''); [].forEach.call(ov.querySelectorAll('[data-tab]'), function (x) { x.classList.toggle('on', x === b); }); render(); };
     });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ov && ov.style.display === 'flex' && !document.getElementById('fm-dlg')) close(); });
+  }
+  function fmt(n) { return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(Math.round(Number(n) || 0)); }
+  function rawNum(v) { return Number(String(v == null ? '' : v).replace(/[^0-9]/g, '')) || 0; }
+  function money(id) {
+    var e = document.getElementById(id); if (!e) return;
+    e.addEventListener('input', function () { var d = e.value.replace(/[^0-9]/g, ''); e.value = d ? fmt(d) : ''; });
   }
   function msg(t, err) { var m = document.getElementById('sk-msg'); if (m) { m.textContent = t || ''; m.className = 'sk-msg' + (err ? ' err' : ''); } }
   function close() { if (ov) ov.style.display = 'none'; }
@@ -77,7 +83,7 @@
     }).join('');
   }
 
-  function render() { if (tab === 'jenis') renderJenis(); else renderMasuk(); }
+  function render() { if (tab === 'jenis') renderJenis(); else if (tab === 'closing') renderClosing(); else renderMasuk(); }
 
   /* ---------- tab Stok Masuk ---------- */
   function renderMasuk() {
@@ -135,10 +141,11 @@
       '<div><label>Jenis</label><input id="sj-v" placeholder="mis. Katun Jepang" autocomplete="off"></div>' +
       '<div><label>Satuan</label><input id="sj-u" value="pcs" placeholder="pcs / meter / roll" autocomplete="off"></div>' +
       '<div><label>Stok awal</label><input id="sj-s" type="number" min="0" step="1" inputmode="numeric" value="0"></div>' +
+      '<div><label>Stok akhir (sisa)</label><input id="sj-e" type="number" min="0" step="1" inputmode="numeric" placeholder="boleh kosong"></div></div>' +
+      '<div class="sk-grid"><div><label>Harga beli per satuan (Rp)</label><input id="sj-h" type="text" inputmode="numeric" placeholder="0" autocomplete="off"></div>' +
       '<div><label>Batas stok menipis</label><input id="sj-m" type="number" min="0" step="1" inputmode="numeric" value="5"></div></div>' +
-      '<div class="sk-opt">Harga jual dan HPP (opsional, isi bila barang ini dijual di Kasir)</div>' +
-      '<div class="sk-grid"><div><label>Harga jual (Rp)</label><input id="sj-p" type="number" min="0" inputmode="numeric" value="0"></div><div><label>HPP / modal (Rp)</label><input id="sj-h" type="number" min="0" inputmode="numeric" value="0"></div></div>' +
       '<div style="margin-bottom:6px"><button type="button" class="sk-go" id="sj-go">Simpan Jenis</button></div>' + listHtml(true);
+    money('sj-h');
     box.querySelector('#sj-go').onclick = saveJenis;
     box.querySelector('#sj-v').onkeydown = function (e) { if (e.key === 'Enter') saveJenis(); };
     [].forEach.call(box.querySelectorAll('[data-del]'), function (b) { b.onclick = function () { delJenis(b.getAttribute('data-del')); }; });
@@ -151,7 +158,7 @@
     var name = g + ' - ' + vr;
     if (prods().some(function (p) { return String(p.name).toLowerCase() === name.toLowerCase(); })) { msg('Jenis "' + name + '" sudah ada.', true); return; }
     var code = newCode(g), stock = Math.max(0, Math.floor(Number(v('sj-s')) || 0));
-    Promise.resolve(STORE.saveProduct({ code: code, name: name, sellPrice: Number(v('sj-p')) || 0, hpp: Number(v('sj-h')) || 0, stock: stock, barcode: '', minStock: v('sj-m'), group: g, variant: vr, unit: v('sj-u').trim() || 'pcs' })).then(function () {
+    Promise.resolve(STORE.saveProduct({ code: code, name: name, sellPrice: 0, hpp: rawNum(v('sj-h')), stock: stock, openStock: stock, endStock: v('sj-e') === '' ? null : Math.max(0, Math.floor(Number(v('sj-e')) || 0)), barcode: '', minStock: v('sj-m'), group: g, variant: vr, unit: v('sj-u').trim() || 'pcs' })).then(function () {
       audit('TAMBAH_JENIS_STOK', 'Menambahkan jenis stok [' + code + '] ' + name, '-', 'Stok awal ' + stock);
       selG = g; msg('Tersimpan: ' + name + ' (' + code + ')'); renderJenis(); refreshOthers();
       var gi = document.getElementById('sj-g'); if (gi) { gi.value = g; document.getElementById('sj-v').focus(); }
@@ -166,10 +173,78 @@
     });
   }
 
+
+  /* ---------- tab Closing Mingguan ---------- */
+  function txAll() { try { return (typeof txList !== 'undefined' && txList) ? txList : []; } catch (e) { return []; } }
+  function tsOf(t) { return t.timestamp || (t.dateISO ? Date.parse(t.dateISO) : 0) || 0; }
+  function isBeli(t) { return t.category === 'cogs' && (String(t.accountCode) === '201' || /pembelian/i.test(t.accountName || '')); }
+  function lastClosing() { try { return (STORE.getStockClosings() || [])[0] || null; } catch (e) { return null; } }
+  function pembelian() {
+    var lc = lastClosing(), since = lc ? lc.at : 0;
+    return txAll().filter(function (t) { return isBeli(t) && tsOf(t) > since; }).reduce(function (a, t) { return a + (t.amount || 0); }, 0);
+  }
+  function calc() {
+    var items = prods(), awal = 0, sisa = 0, ok = true;
+    items.forEach(function (p) {
+      var i = document.getElementById('cl-' + p.code), o = typeof p.openStock === 'number' ? p.openStock : p.stock;
+      awal += o * (p.hpp || 0);
+      if (!i || i.value === '') { ok = false; return; }
+      sisa += Math.max(0, Math.floor(Number(i.value) || 0)) * (p.hpp || 0);
+    });
+    var beli = pembelian();
+    return { awal: awal, beli: beli, sisa: sisa, hpp: awal + beli - sisa, ok: ok };
+  }
+  function renderClosing() {
+    var box = document.getElementById('sk-body'), items = prods(), lc = lastClosing();
+    if (!items.length) { box.innerHTML = '<div class="sk-empty">Belum ada jenis stok. Input dulu di tab <b>Daftar Jenis Stok</b>.</div>'; return; }
+    var hist = (STORE.getStockClosings() || []).slice(0, 8);
+    box.innerHTML =
+      '<div class="sk-info">Closing mingguan: isi <b>sisa stok</b> tiap jenis, lalu tekan Closing. Sisa stok jadi stok awal minggu depan.<br>HPP = stok awal + pembelian (akun COA Pembelian) − sisa stok.</div>' +
+      '<div style="font-size:11.5px;color:#64748b;font-weight:700;margin-bottom:6px">Periode: ' + (lc ? 'sejak closing ' + esc(lc.label) : 'sejak awal pencatatan') + '</div>' +
+      groups().map(function (g) {
+        return '<div class="sk-gh"><span>' + esc(gLabel(g)) + '</span><span></span></div>' + ofGroup(g).map(function (p) {
+          var o = typeof p.openStock === 'number' ? p.openStock : p.stock;
+          return '<div class="sk-row"><div class="nm">' + esc(vLabel(p)) + ' <span class="cd">awal ' + o + ' ' + esc(unit(p)) + ' · Rp ' + fmt(p.hpp) + '</span></div><div style="width:110px"><input id="cl-' + esc(p.code) + '" type="number" min="0" step="1" inputmode="numeric" placeholder="sisa" value="' + (typeof p.endStock === 'number' ? p.endStock : '') + '"></div></div>';
+        }).join('');
+      }).join('') +
+      '<div id="cl-sum" style="margin:14px 0 8px;padding:12px 14px;border-radius:14px;background:rgba(47,85,212,.08);font-size:13px;font-weight:700;line-height:1.8"></div>' +
+      '<div style="margin-bottom:8px"><button type="button" class="sk-go" id="cl-go">Closing Minggu Ini</button></div>' +
+      (hist.length ? '<div style="margin-top:12px;font-size:12px;font-weight:800;color:#475569">Riwayat closing</div>' + hist.map(function (h) { return '<div class="sk-row"><div class="nm">' + esc(h.label) + ' <span class="cd">oleh ' + esc(h.by || '-') + '</span></div><div class="sk-st">HPP Rp ' + fmt(h.hpp) + '</div></div>'; }).join('') : '');
+    function sum() {
+      var c = calc(), el = document.getElementById('cl-sum'); if (!el) return;
+      el.innerHTML = 'Nilai stok awal: Rp ' + fmt(c.awal) + '<br>Pembelian (COA): Rp ' + fmt(c.beli) + '<br>Nilai sisa stok: Rp ' + fmt(c.sisa) + (c.ok ? '' : ' <span style="color:#be123c">(isi semua sisa stok)</span>') + '<br><span style="font-size:15px;font-weight:900">HPP: Rp ' + fmt(c.hpp) + '</span>';
+    }
+    [].forEach.call(box.querySelectorAll('input[id^="cl-"]'), function (i) { if (i.id !== 'cl-sum') i.oninput = sum; });
+    sum();
+    box.querySelector('#cl-go').onclick = doClosing;
+  }
+  function doClosing() {
+    var items = prods(), c = calc();
+    if (!c.ok) { msg('Isi sisa stok semua jenis dulu.', true); return; }
+    var ask = window.fmAsk ? window.fmAsk('Closing stok sekarang?\n\nHPP minggu ini: Rp ' + fmt(c.hpp) + '\nSisa stok jadi stok awal minggu depan. Aksi ini tidak bisa dibatalkan.', { ok: 'Ya, Closing', judul: 'Closing Mingguan' }) : Promise.resolve(confirm('Closing stok sekarang?'));
+    Promise.resolve(ask).then(function (yes) {
+      if (!yes) return;
+      var now = new Date(), pad = function (n) { return String(n).padStart(2, '0'); };
+      var BL = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      var rec = { id: 'sc_' + now.getTime(), at: now.getTime(), dateISO: now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()), label: now.getDate() + ' ' + BL[now.getMonth()] + ' ' + now.getFullYear() + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()), by: '', nilaiAwal: c.awal, pembelian: c.beli, nilaiSisa: c.sisa, hpp: c.hpp, rows: [] };
+      try { rec.by = (typeof user !== 'undefined' && user && user.title) || ''; } catch (e) {}
+      var jobs = items.map(function (p) {
+        var sisa = Math.max(0, Math.floor(Number(document.getElementById('cl-' + p.code).value) || 0));
+        rec.rows.push({ code: p.code, name: p.name, group: p.group || '', variant: p.variant || '', unit: unit(p), awal: typeof p.openStock === 'number' ? p.openStock : p.stock, sisa: sisa, hb: p.hpp || 0 });
+        return STORE.saveProduct({ code: p.code, name: p.name, sellPrice: p.sellPrice, hpp: p.hpp, stock: sisa, openStock: sisa, endStock: null, barcode: p.barcode, minStock: p.minStock, group: p.group, variant: p.variant, unit: p.unit });
+      });
+      return Promise.all(jobs).then(function () { return STORE.addStockClosing(rec); }).then(function () {
+        audit('CLOSING_STOK', 'Closing stok mingguan, HPP Rp ' + fmt(c.hpp), 'Pembelian Rp ' + fmt(c.beli), 'Sisa Rp ' + fmt(c.sisa));
+        renderClosing(); msg('Closing tersimpan. HPP Rp ' + fmt(c.hpp) + ' masuk ke Laba Rugi.'); refreshOthers();
+        try { if (window.FM_LR && FM_LR.refresh) FM_LR.refresh(); } catch (e) {}
+      });
+    }).catch(function () { msg('Closing gagal disimpan. Periksa koneksi lalu coba lagi.', true); });
+  }
+
   window.FM_STOK = {
     open: function (t) {
       build(); msg('');
-      tab = t === 'jenis' ? 'jenis' : 'masuk';
+      tab = t === 'jenis' ? 'jenis' : t === 'closing' ? 'closing' : 'masuk';
       [].forEach.call(ov.querySelectorAll('[data-tab]'), function (x) { x.classList.toggle('on', x.getAttribute('data-tab') === tab); });
       ov.style.display = 'flex'; render();
     },

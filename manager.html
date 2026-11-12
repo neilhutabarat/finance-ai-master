@@ -178,7 +178,7 @@
 
         <div id="fm-actions" class="fm-actions">
             <button data-fm-action data-ic="plus" onclick="openModal('add_cashier_request')">Buka Kasir Baru</button>
-            <button data-fm-action data-ic="box" onclick="openModal('coa_mgmt')">Kelola COA &amp; Produk</button>
+            <button data-fm-action data-ic="box" onclick="openModal('coa_mgmt')">Kelola Akun (COA)</button>
             <button data-fm-action data-ic="box" onclick="FM_STOK.open()">Tambah Stok</button>
             <button data-fm-action data-ic="users" onclick="FM_GAJI.open()">Laporan Gaji</button>
             <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur Toko</button>
@@ -388,38 +388,7 @@
                         </table>
                     </div>
 
-                    <div class="bg-purple-950/70 border border-purple-200 rounded-2xl p-4 space-y-3">
-                        <span class="text-xs font-black text-purple-950 block">Produk Toko (stok otomatis berkurang saat kasir menjual):</span>
-                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                            <input type="text" id="mp-code" placeholder="Kode produk" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-mono font-bold outline-none">
-                            <input type="text" id="mp-name" placeholder="Nama produk" class="sm:col-span-2 bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
-                            <input type="number" min="0" id="mp-sell" placeholder="Harga jual" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
-                            <input type="number" min="0" id="mp-hpp" placeholder="HPP (modal)" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
-                            <input type="number" min="0" id="mp-stock" placeholder="Stok" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
-                            <input type="number" min="0" id="mp-minstock" placeholder="Batas stok menipis (5)" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
-                            <input type="text" id="mp-barcode" placeholder="Barcode (opsional, tembak dengan scanner)" class="sm:col-span-5 bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-mono font-bold outline-none">
-                        </div>
-                        <div class="flex justify-end">
-                            <button onclick="saveProductByManager()" class="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm">+ Simpan Produk</button>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto border border-white/10 rounded-2xl">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-white/10 text-[11px] font-black uppercase text-slate-300 border-b">
-                                <tr>
-                                    <th class="py-2.5 px-3">Kode</th>
-                                    <th class="py-2.5 px-3">Produk</th>
-                                    <th class="py-2.5 px-3">Barcode</th>
-                                    <th class="py-2.5 px-3 text-right">Harga Jual</th>
-                                    <th class="py-2.5 px-3 text-right">HPP</th>
-                                    <th class="py-2.5 px-3 text-right">Stok</th>
-                                    <th class="py-2.5 px-3 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="product-table-body"></tbody>
-                        </table>
-                    </div>
+                    
 
 
                 </div>
@@ -536,7 +505,8 @@
     <script src="js/plans.js?v=1.5.8"></script>
     <script src="js/mutasi-share.js?v=1.5.8"></script>
     <script src="js/gaji.js?v=1.5.8"></script>
-    <script src="js/stok.js?v=2.3"></script>
+    <script src="js/stok.js?v=2.4"></script>
+    <script src="js/coa-drag.js?v=2.4"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); if (window.FM_GAJI) FM_GAJI.mount({ addTx: function (tx) { txList.unshift(tx); persistData(); if (typeof db !== 'undefined' && db) { db.collection(tenantFirestoreCol).add(Object.assign({}, tx, { timestamp: firebase.firestore.FieldValue.serverTimestamp() })).catch(console.error); } renderAllReports(); } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
@@ -849,14 +819,13 @@
 
             coaList.forEach(c => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-white/5 text-xs";
+                tr.className = "border-b border-white/5 text-xs"; tr.dataset.coa = c.code;
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono font-bold text-white">${c.code}</td>
                     <td class="py-2.5 px-3 font-bold text-white">${fmEsc(c.name)}</td>
                     <td class="py-2.5 px-3 uppercase text-[10px] text-slate-500">${c.category}</td>
                     <td class="py-2.5 px-3 text-center space-x-1">
-                        <button onclick="STORE.moveCOA('${c.code}',-1);renderCOATable()" class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 font-black text-[10px]">▲</button>
-                        <button onclick="STORE.moveCOA('${c.code}',1);renderCOATable()" class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 font-black text-[10px]">▼</button>
+                        <span class="coa-h" title="Klik dan seret untuk memindah urutan" style="cursor:grab;display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(148,163,184,.2);font-weight:900;touch-action:none;user-select:none">⠿ Seret</span>
                         <button onclick="editCOAItem('${c.code}')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-slate-200 text-slate-300 font-bold text-[10px]">Edit</button>
                         <button onclick="deleteCOAItem('${c.code}')" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px]">Hapus</button>
                     </td>
@@ -999,7 +968,7 @@
             tbody.innerHTML = "";
             closingHistory.forEach(s => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-white/5 text-xs";
+                tr.className = "border-b border-white/5 text-xs"; tr.dataset.coa = c.code;
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono">${s.closedAt}</td>
                     <td class="py-2.5 px-3 text-right font-black text-emerald-600 font-mono">Rp ${formatThousandSeparator(s.totalIn)}</td>

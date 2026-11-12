@@ -873,7 +873,7 @@
             });
 
             // 2. Produk Inventaris Minimarket dari Manager
-            let products = STORE.getProducts();
+            let products = []; /* penjualan produk dihapus: produk kini dikelola sebagai stok bahan di Manager */
             if (products.length > 0) {
                 const prodGroup = document.createElement('optgroup');
                 prodGroup.label = "5. PRODUK INVENTARIS TOKO";
@@ -1616,8 +1616,8 @@
             const wrap = document.getElementById('product-grid-wrap'), grid = document.getElementById('product-grid');
             if (!wrap || !grid) return;
             const q = (document.getElementById('product-grid-search').value || '').toLowerCase().trim();
-            const all = STORE.getProducts();
-            wrap.classList.toggle('hidden', all.length === 0 || !BARCODE_ON);
+            const all = [];
+            wrap.classList.add('hidden'); return;
             grid.innerHTML = '';
             const hues = [221, 262, 160, 340, 25, 190, 45, 280];
             all.filter(p => !q || p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)).forEach(p => {
@@ -1648,7 +1648,7 @@
         });
 
         // ===== SCAN BARCODE =====
-        const BARCODE_ON = (window.FM_PLANS && FM_PLANS.has) ? FM_PLANS.has('barcode', 'kasir') : true;
+        const BARCODE_ON = false; /* produk tidak dijual di Kasir */
 
         function bcStatus(msg, ok) {
             const el = document.getElementById('barcode-status');
@@ -1662,7 +1662,7 @@
         function handleScannedCode(raw) {
             const code = String(raw || '').trim();
             if (!code) return false;
-            const p = STORE.findProductByCode(code);
+            const p = null;
             if (!p) { bcStatus(`Barcode ${code} tidak ditemukan di daftar produk.`, false); return false; }
             if (availableStock(p.code, '') <= 0) { bcStatus(`Stok ${p.name} habis.`, false); return false; }
 

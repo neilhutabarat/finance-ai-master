@@ -16,8 +16,8 @@
     function createStore(tenant) {
         var id = tenant.id;
         var hasDb = (typeof db !== 'undefined' && db);
-        var coaKey = 'fm_custom_coa_' + id, prodKey = 'fm_products_' + id;
-        var st = { coa: null, products: [], listeners: [], unsubs: [], started: false };
+        var coaKey = 'fm_custom_coa_' + id, clsKey = 'fm_stock_closings_' + id, prodKey = 'fm_products_' + id;
+        var st = { coa: null, closings: null, products: [], listeners: [], unsubs: [], started: false };
 
         function notify() { st.listeners.forEach(function (f) { try { f(); } catch (e) { console.error(e); } }); }
         function ord(p) { return (typeof p.order === 'number' && isFinite(p.order)) ? p.order : 1e9; }
@@ -36,6 +36,20 @@
                 return cp((tenant.customCOA && tenant.customCOA.length) ? tenant.customCOA : []);
             },
             getProducts: function () { return cp(st.products); },
+            getStockClosings: function () { return cp(st.closings || []); },
+            // Simpan hasil closing stok mingguan (riwayat + HPP) di dokumen pengaturan toko
+            addStockClosing: function (rec) {
+                var list = (st.closings || []).slice(); list.unshift(cp(rec)); st.closings = list; notify();
+                if (hasDb) return db.collection('tenant_settings').doc(id).set({ stockClosings: cp(list), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                lsSet(clsKey, list); return Promise.resolve();
+            },
+            // Pindah akun COA: taruh 'from' di posisi 'to' (klik dan seret)
+            reorderCOA: function (from, to) {
+                var list = api.getCOA(), i = list.findIndex(function (c) { return c.code === from; }), j = list.findIndex(function (c) { return c.code === to; });
+                if (i < 0 || j < 0 || i === j) return Promise.resolve(false);
+                var it = list.splice(i, 1)[0]; list.splice(j, 0, it);
+                return api.saveCOA(list).then(function () { return true; });
+            },
             start: function () {
                 if (st.started) return api;
                 st.started = true;
@@ -44,6 +58,7 @@
                     st.unsubs.push(db.collection('tenant_settings').doc(id).onSnapshot(function (snap) {
                         var d = snap.exists ? snap.data() : null;
                         st.coa = (d && Array.isArray(d.coa)) ? d.coa : null;
+                        st.closings = (d && Array.isArray(d.stockClosings)) ? d.stockClosings : [];
                         notify();
                     }, function (e) { console.warn('store.js: gagal membaca COA', e); }));
                     st.unsubs.push(db.collection('tp_' + id).onSnapshot(function (snap) {
@@ -54,7 +69,7 @@
                     }, function (e) { console.warn('store.js: gagal membaca produk', e); }));
                 } else {
                     var c = lsGet(coaKey, null);
-                    st.coa = Array.isArray(c) ? c : null;
+                    st.coa = Array.isArray(c) ? c : null; st.closings = lsGet(clsKey, []);
                     st.products = lsGet(prodKey, []); sortProducts();
                     notify();
                 }
@@ -78,7 +93,9 @@
                     order: (old && typeof old.order === 'number') ? old.order : maxOrd + 1,
                     group: p.group != null ? String(p.group).trim() : (old && old.group) || '',
                     variant: p.variant != null ? String(p.variant).trim() : (old && old.variant) || '',
-                    unit: p.unit != null ? String(p.unit).trim() : (old && old.unit) || ''
+                    unit: p.unit != null ? String(p.unit).trim() : (old && old.unit) || '',
+                    openStock: p.openStock != null ? Math.max(0, Math.floor(num(p.openStock))) : (old && typeof old.openStock === 'number' ? old.openStock : Math.max(0, Math.floor(num(p.stock)))),
+                    endStock: p.endStock !== undefined ? (p.endStock === null || p.endStock === '' ? null : Math.max(0, Math.floor(num(p.endStock)))) : (old && typeof old.endStock === 'number' ? old.endStock : null)
                 };
                 var i = st.products.findIndex(function (q) { return q.code === x.code; });
                 if (i >= 0) st.products[i] = x; else st.products.push(x);
