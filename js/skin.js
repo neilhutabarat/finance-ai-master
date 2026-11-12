@@ -350,6 +350,12 @@
     'html[data-fm-fit] #fm-insights .fm-ins-main{flex:1 1 0;min-height:0}',
     'html[data-fm-fit] #fm-insights .fm-ins-main .fm-scroll{flex:1 1 0}',
     'html[data-fm-fit] #fm-actions{flex:none}',
+    /* semua fitur aktif: isi lebih tinggi dari layar -> halaman digulir, kartu tidak saling menimpa */
+    'html[data-fm-page="owner"] main,html[data-fm-page="manager"] main{overflow-y:auto;overflow-x:hidden}',
+    'html[data-fm-page="owner"] main>*,html[data-fm-page="manager"] main>*{flex-shrink:0}',
+    'html[data-fm-fit] #fm-insights{flex:1 0 auto;min-height:auto}',
+    'html[data-fm-fit] #fm-insights .fm-ins-main{flex:1 0 auto;min-height:0}',
+    'html[data-fm-fit] #fm-insights .fm-ins-main .fm-scroll{flex:1 1 auto;max-height:min(38vh,320px)}',
     'html[data-fm-fit] #fm-insights:empty{display:none}',
     'html[data-fm-fit] main:has(#fm-insights:empty) #fm-actions{flex:1 1 0;min-height:0}',
     'html[data-fm-page="manager"] main>.grid.lg\\:grid-cols-12{display:none!important}',
