@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 5.0';
+  var BETA = 'BETA 5.1';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 5.1)', '13 Nov 2026', [
+      '[Tampilan] Logo Oneilverse kini sejajar dengan nama toko di bagian atas; foto dan inisial toko dihilangkan. Di bawah nama toko kini tampil alamat toko yang terdaftar',
+      '[Perbaikan] Pengaturan unggah foto/logo toko dihapus dari akun Owner dan Manager agar tampilan seragam',
+      '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 5.0)', '13 Nov 2026', [
       '[Tampilan] Logo Oneilverse baru di halaman masuk dan di tengah bagian atas semua halaman, lengkap dengan ikon aplikasi. Toko berpaket Plus ditandai tanda "+" miring di ujung tulisan oneilverse',
       '[Perbaikan] Tampilan paket toko di bagian atas halaman kini ikut berubah otomatis saat paket diganti, tanpa perlu muat ulang',
@@ -194,7 +199,7 @@
 
   // ---------- menu Pengaturan ----------
   var TENANT_ID = (TOKO && TOKO !== 'oneilverse') ? TOKO.toUpperCase() : 'ID26110901';
-  var CAN_LOGO = (ROLE === 'owner' || ROLE === 'manager');
+  var CAN_LOGO = false; /* foto/logo toko dihapus: logo Oneilverse dipakai di semua toko */
   var logoData = null;
 
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
@@ -320,7 +325,7 @@
       logoMsg(data ? 'Logo tersimpan (' + Math.round((data.length - data.indexOf(',') - 1) * 0.75 / 1024) + ' KB).' : 'Logo dihapus.', true);
     }).catch(function (e) { logoMsg('Gagal menyimpan: ' + e.message, false); });
   }
-  function applyLogo() {
+  function applyLogo() { return;
     try {
       var nameEl = document.getElementById('topbar-store-name');
       if (!nameEl) return;
@@ -379,8 +384,7 @@
     if (ROLE === 'login') {
       var o = window.applyTenantBranding;
       if (typeof o === 'function') window.applyTenantBranding = function (tn) { o(tn); applyLoginLogo(); };
-      loginLogo();
-    } else if (ROLE !== 'tower' && ROLE !== 'partner') startLogo();
+    }
   }
   window.FM_THEME = { version: APP_VERSION, toggle: function () { pref.mode = ((pref.mode || DEFAULT_MODE) === 'dark') ? 'light' : 'dark'; savePref(pref); apply(); return pref.mode; }, mode: function () { return pref.mode || DEFAULT_MODE; }, open: function () { document.getElementById('fm-gear').click(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

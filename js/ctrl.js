@@ -43,29 +43,16 @@
         if (el && el.parentNode) el.parentNode.removeChild(el);
     }
 
-    // ===== LOGO ONEILVERSE DI TENGAH HEADER (seperti header Instagram); Plus ditandai "+" di ujung nama =====
-    function centerBrand(tn) {
-        try {
-            var hd = document.querySelector('header.oneui-hero'); if (!hd || !window.FM_LOGO) return;
-            var t = (tn && tn.tier === 'pro') ? 'plus' : ((tn && tn.tier) || 'basic');
-            var box = document.getElementById('fm-center-brand');
-            if (!box) {
-                box = document.createElement('div');
-                box.id = 'fm-center-brand';
-                box.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:11px;margin:0 0 18px;padding:2px 0 14px;border-bottom:1px solid rgba(100,116,139,.22);position:relative;z-index:1;color:inherit;user-select:none';
-                hd.insertBefore(box, hd.firstChild);
-            }
-            box.innerHTML = FM_LOGO.mark(40) + '<span style="font-family:\'Inter Display\',Inter,system-ui,sans-serif;font-weight:700;font-size:25px;letter-spacing:-.012em;line-height:1">oneilverse' + (t === 'plus' ? FM_LOGO.plus() : '') + '</span>';
-        } catch (e) {}
-    }
-
     // ===== NAMA, ID, LOGO, DAN PAKET TOKO DI HEADER (sebelumnya tertulis mati "Oneilverse") =====
     function applyHeaderBranding(tn) {
         if (!tn || tn.notFound) return;
-        centerBrand(tn);
         try {
             var slEl = document.getElementById('topbar-store-slogan');
-            if (slEl && tn.slogan) slEl.textContent = tn.slogan;
+            if (slEl) {
+                var L = tn.locations || {}, alamat = '';
+                ['kasir', 'manager', 'owner'].forEach(function (r) { if (!alamat && L[r] && L[r].name && L[r].name !== '-') alamat = L[r].name; });
+                if (alamat) slEl.textContent = alamat; else if (tn.slogan) slEl.textContent = tn.slogan;
+            }
             if (tn.isMaster) return;
             var nameEl = document.getElementById('topbar-store-name');
             if (nameEl) nameEl.textContent = tn.nama;
@@ -79,17 +66,20 @@
             var t = (tn.tier === 'pro') ? 'plus' : (tn.tier || 'basic');
             if (tierEl) tierEl.style.display = 'none'; // Basic tanpa lencana; Plus ditandai "+" di ujung nama
 
-            // logo: ganti kristal Oneilverse dengan inisial toko
+            // logo Oneilverse sejajar dengan nama toko (tanpa foto profil / inisial toko); Plus = tanda "+" di pojok logo
             if (nameEl) {
                 var box = nameEl, svg = null;
                 while (box && box.parentElement && !svg) { box = box.parentElement; svg = box.querySelector('svg'); }
-                if (svg && svg.parentElement && !document.getElementById('ctrl-logo-badge')) {
-                    var b = document.createElement('div');
-                    b.id = 'ctrl-logo-badge';
-                    b.style.cssText = 'width:100%;height:100%;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:14px;color:#fff;font-weight:900;font-size:20px;letter-spacing:1px;background:linear-gradient(135deg,' + (tn.warna || '#0f172a') + ',' + (tn.warnaAksen || '#22d3ee') + ');';
-                    b.textContent = tn.logoText || 'UM';
-                    svg.style.display = 'none';
-                    svg.parentElement.appendChild(b);
+                var oldB = document.getElementById('ctrl-logo-badge'); if (oldB) oldB.remove();
+                if (svg && svg.parentElement) {
+                    var holder = svg.parentElement;
+                    if (!svg.classList.contains('fm-logo-svg') && window.FM_LOGO) {
+                        svg.style.display = 'none';
+                        if (!holder.querySelector('.fm-logo-svg')) holder.insertAdjacentHTML('beforeend', FM_LOGO.mark('100%'));
+                    } else svg.style.display = '';
+                    holder.style.position = 'relative';
+                    var pp = holder.querySelector('.fm-plus-pill'); if (pp) pp.remove();
+                    if (t === 'plus' && window.FM_LOGO) holder.insertAdjacentHTML('beforeend', '<span class="fm-plus-pill" style="position:absolute;top:-7px;right:-9px;font-size:26px;line-height:1;color:inherit;text-shadow:0 0 6px rgba(255,255,255,.7)">' + FM_LOGO.plus() + '</span>');
                 }
             }
         } catch (e) { console.warn('ctrl.js: gagal menerapkan nama toko', e); }
