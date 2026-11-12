@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 5.9';
+  var BETA = 'BETA 6.0';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 6.0)', '13 Nov 2026', [
+      '[Fitur] Banyak Usaha dalam satu toko: akun COA dan kelompok stok bisa diberi label usaha (mis. Jahit, Karung, Kelontong). Laporan Laba Rugi bisa disaring per usaha, termasuk unduhan PDF dan CSV, dan ada ringkasan perbandingan antar usaha. Fitur ini aktif sesuai kebutuhan usaha; toko satu usaha tidak melihat perubahan',
+      '[Perbaikan] Transaksi lama tanpa label usaha tetap terbaca sebagai Umum, sehingga angka laporan gabungan tidak berubah',
+      '[Keamanan] Perubahan label usaha pada akun dan stok tercatat di riwayat audit'
+    ]],
     ['1.0.0 (BETA 5.9)', '13 Nov 2026', [
       '[Fitur] Usaha dagang kini bisa menjual barang dari stok langsung di kasir: stok berkurang otomatis tiap penjualan. Manager menentukan kelompok stok mana yang dijual lewat sakelar "Dijual di kasir" dan mengisi harga jual; kelompok bahan (mis. kain) tetap tidak tampil di kasir. Fitur ini aktif sesuai kebutuhan usaha',
       '[Fitur] Kartu Laba & Margin kini menampilkan penjualan produk dan penjualan non-produk (jasa dan akun pendapatan) secara terpisah, tidak lagi kosong bila belum ada penjualan produk',

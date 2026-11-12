@@ -227,7 +227,7 @@ function registryMerge(cfg) {
     // toko bawaan file tidak boleh ditimpa, KECUALI toko master (uji coba): hanya field yang boleh diatur Tower
     if (!TENANTS_CONFIG[k].isMaster) return null;
     var m = TENANTS_CONFIG[k];
-    ["nama", "slogan", "warna", "warnaAksen", "logoText", "tier", "features", "customCOA", "locations", "pinnedVersion"].forEach(function (f) { if (cfg[f] !== undefined) m[f] = cfg[f]; });
+    ["nama", "slogan", "warna", "warnaAksen", "logoText", "tier", "features", "customCOA", "locations", "pinnedVersion", "usaha"].forEach(function (f) { if (cfg[f] !== undefined) m[f] = cfg[f]; });
     m.deletedByTower = cfg.deleted === true;
     return k;
   }

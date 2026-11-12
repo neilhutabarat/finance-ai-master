@@ -11,10 +11,12 @@
   function canIn() { return can('stok_input'); }
   function canCl() { return can('stok_closing'); }
   function prods() { try { return (window.STORE && STORE.getProducts()) || []; } catch (e) { return []; } }
+  function bizOn() { return !!(window.FM_BIZ && FM_BIZ.enabled()); }
+  function bizOf(g) { var it = ofGroup(g).filter(function (p) { return p.biz; })[0]; return it ? it.biz : ''; }
   function canSell() { return can('jual_produk'); }
   function sellOn(g) { return ofGroup(g).some(function (p) { return !!p.forSale; }); }
   function upd(p, over) {
-    var o = { code: p.code, name: p.name, sellPrice: p.sellPrice, hpp: p.hpp, stock: p.stock, openStock: p.openStock, endStock: (typeof p.endStock === 'number' ? p.endStock : null), barcode: p.barcode, minStock: p.minStock, group: p.group, variant: p.variant, unit: p.unit, forSale: !!p.forSale };
+    var o = { code: p.code, name: p.name, sellPrice: p.sellPrice, hpp: p.hpp, stock: p.stock, openStock: p.openStock, endStock: (typeof p.endStock === 'number' ? p.endStock : null), barcode: p.barcode, minStock: p.minStock, group: p.group, variant: p.variant, unit: p.unit, forSale: !!p.forSale, biz: p.biz || '' };
     for (var k in over) o[k] = over[k];
     return STORE.saveProduct(o);
   }
@@ -89,7 +91,8 @@
     return gs.map(function (g) {
       var items = ofGroup(g), tot = items.reduce(function (a, p) { return a + p.stock; }, 0);
       var sw = (withDel && canSell() && g !== NONE) ? '<span><button type="button" class="sk-sw' + (sellOn(g) ? ' on' : '') + '" data-sw="' + esc(g) + '" title="Bila hidup, jenis di induk ini tampil di kasir dan stoknya berkurang otomatis tiap penjualan">Dijual di kasir: ' + (sellOn(g) ? 'HIDUP' : 'MATI') + '</button></span>' : '';
-      return '<div class="sk-gh"><span>' + esc(gLabel(g)) + '</span>' + (sw || '<span>' + items.length + ' jenis</span>') + '</div>' + items.map(function (p) {
+      var bz = (withDel && bizOn() && g !== NONE) ? '<select data-biz="' + esc(g) + '" title="Usaha pemilik induk stok ini" style="padding:3px 8px;border-radius:999px;border:1px solid rgba(148,163,184,.45);background:transparent;color:inherit;font-size:11px;font-weight:700;text-transform:none;margin-left:8px">' + FM_BIZ.options(bizOf(g)) + '</select>' : '';
+      return '<div class="sk-gh"><span>' + esc(gLabel(g)) + '</span>' + (sw ? '<span>' + sw.replace(/^<span>|<\/span>$/g, '') + bz + '</span>' : (bz ? '<span>' + bz + '</span>' : '<span>' + items.length + ' jenis</span>')) + '</div>' + items.map(function (p) {
         return '<div class="sk-row"><div class="nm">' + esc(vLabel(p)) + ' <span class="cd">' + esc(p.code) + '</span></div><div class="cd" style="white-space:nowrap;text-align:right">' + (p.hpp ? 'Rp ' + fmt(p.hpp) + '/' + esc(unit(p)) + ' · nilai Rp ' + fmt(p.hpp * p.stock) : 'harga beli belum diisi') + '</div><div class="sk-st' + (low(p) ? ' low' : '') + '">' + p.stock + ' ' + esc(unit(p)) + '</div>' +
           (withDel || !canCl() ? '' : '<div style="width:96px" title="Sisa stok hasil hitung fisik (diisi manager tiap minggu)"><input data-end="' + esc(p.code) + '" type="number" min="0" step="1" inputmode="numeric" placeholder="sisa" value="' + (typeof p.endStock === 'number' ? p.endStock : '') + '" style="padding:6px 8px"></div>') +
           (withDel && canSell() && p.forSale ? '<div style="width:130px" title="Harga jual per satuan di kasir"><input data-pr="' + esc(p.code) + '" type="text" inputmode="numeric" autocomplete="off" placeholder="harga jual" value="' + (p.sellPrice ? fmt(p.sellPrice) : '') + '" style="padding:6px 8px"></div>' : '') +
@@ -176,6 +179,7 @@
       '<div style="margin-bottom:6px"><button type="button" class="sk-go" id="sj-go">Simpan Jenis</button></div>' + listHtml(true);
     money('sj-h'); if (canSell()) money('sj-p');
     box.querySelector('#sj-go').onclick = saveJenis;
+    [].forEach.call(box.querySelectorAll('[data-biz]'), function (s) { s.onchange = function () { setBiz(s.getAttribute('data-biz'), s.value); }; });
     [].forEach.call(box.querySelectorAll('[data-sw]'), function (b) { b.onclick = function () { toggleSell(b.getAttribute('data-sw')); }; });
     [].forEach.call(box.querySelectorAll('[data-pr]'), function (inp) {
       inp.oninput = function () { var n = rawNum(inp.value); inp.value = n ? fmt(n) : ''; };
@@ -192,11 +196,18 @@
     var name = g + ' - ' + vr;
     if (prods().some(function (p) { return String(p.name).toLowerCase() === name.toLowerCase(); })) { msg('Jenis "' + name + '" sudah ada.', true); return; }
     var code = newCode(g), stock = Math.max(0, Math.floor(Number(v('sj-s')) || 0));
-    Promise.resolve(STORE.saveProduct({ code: code, name: name, sellPrice: canSell() ? rawNum(v('sj-p')) : 0, forSale: canSell() && sellOn(g), hpp: rawNum(v('sj-h')), stock: stock, openStock: stock, endStock: v('sj-e') === '' ? null : Math.max(0, Math.floor(Number(v('sj-e')) || 0)), barcode: '', minStock: v('sj-m'), group: g, variant: vr, unit: v('sj-u').trim() || 'pcs' })).then(function () {
+    Promise.resolve(STORE.saveProduct({ code: code, name: name, sellPrice: canSell() ? rawNum(v('sj-p')) : 0, forSale: canSell() && sellOn(g), biz: bizOn() ? bizOf(g) : '', hpp: rawNum(v('sj-h')), stock: stock, openStock: stock, endStock: v('sj-e') === '' ? null : Math.max(0, Math.floor(Number(v('sj-e')) || 0)), barcode: '', minStock: v('sj-m'), group: g, variant: vr, unit: v('sj-u').trim() || 'pcs' })).then(function () {
       audit('TAMBAH_JENIS_STOK', 'Menambahkan jenis stok [' + code + '] ' + name, '-', 'Stok awal ' + stock);
       selG = g; msg('Tersimpan: ' + name + ' (' + code + ')'); renderJenis(); refreshOthers();
       var gi = document.getElementById('sj-g'); if (gi) { gi.value = g; document.getElementById('sj-v').focus(); }
     }).catch(function () { msg('Gagal menyimpan jenis stok.', true); });
+  }
+  function setBiz(g, val) {
+    var items = ofGroup(g), old = bizOf(g) || 'Umum';
+    Promise.all(items.map(function (p) { return upd(p, { biz: val }); })).then(function () {
+      audit('USAHA_INDUK_STOK', 'Usaha induk stok ' + g, old, val || 'Umum');
+      msg('Induk ' + g + ' masuk usaha ' + (val || 'Umum') + '.'); renderJenis(); refreshOthers();
+    }).catch(function () { msg('Gagal mengubah usaha.', true); });
   }
   function toggleSell(g) {
     var items = ofGroup(g), on = !sellOn(g);
@@ -225,6 +236,11 @@
   function pembelian() {
     var lc = lastClosing(), since = lc ? lc.at : 0;
     return txAll().filter(function (t) { return isBeli(t) && tsOf(t) > since; }).reduce(function (a, t) { return a + (t.amount || 0); }, 0);
+  }
+  function pembelianBiz() {
+    var lc = lastClosing(), since = lc ? lc.at : 0, out = {};
+    txAll().filter(function (t) { return isBeli(t) && tsOf(t) > since; }).forEach(function (t) { var b = (window.FM_BIZ && FM_BIZ.ofTx(t)) || ''; out[b] = (out[b] || 0) + (t.amount || 0); });
+    return out;
   }
   function calc() {
     var items = prods(), awal = 0, sisa = 0, ok = true;
@@ -271,10 +287,11 @@
       var now = new Date(), pad = function (n) { return String(n).padStart(2, '0'); };
       var BL = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
       var rec = { id: 'sc_' + now.getTime(), at: now.getTime(), dateISO: now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()), label: now.getDate() + ' ' + BL[now.getMonth()] + ' ' + now.getFullYear() + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()), by: '', nilaiAwal: c.awal, pembelian: c.beli, nilaiSisa: c.sisa, hpp: c.hpp, rows: [] };
+      try { if (bizOn()) rec.beliBiz = pembelianBiz(); } catch (e) {}
       try { rec.by = (typeof user !== 'undefined' && user && user.title) || ''; } catch (e) {}
       var jobs = items.map(function (p) {
         var sisa = Math.max(0, Math.floor(Number(document.getElementById('cl-' + p.code).value) || 0));
-        rec.rows.push({ code: p.code, name: p.name, group: p.group || '', variant: p.variant || '', unit: unit(p), awal: typeof p.openStock === 'number' ? p.openStock : p.stock, sisa: sisa, hb: p.hpp || 0 });
+        rec.rows.push({ code: p.code, name: p.name, group: p.group || '', variant: p.variant || '', unit: unit(p), awal: typeof p.openStock === 'number' ? p.openStock : p.stock, sisa: sisa, hb: p.hpp || 0, biz: p.biz || '' });
         return STORE.saveProduct({ code: p.code, name: p.name, sellPrice: p.sellPrice, hpp: p.hpp, stock: sisa, openStock: sisa, endStock: null, barcode: p.barcode, minStock: p.minStock, group: p.group, variant: p.variant, unit: p.unit });
       });
       return Promise.all(jobs).then(function () { return STORE.addStockClosing(rec); }).then(function () {
