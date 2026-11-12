@@ -57,6 +57,21 @@
     } catch (e) { done(readCache()); }
   }
 
+  /* Toko yang sudah berada di versi targetnya tidak perlu diberi tahu "versi baru" hanya karena akar situs
+     sudah lebih baru: kenaikan versi toko diatur lewat Tower (Rollout Versi / kunci per toko). */
+  function pinUpdateCheck() {
+    try {
+      if (window.__fmPinFetch || !window.fetch) return; window.__fmPinFetch = true;
+      var of = window.fetch, cur = (window.FM_RELEASES && FM_RELEASES.beta) || '';
+      if (!cur) return;
+      window.fetch = function (u) {
+        var url = String((u && u.url) || u || '');
+        if (/(^|\/)version\.json(\?|$)/.test(url)) return Promise.resolve(new Response(JSON.stringify({ versi: cur }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+        return of.apply(this, arguments);
+      };
+    } catch (e) {}
+  }
+
   function decide(cfg) {
     try {
       var key = String(fmTokoParam() || 'id26110901').toLowerCase().trim();
@@ -67,7 +82,8 @@
         target = slug(cfg[tier] || cfg.basic || '');
       }
       var running = slug((window.FM_RELEASES && FM_RELEASES.beta) || '');
-      if (!target || !running || target === running) return;
+      if (target && running && target === running) { pinUpdateCheck(); return; }
+      if (!target || !running) return;
 
       var n = 0; try { n = parseInt(sessionStorage.getItem(SKIP_FLAG) || '0', 10) || 0; } catch (e) {}
       if (n >= MAX_REDIRECT) return; // sudah dialihkan beberapa kali di sesi ini, jangan paksa lagi (hindari loop)

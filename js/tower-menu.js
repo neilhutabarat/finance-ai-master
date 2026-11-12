@@ -7,7 +7,11 @@
   var GROUPS = [
     { id: 'klien', title: 'Klien', hint: 'Toko mitra', c: '#6fc7c0', items: [
       { t: 'Klien Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko baru dan buat ID-nya' },
-      { t: 'Jaringan Mitra', ic: 'building', find: 'Jaringan Mitra', d: 'Daftar toko, edit, inspeksi, bekukan' },
+      { t: 'Jaringan Mitra', ic: 'building', find: 'Jaringan Mitra', d: 'Pantau daftar toko (hanya lihat)' },
+      { t: 'Edit Toko', ic: 'gear', run: "towerPick('edit')", d: 'Atur profil, fitur, COA, dan produk satu toko' },
+      { t: 'Inspeksi Toko', ic: 'shield', run: "towerPick('inspect')", d: 'Periksa data dan kunci versi satu toko' },
+      { t: 'Bekukan / Aktifkan', ic: 'moon', run: "towerPick('freeze')", d: 'Bekukan atau aktifkan kembali toko' },
+      { t: 'Salin Link Toko', ic: 'send', run: "towerPick('link')", d: 'Salin link login toko' },
       { t: 'Permohonan Kasir', ic: 'users', run: "openModal('tickets')", badge: 'stat-pending-tickets', d: 'Setujui atau tolak tambahan terminal' },
       { t: 'Toko Berhenti', ic: 'archive', find: 'Toko Berhenti', d: 'Toko yang dibekukan atau berhenti' },
       { t: 'Kendali Massal', ic: 'users', soon: true, d: 'Segera: ubah banyak toko sekaligus' }
