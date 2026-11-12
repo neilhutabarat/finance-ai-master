@@ -43,6 +43,40 @@
         if (el && el.parentNode) el.parentNode.removeChild(el);
     }
 
+    // ===== LOGO ONEILVERSE + TULISAN DI TENGAH HEADER, SEJAJAR BARIS NAMA TOKO (tanpa foto profil/inisial toko) =====
+    function centerBrand(t) {
+        try {
+            var hd = document.querySelector('header.oneui-hero'); if (!hd || !window.FM_LOGO) return;
+            var row = hd.firstElementChild;
+            var box = document.getElementById('fm-center-brand');
+            if (!box) {
+                box = document.createElement('div');
+                box.id = 'fm-center-brand';
+                var trig = document.getElementById('login-logo-trigger'), old = trig ? trig.parentElement : null;
+                box.innerHTML = '<span id="fm-cb-mark" style="display:inline-flex;width:38px;height:38px;flex:none"></span><span id="fm-cb-text" style="font-family:\'Inter Display\',Inter,system-ui,sans-serif;font-weight:700;font-size:24px;letter-spacing:-.012em;line-height:1;white-space:nowrap"></span>';
+                box.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:10px;color:inherit;user-select:none;z-index:2';
+                if (trig) {
+                    var mk = box.querySelector('#fm-cb-mark'); mk.appendChild(trig);
+                    trig.className = 'relative flex items-center justify-center select-none cursor-pointer shrink-0';
+                    ['width', 'height'].forEach(function (p) { trig.style.setProperty(p, '38px', 'important'); });
+                    if (old && old !== mk && !old.children.length) old.style.display = 'none';
+                } else box.querySelector('#fm-cb-mark').innerHTML = FM_LOGO.mark('100%');
+                var place = function () {
+                    if (window.matchMedia('(min-width:1100px)').matches) {
+                        if (row && box.parentNode !== row) row.appendChild(box);
+                        box.style.cssText += ';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0';
+                    } else {
+                        if (box.parentNode !== hd || hd.firstElementChild !== box) hd.insertBefore(box, hd.firstChild);
+                        box.style.position = 'static'; box.style.transform = 'none'; box.style.margin = '0 0 14px';
+                    }
+                };
+                place(); window.addEventListener('resize', place);
+            }
+            var tx = document.getElementById('fm-cb-text');
+            if (tx) tx.innerHTML = 'oneilverse' + (t === 'plus' ? FM_LOGO.plus() : '');
+        } catch (e) {}
+    }
+
     // ===== NAMA, ID, LOGO, DAN PAKET TOKO DI HEADER (sebelumnya tertulis mati "Oneilverse") =====
     function applyHeaderBranding(tn) {
         if (!tn || tn.notFound) return;
@@ -66,22 +100,7 @@
             var t = (tn.tier === 'pro') ? 'plus' : (tn.tier || 'basic');
             if (tierEl) tierEl.style.display = 'none'; // Basic tanpa lencana; Plus ditandai "+" di ujung nama
 
-            // logo Oneilverse sejajar dengan nama toko (tanpa foto profil / inisial toko); Plus = tanda "+" di pojok logo
-            if (nameEl) {
-                var box = nameEl, svg = null;
-                while (box && box.parentElement && !svg) { box = box.parentElement; svg = box.querySelector('svg'); }
-                var oldB = document.getElementById('ctrl-logo-badge'); if (oldB) oldB.remove();
-                if (svg && svg.parentElement) {
-                    var holder = svg.parentElement;
-                    if (!svg.classList.contains('fm-logo-svg') && window.FM_LOGO) {
-                        svg.style.display = 'none';
-                        if (!holder.querySelector('.fm-logo-svg')) holder.insertAdjacentHTML('beforeend', FM_LOGO.mark('100%'));
-                    } else svg.style.display = '';
-                    holder.style.position = 'relative';
-                    var pp = holder.querySelector('.fm-plus-pill'); if (pp) pp.remove();
-                    if (t === 'plus' && window.FM_LOGO) holder.insertAdjacentHTML('beforeend', '<span class="fm-plus-pill" style="position:absolute;top:-7px;right:-9px;font-size:26px;line-height:1;color:inherit;text-shadow:0 0 6px rgba(255,255,255,.7)">' + FM_LOGO.plus() + '</span>');
-                }
-            }
+            centerBrand(t);
         } catch (e) { console.warn('ctrl.js: gagal menerapkan nama toko', e); }
     }
 

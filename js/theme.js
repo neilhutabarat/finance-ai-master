@@ -3,13 +3,13 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 5.1';
+  var BETA = 'BETA 5.2';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
-    ['1.0.0 (BETA 5.1)', '13 Nov 2026', [
-      '[Tampilan] Logo Oneilverse kini sejajar dengan nama toko di bagian atas; foto dan inisial toko dihilangkan. Di bawah nama toko kini tampil alamat toko yang terdaftar',
+    ['1.0.0 (BETA 5.2)', '13 Nov 2026', [
+      '[Tampilan] Logo Oneilverse dan tulisan oneilverse kini berada di tengah bagian atas, sejajar dengan baris nama toko. Foto dan inisial toko dihilangkan; di bawah nama toko tampil alamat toko yang terdaftar',
       '[Perbaikan] Pengaturan unggah foto/logo toko dihapus dari akun Owner dan Manager agar tampilan seragam',
       '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru'
     ]],
