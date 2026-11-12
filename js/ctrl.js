@@ -52,10 +52,10 @@
             if (!box) {
                 box = document.createElement('div');
                 box.id = 'fm-center-brand';
-                box.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:9px;margin:-10px 0 14px;position:relative;z-index:1;color:inherit;user-select:none';
+                box.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:11px;margin:0 0 18px;padding:2px 0 14px;border-bottom:1px solid rgba(100,116,139,.22);position:relative;z-index:1;color:inherit;user-select:none';
                 hd.insertBefore(box, hd.firstChild);
             }
-            box.innerHTML = FM_LOGO.mark(36) + '<span style="font-family:\'Inter Display\',Inter,system-ui,sans-serif;font-weight:700;font-size:22px;letter-spacing:-.012em;line-height:1">oneilverse' + (t === 'plus' ? FM_LOGO.plus() : '') + '</span>';
+            box.innerHTML = FM_LOGO.mark(40) + '<span style="font-family:\'Inter Display\',Inter,system-ui,sans-serif;font-weight:700;font-size:25px;letter-spacing:-.012em;line-height:1">oneilverse' + (t === 'plus' ? FM_LOGO.plus() : '') + '</span>';
         } catch (e) {}
     }
 

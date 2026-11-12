@@ -3,16 +3,20 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 4.1';
+  var BETA = 'BETA 5.0';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 5.0)', '13 Nov 2026', [
+      '[Tampilan] Logo Oneilverse baru di halaman masuk dan di tengah bagian atas semua halaman, lengkap dengan ikon aplikasi. Toko berpaket Plus ditandai tanda "+" miring di ujung tulisan oneilverse',
+      '[Perbaikan] Tampilan paket toko di bagian atas halaman kini ikut berubah otomatis saat paket diganti, tanpa perlu muat ulang',
+      '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 4.1)', '13 Nov 2026', [
       '[Fitur] Tampilan halaman kini lebih fleksibel per toko: jam, cuaca, kurs dan emas, kartu estimasi biaya layanan, chat, dan pilihan latar belakang dapat disesuaikan untuk Admin, Manager, dan Owner sesuai kebutuhan usaha',
       '[Perbaikan] Fitur yang tidak dipakai toko kini hilang sepenuhnya dari tampilan, tidak sekadar disembunyikan sebagian',
-      '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru',
-      '[Tampilan] Logo Oneilverse baru. Toko berpaket Plus kini ditandai tanda "+" miring di ujung nama toko',
+      '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru'
     ]],
     ['1.0.0 (BETA 4.0)', '12 Nov 2026', [
       '[Perbaikan] Versi stabil: seluruh menu Admin, Manager, dan Owner diperiksa ulang dan dirapikan',
