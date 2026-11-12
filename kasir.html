@@ -497,9 +497,9 @@
                         <span class="text-[10px] font-black text-rose-800 uppercase block tracking-wider relative z-10">Total Keluar</span>
                         <span id="kas-total-out" class="text-sm sm:text-xl font-black text-rose-600 font-mono relative z-10">Rp 0</span>
                     </div>
-                    <div class="white-ice-glass-card p-4 text-center border-slate-800" style="background:#0f172a!important">
-                        <span class="text-[10px] font-black text-slate-300 uppercase block tracking-wider relative z-10">Saldo Kas Sah</span>
-                        <span id="kas-net" class="text-sm sm:text-xl font-black text-emerald-400 font-mono relative z-10">Rp 0</span>
+                    <div class="white-ice-glass-card p-4 text-center">
+                        <span class="text-[10px] font-black text-slate-600 uppercase block tracking-wider relative z-10">Saldo Kas Sah</span>
+                        <span id="kas-net" class="text-sm sm:text-xl font-black text-emerald-700 font-mono relative z-10">Rp 0</span>
                     </div>
                 </div>
 
@@ -1430,7 +1430,7 @@
             document.getElementById('kas-total-out').innerText = "Rp " + formatThousandSeparator(totalOut);
             const netEl = document.getElementById('kas-net');
             netEl.innerText = formatCurrency(netKumulatif);
-            netEl.className = netKumulatif < 0 ? "text-sm sm:text-xl font-black text-rose-400 font-mono relative z-10" : "text-sm sm:text-xl font-black text-emerald-400 font-mono relative z-10";
+            netEl.className = netKumulatif < 0 ? "text-sm sm:text-xl font-black text-rose-600 font-mono relative z-10" : "text-sm sm:text-xl font-black text-emerald-700 font-mono relative z-10";
         }
 
         function renderTaxTable() {
