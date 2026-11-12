@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 5.4';
+  var BETA = 'BETA 5.5';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 5.5)', '13 Nov 2026', [
+      '[Tampilan] Latar belakang kini punya versi layar lebar sendiri, sehingga gambar tampil utuh di komputer dan tablet mendatar, tidak terpotong lagi. Layar HP tetap memakai versi tegak',
+      '[Perbaikan] Pilihan latar belakang dan warna halaman selalu tersedia di Pengaturan, tidak hilang saat paket toko diubah',
+      '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 5.4)', '13 Nov 2026', [
       '[Tampilan] Latar belakang baru bergaya komik: Perbukitan Pagi, Pantai Senja, Kota Malam, Sawah Berundak, dan Gunung & Danau. Perbukitan Pagi menjadi latar bawaan',
       '[Perbaikan] Pilihan latar belakang dan warna halaman kini selalu tersedia di Pengaturan, tidak hilang lagi saat paket toko diubah',
@@ -190,9 +195,16 @@
     { id: 'gunung', name: 'Gunung & Danau', file: 'img/wp-gunung.svg' }
   ];
   function wpOf(id) { return WALLPAPERS.filter(function (w) { return w.id === id; })[0] || WALLPAPERS[0]; }
+  /* Latar gambar: layar lebar (desktop/tablet mendatar) memakai versi mendatar (-l), layar tegak (HP) memakai versi tegak */
+  function wpFile(w) { var land = (window.innerWidth || 0) > (window.innerHeight || 0); return land ? w.file.replace('.svg', '-l.svg') : w.file; }
+  function updateWp() {
+    try { document.documentElement.style.setProperty('--fm-wp', 'url("' + wpFile(wpOf(pref.wp)) + '")'); } catch (e) {}
+  }
+  var wpTimer = null;
+  window.addEventListener('resize', function () { clearTimeout(wpTimer); wpTimer = setTimeout(updateWp, 200); });
   function apply() {
     var h = document.documentElement;
-    try { var w = wpOf(pref.wp); if (w.id === 'bukit' || (window.FM_PLANS && !FM_PLANS.has('wallpaper'))) h.style.removeProperty('--fm-wp'); else h.style.setProperty('--fm-wp', 'url("' + w.file + '")'); } catch (e) {}
+    updateWp();
     var mode = pref.mode || DEFAULT_MODE;     // 'light' | 'dark'
     h.setAttribute('data-fm-native', NATIVE);
     ['data-fm-black', 'data-fm-invert', 'data-fm-accent'].forEach(function (a) { h.removeAttribute(a); });
