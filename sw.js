@@ -2,7 +2,7 @@
    Aturan: saat ada internet, halaman dan skrip SELALU diambil terbaru dari server (batas tunggu 5 detik).
    Jika server GitHub lambat/mati atau internet putus, dipakai salinan terakhir yang tersimpan di browser.
    Data toko (Firestore/Auth/API) tidak pernah disentuh di sini. Naikkan VERSI setiap rilis. */
-var VERSI = 'v1.0.0-beta-5-8';
+var VERSI = 'v1.0.0-beta-5-9';
 var CACHE = 'oneilverse-' + VERSI;
 var TUNGGU_MS = 5000;
 var PRE = ['index.html', '404.html', 'kasir.html', 'manager.html', 'dashboard.html', 'partner.html', 'provider.html',

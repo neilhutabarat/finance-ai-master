@@ -82,9 +82,19 @@
       h += card('Target Omzet', tgt);
       h += card('Stok Menipis', low.length ? low.slice(0, 5).map(function (p) { return line(esc(p.name), p.stock + '/' + (typeof p.minStock === 'number' ? p.minStock : 5)); }).join('') + (low.length > 5 ? '<div class="fm-sub">+' + (low.length - 5) + ' produk lain</div>' : '') : '<div class="fm-ok">Semua stok aman.</div>');
       h += '</div>';
-      h += '<div class="ios-glass fm-ic fm-ins-main" data-fm-i="Laba &amp; Margin per Produk"><h4>Laba & Margin per Produk</h4>' + (aggArr.length ? '<div class="fm-scroll"><table><thead><tr><th>Produk</th><th>Terjual</th><th>Omzet</th><th>Laba</th><th>Margin</th></tr></thead><tbody>' +
+      var nonAgg = {};
+      sales.filter(function (t) { return !t.isProduct; }).forEach(function (t) {
+        var k = t.accountCode || t.accountName, a = nonAgg[k] = nonAgg[k] || { name: t.accountName || k, n: 0, rev: 0 };
+        a.n += 1; a.rev += (t.amount || 0);
+      });
+      var nonArr = Object.keys(nonAgg).map(function (k) { return nonAgg[k]; }).sort(function (x, y) { return y.rev - x.rev; });
+      var secP = aggArr.length ? '<div class="fm-scroll"><table><thead><tr><th>Produk</th><th>Terjual</th><th>Omzet</th><th>Laba</th><th>Margin</th></tr></thead><tbody>' +
         aggArr.slice(0, 20).map(function (a) { return '<tr><td>' + esc(a.name) + '</td><td>' + a.qty + '</td><td>' + rp(a.rev) + '</td><td class="' + (a.profit >= 0 ? 'pos' : 'neg') + '">' + rp(a.profit) + '</td><td>' + (a.rev ? Math.round(a.profit / a.rev * 100) : 0) + '%</td></tr>'; }).join('') +
-        '</tbody></table></div>' : '<div class="fm-sub">Belum ada penjualan produk.</div>') + '</div>';
+        '</tbody></table></div>' : '';
+      var secN = nonArr.length ? '<div class="fm-sub" style="margin-top:' + (aggArr.length ? '8' : '0') + 'px;font-weight:700">Penjualan non-produk (jasa dan akun pendapatan, tanpa data modal per barang)</div><div class="fm-scroll"><table><thead><tr><th>Akun</th><th>Nota</th><th>Omzet</th><th>Laba</th><th>Margin</th></tr></thead><tbody>' +
+        nonArr.slice(0, 20).map(function (a) { return '<tr><td>' + esc(a.name) + '</td><td>' + a.n + '</td><td>' + rp(a.rev) + '</td><td>-</td><td>-</td></tr>'; }).join('') +
+        '</tbody></table></div>' : '';
+      h += '<div class="ios-glass fm-ic fm-ins-main" data-fm-i="Laba &amp; Margin per Produk"><h4>Laba & Margin per Produk</h4>' + ((secP || secN) ? secP + secN : '<div class="fm-sub">Belum ada penjualan.</div>') + '</div>';
     }
     box.innerHTML = h;
     var sb = box.querySelector('[data-save-tg]'); if (sb) sb.onclick = saveTargets;

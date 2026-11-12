@@ -94,6 +94,7 @@
                     group: p.group != null ? String(p.group).trim() : (old && old.group) || '',
                     variant: p.variant != null ? String(p.variant).trim() : (old && old.variant) || '',
                     unit: p.unit != null ? String(p.unit).trim() : (old && old.unit) || '',
+                    forSale: p.forSale != null ? !!p.forSale : !!(old && old.forSale),
                     openStock: p.openStock != null ? Math.max(0, Math.floor(num(p.openStock))) : (old && typeof old.openStock === 'number' ? old.openStock : Math.max(0, Math.floor(num(p.stock)))),
                     endStock: p.endStock !== undefined ? (p.endStock === null || p.endStock === '' ? null : Math.max(0, Math.floor(num(p.endStock)))) : (old && typeof old.endStock === 'number' ? old.endStock : null)
                 };

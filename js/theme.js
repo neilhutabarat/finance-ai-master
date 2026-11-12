@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 5.8';
+  var BETA = 'BETA 5.9';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 5.9)', '13 Nov 2026', [
+      '[Fitur] Usaha dagang kini bisa menjual barang dari stok langsung di kasir: stok berkurang otomatis tiap penjualan. Manager menentukan kelompok stok mana yang dijual lewat sakelar "Dijual di kasir" dan mengisi harga jual; kelompok bahan (mis. kain) tetap tidak tampil di kasir. Fitur ini aktif sesuai kebutuhan usaha',
+      '[Fitur] Kartu Laba & Margin kini menampilkan penjualan produk dan penjualan non-produk (jasa dan akun pendapatan) secara terpisah, tidak lagi kosong bila belum ada penjualan produk',
+      '[Perbaikan] Pengaturan "dijual di kasir" dan harga jual tetap tersimpan saat stok masuk dan closing mingguan',
+      '[Keamanan] Perubahan sakelar dan harga jual tercatat di riwayat audit'
+    ]],
     ['1.0.0 (BETA 5.8)', '13 Nov 2026', [
       '[Perbaikan] Halaman owner dan manager kini otomatis memadatkan kartu dan tombol mengikuti tinggi layar, sehingga seluruh fitur muat dalam satu layar tanpa digulir. Semua keterangan di kartu dan tombol tetap ada',
       '[Keamanan] Tidak ada perubahan data atau akses; pembaruan hanya pada tampilan'

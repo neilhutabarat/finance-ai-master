@@ -21,6 +21,7 @@
     { key: 'ledger', label: 'Buku Besar', r: { kasir: 'o', manager: 'c', owner: 'o' } },
     { key: 'stok', label: 'Stok: lihat daftar stok, harga beli, nilai, dan riwayat closing', r: { manager: 'o', owner: 'o' } },
     { key: 'stok_input', label: 'Stok: input jenis stok dan stok masuk', r: { manager: 'o', owner: 'o' } },
+    { key: 'jual_produk', label: 'Jual produk dari stok di kasir (sakelar per Induk di Stok, untuk minimarket/kelontong)', r: { kasir: 'o', manager: 'o' } },
     { key: 'stok_closing', label: 'Stok: isi sisa stok dan Closing Mingguan (HPP)', r: { manager: 'o', owner: 'o' } },
     { key: 'bukti', label: 'Foto bukti transaksi', r: { kasir: 'o' } },
     { key: 'wa_receipt', label: 'Struk lewat WhatsApp', r: { kasir: 'o' } },

@@ -11,6 +11,13 @@
   function canIn() { return can('stok_input'); }
   function canCl() { return can('stok_closing'); }
   function prods() { try { return (window.STORE && STORE.getProducts()) || []; } catch (e) { return []; } }
+  function canSell() { return can('jual_produk'); }
+  function sellOn(g) { return ofGroup(g).some(function (p) { return !!p.forSale; }); }
+  function upd(p, over) {
+    var o = { code: p.code, name: p.name, sellPrice: p.sellPrice, hpp: p.hpp, stock: p.stock, openStock: p.openStock, endStock: (typeof p.endStock === 'number' ? p.endStock : null), barcode: p.barcode, minStock: p.minStock, group: p.group, variant: p.variant, unit: p.unit, forSale: !!p.forSale };
+    for (var k in over) o[k] = over[k];
+    return STORE.saveProduct(o);
+  }
   function gOf(p) { return p.group ? String(p.group) : ''; }
   function groups() {
     var seen = {}, out = [], none = false;
@@ -41,6 +48,8 @@
     '#fm-stok .sk-go{all:unset;cursor:pointer;display:inline-block;padding:10px 18px;border-radius:12px;background:#2f55d4;color:#fff;font-size:13px;font-weight:800;text-align:center}#fm-stok .sk-go:active{transform:scale(.97)}' +
     '#fm-stok .sk-del{all:unset;cursor:pointer;padding:6px 10px;border-radius:10px;background:rgba(225,29,72,.12);color:#be123c;font-size:12px;font-weight:800}' +
     '#fm-stok .sk-info{padding:8px 12px;border-radius:12px;background:rgba(47,85,212,.1);font-size:12.5px;font-weight:700;margin-bottom:10px}' +
+    '#fm-stok .sk-sw{all:unset;cursor:pointer;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800;text-transform:none;background:rgba(100,116,139,.18);color:#475569}#fm-stok .sk-sw.on{background:rgba(16,185,129,.18);color:#047857}' +
+    '#fm-stok .sk-sw+span{margin-left:8px}' +
     '#fm-stok .sk-gh{display:flex;justify-content:space-between;align-items:center;margin:14px 0 4px;padding:6px 10px;border-radius:10px;background:rgba(71,85,105,.12);font-size:12.5px;font-weight:800;text-transform:uppercase}' +
     '#fm-stok .sk-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid rgba(71,85,105,.15);font-size:13px}' +
     '#fm-stok .sk-row .nm{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#fm-stok .sk-row .cd{font-size:11px;color:#64748b;font-weight:600}' +
@@ -79,9 +88,11 @@
     var gs = groups(); if (!gs.length) return '';
     return gs.map(function (g) {
       var items = ofGroup(g), tot = items.reduce(function (a, p) { return a + p.stock; }, 0);
-      return '<div class="sk-gh"><span>' + esc(gLabel(g)) + '</span><span>' + items.length + ' jenis</span></div>' + items.map(function (p) {
+      var sw = (withDel && canSell() && g !== NONE) ? '<span><button type="button" class="sk-sw' + (sellOn(g) ? ' on' : '') + '" data-sw="' + esc(g) + '" title="Bila hidup, jenis di induk ini tampil di kasir dan stoknya berkurang otomatis tiap penjualan">Dijual di kasir: ' + (sellOn(g) ? 'HIDUP' : 'MATI') + '</button></span>' : '';
+      return '<div class="sk-gh"><span>' + esc(gLabel(g)) + '</span>' + (sw || '<span>' + items.length + ' jenis</span>') + '</div>' + items.map(function (p) {
         return '<div class="sk-row"><div class="nm">' + esc(vLabel(p)) + ' <span class="cd">' + esc(p.code) + '</span></div><div class="cd" style="white-space:nowrap;text-align:right">' + (p.hpp ? 'Rp ' + fmt(p.hpp) + '/' + esc(unit(p)) + ' · nilai Rp ' + fmt(p.hpp * p.stock) : 'harga beli belum diisi') + '</div><div class="sk-st' + (low(p) ? ' low' : '') + '">' + p.stock + ' ' + esc(unit(p)) + '</div>' +
           (withDel || !canCl() ? '' : '<div style="width:96px" title="Sisa stok hasil hitung fisik (diisi manager tiap minggu)"><input data-end="' + esc(p.code) + '" type="number" min="0" step="1" inputmode="numeric" placeholder="sisa" value="' + (typeof p.endStock === 'number' ? p.endStock : '') + '" style="padding:6px 8px"></div>') +
+          (withDel && canSell() && p.forSale ? '<div style="width:130px" title="Harga jual per satuan di kasir"><input data-pr="' + esc(p.code) + '" type="text" inputmode="numeric" autocomplete="off" placeholder="harga jual" value="' + (p.sellPrice ? fmt(p.sellPrice) : '') + '" style="padding:6px 8px"></div>' : '') +
           (withDel ? '<button type="button" class="sk-del" data-del="' + esc(p.code) + '">Hapus</button>' : '') + '</div>';
       }).join('');
     }).join('');
@@ -160,10 +171,16 @@
       '<div><label>Stok awal</label><input id="sj-s" type="number" min="0" step="1" inputmode="numeric" value="0"></div>' +
       '<div><label>Stok akhir (sisa)</label><input id="sj-e" type="number" min="0" step="1" inputmode="numeric" placeholder="boleh kosong"></div></div>' +
       '<div class="sk-grid"><div><label>Harga beli per satuan (Rp)</label><input id="sj-h" type="text" inputmode="numeric" placeholder="0" autocomplete="off"></div>' +
-      '<div><label>Batas stok menipis</label><input id="sj-m" type="number" min="0" step="1" inputmode="numeric" value="5"></div></div>' +
+      '<div><label>Batas stok menipis</label><input id="sj-m" type="number" min="0" step="1" inputmode="numeric" value="5"></div>' +
+      (canSell() ? '<div><label>Harga jual di kasir (Rp, bila induk dijual)</label><input id="sj-p" type="text" inputmode="numeric" placeholder="0" autocomplete="off"></div>' : '') + '</div>' +
       '<div style="margin-bottom:6px"><button type="button" class="sk-go" id="sj-go">Simpan Jenis</button></div>' + listHtml(true);
-    money('sj-h');
+    money('sj-h'); if (canSell()) money('sj-p');
     box.querySelector('#sj-go').onclick = saveJenis;
+    [].forEach.call(box.querySelectorAll('[data-sw]'), function (b) { b.onclick = function () { toggleSell(b.getAttribute('data-sw')); }; });
+    [].forEach.call(box.querySelectorAll('[data-pr]'), function (inp) {
+      inp.oninput = function () { var n = rawNum(inp.value); inp.value = n ? fmt(n) : ''; };
+      inp.onchange = function () { var p = prods().filter(function (x) { return x.code === inp.getAttribute('data-pr'); })[0]; if (!p) return; Promise.resolve(upd(p, { sellPrice: rawNum(inp.value) })).then(function () { audit('HARGA_JUAL_STOK', 'Harga jual [' + p.code + '] ' + p.name, 'Rp ' + fmt(p.sellPrice), 'Rp ' + fmt(rawNum(inp.value))); msg('Harga jual ' + vLabel(p) + ' tersimpan.'); refreshOthers(); }); };
+    });
     box.querySelector('#sj-v').onkeydown = function (e) { if (e.key === 'Enter') saveJenis(); };
     [].forEach.call(box.querySelectorAll('[data-del]'), function (b) { b.onclick = function () { delJenis(b.getAttribute('data-del')); }; });
   }
@@ -175,11 +192,20 @@
     var name = g + ' - ' + vr;
     if (prods().some(function (p) { return String(p.name).toLowerCase() === name.toLowerCase(); })) { msg('Jenis "' + name + '" sudah ada.', true); return; }
     var code = newCode(g), stock = Math.max(0, Math.floor(Number(v('sj-s')) || 0));
-    Promise.resolve(STORE.saveProduct({ code: code, name: name, sellPrice: 0, hpp: rawNum(v('sj-h')), stock: stock, openStock: stock, endStock: v('sj-e') === '' ? null : Math.max(0, Math.floor(Number(v('sj-e')) || 0)), barcode: '', minStock: v('sj-m'), group: g, variant: vr, unit: v('sj-u').trim() || 'pcs' })).then(function () {
+    Promise.resolve(STORE.saveProduct({ code: code, name: name, sellPrice: canSell() ? rawNum(v('sj-p')) : 0, forSale: canSell() && sellOn(g), hpp: rawNum(v('sj-h')), stock: stock, openStock: stock, endStock: v('sj-e') === '' ? null : Math.max(0, Math.floor(Number(v('sj-e')) || 0)), barcode: '', minStock: v('sj-m'), group: g, variant: vr, unit: v('sj-u').trim() || 'pcs' })).then(function () {
       audit('TAMBAH_JENIS_STOK', 'Menambahkan jenis stok [' + code + '] ' + name, '-', 'Stok awal ' + stock);
       selG = g; msg('Tersimpan: ' + name + ' (' + code + ')'); renderJenis(); refreshOthers();
       var gi = document.getElementById('sj-g'); if (gi) { gi.value = g; document.getElementById('sj-v').focus(); }
     }).catch(function () { msg('Gagal menyimpan jenis stok.', true); });
+  }
+  function toggleSell(g) {
+    var items = ofGroup(g), on = !sellOn(g);
+    Promise.all(items.map(function (p) { return upd(p, { forSale: on }); })).then(function () {
+      audit('JUAL_DI_KASIR', 'Induk ' + g + ' ' + (on ? 'dijual di kasir' : 'tidak dijual di kasir'), on ? 'MATI' : 'HIDUP', on ? 'HIDUP' : 'MATI');
+      var kosong = on && items.some(function (p) { return !p.sellPrice; });
+      msg(on ? 'Induk ' + g + ' kini dijual di kasir.' + (kosong ? ' Isi harga jual tiap jenis agar tampil di kasir.' : '') : 'Induk ' + g + ' tidak lagi tampil di kasir.');
+      renderJenis(); refreshOthers();
+    }).catch(function () { msg('Gagal mengubah pengaturan.', true); });
   }
   function delJenis(code) {
     var p = prods().filter(function (x) { return x.code === code; })[0]; if (!p) return;
