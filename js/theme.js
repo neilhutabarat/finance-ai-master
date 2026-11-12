@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.12';
+  var BETA = 'BETA 1.13';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.13)', '12 Nov 2026', [
+      '[Perbaikan] Mode gelap: bagian atas dan menu bawah kini ikut gelap tembus pandang (sebelumnya tampak putih)',
+      '[Perbaikan] Tombol Closing, Konfirmasi, dan tombol berwarna lain kini berikon dan bertulisan putih yang jelas di mode terang maupun gelap',
+      '[Perbaikan] Tombol Pasang aplikasi tidak lagi menutupi isi halaman kerja; muncul rapi di bagian atas dan hilang otomatis setelah aplikasi terpasang',
+      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 1.12)', '12 Nov 2026', [
       '[Tampilan] Latar baru bergaya ilustrasi hujan gerimis (pohon rindang, kolam, bunga matahari); kartu, menu bawah, dan semua pop-up dibuat tembus pandang dengan tulisan tetap jelas',
       '[Tampilan] Istilah di layar Kasir disederhanakan (Closing, Riwayat Closing, Saldo); menu bawah dirapikan agar garis tepinya presisi',

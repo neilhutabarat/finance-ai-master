@@ -53,12 +53,23 @@
   function isStandalone() { return window.matchMedia && window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
   function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
 
+  var IS_LOGIN = /(^|\/)(index\.html)?$/.test(PATH);
+  function removeBtn() { if (btn) { btn.remove(); btn = null; } }
   function buildButton(label, onClick) {
-    if (btn) btn.remove();
+    removeBtn();
     btn = document.createElement('button'); btn.type = 'button'; btn.id = 'pwa-install-btn'; btn.textContent = label;
-    btn.style.cssText = 'position:fixed;right:16px;bottom:96px;z-index:2147481000;background:rgba(255,255,255,.75);color:#1e293b;border:1px solid rgba(71,85,105,.35);border-radius:99px;padding:9px 18px;font:700 12.5px system-ui,sans-serif;box-shadow:0 6px 20px rgba(51,65,85,.2);cursor:pointer';
     btn.onclick = onClick;
-    document.body.appendChild(btn);
+    if (IS_LOGIN) {
+      /* di portal (halaman masuk) tidak ada konten lain, jadi boleh melayang di bawah */
+      btn.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:2147481000;background:rgba(255,255,255,.85);color:#1e293b;border:1px solid rgba(71,85,105,.35);border-radius:99px;padding:9px 18px;font:700 12.5px system-ui,sans-serif;box-shadow:0 6px 20px rgba(51,65,85,.2);cursor:pointer';
+      document.body.appendChild(btn);
+    } else {
+      /* di halaman kerja: jadi chip kecil di dalam header (tidak menutupi konten) */
+      var host = document.querySelector('header.oneui-hero > div');
+      if (!host) { btn = null; return; }
+      btn.style.cssText = 'margin-left:8px;background:rgba(255,255,255,.7);color:#1e293b;border:1px solid rgba(71,85,105,.35);border-radius:99px;padding:5px 12px;font:700 11.5px system-ui,sans-serif;cursor:pointer;white-space:nowrap;align-self:center';
+      host.appendChild(btn);
+    }
   }
 
   function applyManifest(tn, id, warna, icons) {
@@ -100,20 +111,21 @@
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault(); installEvt = e;
     if (isStandalone()) return;
-    buildButton('Pasang aplikasi toko ini', function () {
+    var mk = function () { buildButton('Pasang aplikasi toko ini', function () {
       if (!installEvt) return;
       installEvt.prompt();
-      installEvt.userChoice.then(function () { installEvt = null; if (btn) { btn.remove(); btn = null; } });
-    });
+      installEvt.userChoice.then(function () { installEvt = null; removeBtn(); });
+    }); };
+    if (document.body) mk(); else document.addEventListener('DOMContentLoaded', mk);
   });
-  window.addEventListener('appinstalled', function () { if (btn) { btn.remove(); btn = null; } });
+  window.addEventListener('appinstalled', function () { installEvt = null; removeBtn(); });
 
   function maybeIosTip() {
     if (!isIOS() || isStandalone()) return;
     try { if (localStorage.getItem('fm_pwa_ios_tip_v1')) return; } catch (e) {}
     buildButton('Pasang: tombol Bagikan → Tambah ke Layar Utama', function () {
       try { localStorage.setItem('fm_pwa_ios_tip_v1', '1'); } catch (e) {}
-      if (btn) { btn.remove(); btn = null; }
+      removeBtn();
     });
   }
 
