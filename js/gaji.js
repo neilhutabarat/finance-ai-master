@@ -114,7 +114,7 @@
       '<div style="display:flex;gap:8px;margin-top:14px"><button data-a="save" style="' + btn + ';background:#22c55e;color:#04210f;border-color:#22c55e">Simpan</button><button data-a="cancel" style="' + btn + '">Batal</button></div>';
   }
   function sumForm() { var t = document.getElementById('gj-total'); if (!t) return; var v = function (id) { var e = document.getElementById(id); return e ? num(e.value) : 0; }; t.textContent = rp(Math.max(0, v('gj-pokok') + v('gj-tunj') - v('gj-pot'))); }
-  function act(a, id) {
+  async function act(a, id) {
     var r = id ? rows.filter(function (x) { return x.id === id; })[0] : null;
     if (a === 'add') { editing = { isNew: true, id: 'gj_' + Date.now(), bulan: month, nama: '', jabatan: '', pokok: 0, tunjangan: 0, potongan: 0, catatan: '', status: 'belum' }; render(); }
     else if (a === 'edit' && r) { editing = Object.assign({ isNew: false }, r); render(); }
@@ -128,11 +128,11 @@
     }
     else if (a === 'toggle' && r) {
       var rec2 = Object.assign({}, r);
-      if (r.status === 'dibayar') { if (r.txId && !confirm('Pembayaran ini sudah tercatat sebagai pengeluaran. Membatalkan status TIDAK menghapus catatan pengeluarannya (hapus manual di Mutasi bila perlu). Lanjut?')) return; rec2.status = 'belum'; rec2.tglBayar = ''; }
+      if (r.status === 'dibayar') { if (r.txId && !await fmAsk('Pembayaran ini sudah tercatat sebagai pengeluaran. Membatalkan status TIDAK menghapus catatan pengeluarannya (hapus manual di Mutasi bila perlu). Lanjut?')) return; rec2.status = 'belum'; rec2.tglBayar = ''; }
       else { rec2.status = 'dibayar'; rec2.tglBayar = new Date().toLocaleDateString('id-ID'); var tx = postExpense(rec2); if (tx) rec2.txId = tx; }
       saveRec(rec2);
     }
-    else if (a === 'del' && r) { if (confirm('Hapus data gaji ' + r.nama + ' bulan ' + monthLabel(r.bulan) + '?')) delRec(r.id); }
+    else if (a === 'del' && r) { if (await fmAsk('Hapus data gaji ' + r.nama + ' bulan ' + monthLabel(r.bulan) + '?')) delRec(r.id); }
     else if (a === 'slip' && r) printSlip(r);
     else if (a === 'printall') printAll();
   }

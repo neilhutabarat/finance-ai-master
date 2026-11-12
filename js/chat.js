@@ -108,7 +108,14 @@
     '#fmc-feed{flex:1 1 0;min-height:0;overflow:auto;padding:8px 12px;display:flex;flex-direction:column;gap:4px}',
     '#fmc-note{flex:none;min-height:16px;padding:0 12px;font-size:11px;color:#b45309}',
     '#fmc-in{flex:none;display:flex;gap:6px;padding:8px 10px;border-top:1px solid rgba(100,116,139,.25)}#fmc-in input{flex:1;min-width:0;background:rgba(255,255,255,.6);border:1px solid rgba(100,116,139,.3);border-radius:99px;padding:7px 12px;color:#1f2937;font-size:13px;outline:none}#fmc-in button{all:unset;cursor:pointer;padding:6px 14px;border-radius:99px;background:#4b5768;color:#fff;font:700 12px system-ui}',
-    '@media(max-width:1023px){#fmc-tab{bottom:88px;padding:11px 16px}#fmc-tab.kasir{left:auto;right:12px}#fmc-panel,#fmc-panel.kasir,#fmc-panel.owner{inset:0;bottom:0;left:0;right:0;width:auto;height:auto;border-radius:0;z-index:2147482000;transform:none;transition:opacity .2s ease}#fmc-panel.kasir,#fmc-panel.owner{transform:none}#fmc-panel:not(.open){opacity:0}}'
+    '@media(max-width:1023px){#fmc-tab{bottom:88px;padding:11px 16px}#fmc-tab.kasir{left:auto;right:12px}#fmc-panel,#fmc-panel.kasir,#fmc-panel.owner{inset:0;bottom:0;left:0;right:0;width:auto;height:auto;border-radius:0;z-index:2147482000;transform:none;transition:opacity .2s ease}#fmc-panel.kasir,#fmc-panel.owner{transform:none}#fmc-panel:not(.open){opacity:0}}',
+    /* tampilan gelap tembus pandang: terbaca jelas di atas latar apa pun */
+    '#fmc-panel{background:rgba(10,15,28,.78)!important;color:#e5e7eb!important;border:1px solid rgba(255,255,255,.2)!important;box-shadow:0 12px 40px rgba(0,0,0,.45)!important}',
+    '#fmc-hd,#fmc-opt,#fmc-in{border-color:rgba(255,255,255,.16)!important}#fmc-hd{color:#f8fafc}#fmc-hd small{color:#94a3b8!important}#fmc-hd button{color:#cbd5e1!important}#fmc-opt{color:#cbd5e1!important}',
+    '#fmc-panel .fmc-t{color:#94a3b8!important}#fmc-panel .fmc-id{color:#cbd5e1!important}#fmc-panel .fmc-x{color:#f1f5f9!important}#fmc-panel .fmc-m.me .fmc-id{color:#7dd3fc!important}#fmc-panel .fmc-m.dev .fmc-id{color:#fde68a!important;background:rgba(251,191,36,.22)!important}#fmc-panel .fmc-empty{color:#94a3b8!important}#fmc-note{color:#fbbf24!important}',
+    '#fmc-in input{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.22)!important;color:#f8fafc!important}#fmc-in input::placeholder{color:#94a3b8}#fmc-in button{background:#3b5bdb!important}',
+    '#fmc-tab{background:rgba(15,23,42,.72)!important;border-color:rgba(255,255,255,.3)!important}',
+    'html[data-fm-invert="1"] #fmc-panel,html[data-fm-invert="1"] #fmc-tab{filter:invert(1) hue-rotate(180deg)}'
   ].join('\n');
   var built = false;
   function build() {
@@ -170,7 +177,7 @@
         return '<div style="display:flex;gap:8px;align-items:baseline;font-size:12.5px;border-bottom:1px solid #151515;padding:3px 0"><span style="color:#666;flex:none">' + hm(x.ms || 0) + '</span><b style="color:' + (x.role === 'dev' ? '#f5c542' : '#9a9a9a') + ';flex:none">' + esc(x.label) + '</b><span style="flex:1;word-break:break-word">' + esc(x.text) + '</span>' +
           (x.role === 'dev' ? '' : '<a data-a="mute" data-id="' + esc(x.tid) + '" style="cursor:pointer;color:#f5c542;flex:none">bisukan</a>') + '<a data-a="del" data-id="' + esc(x.id) + '" style="cursor:pointer;color:#ff8f8f;flex:none">hapus</a></div>';
       }).join('') || '<div style="color:#666;font-size:12px">Belum ada pesan.</div>') + '</div>';
-    b.onclick = function (e) {
+    b.onclick = async function (e) {
       var a = e.target.getAttribute && e.target.getAttribute('data-a'); if (!a) return;
       var id = e.target.getAttribute('data-id'), ref = db.collection(CFG).doc('main');
       var done = function () {}, fail = function () { alert('Gagal. Pastikan aturan Firestore v6 sudah dipublikasikan.'); };
@@ -178,7 +185,7 @@
       else if (a === 'mute') { id = (id || ($('fmc-mid') && $('fmc-mid').value) || '').trim().toUpperCase(); if (!id) return; var m = (S.cfg.muted || []).filter(function (x) { return x !== id; }); m.push(id); ref.set({ enabled: S.cfg.enabled !== false, muted: m }, { merge: true }).then(done, fail); }
       else if (a === 'unmute') ref.set({ enabled: S.cfg.enabled !== false, muted: (S.cfg.muted || []).filter(function (x) { return x !== id; }) }, { merge: true }).then(done, fail);
       else if (a === 'del') db.collection(COL).doc(id).delete().then(done, fail);
-      else if (a === 'clear') { if (!confirm('Hapus semua pesan chat?')) return; var bt = db.batch(); S.msgs.forEach(function (x) { bt.delete(db.collection(COL).doc(x.id)); }); bt.commit().then(done, fail); }
+      else if (a === 'clear') { if (!await fmAsk('Hapus semua pesan chat?')) return; var bt = db.batch(); S.msgs.forEach(function (x) { bt.delete(db.collection(COL).doc(x.id)); }); bt.commit().then(done, fail); }
     };
   }
 
@@ -194,9 +201,9 @@
   }
 
   /* Hapus seluruh isi Chat Universe, dipanggil langsung dari tile KENDALI (tanpa buka panel moderasi dulu) */
-  function clearAll() {
+  async function clearAll() {
     if (!IS_TOWER) return;
-    if (!confirm('Hapus SEMUA pesan di Chat Universe? Tindakan ini tidak bisa dibatalkan.')) return;
+    if (!await fmAsk('Hapus SEMUA pesan di Chat Universe? Tindakan ini tidak bisa dibatalkan.')) return;
     db.collection(COL).get().then(function (snap) {
       if (snap.empty) { alert('Chat sudah kosong.'); return; }
       var docs = snap.docs, i = 0;

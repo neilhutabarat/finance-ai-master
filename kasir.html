@@ -133,6 +133,7 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="js/dialog.js?v=1.13"></script>
     <script src="js/theme.js?v=1.5.8"></script>
     <script src="js/logo.js?v=1.5.8"></script>
     <script src="js/skin.js?v=1.5.8"></script>
@@ -326,9 +327,8 @@
                             <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
                             </div>
-                            <span>Input Transaksi Kas</span>
+                            <span>Input Transaksi</span>
                         </h2>
-                        <p class="text-xs text-slate-500 font-medium mt-0.5">Format titik otomatis • Simpan ke Draft Antrean</p>
                     </div>
                     <button id="btn-cancel-edit" onclick="cancelEditMode()" class="hidden text-xs text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-xl border border-rose-200">
                         Batal
@@ -1179,7 +1179,7 @@
 
         function cancelEditMode() { resetDraftForm(); }
 
-        function finalizeAndPrint() {
+        async function finalizeAndPrint() {
             if (draftList.length === 0) return alert("Antrean draft kosong! Input transaksi terlebih dahulu.");
 
             // pastikan stok masih cukup (kasir lain mungkin sudah menjual)
@@ -1193,7 +1193,7 @@
             let total = 0;
             draftList.forEach(d => total += d.amount);
 
-            if (!confirm(`Konfirmasi pembayaran lunas dan cetak struk total Rp ${formatThousandSeparator(total)}?\n\nTransaksi akan disahkan, stok produk akan dipotong otomatis, dan diteruskan ke pembukuan resmi.`)) return;
+            if (!await fmAsk(`Konfirmasi pembayaran lunas dan cetak struk total Rp ${formatThousandSeparator(total)}?\n\nTransaksi akan disahkan, stok produk akan dipotong otomatis, dan diteruskan ke pembukuan resmi.`)) return;
 
             const payNow = currentPay();
             const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -1272,7 +1272,7 @@
             document.getElementById('modal-receipt').classList.add('hidden');
         }
 
-        function triggerClosingKasirCycle() {
+        async function triggerClosingKasirCycle() {
             const now = new Date();
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -1287,7 +1287,7 @@
             });
             const drawerBalance = totalIn - totalOut;
 
-            if (confirm(`Lakukan Closing Kasir sekarang?\n\nWaktu Closing: ${preciseTimestamp}\nUang yang diserahkan: Rp ${formatThousandSeparator(drawerBalance)}\n\nSetelah closing, saldo laci kasir aktif akan di-reset kembali ke Rp 0.`)) {
+            if (await fmAsk(`Lakukan Closing Kasir sekarang?\n\nWaktu Closing: ${preciseTimestamp}\nUang yang diserahkan: Rp ${formatThousandSeparator(drawerBalance)}\n\nSetelah closing, saldo laci kasir aktif akan di-reset kembali ke Rp 0.`)) {
                 const closingRecord = {
                     id: 'closing_' + Date.now(),
                     closedAt: preciseTimestamp,

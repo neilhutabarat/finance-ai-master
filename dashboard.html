@@ -59,6 +59,7 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="js/dialog.js?v=1.13"></script>
     <script src="js/theme.js?v=1.5.8"></script>
     <script src="js/logo.js?v=1.5.8"></script>
     <script src="js/skin.js?v=1.5.8"></script>
@@ -825,17 +826,17 @@
             });
         }
 
-        function deleteAuditLogItem(idx) {
+        async function deleteAuditLogItem(idx) {
             const l = auditView[idx];
             if (!l) return;
-            if (confirm("Hapus baris rekaman audit ini dari buku Owner? (Arsip asli tetap tersimpan di server.)")) {
+            if (await fmAsk("Hapus baris rekaman audit ini dari buku Owner? (Arsip asli tetap tersimpan di server.)")) {
                 hideAuditIds([l.id || l.docId]);
                 renderAuditTrailTable();
             }
         }
 
-        function clearAllAuditLogs() {
-            if (confirm("Kosongkan seluruh rekaman audit dari buku Owner? (Arsip asli tetap tersimpan di server.)")) {
+        async function clearAllAuditLogs() {
+            if (await fmAsk("Kosongkan seluruh rekaman audit dari buku Owner? (Arsip asli tetap tersimpan di server.)")) {
                 hideAuditIds(auditView.map(function (l) { return l.id || l.docId; }));
                 renderAuditTrailTable();
             }
@@ -1174,8 +1175,8 @@ function closeWeatherModal() {
 
 <script>
 /* Logout: hapus semua kunci sesi yang dipakai halaman (core.js hanya menghapus kunci lama) */
-window.logout = function () {
-  if (!confirm("Keluar dari sistem?")) return;
+window.logout = async function () {
+  if (!await fmAsk("Keluar dari sistem?")) return;
   try { ['currentUser','auth_role','auth_title','fm_session_user_v13'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
   var t = new URLSearchParams(window.location.search).get('toko');
   window.location.replace('index.html' + (t ? '?toko=' + encodeURIComponent(t) : ''));
@@ -1227,13 +1228,13 @@ window.logout = function () {
             }
         }
 
-        function deleteCOAItem(code) {
+        async function deleteCOAItem(code) {
             let coaList = STORE.getCOA();
 
             const idx = coaList.findIndex(c => c.code === code);
             if (idx === -1) return;
 
-            if (confirm(`Hapus akun COA [${coaList[idx].code}] ${coaList[idx].name}?\n\nAksi ini akan dicatat ke audit Owner.`)) {
+            if (await fmAsk(`Hapus akun COA [${coaList[idx].code}] ${coaList[idx].name}?\n\nAksi ini akan dicatat ke audit Owner.`)) {
                 const deleted = coaList[idx];
                 coaList.splice(idx, 1);
                 STORE.saveCOA(coaList);
@@ -1335,10 +1336,10 @@ window.logout = function () {
             document.getElementById('mp-name').focus();
         }
 
-        function deleteProductByManager(code) {
+        async function deleteProductByManager(code) {
             const p = STORE.getProducts().find(x => x.code === code);
             if (!p) return;
-            if (!confirm(`Hapus produk [${p.code}] ${p.name}?\n\nAksi ini akan dicatat ke audit Owner.`)) return;
+            if (!await fmAsk(`Hapus produk [${p.code}] ${p.name}?\n\nAksi ini akan dicatat ke audit Owner.`)) return;
             STORE.deleteProduct(code);
             recordAuditLog("HAPUS_PRODUK", `Manager menghapus produk [${p.code}] ${p.name}`, `Stok ${p.stock}`, "DIHAPUS");
             renderProductTable();

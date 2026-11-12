@@ -166,9 +166,9 @@
     ['logout', 'logoutKasirSession'].forEach(function (n) {
       var f = window[n];
       if (typeof f !== 'function' || f.__fmAuth) return;
-      var w = function () {
+      var w = async function () {
         var url = loginUrl();
-        if (n === 'logout' && !confirm('Keluar dari sistem?')) return;
+        if (n === 'logout' && !await fmAsk('Keluar dari sistem?')) return;
         try { ['currentUser', 'auth_role', 'auth_title', 'fm_session_user_v13', 'fm_active_cashier_session', 'fm_legacy_tenant'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
         doSignOut(function () { location.replace(url); });
       };

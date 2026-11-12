@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.13';
+  var BETA = 'BETA 1.14';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.14)', '12 Nov 2026', [
+      '[Perbaikan] Kotak konfirmasi dan pemberitahuan kini tampil di tengah layar dengan desain baru yang rapi dan tembus pandang',
+      '[Perbaikan] Tombol Tema kini ada di menu bawah, sekali tekan langsung berganti terang atau gelap; keterangan tema di Pengaturan dihapus',
+      '[Perbaikan] Pop-up lebih tembus pandang tetap terbaca; jendela Chat dibuat lebih gelap agar jelas; bilah gulir pada form Input Transaksi dihilangkan',
+      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 1.13)', '12 Nov 2026', [
       '[Perbaikan] Mode gelap: bagian atas dan menu bawah kini ikut gelap tembus pandang (sebelumnya tampak putih)',
       '[Perbaikan] Tombol Closing, Konfirmasi, dan tombol berwarna lain kini berikon dan bertulisan putih yang jelas di mode terang maupun gelap',
@@ -244,7 +250,7 @@
     box.style.setProperty('--fm-pick', pick);
     var h = '<div style="display:flex;justify-content:space-between;align-items:center"><h3>Pengaturan</h3><button class="fm-btn" data-close>Tutup</button></div>';
     var THEME_ON = !(window.FM_PLANS && !FM_PLANS.has('theme'));
-    h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
+    if (!document.documentElement.hasAttribute('data-fm-dock')) h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (mode === 'light' ? 'on' : '') + '" data-mode="light"><div class="fm-prev" style="background:linear-gradient(135deg,#ffffff,#e2e8f0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (mode === 'dark' ? 'on' : '') + '" data-mode="dark"><div class="fm-prev" style="background:#000"></div>Gelap Pekat</button></div></div>';
     if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
@@ -263,7 +269,6 @@
     h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.slice(0, SHOW_LAST).map(function (n, i) {
       return '<details ' + (i === 0 ? 'open' : '') + '><summary>v' + n[0] + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { var m = /^\[(\w+)\]\s*/.exec(t); var tag = m ? m[1] : ''; return '<li>' + (tag ? '<i class="fm-tag fm-tag-' + tag.toLowerCase() + '">' + esc(tag) + '</i>' : '') + esc(t.replace(/^\[\w+\]\s*/, '')) + '</li>'; }).join('') + '</ul></details>';
     }).join('') + '</div>';
-    h += '<p style="font-size:11px;color:#aab2c5;margin-top:14px;line-height:1.5">Tema dan warna tersimpan di perangkat ini, terpisah untuk tiap peran.</p>';
     box.innerHTML = h;
 
     var lo = box.querySelector('[data-logout]'); if (lo) lo.onclick = function () { document.getElementById('fm-set').style.display = 'none'; window.FM_LOGOUT(); };
@@ -405,6 +410,6 @@
       loginLogo();
     } else if (ROLE !== 'tower' && ROLE !== 'partner') startLogo();
   }
-  window.FM_THEME = { version: APP_VERSION, open: function () { document.getElementById('fm-gear').click(); } };
+  window.FM_THEME = { version: APP_VERSION, toggle: function () { pref.mode = ((pref.mode || DEFAULT_MODE) === 'dark') ? 'light' : 'dark'; savePref(pref); apply(); return pref.mode; }, mode: function () { return pref.mode || DEFAULT_MODE; }, open: function () { document.getElementById('fm-gear').click(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
