@@ -282,10 +282,11 @@
     window.closeWeatherModal = function () { var m = document.getElementById('w-modal-weather'); if (m) m.style.display = 'none'; };
     window.closeKursModal = function () { var m = document.getElementById('w-modal-kurs'); if (m) m.style.display = 'none'; };
     var PL = window.FM_PLANS;
-    if (PL && !PL.has('weather_rates')) {
-      var hid = function (e) { if (e && e.parentElement) e.parentElement.style.setProperty('display', 'none', 'important'); };
-      hid(wt); hid(kt); return;
-    }
+    var hid = function (e) { if (e && e.parentElement) e.parentElement.style.setProperty('display', 'none', 'important'); };
+    var okW = !(PL && !PL.has('weather')), okK = !(PL && !PL.has('rates'));
+    if (!okW) { hid(wt); wt = null; }
+    if (!okK) { hid(kt); kt = null; }
+    if (!okW && !okK) return;
     if (wt && wt.parentElement) { wt.parentElement.onclick = ow; wt.parentElement.style.cursor = 'pointer'; }
     if (kt && kt.parentElement) { kt.parentElement.onclick = ok; kt.parentElement.style.cursor = 'pointer'; }
     var box = document.getElementById('premium-widgets-container');

@@ -99,7 +99,7 @@
     var b = window.TENANT_CTRL && window.TENANT_CTRL.billing;
     var grid = document.querySelector('main > .grid');
     var el = document.getElementById('fm-bill');
-    var show = ok(b) && curA(b, Date.now()) > 0 && grid;
+    var show = ok(b) && curA(b, Date.now()) > 0 && grid && !(window.FM_PLANS && !FM_PLANS.has('billing_card'));
     if (!show) { if (el) el.remove(); if (grid) grid.classList.remove('fm-has-bill'); cur = null; return; }
     cur = b;
     if (!el) {

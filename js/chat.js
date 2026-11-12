@@ -119,7 +119,9 @@
   ].join('\n');
   var built = false;
   function build() {
-    if (built || IS_TOWER) return; built = true;
+    if (built || IS_TOWER) return;
+    if (window.FM_PLANS && !FM_PLANS.has('chat')) return;
+    built = true;
     var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
     var side = ROLE === 'staff' ? 'kasir' : 'owner';
     var tab = document.createElement('button'); tab.id = 'fmc-tab'; tab.className = side; tab.type = 'button'; tab.innerHTML = 'Chat <i id="fmc-n"></i>';

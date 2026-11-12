@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 4.0';
+  var BETA = 'BETA 4.1';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 4.1)', '13 Nov 2026', [
+      '[Fitur] Tampilan halaman kini lebih fleksibel per toko: jam, cuaca, kurs dan emas, kartu estimasi biaya layanan, chat, dan pilihan latar belakang dapat disesuaikan untuk Admin, Manager, dan Owner sesuai kebutuhan usaha',
+      '[Perbaikan] Fitur yang tidak dipakai toko kini hilang sepenuhnya dari tampilan, tidak sekadar disembunyikan sebagian',
+      '[Keamanan] Pengecekan ulang aturan akses dan izin tiap peran; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 4.0)', '12 Nov 2026', [
       '[Perbaikan] Versi stabil: seluruh menu Admin, Manager, dan Owner diperiksa ulang dan dirapikan',
       '[Keamanan] Pengecekan ulang aturan akses, sesi login, dan izin tiap peran; tidak ditemukan celah baru'
@@ -166,7 +171,7 @@
   function wpOf(id) { return WALLPAPERS.filter(function (w) { return w.id === id; })[0] || WALLPAPERS[0]; }
   function apply() {
     var h = document.documentElement;
-    try { var w = wpOf(pref.wp); if (w.id === 'hujan') h.style.removeProperty('--fm-wp'); else h.style.setProperty('--fm-wp', 'url("' + w.file + '")'); } catch (e) {}
+    try { var w = wpOf(pref.wp); if (w.id === 'hujan' || (window.FM_PLANS && !FM_PLANS.has('wallpaper'))) h.style.removeProperty('--fm-wp'); else h.style.setProperty('--fm-wp', 'url("' + w.file + '")'); } catch (e) {}
     var mode = pref.mode || DEFAULT_MODE;     // 'light' | 'dark'
     h.setAttribute('data-fm-native', NATIVE);
     ['data-fm-black', 'data-fm-invert', 'data-fm-accent'].forEach(function (a) { h.removeAttribute(a); });
@@ -212,7 +217,7 @@
     if (!document.documentElement.hasAttribute('data-fm-dock')) h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (mode === 'light' ? 'on' : '') + '" data-mode="light"><div class="fm-prev" style="background:linear-gradient(135deg,#ffffff,#e2e8f0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (mode === 'dark' ? 'on' : '') + '" data-mode="dark"><div class="fm-prev" style="background:#000"></div>Gelap Pekat</button></div></div>';
-    if (ROLE !== 'lain' && ROLE !== 'login' && ROLE !== 'tower' && ROLE !== 'provider') h += '<div class="fm-sec"><div class="fm-lab">Latar Belakang</div><div class="fm-modes" style="grid-template-columns:1fr 1fr 1fr">' +
+    if (ROLE !== 'lain' && ROLE !== 'login' && ROLE !== 'tower' && ROLE !== 'provider' && !(window.FM_PLANS && !FM_PLANS.has('wallpaper'))) h += '<div class="fm-sec"><div class="fm-lab">Latar Belakang</div><div class="fm-modes" style="grid-template-columns:1fr 1fr 1fr">' +
       WALLPAPERS.map(function (w) { return '<button class="fm-mode ' + (wpOf(pref.wp).id === w.id ? 'on' : '') + '" data-wp="' + w.id + '" style="padding:8px"><div class="fm-prev" style="height:54px;background:url(' + w.file + ') center/cover"></div><span style="font-size:11.5px">' + w.name + '</span></button>'; }).join('') + '</div></div>';
     if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
       ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +

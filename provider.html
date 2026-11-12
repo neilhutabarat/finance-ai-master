@@ -68,13 +68,13 @@
             { label: 'Pesan', icon: 'send', run: "openModal('broadcast_modal')" }
         ];
     </script>
-    <script src="js/billing.js?v=1.5.8"></script>
+    <script src="js/billing.js?v=4.1"></script>
     <script src="js/dialog.js?v=1.13"></script>
-    <script src="js/theme.js?v=1.5.8"></script>
+    <script src="js/theme.js?v=4.1"></script>
     <script src="js/logo.js?v=1.5.8"></script>
     <script src="js/skin.js?v=1.5.8"></script>
     <script src="js/tower-menu.js?v=1.5.8"></script>
-    <script src="js/chat.js?v=1.5.8"></script>
+    <script src="js/chat.js?v=4.1"></script>
     <script src="js/tower-cockpit.js?v=1.5.8"></script>
     <style>#main-modal-container{z-index:70 !important}</style>
     <script src="js/sw-register.js" defer></script>
@@ -242,6 +242,10 @@
 
         <!-- TOMBOL AKSI CEPAT PROVIDER -->
         <div id="fm-actions" class="fm-actions">
+            <button data-fm-action data-ic="gear" onclick="towerPick('edit')"><span>Edit Toko</span></button>
+            <button data-fm-action data-ic="shield" onclick="towerPick('inspect')"><span>Inspeksi Toko</span></button>
+            <button data-fm-action data-ic="moon" onclick="towerPick('freeze')"><span>Bekukan / Aktifkan</span></button>
+            <button data-fm-action data-ic="send" onclick="towerPick('link')"><span>Salin Link Toko</span></button>
             <button data-fm-action data-ic="list" onclick="openModal('provider_coa_mgmt')"><span>COA Provider</span></button>
             <button data-fm-action data-ic="tag" onclick="openModal('pricing')"><span>Harga Paket</span></button>
             <button data-fm-action data-ic="archive" onclick="openModal('former')"><span>Toko Berhenti</span><span id="former-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-black"></span></button>
@@ -252,7 +256,7 @@
         </div>
 
         <!-- TABEL DIREKTORI MITRA UMKM -->
-        <div class="ios-glass p-6 space-y-4" data-fm-panel data-first data-wide data-title="Jaringan Mitra UMKM" data-sub="Usia ID, mode, terminal, income, outcome, status, dan inspeksi" data-ic="building">
+        <div class="ios-glass p-6 space-y-4" data-fm-panel data-first data-wide data-title="Jaringan Mitra UMKM" data-sub="Usia ID, mode, terminal, income, outcome, dan status (pantau saja)" data-ic="building">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <div>
                     <h2 class="text-base font-black text-white flex items-center space-x-2">
@@ -279,7 +283,6 @@
                             <th class="py-3 px-4 text-right">Outcome (Bln Ini)</th>
                             <th class="py-3 px-4 text-center">Badge Finansial</th>
                             <th class="py-3 px-4 text-center">Status</th>
-                            <th class="py-3 px-4 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="umkm-table-body"></tbody>
@@ -735,8 +738,8 @@
 
     <script src="js/tenants.js"></script>
     <script src="js/auth.js?v=1.5.8"></script>
-    <script src="js/plans.js?v=2.9"></script>
-    <script src="js/widgets.js?v=1.5.8"></script>
+    <script src="js/plans.js?v=4.1"></script>
+    <script src="js/widgets.js?v=4.1"></script>
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
@@ -829,6 +832,51 @@
                 return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
             });
         }
+
+        /* Pemilih toko untuk tile Kendali: popup daftar toko -> aksi langsung */
+        function towerPick(kind) {
+            var T = { edit: ['Edit Toko', 'Pilih toko yang mau diubah profil, fitur, COA, dan produknya'], inspect: ['Inspeksi Toko', 'Pilih toko yang mau diperiksa'], freeze: ['Bekukan / Aktifkan', 'Pilih toko untuk dibekukan atau diaktifkan kembali'], link: ['Salin Link Toko', 'Pilih toko, link login langsung tersalin'] }[kind];
+            var old = document.getElementById('tw-pick'); if (old) old.remove();
+            var o = document.createElement('div'); o.id = 'tw-pick';
+            o.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+            o.innerHTML = '<div style="width:min(520px,100%);max-height:86vh;display:flex;flex-direction:column;border-radius:22px;background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 20px 60px rgba(0,0,0,.5)">' +
+                '<div style="padding:16px 18px 10px;display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:900;font-size:16px">' + T[0] + '</div><div style="opacity:.65;font-size:12px">' + T[1] + '</div></div><button id="tw-pick-x" style="font-size:22px;line-height:1;opacity:.7">×</button></div>' +
+                '<div style="padding:0 18px 10px"><input id="tw-pick-q" placeholder="Cari nama atau ID toko" style="width:100%;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:13px;outline:none"></div>' +
+                '<div id="tw-pick-l" style="overflow:auto;padding:0 12px 14px"></div></div>';
+            document.body.appendChild(o);
+            var close = function () { o.remove(); };
+            o.onclick = function (e) { if (e.target === o) close(); };
+            document.getElementById('tw-pick-x').onclick = close;
+            var q = document.getElementById('tw-pick-q'), L = document.getElementById('tw-pick-l');
+            function draw() {
+                var k = q.value.trim().toLowerCase();
+                var list = listNetworkTenants().filter(function (t) { return !t.deletedByTower && (!k || String(t.id).toLowerCase().indexOf(k) >= 0 || String(t.nama || '').toLowerCase().indexOf(k) >= 0); });
+                L.innerHTML = '';
+                if (!list.length) { L.innerHTML = '<div style="padding:18px;text-align:center;opacity:.6;font-size:13px">Tidak ada toko yang cocok</div>'; return; }
+                list.forEach(function (t) {
+                    var sus = isTenantSuspended(t.id), b = document.createElement('button');
+                    b.style.cssText = 'display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:11px 12px;margin-bottom:6px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)';
+                    var act = kind === 'freeze' ? (sus ? 'Aktifkan' : 'Bekukan') : '';
+                    b.innerHTML = '<span><span style="font-weight:800;font-size:13px">' + escHtml(t.nama || t.id) + '</span><span style="display:block;opacity:.6;font-size:11px;font-family:monospace">' + escHtml(t.id) + '</span></span>' +
+                        '<span style="font-size:10px;font-weight:900;padding:3px 9px;border-radius:99px;' + (sus ? 'background:rgba(244,63,94,.2);color:#fda4af' : 'background:rgba(16,185,129,.2);color:#6ee7b7') + '">' + (act || (sus ? 'BEKU' : 'AKTIF')) + '</span>';
+                    b.onclick = function () {
+                        if (kind === 'link') {
+                            var link = tenantLink(t.id), ok = function () { b.lastChild.textContent = 'Tersalin ✓'; setTimeout(close, 700); };
+                            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(ok, function () { close(); alert(link); });
+                            else { close(); alert(link); }
+                            return;
+                        }
+                        close();
+                        if (kind === 'edit') openTenantSettings(t.id);
+                        else if (kind === 'inspect') openInspectUMKM(t.id);
+                        else setTenantSuspended(t.id, !sus);
+                    };
+                    L.appendChild(b);
+                });
+            }
+            q.oninput = draw; draw(); setTimeout(function () { q.focus(); }, 50);
+        }
+        window.towerPick = towerPick;
 
         function listNetworkTenants() {
             if (typeof TENANTS_CONFIG === 'undefined') return [];
@@ -2115,8 +2163,7 @@
                 const localTag = tenantSource[tenant.id] === 'firestore' ? '' : '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-400/30" title="Data dibaca dari browser ini, bukan dari server">LOKAL</span>';
 
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-white/5 hover:bg-slate-900/5 cursor-pointer transition";
-                tr.onclick = function () { openInspectUMKM(tenant.id); };
+                tr.className = "border-b border-white/5 transition";
                 tr.innerHTML = `
                     <td class="py-3.5 px-4">
                         <span class="font-mono font-bold text-cyan-400 block">${tenant.id}</span>
@@ -2145,28 +2192,7 @@
                             ${tenant.deletedByTower ? 'DIHAPUS' : (isSuspended ? 'BEKU' : 'AKTIF')}
                         </span>
                     </td>
-                    <td class="py-3.5 px-4 text-center">
-                        <div class="flex items-center justify-center flex-wrap gap-1 tw-rowbtns"></div>
-                    </td>
                 `;
-                (function () {
-                    const wrap = tr.querySelector('.tw-rowbtns');
-                    const mk = function (txt, cls, fn, title) {
-                        const b = document.createElement('button');
-                        b.className = 'px-2.5 py-1 rounded-xl text-white font-bold text-[10px] transition ' + cls;
-                        b.innerText = txt; if (title) b.title = title;
-                        b.onclick = function (ev) { ev.stopPropagation(); fn(b); };
-                        wrap.appendChild(b); return b;
-                    };
-                    mk('Inspeksi', 'bg-cyan-600 hover:bg-cyan-700', function () { openInspectUMKM(tenant.id); });
-                    if (!tenant.isSinglePage) mk('Edit Toko', 'bg-purple-600 hover:bg-purple-700', function () { openTenantSettings(tenant.id); }, 'Profil, warna, fitur, COA & produk');
-                    if (!tenant.deletedByTower && !tenant.isSinglePage) mk(isSuspended ? 'Aktifkan' : 'Bekukan', isSuspended ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700', function () { setTenantSuspended(tenant.id, !isSuspended); });
-                    if (!tenant.isSinglePage) mk('Salin Link', 'bg-slate-600 hover:bg-slate-500', function (b) {
-                        const link = tenantLink(tenant.id), done = function () { b.innerText = 'Tersalin ✓'; setTimeout(function () { b.innerText = 'Salin Link'; }, 1600); };
-                        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { alert(link); });
-                        else alert(link);
-                    }, 'Salin link login toko');
-                })();
                 tbody.appendChild(tr);
             });
         }

@@ -31,7 +31,11 @@
     { key: 'audit', label: 'Riwayat audit manager', r: { owner: 'o' } },
     { key: 'export_csv', label: 'Unduh laporan (PDF dan CSV)', r: { owner: 'o' } },
     { key: 'clock', label: 'Jam', r: { kasir: 'o', manager: 'o', owner: 'o' } },
-    { key: 'weather_rates', label: 'Cuaca dan Kurs', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'weather', label: 'Cuaca', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'rates', label: 'Kurs dan Emas', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'billing_card', label: 'Kartu Estimasi Biaya Layanan', r: { manager: 'o', owner: 'o' } },
+    { key: 'chat', label: 'Chat global', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'wallpaper', label: 'Pilihan Latar Belakang (wallpaper)', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'theme', label: 'Pilih warna halaman dan logo usaha', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'mutasi_wa', label: 'Mutasi dikirim lewat WA dan dicetak', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'gaji', label: 'Laporan gaji (Manager mencatat; Owner hanya melihat)', r: { manager: 'o', owner: 'o' } },
@@ -54,6 +58,8 @@
     if (L && typeof L === 'object') return L[role] === true;
     return true;
   }
+  var ALIAS = { weather: 'weather_rates', rates: 'weather_rates' };
+  var NEW_ON = ['clock', 'weather', 'rates', 'billing_card', 'chat', 'wallpaper'];
   function has(key, role, tn) {
     var f = find(key); if (!f) return false;
     role = role || pageRole();
@@ -62,6 +68,7 @@
     if (f.soon) return false;
     tn = tn || tenant();
     var v = tn && tn.features ? tn.features[key] : undefined;
+    if (v === undefined && ALIAS[key] && tn && tn.features) v = tn.features[ALIAS[key]];
     if (v === true || v === false) return v;                       // format lama (berlaku untuk semua mode)
     if (v && typeof v === 'object' && typeof v[role] === 'boolean') return v[role];
     return legacyValue(f, role, tn);
@@ -73,7 +80,7 @@
     var tn = tnFull || { features: features || null }, isNew = !features;
     var th = 'text-align:center;padding:4px 6px;font-weight:800;white-space:nowrap';
     var h = '<div style="font-weight:800;margin-bottom:2px">Fitur toko</div>' +
-      '<div style="opacity:.65;margin-bottom:6px">Fitur inti selalu aktif. Fitur tambahan hanya tampil bila dicentang.</div>' +
+      '<div style="opacity:.65;margin-bottom:6px">Merah = fitur inti (terkunci). Hijau = bebas ditambah atau dicabut per toko; yang tidak dicentang hilang dari tampilan klien.</div>' +
       '<div style="display:flex;gap:6px;margin-bottom:6px"><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',true)" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:11px">Centang semua tambahan</button>' +
       '<button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',false)" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:11px">Kosongkan tambahan</button></div>' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span style="opacity:.65;font-size:11px">Paket siap pakai:</span>' + '<span id="' + prefix + '-presets" style="display:contents">' + presetButtons(prefix) + '</span></div>' +
@@ -86,9 +93,9 @@
       h += '<tr style="border-top:1px solid rgba(255,255,255,.08);' + (f.soon ? 'opacity:.5' : '') + '"><td style="padding:6px">' + f.label + (f.soon ? ' <i>(segera)</i>' : '') + '</td>';
       ROLES.forEach(function (r) {
         var m = f.r[r], cell;
-        if (!m) cell = '<span style="opacity:.3">–</span>';
-        else if (m === 'c') cell = '<span title="Inti: selalu aktif" style="display:inline-flex;width:18px;height:18px;border-radius:5px;background:#22c55e;color:#04210f;font-weight:900;font-size:13px;line-height:18px;align-items:center;justify-content:center">&#10003;</span>';
-        else cell = '<input type="checkbox" id="' + prefix + '-f-' + f.key + '-' + r + '" ' + ((isNew ? false : has(f.key, r, tn)) ? 'checked ' : '') + ((f.soon || editable === false) ? 'disabled ' : '') + 'style="width:18px;height:18px;accent-color:#22c55e;cursor:pointer">';
+        if (m === 'c') cell = '<span title="Fitur inti: terkunci, tidak bisa dicabut" style="display:inline-flex;width:18px;height:18px;border-radius:5px;background:#ef4444;color:#fff;font-weight:900;font-size:13px;line-height:18px;align-items:center;justify-content:center">✓</span>';
+        else if (!m) cell = '<input type="checkbox" disabled title="Belum tersedia di mode ini" style="width:16px;height:16px;opacity:.25">';
+        else cell = '<input type="checkbox" id="' + prefix + '-f-' + f.key + '-' + r + '" ' + (((isNew ? NEW_ON.indexOf(f.key) >= 0 : has(f.key, r, tn))) ? 'checked ' : '') + ((f.soon || editable === false) ? 'disabled ' : '') + 'style="width:16px;height:16px;accent-color:#22c55e">';
         h += '<td style="text-align:center;padding:6px">' + cell + '</td>';
       });
       h += '</tr>';
@@ -168,6 +175,7 @@
     var role = pageRole();
     if (!has('tax', role)) { drop('button[onclick*="openModal(\'tax\')"]'); hide(cardOf(document.getElementById('stat-total-pajak-sumbang'))); }
     if (!has('coa', role)) drop('button[onclick*="openModal(\'coa_mgmt\')"]');
+    if (!has('wallpaper', role)) { try { document.documentElement.style.removeProperty('--fm-wp'); } catch (e) {} }
     if (!has('stok', role)) drop('button[onclick*="FM_STOK"]');
     if (!has('gaji', role)) drop('button[onclick*="FM_GAJI"]');
     if (!has('ledger', role)) drop('button[onclick*="openModal(\'ledger\')"]');
