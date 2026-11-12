@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 3.0';
+  var BETA = 'BETA 4.0';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 4.0)', '12 Nov 2026', [
+      '[Perbaikan] Versi stabil: seluruh menu Admin, Manager, dan Owner diperiksa ulang dan dirapikan',
+      '[Keamanan] Pengecekan ulang aturan akses, sesi login, dan izin tiap peran; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 3.0)', '12 Nov 2026', [
       '[Fitur] Pilihan Latar Belakang di Pengaturan: Hujan Gerimis, Senja Orbit, dan Malam Rasi N (gambar orisinal Oneilverse)',
       '[Fitur] Unduh PDF di laman Owner menggantikan Ekspor CSV: laporan berkop dengan ringkasan dan rincian transaksi, pilihan periode hari ini sampai kustom; CSV untuk Excel tetap tersedia di jendela yang sama',
