@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 2.8';
+  var BETA = 'BETA 2.9';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 2.9)', '12 Nov 2026', [
+      '[Fitur] Izin Stok kini bisa diatur per peran: lihat stok, input stok, dan closing stok. Peran yang hanya boleh melihat tidak melihat form input dan tombol closing',
+      '[Perbaikan] Susunan fitur toko bisa disimpan sebagai paket dan dipakai ulang',
+      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 2.8)', '12 Nov 2026', [
       '[Perbaikan] Daftar Fitur Toko disesuaikan dengan fitur yang benar-benar ada (Stok dan Closing Stok ditambahkan; barcode dan label produk yang sudah tidak ada dihapus)',
       '[Perbaikan] Tombol Fitur Toko dipindah ke tepi agar menu yang sering dipakai lebih mudah dijangkau',

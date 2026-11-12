@@ -19,7 +19,9 @@
     { key: 'laba_rugi', label: 'Laba Rugi', r: { manager: 'c', owner: 'c' } },
     { key: 'pin', label: 'Kelola PIN dan nama peran', r: { owner: 'c' } },
     { key: 'ledger', label: 'Buku Besar', r: { kasir: 'o', manager: 'c', owner: 'o' } },
-    { key: 'stok', label: 'Stok dan Closing Stok (induk, jenis, sisa stok, HPP)', r: { manager: 'o', owner: 'o' } },
+    { key: 'stok', label: 'Stok: lihat daftar stok, harga beli, nilai, dan riwayat closing', r: { manager: 'o', owner: 'o' } },
+    { key: 'stok_input', label: 'Stok: input jenis stok dan stok masuk', r: { manager: 'o', owner: 'o' } },
+    { key: 'stok_closing', label: 'Stok: isi sisa stok dan Closing Mingguan (HPP)', r: { manager: 'o', owner: 'o' } },
     { key: 'bukti', label: 'Foto bukti transaksi', r: { kasir: 'o' } },
     { key: 'wa_receipt', label: 'Struk lewat WhatsApp', r: { kasir: 'o' } },
     { key: 'tax', label: 'Pajak PPN 12%', r: { kasir: 'o', manager: 'o', owner: 'o' } },
@@ -38,7 +40,7 @@
     { key: 'neraca', label: 'Neraca', soon: true, r: { manager: 'o', owner: 'o' } }
   ];
   // nilai untuk toko lama yang belum punya pilihan tersimpan
-  var LEGACY = { wa_receipt: 'plus', analisa: { owner: true }, coa: {}, ledger: { kasir: true }, mutasi_wa: {}, gaji: {}, gaji_auto: {} };
+  var LEGACY = { wa_receipt: 'plus', analisa: { owner: true }, coa: {}, ledger: { kasir: true }, mutasi_wa: {}, gaji: {}, gaji_auto: {}, stok_input: { manager: true }, stok_closing: { manager: true } };
 
   function find(key) { return FEATURES.filter(function (f) { return f.key === key; })[0]; }
   function tenant() { try { return (typeof getActiveTenant === 'function') ? getActiveTenant() : null; } catch (e) { return null; } }
@@ -74,7 +76,7 @@
       '<div style="opacity:.65;margin-bottom:6px">Fitur inti selalu aktif. Fitur tambahan hanya tampil bila dicentang.</div>' +
       '<div style="display:flex;gap:6px;margin-bottom:6px"><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',true)" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:11px">Centang semua tambahan</button>' +
       '<button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',false)" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:11px">Kosongkan tambahan</button></div>' +
-      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span style="opacity:.65;font-size:11px">Paket siap pakai:</span>' + Object.keys(PRESETS).map(function (k) { return '<button type="button" onclick="FM_PLANS.applyPreset(\'' + prefix + '\',\'' + k + '\')" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(34,197,94,.45);background:rgba(34,197,94,.10);color:inherit;font-size:11px">' + PRESETS[k].label + '</button>'; }).join('') + '</div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span style="opacity:.65;font-size:11px">Paket siap pakai:</span>' + '<span id="' + prefix + '-presets" style="display:contents">' + presetButtons(prefix) + '</span></div>' +
       '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:4px 6px">Fitur</th>' +
       ROLES.map(function (r) { return '<th style="' + th + '">' + RLABEL[r] + '</th>'; }).join('') + '</tr></thead><tbody>';
     var order = FEATURES.filter(function (f) { return !f.soon && Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); })
@@ -94,21 +96,52 @@
     return h + '</tbody></table></div>';
   }
   var PRESETS = {
-    warung: { label: 'Warung / Kafe', keys: ['bukti', 'wa_receipt', 'mutasi_wa', 'clock'] },
-    toko: { label: 'Toko Retail', keys: ['bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
-    jasa: { label: 'Jasa / Klinik', keys: ['ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
+    warung: { label: 'Warung / Kafe', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'clock'] },
+    toko: { label: 'Toko Retail', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
+    jasa: { label: 'Jasa / Klinik', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
     lengkap: { label: 'Lengkap', keys: null }
   };
+  /* paket buatan sendiri (disimpan di browser Tower dan, bila ada, di provider_settings/plan_presets) */
+  var CUSTOM = {};
+  try { CUSTOM = JSON.parse(localStorage.getItem('fm_plan_presets') || '{}') || {}; } catch (e) { CUSTOM = {}; }
+  function saveCustom() {
+    try { localStorage.setItem('fm_plan_presets', JSON.stringify(CUSTOM)); } catch (e) {}
+    try { if (typeof db !== 'undefined' && db) db.collection('provider_settings').doc('plan_presets').set({ list: CUSTOM }); } catch (e) {}
+  }
+  try { if (!/provider\.html$/i.test(location.pathname) === false && typeof db !== 'undefined' && db) db.collection('provider_settings').doc('plan_presets').get().then(function (d) { if (d.exists && d.data().list) { CUSTOM = d.data().list; try { localStorage.setItem('fm_plan_presets', JSON.stringify(CUSTOM)); } catch (e) {} } }).catch(function () {}); } catch (e) {}
   function applyPreset(prefix, name) {
-    var pr = PRESETS[name]; if (!pr) return;
+    var cu = name.indexOf('custom:') === 0 ? CUSTOM[name.slice(7)] : null, pr = PRESETS[name];
+    if (!pr && !cu) return;
     FEATURES.forEach(function (f) {
       if (f.soon) return;
       ROLES.forEach(function (r) {
         if (f.r[r] !== 'o') return;
         var el = document.getElementById(prefix + '-f-' + f.key + '-' + r);
-        if (el && !el.disabled) el.checked = !pr.keys || pr.keys.indexOf(f.key) >= 0;
+        if (!el || el.disabled) return;
+        if (cu) el.checked = !!cu.checks[f.key + ':' + r];
+        else el.checked = !pr.keys || pr.keys.indexOf(f.key) >= 0 || pr.keys.indexOf(f.key + ':' + r) >= 0;
       });
     });
+  }
+  function saveAsPreset(prefix) {
+    var name = (window.prompt ? window.prompt('Nama paket baru (mis. Basic Konveksi):', '') : '') || '';
+    name = name.trim(); if (!name) return;
+    var checks = {};
+    FEATURES.forEach(function (f) { ROLES.forEach(function (r) { if (f.r[r] !== 'o') return; var el = document.getElementById(prefix + '-f-' + f.key + '-' + r); if (el) checks[f.key + ':' + r] = !!el.checked; }); });
+    CUSTOM[name] = { label: name, checks: checks }; saveCustom();
+    var box = document.getElementById(prefix + '-presets'); if (box) box.innerHTML = presetButtons(prefix);
+  }
+  function deletePreset(prefix, name) {
+    if (!window.confirm('Hapus paket "' + name + '"?')) return;
+    delete CUSTOM[name]; saveCustom();
+    var box = document.getElementById(prefix + '-presets'); if (box) box.innerHTML = presetButtons(prefix);
+  }
+  function presetButtons(prefix) {
+    var st = 'padding:4px 10px;border-radius:8px;font-size:11px;color:inherit;';
+    var h = Object.keys(PRESETS).map(function (k) { return '<button type="button" onclick="FM_PLANS.applyPreset(\'' + prefix + '\',\'' + k + '\')" style="' + st + 'border:1px solid rgba(34,197,94,.45);background:rgba(34,197,94,.10)">' + PRESETS[k].label + '</button>'; }).join('');
+    h += Object.keys(CUSTOM).map(function (k) { var e = k.replace(/[&<>"']/g, ''); return '<span style="display:inline-flex;gap:2px"><button type="button" onclick="FM_PLANS.applyPreset(\'' + prefix + '\',\'custom:' + e + '\')" style="' + st + 'border:1px solid rgba(59,130,246,.55);background:rgba(59,130,246,.12)">' + e + '</button><button type="button" title="Hapus paket" onclick="FM_PLANS.deletePreset(\'' + prefix + '\',\'' + e + '\')" style="' + st + 'border:1px solid rgba(244,63,94,.4);background:transparent;padding:4px 7px">×</button></span>'; }).join('');
+    h += '<button type="button" onclick="FM_PLANS.saveAsPreset(\'' + prefix + '\')" style="' + st + 'border:1px dashed rgba(255,255,255,.4);background:transparent">+ Simpan susunan ini sebagai paket</button>';
+    return h;
   }
   function setAll(prefix, on) {
     FEATURES.forEach(function (f) { if (f.soon) return; ROLES.forEach(function (r) { if (f.r[r] === 'o') { var el = document.getElementById(prefix + '-f-' + f.key + '-' + r); if (el && !el.disabled) el.checked = !!on; } }); });
@@ -167,5 +200,5 @@
   }
 
   window.FM_PLANS = { FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml,
-    readChecklist: readChecklist, setAll: setAll, applyPreset: applyPreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
+    readChecklist: readChecklist, setAll: setAll, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();
