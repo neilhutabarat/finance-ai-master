@@ -212,7 +212,7 @@
       (hist.length ? '<div style="margin-top:12px;font-size:12px;font-weight:800;color:#475569">Riwayat closing</div>' + hist.map(function (h) { return '<div class="sk-row"><div class="nm">' + esc(h.label) + ' <span class="cd">oleh ' + esc(h.by || '-') + '</span></div><div class="sk-st">HPP Rp ' + fmt(h.hpp) + '</div></div>'; }).join('') : '');
     function sum() {
       var c = calc(), el = document.getElementById('cl-sum'); if (!el) return;
-      el.innerHTML = 'Nilai stok awal: Rp ' + fmt(c.awal) + '<br>Pembelian (COA): Rp ' + fmt(c.beli) + '<br>Nilai sisa stok: Rp ' + fmt(c.sisa) + (c.ok ? '' : ' <span style="color:#be123c">(isi semua sisa stok)</span>') + '<br><span style="font-size:15px;font-weight:900">HPP: Rp ' + fmt(c.hpp) + '</span>';
+      el.innerHTML = 'Stok awal: Rp ' + fmt(c.awal) + '<br>Pembelian (COA): Rp ' + fmt(c.beli) + '<br><b>Barang tersedia untuk dijual: Rp ' + fmt(c.awal + c.beli) + '</b><br>Stok akhir (sisa): Rp ' + fmt(c.sisa) + (c.ok ? '' : ' <span style="color:#be123c">(isi semua sisa stok)</span>') + '<br><span style="font-size:15px;font-weight:900">HPP (barang terpakai untuk dijual): Rp ' + fmt(c.hpp) + '</span>';
     }
     [].forEach.call(box.querySelectorAll('input[id^="cl-"]'), function (i) { if (i.id !== 'cl-sum') i.oninput = sum; });
     sum();

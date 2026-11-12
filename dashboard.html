@@ -205,6 +205,7 @@
             <button data-fm-action data-ic="plus" onclick="openModal('add_cashier_request')">Buka Kasir Baru</button>
             <button data-fm-action data-ic="download" onclick="FM_INSIGHTS.exportCSV()">Ekspor CSV</button>
             <button data-fm-action data-ic="box" onclick="FM_STOK.open()">Tambah Stok</button>
+            <button data-fm-action data-ic="clock" onclick="FM_STOK.open('closing')">Closing Stok (isi sisa stok)</button>
             <button data-fm-action data-ic="users" onclick="FM_GAJI.open()">Laporan Gaji</button>
             <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur Toko</button>
         </div>
@@ -704,7 +705,7 @@
             activeItems.forEach(item => {
                 const isInc = item.category === 'sales';
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-white/5 text-xs"; tr.dataset.coa = c.code;
+                tr.className = "border-b border-white/5 text-xs";
                 tr.innerHTML = `
                     <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono ${isInc ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isInc ? 'INCOME' : 'OUTCOME'} [${item.code}]</span></td>
                     <td class="py-2.5 px-3 font-bold">${fmEsc(item.name)}</td>
@@ -781,7 +782,7 @@
 
             auditView.forEach((l, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-white/5 text-xs"; tr.dataset.coa = c.code;
+                tr.className = "border-b border-white/5 text-xs";
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono text-slate-400">${escAudit(l.date)}</td>
                     <td class="py-2.5 px-3 font-bold text-purple-900">${escAudit(l.actor)}</td>
@@ -829,7 +830,7 @@
 
             withBalance.forEach(tx => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-white/5 text-xs"; tr.dataset.coa = c.code;
+                tr.className = "border-b border-white/5 text-xs";
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono">${tx.dateFull} ${tx.date}</td>
                     <td class="py-2.5 px-3 font-bold">[${fmEsc(tx.accountCode)}] ${fmEsc(tx.accountName)}<br><span class="text-[10px] text-slate-400 font-normal">${fmEsc(tx.desc || '-')} (${fmEsc(tx.staff)})</span></td>

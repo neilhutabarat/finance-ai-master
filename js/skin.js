@@ -554,6 +554,7 @@
       var map = MAP[m ? m[1] : ''] || [(b.querySelector('h4').textContent || '').trim(), 'grid'];
       return { label: map[0], icon: map[1], el: b };
     });
+    if (/^(manager|owner)$/.test(document.documentElement.getAttribute('data-fm-page') || '') && !(custom && custom.length)) items.push({ label: 'Closing Stok', icon: 'box', fn: function () { if (window.FM_STOK) FM_STOK.open('closing'); } });
     tiles.forEach(function (b) {
       b.classList.add('fm-tile');
       var p = b.parentElement;

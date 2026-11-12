@@ -180,6 +180,7 @@
             <button data-fm-action data-ic="plus" onclick="openModal('add_cashier_request')">Buka Kasir Baru</button>
             <button data-fm-action data-ic="box" onclick="openModal('coa_mgmt')">Kelola Akun (COA)</button>
             <button data-fm-action data-ic="box" onclick="FM_STOK.open()">Tambah Stok</button>
+            <button data-fm-action data-ic="clock" onclick="FM_STOK.open('closing')">Closing Stok (isi sisa stok)</button>
             <button data-fm-action data-ic="users" onclick="FM_GAJI.open()">Laporan Gaji</button>
             <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur Toko</button>
         </div>
@@ -968,7 +969,7 @@
             tbody.innerHTML = "";
             closingHistory.forEach(s => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-white/5 text-xs"; tr.dataset.coa = c.code;
+                tr.className = "border-b border-white/5 text-xs";
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono">${s.closedAt}</td>
                     <td class="py-2.5 px-3 text-right font-black text-emerald-600 font-mono">Rp ${formatThousandSeparator(s.totalIn)}</td>
