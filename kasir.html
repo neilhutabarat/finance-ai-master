@@ -540,7 +540,7 @@
                 <div id="receipt-items-list" class="space-y-1.5 py-1"></div>
                 <div class="border-t border-dashed border-slate-300 pt-2 space-y-1 font-bold">
                     <div class="flex justify-between">
-                        <span>TOTAL BAYAR:</span>
+                        <span id="receipt-total-label">TOTAL BAYAR:</span>
                         <span id="receipt-total" class="font-black">Rp 0</span>
                     </div>
                     <div class="flex justify-between text-[10px] text-slate-500 font-normal">
@@ -548,7 +548,7 @@
                         <span id="receipt-pay">Tunai</span>
                     </div>
                     <div class="flex justify-between text-[10px] text-slate-500 font-normal">
-                        <span>Kasir:</span>
+                        <span>Petugas:</span>
                         <span id="receipt-staff">PIC Kasir</span>
                     </div>
                 </div>
@@ -561,6 +561,9 @@
                 <button onclick="window.print()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black py-2.5 rounded-xl text-xs transition active:scale-95 flex items-center justify-center space-x-1 shadow-md">
                     <i data-lucide="printer" class="w-3.5 h-3.5"></i>
                     <span>Cetak Sekarang</span>
+                </button>
+                <button onclick="FM_STRUK_PDF.save()" class="px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 rounded-xl text-xs transition active:scale-95 flex items-center justify-center space-x-1" id="btn-pdf-receipt" title="Simpan struk sebagai PDF">
+                    <span>📄 Simpan PDF</span>
                 </button>
                 <button onclick="sendReceiptWA()" class="px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 rounded-xl text-xs transition active:scale-95 flex items-center justify-center space-x-1" id="btn-wa-receipt">
                     <span>💬 WhatsApp</span>
@@ -734,6 +737,7 @@
     <script src="js/auth.js?v=1.5.8"></script>
     <script src="js/plans.js?v=1.5.8"></script>
     <script src="js/mutasi-share.js?v=1.5.8"></script>
+    <script src="js/struk-pdf.js?v=2.1"></script>
     <script src="js/gaji.js?v=1.5.8"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); }
@@ -1094,7 +1098,7 @@
             }
 
             draftList.forEach((d, idx) => {
-                total += d.amount;
+                total += sgnAmt(d);
                 const item = document.createElement('div');
                 item.className = "flex items-center justify-between p-3 rounded-2xl bg-white/80 border border-slate-200 text-xs shadow-xs";
                 item.innerHTML = `
@@ -1106,7 +1110,7 @@
                         <p class="text-[11px] text-slate-500 font-medium">${d.desc || '-'}</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <span class="font-black text-slate-900 font-mono">Rp ${formatThousandSeparator(d.amount)}</span>
+                        <span class="font-black font-mono ${d.category === 'sales' ? 'text-slate-900' : 'text-rose-700'}">${d.category === 'sales' ? '' : '-'}Rp ${formatThousandSeparator(d.amount)}</span>
                         <button onclick="editDraftItem('${d.id}')" class="p-1 rounded-lg hover:bg-slate-100 text-slate-600" title="Edit">
                             <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
                         </button>
@@ -1118,7 +1122,7 @@
                 container.appendChild(item);
             });
 
-            document.getElementById('draft-total-amount').innerText = "Rp " + formatThousandSeparator(total);
+            document.getElementById('draft-total-amount').innerText = fmSigned(total);
             if (window.lucide) lucide.createIcons();
         }
 
@@ -1152,6 +1156,9 @@
         }
 
         function localISO() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+        /* Penjualan menambah, pengeluaran mengurangi: struk dan total antrean memakai nilai bertanda */
+        function sgnAmt(d) { return d.category === 'sales' ? d.amount : -d.amount; }
+        function fmSigned(n) { return (n < 0 ? '-' : '') + 'Rp ' + formatThousandSeparator(Math.abs(n)); }
         let lastReceipt = null;
         function currentPay() { const el = document.getElementById('pay-method'); return el ? el.value : 'tunai'; }
 
@@ -1173,7 +1180,7 @@
             let phone = prompt('Nomor WhatsApp pelanggan (contoh 08123456789). Kosongkan untuk memilih kontak sendiri di WhatsApp:', '') || '';
             phone = phone.replace(/[^0-9]/g, '');
             if (phone.startsWith('0')) phone = '62' + phone.slice(1);
-            const txt = lastReceipt.store + '\n' + lastReceipt.when + '\n------------------\n' + lastReceipt.items.join('\n') + '\n------------------\nTOTAL: Rp ' + formatThousandSeparator(lastReceipt.total) + '\nBayar: ' + lastReceipt.pay + '\nTerima kasih!';
+            const txt = lastReceipt.store + '\n' + lastReceipt.when + '\n------------------\n' + lastReceipt.items.join('\n') + '\n------------------\nTOTAL: ' + fmSigned(lastReceipt.total) + '\nBayar: ' + lastReceipt.pay + '\nTerima kasih!';
             window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(txt), '_blank');
         }
 
@@ -1191,9 +1198,9 @@
             }
 
             let total = 0;
-            draftList.forEach(d => total += d.amount);
+            draftList.forEach(d => total += sgnAmt(d));
 
-            if (!await fmAsk(`Konfirmasi pembayaran lunas dan cetak struk total Rp ${formatThousandSeparator(total)}?\n\nTransaksi akan disahkan, stok produk akan dipotong otomatis, dan diteruskan ke pembukuan resmi.`)) return;
+            if (!await fmAsk(`Konfirmasi pembayaran lunas dan cetak struk total ${fmSigned(total)}?\n\nTransaksi akan disahkan, stok produk akan dipotong otomatis, dan diteruskan ke pembukuan resmi.`)) return;
 
             const payNow = currentPay();
             const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -1205,8 +1212,10 @@
             });
 
             // 2. Simpan Transaksi Sah
-            draftList.forEach(d => {
+            const seqBase = Date.now() * 1000;
+            draftList.forEach((d, di) => {
                 const finalTx = {
+                    seq: seqBase + di,
                     id: 'tx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
                     accountCode: d.accountCode,
                     accountName: d.accountName,
@@ -1241,21 +1250,23 @@
 
             document.getElementById('receipt-date').innerText = `${nowFull} ${nowTime}`;
             document.getElementById('receipt-staff').innerText = user.title;
-            document.getElementById('receipt-total').innerText = "Rp " + formatThousandSeparator(total);
+            document.getElementById('receipt-total').innerText = fmSigned(total);
+            const mixed = draftList.some(d => d.category !== 'sales');
+            const lblEl = document.getElementById('receipt-total-label'); if (lblEl) lblEl.innerText = mixed ? 'TOTAL BERSIH:' : 'TOTAL BAYAR:';
 
             const PAYLBL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer' };
             document.getElementById('receipt-pay').innerText = PAYLBL[payNow] || payNow;
             lastReceipt = {
                 store: (document.getElementById('receipt-store-name') || {}).innerText || '',
                 when: nowFull + ' ' + nowTime, total: total, pay: PAYLBL[payNow] || payNow,
-                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) : '') + ' = Rp ' + formatThousandSeparator(d.amount)))
+                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) : '') + ' = ' + (d.category === 'sales' ? '' : '-') + 'Rp ' + formatThousandSeparator(d.amount)))
             };
             const rList = document.getElementById('receipt-items-list');
             rList.innerHTML = "";
             draftList.forEach(d => {
                 const row = document.createElement('div');
                 row.className = "flex justify-between";
-                row.innerHTML = `<span>${d.isProduct ? '📦 ' : ''}${fmEsc(d.accountName)}${d.isProduct ? ' x' + (d.qty || 1) : ''}</span><span>Rp ${formatThousandSeparator(d.amount)}</span>`;
+                row.innerHTML = `<span>${d.isProduct ? '📦 ' : ''}${fmEsc(d.accountName)}${d.isProduct ? ' x' + (d.qty || 1) : ''}</span><span>${d.category === 'sales' ? '' : '-'}Rp ${formatThousandSeparator(d.amount)}</span>`;
                 rList.appendChild(row);
             });
 
@@ -1387,7 +1398,7 @@
 
             let totalIn = 0;
             let totalOut = 0;
-            const chronoList = [...txList].reverse();
+            const chronoList = fmSortChrono(txList);
             let runningBalance = 0;
             const withBalance = chronoList.map(tx => {
                 if (tx.category === 'sales') runningBalance += tx.amount;
@@ -1395,7 +1406,7 @@
                 return { ...tx, runningBalance };
             });
 
-            const displayList = withBalance.reverse();
+            const displayList = withBalance;
             displayList.forEach(tx => {
                 if (tx.category === 'sales') totalIn += tx.amount;
                 else totalOut += tx.amount;

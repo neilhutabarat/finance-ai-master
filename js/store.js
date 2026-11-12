@@ -120,6 +120,16 @@
                 if (hasDb) return db.collection('tp_' + id).doc(prodId(code)).delete();
                 lsSet(prodKey, st.products); return Promise.resolve();
             },
+            // Tambah stok masuk (restock); qty bisa desimal-tidak, dibulatkan ke bawah, minimal 1
+            incrementStock: function (code, qty) {
+                qty = Math.floor(num(qty));
+                if (!(qty > 0)) return Promise.resolve(false);
+                var p = st.products.find(function (q) { return q.code === code; });
+                if (!p) return Promise.resolve(false);
+                p.stock = Math.max(0, p.stock + qty); notify();
+                if (hasDb) return db.collection('tp_' + id).doc(prodId(code)).update({ stock: firebase.firestore.FieldValue.increment(qty) }).then(function () { return true; }).catch(function (e) { console.warn('store.js: tambah stok gagal', e); return false; });
+                lsSet(prodKey, st.products); return Promise.resolve(true);
+            },
             decrementStock: function (code, qty) {
                 qty = num(qty) || 1;
                 var p = st.products.find(function (q) { return q.code === code; });

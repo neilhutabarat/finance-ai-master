@@ -1,6 +1,19 @@
 /* mutasi-share.js — kirim mutasi lewat WhatsApp dan cetak. Dipasang di popup Mutasi bila fiturnya dicentang di Tower. */
 (function () {
   'use strict';
+  /* Urutan transaksi = urutan saat diinput: pakai nomor urut (seq) bila ada, jika tidak pakai waktu simpan. */
+  window.fmTxKey = function (t) {
+    if (!t) return 0;
+    if (typeof t.seq === 'number') return t.seq;
+    var ts = t.timestamp;
+    var ms = ts && typeof ts.toMillis === 'function' ? ts.toMillis() : Number(ts) || 0;
+    return ms * 1000;
+  };
+  window.fmSortChrono = function (list) {
+    return (list || []).map(function (t, i) { return { t: t, i: i }; })
+      .sort(function (a, b) { return (window.fmTxKey(a.t) - window.fmTxKey(b.t)) || (b.i - a.i); })
+      .map(function (x) { return x.t; });
+  };
   var cfg = null;
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
   function rp(n) { return 'Rp ' + (typeof formatThousandSeparator === 'function' ? formatThousandSeparator(Math.round(n || 0)) : Math.round(n || 0)); }
@@ -26,7 +39,7 @@
       if (d < r[0]) open += sg * t.amount;
       else if (d <= r[1]) { list.push(t); if (sg > 0) inn += t.amount; else out += t.amount; }
     });
-    list.sort(function (x, y) { return String(x.dateISO).localeCompare(String(y.dateISO)) || String(x.date).localeCompare(String(y.date)); });
+    list.sort(function (x, y) { return String(x.dateISO).localeCompare(String(y.dateISO)) || (window.fmTxKey(x) - window.fmTxKey(y)); });
     return { r: r, open: open, inn: inn, out: out, list: list, close: open + inn - out };
   }
   function periodText(d) { return d.r[0] === d.r[1] ? dmy(d.r[0]) : dmy(d.r[0]) + ' s/d ' + dmy(d.r[1]); }

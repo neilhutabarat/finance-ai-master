@@ -467,7 +467,7 @@
     var st = document.createElement('style'); st.textContent = 'html[data-fm-modal] #fm-dock{opacity:0!important;pointer-events:none!important;transition:opacity .15s}';
     document.head.appendChild(st);
     function open() {
-      var list = document.querySelectorAll('.fixed.inset-0[id*="modal"],#fm-panel-modal,#fm-set,#fm-more,#fm-dlg,#fmc-mod');
+      var list = document.querySelectorAll('.fixed.inset-0[id*="modal"],#fm-panel-modal,#fm-set,#fm-more,#fm-dlg,#fmc-mod,#fm-stok');
       for (var i = 0; i < list.length; i++) { var e = list[i]; if (e.classList.contains('hidden')) continue; var cs = getComputedStyle(e); if (cs.display !== 'none' && cs.visibility !== 'hidden') return true; }
       return false;
     }

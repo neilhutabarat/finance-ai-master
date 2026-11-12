@@ -3,11 +3,22 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 2';
+  var BETA = 'BETA 2.2';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 2.2)', '12 Nov 2026', [
+      '[Perbaikan] Daftar Mutasi kini berurutan sesuai transaksi yang diinput lebih dulu (dari lama ke baru), saldo berjalan mengikuti urutan itu',
+      '[Fitur] Struk bisa disimpan sebagai PDF kecil (ukuran kertas struk) lewat tombol Simpan PDF; di HP bisa langsung dikirim ke WhatsApp atau disimpan ke galeri/berkas',
+      '[Fitur] Manager dan Owner punya form Tambah Stok: tambah stok barang masuk atau koreksi jumlah stok, tercatat di audit',
+      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
+    ]],
+    ['1.0.0 (BETA 2.1)', '12 Nov 2026', [
+      '[Perbaikan] Struk dan total antrean kini benar: penjualan menambah, pengeluaran (mis. transportasi) mengurangi; total ditulis "Total Bersih" bila ada pengeluaran',
+      '[Perbaikan] Istilah di struk disamakan (Petugas); struk WhatsApp ikut memakai nilai yang benar',
+      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 2)', '12 Nov 2026', [
       '[Tampilan] Latar ilustrasi hujan gerimis; kartu, menu bawah, dan pop-up tembus pandang tetapi tulisan tetap jelas, dengan mode terang sebagai tampilan awal',
       '[Tampilan] Tombol Tema ada di menu bawah: sekali tekan langsung berganti terang atau gelap',

@@ -204,6 +204,7 @@
             <button data-fm-action data-ic="user" onclick="openModal('customize_roles')">Ubah Nama Peran</button>
             <button data-fm-action data-ic="plus" onclick="openModal('add_cashier_request')">Buka Kasir Baru</button>
             <button data-fm-action data-ic="download" onclick="FM_INSIGHTS.exportCSV()">Ekspor CSV</button>
+            <button data-fm-action data-ic="box" onclick="FM_STOK.open()">Tambah Stok</button>
             <button data-fm-action data-ic="users" onclick="FM_GAJI.open()">Laporan Gaji</button>
             <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur Toko</button>
         </div>
@@ -593,6 +594,7 @@
     <script src="js/plans.js?v=1.5.8"></script>
     <script src="js/mutasi-share.js?v=1.5.8"></script>
     <script src="js/gaji.js?v=1.5.8"></script>
+    <script src="js/stok.js?v=2.1"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
@@ -847,7 +849,7 @@
             const tbody = document.getElementById('kasir-table-body');
             if (!tbody) return;
             tbody.innerHTML = "";
-            const chronoList = [...txList].reverse();
+            const chronoList = fmSortChrono(txList);
             let runningBalance = 0;
             const withBalance = chronoList.map(tx => {
                 if (tx.category === 'sales') runningBalance += tx.amount;
@@ -855,7 +857,7 @@
                 return { ...tx, runningBalance };
             });
 
-            withBalance.reverse().forEach(tx => {
+            withBalance.forEach(tx => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-white/5 text-xs";
                 tr.innerHTML = `
