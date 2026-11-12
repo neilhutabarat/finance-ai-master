@@ -50,7 +50,7 @@
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-stok';
     ov.innerHTML = '<div class="sk-box"><div class="sk-h"><h3>Stok</h3><button type="button" class="sk-x" data-x aria-label="Tutup">✕</button></div>' +
-      '<div class="sk-tabs"><button type="button" class="sk-chip on" data-tab="masuk">Stok Masuk</button><button type="button" class="sk-chip" data-tab="jenis">Daftar Jenis Stok</button><button type="button" class="sk-chip" data-tab="closing">Closing Mingguan</button></div>' +
+      '<div class="sk-tabs"><button type="button" class="sk-chip on" data-tab="masuk">Stok Masuk</button><button type="button" class="sk-chip" data-tab="jenis">Daftar Jenis Stok</button><button type="button" class="sk-chip" data-tab="closing">Sisa Stok &amp; Closing</button></div>' +
       '<div class="sk-body" id="sk-body"></div><div class="sk-msg" id="sk-msg"></div></div>';
     document.body.appendChild(ov);
     ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
@@ -78,6 +78,7 @@
       var items = ofGroup(g), tot = items.reduce(function (a, p) { return a + p.stock; }, 0);
       return '<div class="sk-gh"><span>' + esc(gLabel(g)) + '</span><span>' + items.length + ' jenis</span></div>' + items.map(function (p) {
         return '<div class="sk-row"><div class="nm">' + esc(vLabel(p)) + ' <span class="cd">' + esc(p.code) + '</span></div><div class="cd" style="white-space:nowrap;text-align:right">' + (p.hpp ? 'Rp ' + fmt(p.hpp) + '/' + esc(unit(p)) + ' · nilai Rp ' + fmt(p.hpp * p.stock) : 'harga beli belum diisi') + '</div><div class="sk-st' + (low(p) ? ' low' : '') + '">' + p.stock + ' ' + esc(unit(p)) + '</div>' +
+          (withDel ? '' : '<div style="width:96px" title="Sisa stok hasil hitung fisik (diisi manager tiap minggu)"><input data-end="' + esc(p.code) + '" type="number" min="0" step="1" inputmode="numeric" placeholder="sisa" value="' + (typeof p.endStock === 'number' ? p.endStock : '') + '" style="padding:6px 8px"></div>') +
           (withDel ? '<button type="button" class="sk-del" data-del="' + esc(p.code) + '">Hapus</button>' : '') + '</div>';
       }).join('');
     }).join('');
@@ -101,7 +102,15 @@
       '<div><label>Harga beli per satuan (Rp)</label><input id="sk-h" type="text" inputmode="numeric" autocomplete="off" placeholder="0" value="' + (cur && cur.hpp ? fmt(cur.hpp) : '') + '"></div>' +
       '<div><label>Keterangan (opsional)</label><input id="sk-n" placeholder="mis. nota supplier" value="' + esc(note) + '"></div></div>' +
       '<div style="margin-bottom:6px"><button type="button" class="sk-go" id="sk-go">' + (mode === 'tambah' ? 'Tambah Stok' : 'Simpan Koreksi') + '</button></div>' +
-      '<div style="margin-top:10px;font-size:12px;font-weight:800;color:#475569">Stok saat ini</div>' + listHtml(false);
+      '<div style="margin-top:10px;font-size:12px;font-weight:800;color:#475569">Stok saat ini dan <span style="color:#2f55d4">sisa stok mingguan</span> (isi kolom "sisa", otomatis tersimpan)</div>' + listHtml(false) + '<div style="margin:12px 0 4px"><button type="button" class="sk-go" id="sk-tocl" style="background:#0f766e">Lanjut ke Closing Mingguan</button></div>';
+    [].forEach.call(box.querySelectorAll('[data-end]'), function (i) {
+      i.onchange = function () {
+        var q = prods().filter(function (x) { return x.code === i.getAttribute('data-end'); })[0]; if (!q) return;
+        var v = i.value === '' ? null : Math.max(0, Math.floor(Number(i.value) || 0));
+        Promise.resolve(STORE.saveProduct({ code: q.code, name: q.name, sellPrice: q.sellPrice, hpp: q.hpp, stock: q.stock, endStock: v, barcode: q.barcode, minStock: q.minStock, group: q.group, variant: q.variant, unit: q.unit })).then(function () { msg(v === null ? 'Sisa stok ' + q.name + ' dikosongkan.' : 'Sisa stok ' + q.name + ' tersimpan: ' + v + ' ' + unit(q) + '. Tekan Closing bila semua sudah diisi.'); });
+      };
+    });
+    box.querySelector('#sk-tocl').onclick = function () { tab = 'closing'; [].forEach.call(ov.querySelectorAll('[data-tab]'), function (x) { x.classList.toggle('on', x.getAttribute('data-tab') === 'closing'); }); render(); };
     [].forEach.call(box.querySelectorAll('[data-mode]'), function (b) { b.onclick = function () { mode = b.getAttribute('data-mode'); render(); }; });
     box.querySelector('#sk-g').onchange = function (e) { selG = e.target.value; selC = ''; renderMasuk(); };
     box.querySelector('#sk-c').onchange = function (e) { selC = e.target.value; renderMasuk(); };

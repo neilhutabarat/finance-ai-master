@@ -505,7 +505,7 @@
     <script src="js/plans.js?v=1.5.8"></script>
     <script src="js/mutasi-share.js?v=1.5.8"></script>
     <script src="js/gaji.js?v=1.5.8"></script>
-    <script src="js/stok.js?v=2.6"></script>
+    <script src="js/stok.js?v=2.7"></script>
     <script src="js/coa-drag.js?v=2.4"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); if (window.FM_GAJI) FM_GAJI.mount({ addTx: function (tx) { txList.unshift(tx); persistData(); if (typeof db !== 'undefined' && db) { db.collection(tenantFirestoreCol).add(Object.assign({}, tx, { timestamp: firebase.firestore.FieldValue.serverTimestamp() })).catch(console.error); } renderAllReports(); } }); }
