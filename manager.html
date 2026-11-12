@@ -62,7 +62,9 @@
     <script src="js/theme.js?v=1.5.8"></script>
     <script src="js/logo.js?v=1.5.8"></script>
     <script src="js/skin.js?v=1.5.8"></script>
+    <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
+    <script src="js/update-check.js" defer></script>
 </head>
 <body class="text-white min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white pb-6">
 
@@ -525,20 +527,6 @@
             </button>
         </div>
     </div>
-
-    <!-- MODAL CATATAN RILIS & VERSI -->
-    <div id="modal-release-notes" class="hidden fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="ios-glass w-full max-w-lg p-0 shadow-2xl modal-sheet flex flex-col overflow-hidden bg-slate-900">
-            <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-slate-900 text-white">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-slate-900/10 flex items-center justify-center">
-                        <i data-lucide="info" class="w-5 h-5 text-purple-300"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-black text-base leading-tight">Catatan Rilis & Versi Sistem</h3>
-                        <p class="text-[10px] text-slate-400">Pembaruan fungsional dan keamanan terbaru</p>
-                    </div>
-                </div>
                 <button onclick="closeReleaseNotesModal()" class="w-8 h-8 rounded-full bg-slate-900/10 hover:bg-slate-900/20 flex items-center justify-center transition">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
@@ -1047,55 +1035,6 @@
         }
 
         // CATATAN RILIS LOGIKA (MAKSIMAL 10 TERBARU)
-        const RELEASE_NOTES_DB = [
-            { version: "v1.0.0 (Beta 1.0)", type: "App", date: "10 Nov 2026", title: "Penyederhanaan Closing Kasir", desc: "Konsep penamaan shift dihapus. Kasir cukup menekan Closing Kasir untuk mereset laci ke Rp 0." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "10 Nov 2026", title: "Single-Session Lockout", desc: "Perlindungan anti-fitnah: sesi kasir dikunci pada 1 perangkat kerja aktif." },
-            { version: "v1.1.1", type: "App", date: "09 Nov 2026", title: "Sistem Kasir 2-Langkah", desc: "Input pesanan masuk ke draft sementara bebas edit sebelum dicetak struk sah." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "09 Nov 2026", title: "Audit Trail Forensik", desc: "Seluruh tindakan koreksi nota oleh Manager otomatis terekam permanen di Owner." },
-            { version: "v1.1.0", type: "App", date: "05 Nov 2026", title: "Tiket Penambahan Kasir", desc: "Penambahan menu pengajuan lisensi terminal meja kasir baru ke panel Provider." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "05 Nov 2026", title: "Restriksi Waktu Transaksi", desc: "Hanya Owner yang memiliki wewenang mengoreksi tanggal nota transaksi." },
-            { version: "v1.0.5", type: "App", date: "01 Nov 2026", title: "Kapsul Waktu Realtime Glass", desc: "Desain kapsul jam dan tanggal realtime berbalut kaca es transparan." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "01 Nov 2026", title: "Proteksi Sandi Bertahap", desc: "Sistem penguncian bertahap 5 menit, 10 menit, hingga pemblokiran akun." },
-            { version: "v1.0.0", type: "App", date: "25 Okt 2026", title: "Rilis Perdana Oneilverse POS", desc: "Peluncuran sistem kasir dan keuangan multi-tenant jaringan UMKM." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "25 Okt 2026", title: "Enkripsi Multi-Tenant", desc: "Isolasi data antar toko untuk keamanan pembukuan finansial." }
-        ];
-
-        function renderReleaseNotes() {
-            const container = document.getElementById('release-notes-container');
-            if (!container) return;
-            container.innerHTML = "";
-            RELEASE_NOTES_DB.slice(0, 10).forEach(note => {
-                const isSec = note.type === "Security";
-                const bg = isSec ? "bg-amber-50 border-amber-200" : "bg-indigo-50 border-indigo-200";
-                const icon = isSec ? '<i data-lucide="shield-check" class="w-4 h-4 text-amber-600"></i>' : '<i data-lucide="zap" class="w-4 h-4 text-indigo-600"></i>';
-                const pillBg = isSec ? "bg-amber-100 text-amber-800" : "bg-indigo-100 text-indigo-800";
-                
-                const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border ${bg} space-y-1.5`;
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            ${icon}
-                            <span class="font-black text-[11px] text-white font-mono">${note.version}</span>
-                        </div>
-                        <span class="px-2 py-0.5 rounded text-[9px] font-bold ${pillBg}">${note.date}</span>
-                    </div>
-                    <h4 class="font-bold text-xs text-white">${note.title}</h4>
-                    <p class="text-[11px] text-slate-400 leading-relaxed">${note.desc}</p>
-                `;
-                container.appendChild(card);
-            });
-            if (window.lucide) lucide.createIcons();
-        }
-
-        window.openReleaseNotesModal = function() {
-            renderReleaseNotes();
-            document.getElementById('modal-release-notes').classList.remove('hidden');
-        };
-
-        window.closeReleaseNotesModal = function() {
-            document.getElementById('modal-release-notes').classList.add('hidden');
-        };
 
         document.addEventListener('DOMContentLoaded', () => {
             loadTransactions();

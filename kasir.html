@@ -136,7 +136,9 @@
     <script src="js/theme.js?v=1.5.8"></script>
     <script src="js/logo.js?v=1.5.8"></script>
     <script src="js/skin.js?v=1.5.8"></script>
+    <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
+    <script src="js/update-check.js" defer></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -668,20 +670,6 @@
             </button>
         </div>
     </div>
-
-    <!-- MODAL CATATAN RILIS & VERSI -->
-    <div id="modal-release-notes" class="hidden fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="modal-sheet-glass w-full max-w-lg p-0 flex flex-col overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-200/80 flex items-center justify-between bg-slate-900 text-white">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-                        <i data-lucide="info" class="w-5 h-5 text-cyan-300"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-black text-base leading-tight">Catatan Rilis & Versi Sistem</h3>
-                        <p class="text-[10px] text-slate-400">Pembaruan fungsional dan keamanan terbaru</p>
-                    </div>
-                </div>
                 <button onclick="closeReleaseNotesModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
@@ -1566,48 +1554,6 @@
                 tbody.appendChild(tr);
             });
         }
-
-        const RELEASE_NOTES_DB = [
-            { version: "v1.0.0 (Beta 1.0)", type: "App", date: "10 Nov 2026", title: "Rilis Perdana Terminal Kasir Oneilverse", desc: "Integrasi sistem kasir 2-langkah, closing presisi detik, dan sinkronisasi stok otomatis." },
-            { version: "Core Shield v1.0.0 (Beta 1.0)", type: "Security", date: "10 Nov 2026", title: "Single-Session Lockout", desc: "Perlindungan anti-fitnah kasir aktif: akses kasir dikunci pada 1 sesi perangkat kerja." }
-        ];
-
-        function renderReleaseNotes() {
-            const container = document.getElementById('release-notes-container');
-            if (!container) return;
-            container.innerHTML = "";
-            RELEASE_NOTES_DB.forEach(note => {
-                const isSec = note.type === "Security";
-                const bg = isSec ? "bg-amber-50 border-amber-200" : "bg-indigo-50 border-indigo-200";
-                const icon = isSec ? '<i data-lucide="shield-check" class="w-4 h-4 text-amber-600"></i>' : '<i data-lucide="zap" class="w-4 h-4 text-indigo-600"></i>';
-                const pillBg = isSec ? "bg-amber-100 text-amber-800" : "bg-indigo-100 text-indigo-800";
-                
-                const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border ${bg} space-y-1.5`;
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            ${icon}
-                            <span class="font-black text-[11px] text-slate-900 font-mono">${note.version}</span>
-                        </div>
-                        <span class="px-2 py-0.5 rounded text-[9px] font-bold ${pillBg}">${note.date}</span>
-                    </div>
-                    <h4 class="font-bold text-xs text-slate-900">${note.title}</h4>
-                    <p class="text-[11px] text-slate-600 leading-relaxed font-medium">${note.desc}</p>
-                `;
-                container.appendChild(card);
-            });
-            if (window.lucide) lucide.createIcons();
-        }
-
-        window.openReleaseNotesModal = function() {
-            renderReleaseNotes();
-            document.getElementById('modal-release-notes').classList.remove('hidden');
-        };
-
-        window.closeReleaseNotesModal = function() {
-            document.getElementById('modal-release-notes').classList.add('hidden');
-        };
 
         function openWeatherModal() { document.getElementById('modal-weather-dialog').classList.remove('hidden'); }
         function closeWeatherModal() { document.getElementById('modal-weather-dialog').classList.add('hidden'); }
