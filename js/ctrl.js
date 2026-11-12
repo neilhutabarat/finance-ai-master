@@ -43,9 +43,26 @@
         if (el && el.parentNode) el.parentNode.removeChild(el);
     }
 
+    // ===== LOGO ONEILVERSE DI TENGAH HEADER (seperti header Instagram); Plus ditandai "+" di ujung nama =====
+    function centerBrand(tn) {
+        try {
+            var hd = document.querySelector('header.oneui-hero'); if (!hd || !window.FM_LOGO) return;
+            var t = (tn && tn.tier === 'pro') ? 'plus' : ((tn && tn.tier) || 'basic');
+            var box = document.getElementById('fm-center-brand');
+            if (!box) {
+                box = document.createElement('div');
+                box.id = 'fm-center-brand';
+                box.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:9px;margin:-10px 0 14px;position:relative;z-index:1;color:inherit;user-select:none';
+                hd.insertBefore(box, hd.firstChild);
+            }
+            box.innerHTML = FM_LOGO.mark(36) + '<span style="font-family:\'Inter Display\',Inter,system-ui,sans-serif;font-weight:700;font-size:22px;letter-spacing:-.012em;line-height:1">oneilverse' + (t === 'plus' ? FM_LOGO.plus() : '') + '</span>';
+        } catch (e) {}
+    }
+
     // ===== NAMA, ID, LOGO, DAN PAKET TOKO DI HEADER (sebelumnya tertulis mati "Oneilverse") =====
     function applyHeaderBranding(tn) {
         if (!tn || tn.notFound) return;
+        centerBrand(tn);
         try {
             var slEl = document.getElementById('topbar-store-slogan');
             if (slEl && tn.slogan) slEl.textContent = tn.slogan;
@@ -61,10 +78,6 @@
             var tierEl = document.getElementById('tier-badge-indicator');
             var t = (tn.tier === 'pro') ? 'plus' : (tn.tier || 'basic');
             if (tierEl) tierEl.style.display = 'none'; // Basic tanpa lencana; Plus ditandai "+" di ujung nama
-            if (nameEl) {
-                var oldPl = nameEl.querySelector('.fm-plus'); if (oldPl) oldPl.remove();
-                if (t === 'plus') nameEl.insertAdjacentHTML('beforeend', (window.FM_LOGO && FM_LOGO.plus) ? FM_LOGO.plus() : '<span class="fm-plus" style="display:inline-block;transform:skewX(-14deg);font-weight:800">+</span>');
-            }
 
             // logo: ganti kristal Oneilverse dengan inisial toko
             if (nameEl) {

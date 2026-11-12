@@ -436,27 +436,33 @@
             document.getElementById('input-pin').focus();
         }
 
+        function setLoginBrand(tn) {
+            const h = document.getElementById('login-brand'), trig = document.getElementById('login-logo-trigger');
+            if (!h || !trig) return;
+            if (!h.getAttribute('data-lock')) {
+                const oldWrap = trig.parentElement;
+                h.setAttribute('data-lock', '1');
+                h.innerHTML = '<span id="login-brand-text"></span>';
+                h.insertBefore(trig, h.firstChild);
+                trig.className = 'relative flex items-center justify-center select-none cursor-pointer shrink-0';
+                ['width', 'height'].forEach(function (p) { trig.style.setProperty(p, '48px', 'important'); });
+                h.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:11px;margin-top:0;font-size:30px;font-weight:700;letter-spacing:-.012em;line-height:1';
+                if (oldWrap && oldWrap !== h && !oldWrap.querySelector('#login-logo-trigger') && oldWrap.parentElement) oldWrap.style.display = 'none';
+            }
+            const t = (tn && tn.tier === 'pro') ? 'plus' : ((tn && tn.tier) || 'basic');
+            const tx = document.getElementById('login-brand-text');
+            if (tx) tx.innerHTML = 'oneilverse' + ((t === 'plus' && window.FM_LOGO) ? FM_LOGO.plus() : '');
+        }
+
         function applyTenantBranding(tn) {
             const trig = document.getElementById('login-logo-trigger');
             if (!trig) return;
             const svg = trig.querySelector('svg');
             let badge = document.getElementById('login-logo-badge');
-            const custom = !!(tn && (tn.fromRegistry || tn.notFound));
-            if (custom) {
-                if (svg) svg.style.display = 'none';
-                if (!badge) {
-                    badge = document.createElement('div');
-                    badge.id = 'login-logo-badge';
-                    badge.style.cssText = 'width:80px;height:80px;border-radius:24px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:28px;letter-spacing:1px;box-shadow:0 8px 24px rgba(0,0,0,.25);';
-                    trig.appendChild(badge);
-                }
-                badge.style.display = 'flex';
-                badge.style.background = 'linear-gradient(135deg,' + (tn.warna || '#0f172a') + ',' + (tn.warnaAksen || '#22d3ee') + ')';
-                badge.innerText = tn.logoText || 'UM';
-            } else {
-                if (svg) svg.style.display = '';
-                if (badge) badge.style.display = 'none';
-            }
+            // logo Oneilverse selalu tampil (menggantikan nama & gambar profil toko)
+            if (svg) svg.style.display = '';
+            if (badge) badge.style.display = 'none';
+            setLoginBrand(tn);
             const pin = document.getElementById('input-pin');
             const btn = document.getElementById('btn-login-submit');
             if (tn && tn.notFound) { if (pin) pin.disabled = true; if (btn) btn.disabled = true; if (typeof checkFormerStore === 'function' && !window.__formerChecked) { window.__formerChecked = true; checkFormerStore(); } }
@@ -468,7 +474,6 @@
             const singlePageMode = activeTenant && activeTenant.isSinglePage;
 
             document.getElementById('input-tenant-id').value = tenantKey;
-            document.getElementById('login-brand').innerText = activeTenant.nama;
             document.getElementById('login-sub').innerText = activeTenant.slogan;
             document.title = activeTenant.notFound ? 'Toko tidak ditemukan' : (activeTenant.nama + ' - Masuk');
             applyTenantBranding(activeTenant);
