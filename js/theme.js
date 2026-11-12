@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 6.0';
+  var BETA = 'BETA 6.1';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 6.1)', '13 Nov 2026', [
+      '[Perbaikan] Atur Target Omzet kini lewat pop-up: Owner mengetuk kartu Target Omzet, mengisi target harian dan bulanan, lalu menyimpan. Kartu jadi lebih ringkas dan muat satu layar',
+      '[Perbaikan] Menu Stok kini selalu menampilkan harga modal dan harga jual tiap barang, lengkap dengan pilihan "Jual" per barang untuk ditampilkan di kasir, tanpa perlu membuka pengaturan tambahan',
+      '[Keamanan] Perubahan harga jual dan status jual di kasir tercatat di riwayat audit'
+    ]],
     ['1.0.0 (BETA 6.0)', '13 Nov 2026', [
       '[Fitur] Banyak Usaha dalam satu toko: akun COA dan kelompok stok bisa diberi label usaha (mis. Jahit, Karung, Kelontong). Laporan Laba Rugi bisa disaring per usaha, termasuk unduhan PDF dan CSV, dan ada ringkasan perbandingan antar usaha. Fitur ini aktif sesuai kebutuhan usaha; toko satu usaha tidak melihat perubahan',
       '[Perbaikan] Transaksi lama tanpa label usaha tetap terbaca sebagai Umum, sehingga angka laporan gabungan tidak berubah',

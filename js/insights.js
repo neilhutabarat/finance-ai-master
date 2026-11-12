@@ -19,9 +19,23 @@
       if (t) { targets = t; try { localStorage.setItem(tkey(), JSON.stringify(t)); } catch (e) {} render(); }
     }).catch(function () {});
   }
+  function openTargets() {
+    var old = document.getElementById('fm-tg-panel'); if (old && old.parentNode) old.parentNode.removeChild(old);
+    var p = document.createElement('div'); p.id = 'fm-tg-panel';
+    var inp = 'width:100%;padding:11px 14px;border-radius:14px;border:1px solid rgba(148,163,184,.5);background:transparent;color:inherit;font-size:15px;font-weight:700;font-family:ui-monospace,Menlo,monospace;outline:none';
+    p.innerHTML = '<p style="font-size:12.5px;opacity:.7;margin:0 0 12px">Isi target omzet. Progresnya tampil di kartu Target Omzet pada halaman Owner dan Manager. Kosongkan atau isi 0 untuk menghapus target.</p>' +
+      '<label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px">Target harian (Rp)</label><input id="tg-day" inputmode="numeric" autocomplete="off" placeholder="mis. 2.000.000" value="' + (targets.day ? fmt(targets.day) : '') + '" style="' + inp + '">' +
+      '<label style="font-size:12px;font-weight:800;display:block;margin:12px 0 4px">Target bulanan (Rp)</label><input id="tg-month" inputmode="numeric" autocomplete="off" placeholder="mis. 40.000.000" value="' + (targets.month ? fmt(targets.month) : '') + '" style="' + inp + '">' +
+      '<button type="button" data-save-tg style="all:unset;cursor:pointer;display:block;text-align:center;margin-top:16px;padding:12px;border-radius:99px;background:#2563eb;color:#fff;font-weight:800;font-size:13.5px">Simpan Target</button>';
+    [].forEach.call(p.querySelectorAll('input'), function (el) { el.oninput = function () { var n = Number(String(el.value).replace(/[^0-9]/g, '')) || 0; el.value = n ? fmt(n) : ''; }; });
+    p.querySelector('[data-save-tg]').onclick = saveTargets;
+    if (window.FM_OPEN_PANEL) FM_OPEN_PANEL(p, 'Atur Target Omzet', 'Target harian dan bulanan toko');
+    setTimeout(function () { var f = document.getElementById('tg-day'); if (f) f.focus(); }, 60);
+  }
   function saveTargets() {
     var d = Number(parseThousandSeparator(document.getElementById('tg-day').value)) || 0;
     var m = Number(parseThousandSeparator(document.getElementById('tg-month').value)) || 0;
+    var cx = document.querySelector('#fm-panel-modal .fm-px'); if (cx) cx.click();
     targets = { day: d, month: m };
     try { localStorage.setItem(tkey(), JSON.stringify(targets)); } catch (e) {}
     if (typeof db !== 'undefined' && db) db.collection('tenant_settings').doc(tid()).set({ targets: targets }, { merge: true }).catch(console.error);
@@ -78,7 +92,7 @@
       h += card('Metode Bayar Hari Ini', line('Tunai', rp(pay.tunai)) + line('QRIS', rp(pay.qris)) + line('Transfer', rp(pay.transfer)) + '<div class="fm-sub">Cocokkan uang laci dengan baris Tunai.</div>');
       var tgt = '<div class="fm-sub" style="margin:0">Hari ini <b>' + rp(omToday) + '</b></div>' + bar(omToday, targets.day || 0) + '<div class="fm-sub" style="margin:6px 0 0">Bulan ini <b>' + rp(omMonth) + '</b></div>' + bar(omMonth, targets.month || 0);
       if (!targets.day && !targets.month) tgt += '<div class="fm-sub">' + (cfg.editTargets ? 'Isi target di bawah untuk melihat progres.' : 'Target belum diisi oleh owner.') + '</div>';
-      if (cfg.editTargets) tgt += '<div class="fm-tg"><input id="tg-day" inputmode="numeric" placeholder="Target harian" value="' + (targets.day ? fmt(targets.day) : '') + '"><input id="tg-month" inputmode="numeric" placeholder="Target bulanan" value="' + (targets.month ? fmt(targets.month) : '') + '"><button type="button" data-save-tg>Simpan</button></div>';
+      if (cfg.editTargets) tgt += '<div class="fm-tg"><button type="button" data-open-tg style="grid-column:1/-1">Atur target</button></div>';
       h += card('Target Omzet', tgt);
       h += card('Stok Menipis', low.length ? low.slice(0, 5).map(function (p) { return line(esc(p.name), p.stock + '/' + (typeof p.minStock === 'number' ? p.minStock : 5)); }).join('') + (low.length > 5 ? '<div class="fm-sub">+' + (low.length - 5) + ' produk lain</div>' : '') : '<div class="fm-ok">Semua stok aman.</div>');
       h += '</div>';
@@ -97,7 +111,7 @@
       h += '<div class="ios-glass fm-ic fm-ins-main" data-fm-i="Laba &amp; Margin per Produk"><h4>Laba & Margin per Produk</h4>' + ((secP || secN) ? secP + secN : '<div class="fm-sub">Belum ada penjualan.</div>') + '</div>';
     }
     box.innerHTML = h;
-    var sb = box.querySelector('[data-save-tg]'); if (sb) sb.onclick = saveTargets;
+    var ob = box.querySelector('[data-open-tg]'); if (ob) { ob.onclick = openTargets; var cd = ob.closest('.fm-ic'); if (cd) { cd.style.cursor = 'pointer'; cd.onclick = function (e) { if (e.target.closest('button')) return; openTargets(); }; } }
   }
 
   window.FM_INSIGHTS = {

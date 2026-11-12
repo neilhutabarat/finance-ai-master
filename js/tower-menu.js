@@ -16,7 +16,6 @@
       { t: 'Profil Toko', ic: 'store', run: "towerPick('profil')", d: 'Nama, slogan, warna, logo' },
       { t: 'Fitur Toko', ic: 'grid', run: "towerPick('fitur')", d: 'Centang fitur per peran' },
       { t: 'COA Toko', ic: 'list', run: "towerPick('coa')", d: 'Daftar akun toko' },
-      { t: 'Produk Toko', ic: 'box', run: "towerPick('produk')", d: 'Produk dan stok toko' },
       { t: 'Kuota Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Kasir, Manager, Owner' },
       { t: 'Paket', ic: 'tag', run: "towerPick('paket')", d: 'Basic atau Plus' },
       { t: 'Billing', ic: 'chart', run: "towerPick('billing')", d: 'Biaya dan pembayaran toko' },
