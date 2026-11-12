@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.15';
+  var BETA = 'BETA 1.16';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.16)', '12 Nov 2026', [
+      '[Perbaikan] Tulisan di halaman Manager dan Owner dibuat lebih gelap dan kontras sehingga nyaman dibaca; kartu sedikit lebih pekat',
+      '[Perbaikan] Tampilan awal semua halaman kembali ke mode terang (pilihan tema lama direset sekali)',
+      '[Perbaikan] Pemberitahuan versi baru kini terlihat jelas di Manager dan Owner (tidak menimpa menu bawah) dan dicek lebih cepat saat halaman dibuka kembali',
+      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 1.15)', '12 Nov 2026', [
       '[Perbaikan] Tampilan Manager dan Owner dirapikan: tulisan kartu, menu, dan pop-up terbaca jelas di mode terang maupun gelap; bawaan tetap mode terang',
       '[Perbaikan] Pop-up lebih mudah dibaca; menu bawah otomatis tersembunyi saat pop-up terbuka agar tidak menimpa isinya',
@@ -137,7 +143,7 @@
   var NATIVE = (ROLE === 'kasir' || ROLE === 'login') ? 'light' : 'dark';
   var DEFAULT_MODE = (ROLE === 'tower') ? NATIVE : 'light';   // tampilan bawaan: terang untuk semua toko; Tower tetap gelap
   var TOKO = ''; try { TOKO = (new URLSearchParams(location.search).get('toko') || '').toLowerCase().trim(); } catch (e) {}
-  var KEY = 'fm_theme_' + (TOKO || 'master') + '_' + ROLE;
+  var KEY = 'fm_theme2_' + (TOKO || 'master') + '_' + ROLE;
 
   function loadPref() { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } }
   function savePref(p) { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {} }

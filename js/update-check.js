@@ -23,10 +23,10 @@
     if (pill) return;
     pill = document.createElement('div');
     pill.id = 'fm-update-pill';
-    pill.style.cssText = 'position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:2147483100;background:#111;color:#fff;border-radius:16px;padding:10px 14px;font:13px system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.3);display:flex;align-items:center;gap:10px;max-width:92vw';
-    pill.innerHTML = '<span>Versi baru tersedia' + (versiBaru ? ' (' + versiBaru.replace('1.0.0 ', '') + ')' : '') + '.</span>' +
+    pill.style.cssText = 'position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:2147483100;background:#111;color:#fff;border-radius:16px;padding:10px 14px;font:13px system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.3);display:flex;align-items:center;gap:10px;max-width:92vw';
+    pill.innerHTML = '<span>Versi baru tersedia' + (versiBaru ? ' (' + versiBaru.replace('1.0.0 ', '').replace('BETA ', 'Beta ') + ')' : '') + '. Muat ulang halaman untuk memperbarui.</span>' +
       '<button id="fm-update-go" style="all:unset;cursor:pointer;background:#2563eb;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700;font-size:12.5px">Muat ulang</button>' +
-      '<button id="fm-update-later" style="all:unset;cursor:pointer;color:#aaa;font-size:12.5px;padding:6px 6px">Nanti</button>';
+      '<button id="fm-update-later" style="all:unset;cursor:pointer;color:#e5e7eb;font-size:12.5px;padding:6px 8px">Nanti</button>';
     document.body.appendChild(pill);
     document.getElementById('fm-update-go').onclick = muatUlang;
     document.getElementById('fm-update-later').onclick = function () { pill.remove(); pill = null; };
@@ -44,7 +44,10 @@
     cek();
     if (versiBaru && Date.now() - lastTouch > IDLE_MS) muatUlang();
   }, CEK_MS);
-  setTimeout(cek, 8000);
+  setTimeout(cek, 3000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) cek(); });
+  window.addEventListener('focus', cek);
+  try { var cs = document.createElement('style'); cs.textContent = 'html[data-fm-invert="1"] #fm-update-pill{filter:invert(1) hue-rotate(180deg)}#fm-update-pill{max-width:min(94vw,560px);flex-wrap:wrap;justify-content:center}'; document.head.appendChild(cs); } catch (e) {}
 
   /* "Yang baru" sekali tampil setelah versi berganti di perangkat ini */
   function tampilkanCatatanBaru() {
