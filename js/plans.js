@@ -10,16 +10,16 @@
   var ORDER = { basic: 0, plus: 1, pro: 2 };
   // c = inti (core), o = tambahan (opt); soon = belum tersedia
   var FEATURES = [
-    { key: 'input', label: 'Input transaksi, draft, metode bayar, cetak struk, stok', r: { kasir: 'c' } },
+    { key: 'input', label: 'Input transaksi, draft, metode bayar, cetak struk', r: { kasir: 'c' } },
     { key: 'saldo', label: 'Saldo kas, total masuk dan keluar', r: { kasir: 'c', manager: 'c', owner: 'c' } },
     { key: 'closing', label: 'Closing kasir dan riwayatnya', r: { kasir: 'c', manager: 'c' } },
     { key: 'mutasi', label: 'Mutasi / buku kas', r: { kasir: 'c', manager: 'c', owner: 'c' } },
-    { key: 'coa', label: 'Kelola akun (COA) dan produk', r: { manager: 'c', owner: 'o' } },
+    { key: 'coa', label: 'Kelola akun (COA)', r: { manager: 'c', owner: 'o' } },
     { key: 'kasir_baru', label: 'Pengajuan kasir baru', r: { manager: 'c', owner: 'c' } },
     { key: 'laba_rugi', label: 'Laba Rugi', r: { manager: 'c', owner: 'c' } },
     { key: 'pin', label: 'Kelola PIN dan nama peran', r: { owner: 'c' } },
     { key: 'ledger', label: 'Buku Besar', r: { kasir: 'o', manager: 'c', owner: 'o' } },
-    { key: 'barcode', label: 'Scan barcode dan Produk Cepat', r: { kasir: 'o' } },
+    { key: 'stok', label: 'Stok dan Closing Stok (induk, jenis, sisa stok, HPP)', r: { manager: 'o', owner: 'o' } },
     { key: 'bukti', label: 'Foto bukti transaksi', r: { kasir: 'o' } },
     { key: 'wa_receipt', label: 'Struk lewat WhatsApp', r: { kasir: 'o' } },
     { key: 'tax', label: 'Pajak PPN 12%', r: { kasir: 'o', manager: 'o', owner: 'o' } },
@@ -94,8 +94,8 @@
     return h + '</tbody></table></div>';
   }
   var PRESETS = {
-    warung: { label: 'Warung / Kafe', keys: ['barcode', 'bukti', 'wa_receipt', 'mutasi_wa', 'clock'] },
-    toko: { label: 'Toko Retail', keys: ['barcode', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
+    warung: { label: 'Warung / Kafe', keys: ['bukti', 'wa_receipt', 'mutasi_wa', 'clock'] },
+    toko: { label: 'Toko Retail', keys: ['bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
     jasa: { label: 'Jasa / Klinik', keys: ['ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
     lengkap: { label: 'Lengkap', keys: null }
   };
@@ -135,6 +135,7 @@
     var role = pageRole();
     if (!has('tax', role)) { drop('button[onclick*="openModal(\'tax\')"]'); hide(cardOf(document.getElementById('stat-total-pajak-sumbang'))); }
     if (!has('coa', role)) drop('button[onclick*="openModal(\'coa_mgmt\')"]');
+    if (!has('stok', role)) drop('button[onclick*="FM_STOK"]');
     if (!has('gaji', role)) drop('button[onclick*="FM_GAJI"]');
     if (!has('ledger', role)) drop('button[onclick*="openModal(\'ledger\')"]');
     if (!has('audit', role)) drop('button[onclick*="openModal(\'audit_trail\')"]');

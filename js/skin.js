@@ -533,6 +533,8 @@
       var tl = actionTile(title, ic, function () { openPanel(el, title, sub); });
       if (el.hasAttribute('data-first')) grid.insertBefore(tl, grid.firstChild); else grid.appendChild(tl);
     });
+    /* Fitur Toko cukup di tepi (paling akhir): tukar tempat dengan tile lain */
+    [].slice.call(grid.children).forEach(function (t) { if (/^\s*Fitur Toko\s*$/.test(t.textContent || '')) grid.appendChild(t); });
   }
 
   /* ===================== dock ===================== */
