@@ -62,10 +62,16 @@
                     if (old && old !== mk && !old.children.length) old.style.display = 'none';
                 } else box.querySelector('#fm-cb-mark').innerHTML = FM_LOGO.mark('100%');
                 var place = function () {
-                    if (window.matchMedia('(min-width:1100px)').matches) {
-                        if (row && box.parentNode !== row) row.appendChild(box);
-                        box.style.cssText += ';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0';
+                    var kids = row ? Array.prototype.filter.call(row.children, function (k) { return k !== box; }) : [];
+                    if (row && kids.length >= 2 && window.matchMedia('(min-width:1100px)').matches) {
+                        // 3 kolom: nama toko | logo di tengah | widget (jam, cuaca, kurs). Tidak saling menimpa walau widget banyak.
+                        row.style.display = 'grid'; row.style.gridTemplateColumns = 'minmax(0,1fr) auto minmax(0,1fr)'; row.style.alignItems = 'center'; row.style.columnGap = '20px';
+                        if (box.parentNode !== row || row.children[1] !== box) row.insertBefore(box, kids[1]);
+                        kids[0].style.justifySelf = 'start'; kids[kids.length - 1].style.justifySelf = 'end'; kids[kids.length - 1].style.justifyContent = 'flex-end';
+                        box.style.position = 'static'; box.style.transform = 'none'; box.style.margin = '0';
                     } else {
+                        if (row) { row.style.display = ''; row.style.gridTemplateColumns = ''; row.style.columnGap = ''; }
+                        kids.forEach(function (k) { k.style.justifySelf = ''; });
                         if (box.parentNode !== hd || hd.firstElementChild !== box) hd.insertBefore(box, hd.firstChild);
                         box.style.position = 'static'; box.style.transform = 'none'; box.style.margin = '0 0 14px';
                     }

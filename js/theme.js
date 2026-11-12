@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 5.5';
+  var BETA = 'BETA 5.6';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 5.6)', '13 Nov 2026', [
+      '[Perbaikan] Tata letak bagian atas dirapikan: logo di tengah tidak lagi menimpa jam, cuaca, dan kurs saat widget tersebut aktif. Di layar kecil logo tampil di baris sendiri',
+      '[Keamanan] Tidak ada perubahan data atau akses; pembaruan hanya pada tampilan'
+    ]],
     ['1.0.0 (BETA 5.5)', '13 Nov 2026', [
       '[Tampilan] Latar belakang kini punya versi layar lebar sendiri, sehingga gambar tampil utuh di komputer dan tablet mendatar, tidak terpotong lagi. Layar HP tetap memakai versi tegak',
       '[Perbaikan] Pilihan latar belakang dan warna halaman selalu tersedia di Pengaturan, tidak hilang saat paket toko diubah',
