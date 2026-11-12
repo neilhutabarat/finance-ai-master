@@ -8,9 +8,9 @@
     { id: 'klien', title: 'Klien', hint: 'Toko mitra', c: '#6fc7c0', items: [
       { t: 'Klien Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko baru dan buat ID-nya' },
       { t: 'Jaringan Mitra', ic: 'building', find: 'Jaringan Mitra', d: 'Pantau daftar toko (hanya lihat)' },
-      { t: 'Permohonan Kasir', ic: 'users', run: "openModal('tickets')", badge: 'stat-pending-tickets', d: 'Setujui atau tolak tambahan terminal' },
+      { t: 'Permohonan Kasir', ic: 'users', run: "openModal('tickets')", badge: 'stat-pending-tickets', d: 'Setujui atau tolak terminal baru' },
       { t: 'Toko Berhenti', ic: 'archive', find: 'Toko Berhenti', d: 'Toko yang dibekukan atau berhenti' },
-      { t: 'Kendali Massal', ic: 'users', soon: true, d: 'Segera: ubah banyak toko sekaligus' }
+      { t: 'Kendali Massal', ic: 'users', run: "towerMass()", d: 'Bekukan, pesan, paket fitur: banyak toko' }
     ] },
     { id: 'toko', title: 'Toko', hint: 'Pilih toko, lalu langsung ke isinya', c: '#8fb8e8', items: [
       { t: 'Profil Toko', ic: 'store', run: "towerPick('profil')", d: 'Nama, slogan, warna, logo' },
@@ -18,29 +18,31 @@
       { t: 'COA Toko', ic: 'list', run: "towerPick('coa')", d: 'Daftar akun toko' },
       { t: 'Produk Toko', ic: 'box', run: "towerPick('produk')", d: 'Produk dan stok toko' },
       { t: 'Kuota Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Kasir, Manager, Owner' },
-      { t: 'Paket', ic: 'tag', run: "towerPick('paket')", d: 'Basic, Plus, Pro' },
+      { t: 'Paket', ic: 'tag', run: "towerPick('paket')", d: 'Basic atau Plus' },
       { t: 'Billing', ic: 'chart', run: "towerPick('billing')", d: 'Biaya dan pembayaran toko' },
       { t: 'Lokasi & Aktivitas', ic: 'shield', run: "towerPick('lokasi')", d: 'GPS, online, mutasi live' },
       { t: 'Versi Toko', ic: 'swap', run: "towerPick('versi')", d: 'Kunci versi aplikasi' },
+      { t: 'Salin Fitur', ic: 'grid', run: "towerPick('salin')", d: 'Salin fitur dari toko lain' },
       { t: 'Link Toko', ic: 'send', run: "towerPick('link')", d: 'Salin link login' },
       { t: 'Bekukan / Aktifkan', ic: 'moon', run: "towerPick('freeze')", d: 'Bekukan atau aktifkan toko' },
       { t: 'Hapus / Pulihkan Klien', ic: 'trash', run: "towerPick('hapus')", d: 'Hapus klien atau pulihkan' }
     ] },
     { id: 'uang', title: 'Uang', hint: 'Tagihan, pajak, dan pembukuan', c: '#d9b872', items: [
       { t: 'Billing Jaringan', ic: 'chart', find: 'Billing Jaringan', d: 'Tagihan, jatuh tempo, cicilan, uji coba' },
-      { t: 'Pajak Jaringan', ic: 'tax', run: "openModal('tax_net')", d: 'Pajak yang sudah disumbangkan tiap toko' },
-      { t: 'Catat Pembukuan', dup: true, ic: 'swap', run: "openModal('provider_input_tx')", d: 'Catat pemasukan dan pengeluaran Tower' },
+      { t: 'Pajak Jaringan', ic: 'tax', run: "openModal('tax_net')", d: 'Pajak yang disumbangkan tiap toko' },
+      { t: 'Catat Pembukuan', dup: true, ic: 'swap', run: "openModal('provider_input_tx')", d: 'Pemasukan dan pengeluaran Tower' },
+      { t: 'Pengingat Jatuh Tempo', ic: 'bell', run: "towerDue()", d: 'Toko yang tagihannya dekat' },
       { t: 'COA Provider', ic: 'list', find: 'COA Provider', d: 'Daftar akun, bisa diseret untuk urutan' },
-      { t: 'Harga Paket', ic: 'tag', soon: true, d: 'Segera: paket Basic, Plus, Pro' }
+      { t: 'Harga Paket', ic: 'tag', soon: true, d: 'Segera: harga Basic dan Plus' }
     ] },
     { id: 'sistem', title: 'Sistem', hint: 'Akun dan pengaturan platform', c: '#9fa8e6', items: [
       { t: 'Akun Login', ic: 'key', find: 'Akun Login', d: 'Email dan sandi masuk Tower' },
       { t: 'Pesan Siaran', dup: true, ic: 'send', run: "openModal('broadcast_modal')", d: 'Kirim pengumuman ke semua toko' },
       { t: 'Kurs & Emas', ic: 'coins', find: 'Kurs', d: 'Kurs dan harga emas terkini' },
       { t: 'Catatan Rilis', ic: 'book', find: 'Catatan Rilis', d: 'Riwayat pembaruan untuk klien' },
-      { t: 'Chat Global', ic: 'bell', run: "if(window.FM_CHAT)FM_CHAT.openModeration()", d: 'Hapus pesan, bisukan ID, nyalakan atau matikan' },
-      { t: 'Hapus Semua Chat', ic: 'trash', run: "if(window.FM_CHAT)FM_CHAT.clearAll()", d: 'Kosongkan seluruh Chat Universe, tidak bisa dibatalkan' },
-      { t: 'Rollout Versi', ic: 'box', run: "if(window.openRolloutModal)openRolloutModal()", d: 'Versi default Basic/Plus; kunci versi per toko ada di Inspeksi' }
+      { t: 'Chat Global', ic: 'bell', run: "if(window.FM_CHAT)FM_CHAT.openModeration()", d: 'Moderasi, bisukan, nyala atau mati' },
+      { t: 'Hapus Semua Chat', ic: 'trash', run: "if(window.FM_CHAT)FM_CHAT.clearAll()", d: 'Kosongkan Chat Universe (permanen)' },
+      { t: 'Rollout Versi', ic: 'box', run: "if(window.openRolloutModal)openRolloutModal()", d: 'Versi default Basic dan Plus' }
     ] }
   ];
 
@@ -126,6 +128,9 @@
     host.innerHTML = '';
     host.appendChild(frag);
     host.classList.add('tw-grouped');
+    var rows = 0; GROUPS.forEach(function (g) { rows += Math.ceil(g.items.length / 5); });
+    host.style.setProperty('--tw-rows', rows);
+    host.style.setProperty('--tw-fixed', (GROUPS.length * 26 + (GROUPS.length - 1) * 8 + (rows - GROUPS.length) * 10 + 6) + 'px');
   }
 
   function badges() {

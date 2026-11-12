@@ -73,10 +73,14 @@
     <script src="js/theme.js?v=4.1"></script>
     <script src="js/logo.js?v=1.5.8"></script>
     <script src="js/skin.js?v=1.5.8"></script>
-    <script src="js/tower-menu.js?v=4.2"></script>
+    <script src="js/tower-menu.js?v=4.3"></script>
     <script src="js/chat.js?v=4.1"></script>
-    <script src="js/tower-cockpit.js?v=4.2"></script>
-    <style>#main-modal-container{z-index:70 !important}</style>
+    <script src="js/tower-cockpit.js?v=4.3"></script>
+    <style>#main-modal-container{z-index:70 !important}
+    .fm-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+    .fm-dot-on{background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:fmBlink 1.4s infinite}
+    .fm-dot-afk{background:#facc15}.fm-dot-off{background:#ef4444}
+    @keyframes fmBlink{0%{box-shadow:0 0 0 0 rgba(34,197,94,.7);opacity:1}50%{opacity:.45}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0);opacity:1}}</style>
     <script src="js/sw-register.js" defer></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-8">
@@ -556,10 +560,9 @@
                     <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-400/30 space-y-3 text-xs">
                         <span class="font-black text-sm text-white block">Harga Paket per Bulan (Rp)</span>
                         <p class="text-slate-400">Harga bulanan Anda tentukan sendiri. Paket tahunan otomatis dihitung 12 bulan dikurangi diskon.</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div><label class="font-bold text-slate-300 block mb-1">Basic</label><input id="pr-basic" type="number" min="0" oninput="previewPricing()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Plus</label><input id="pr-plus" type="number" min="0" oninput="previewPricing()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
-                            <div><label class="font-bold text-slate-300 block mb-1">Pro</label><input id="pr-pro" type="number" min="0" oninput="previewPricing()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                         </div>
                         <div><label class="font-bold text-slate-300 block mb-1">Diskon Paket Tahunan (%)</label><input id="pr-disc" type="number" min="0" max="90" value="20" oninput="previewPricing()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                         <div id="pr-preview" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300 space-y-1"></div>
@@ -734,7 +737,7 @@
 
     <script src="js/tenants.js"></script>
     <script src="js/auth.js?v=1.5.8"></script>
-    <script src="js/plans.js?v=4.1"></script>
+    <script src="js/plans.js?v=4.3"></script>
     <script src="js/widgets.js?v=4.1"></script>
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
@@ -792,7 +795,7 @@
             { code: "P101", name: "Langganan Server UMKM (50rb/bln)", category: "income" },
             { code: "P102", name: "Biaya Lisensi Terminal Kasir Tambahan", category: "income" },
             { code: "P103", name: "Upgrade Paket Plus Mode", category: "income" },
-            { code: "P104", name: "Upgrade Paket Pro Mode", category: "income" },
+            { code: "P104", name: "Upgrade Paket Plus", category: "income" },
             { code: "P105", name: "Jasa Custom Software & Maintenance", category: "income" },
             { code: "P201", name: "Sewa Cloud Hosting & Database Server", category: "outcome" },
             { code: "P202", name: "Kuota Token API AI Engine", category: "outcome" },
@@ -829,8 +832,140 @@
             });
         }
 
+
+        /* ---- helper fitur toko ---- */
+        function towerEffFeatures(tn) {
+            const out = {};
+            FM_PLANS.FEATURES.forEach(function (f) { if (f.soon) return; FM_PLANS.ROLES.forEach(function (r) { if (f.r[r] === 'o') { out[f.key] = out[f.key] || {}; out[f.key][r] = !!FM_PLANS.has(f.key, r, tn); } }); });
+            return out;
+        }
+        function towerSaveFeatures(tn, features) {
+            if (!(typeof db !== 'undefined' && db)) return Promise.reject(new Error('Firestore belum terhubung.'));
+            const key = String(tn.id).toLowerCase();
+            const cfg = JSON.parse(JSON.stringify(tn)); delete cfg.fromRegistry; cfg.features = features;
+            return db.collection('tenants_registry').doc(key).set({ id: cfg.id, nama: cfg.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+                .then(function () { return db.collection('tenant_ctrl').doc(cfg.id).set({ gajiOwner: !!(features.gaji && features.gaji.owner) }, { merge: true }); });
+        }
+        function towerOverlay(id, title, sub, bodyHtml) {
+            const old = document.getElementById(id); if (old) old.remove();
+            const o = document.createElement('div'); o.id = id;
+            o.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+            o.innerHTML = '<div style="width:min(620px,100%);max-height:88vh;display:flex;flex-direction:column;border-radius:22px;background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 20px 60px rgba(0,0,0,.5)">' +
+                '<div style="padding:16px 18px 10px;display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:900;font-size:16px">' + title + '</div><div style="opacity:.65;font-size:12px">' + sub + '</div></div><button data-x style="font-size:22px;line-height:1;opacity:.7">×</button></div>' + bodyHtml + '</div>';
+            document.body.appendChild(o);
+            const close = function () { o.remove(); };
+            o.onclick = function (e) { if (e.target === o) close(); };
+            o.querySelector('[data-x]').onclick = close;
+            return { el: o, close: close };
+        }
+        const TW_BTN = 'padding:8px 12px;border-radius:12px;font-weight:800;font-size:12px;color:#fff;';
+        function sendNoticeTo(ids, title, message, level, days) {
+            const now = Date.now(), batch = db.batch();
+            ids.forEach(function (id) {
+                batch.set(db.collection('provider_notices').doc(), { targetTenant: id, title: title, message: message, level: level || 'info', date: new Date().toLocaleString('id-ID'), timestamp: now, expiresAt: days > 0 ? now + days * 86400000 : 0 });
+            });
+            return batch.commit();
+        }
+
+        /* ---- Kendali Massal ---- */
+        function towerMass() {
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+            const list = listNetworkTenants().filter(function (t) { return !t.deletedByTower; });
+            const ov = towerOverlay('tw-mass', 'Kendali Massal', 'Centang toko, lalu pilih tindakan',
+                '<div style="padding:0 18px 8px;display:flex;gap:8px;flex-wrap:wrap"><button id="tm-all" style="' + TW_BTN + 'background:#334155">Pilih semua</button><button id="tm-none" style="' + TW_BTN + 'background:#334155">Kosongkan</button></div>' +
+                '<div id="tm-list" style="overflow:auto;padding:0 14px 8px"></div>' +
+                '<div style="padding:10px 18px 16px;border-top:1px solid rgba(255,255,255,.1);display:flex;gap:8px;flex-wrap:wrap">' +
+                '<button id="tm-frz" style="' + TW_BTN + 'background:#e11d48">Bekukan</button><button id="tm-act" style="' + TW_BTN + 'background:#059669">Aktifkan</button>' +
+                '<button id="tm-msg" style="' + TW_BTN + 'background:#2563eb">Kirim pesan…</button>' +
+                '<button id="tm-fb" style="' + TW_BTN + 'background:#7c3aed">Fitur Basic</button><button id="tm-fp" style="' + TW_BTN + 'background:#7c3aed">Fitur Plus</button></div>');
+            const L = ov.el.querySelector('#tm-list');
+            list.forEach(function (t) {
+                const sus = isTenantSuspended(t.id);
+                const row = document.createElement('label');
+                row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 10px;margin-bottom:5px;border-radius:12px;background:rgba(255,255,255,.06);cursor:pointer';
+                row.innerHTML = '<input type="checkbox" data-id="' + escHtml(t.id) + '" style="width:16px;height:16px"><span style="flex:1"><b style="font-size:13px">' + escHtml(t.nama || t.id) + '</b><span style="display:block;opacity:.6;font-size:11px;font-family:monospace">' + escHtml(t.id) + '</span></span>' +
+                    '<span style="font-size:10px;font-weight:900;padding:3px 9px;border-radius:99px;' + (sus ? 'background:rgba(244,63,94,.2);color:#fda4af' : 'background:rgba(16,185,129,.2);color:#6ee7b7') + '">' + (sus ? 'BEKU' : 'AKTIF') + '</span>';
+                L.appendChild(row);
+            });
+            const picked = function () { return [].slice.call(L.querySelectorAll('input:checked')).map(function (i) { return i.getAttribute('data-id'); }); };
+            const need = function () { const p = picked(); if (!p.length) { alert('Centang minimal satu toko.'); return null; } return p; };
+            const byId = function (id) { return TENANTS_CONFIG[String(id).toLowerCase()]; };
+            ov.el.querySelector('#tm-all').onclick = function () { L.querySelectorAll('input').forEach(function (i) { i.checked = true; }); };
+            ov.el.querySelector('#tm-none').onclick = function () { L.querySelectorAll('input').forEach(function (i) { i.checked = false; }); };
+            const setSus = function (flag) {
+                const p = need(); if (!p) return;
+                let reason = '';
+                if (flag) { reason = prompt('Alasan pembekuan (terlihat oleh toko):', 'Pembayaran belum diterima'); if (reason === null) return; }
+                else if (!confirm('Aktifkan ' + p.length + ' toko?')) return;
+                if (flag && !confirm('Bekukan ' + p.length + ' toko?')) return;
+                const batch = db.batch();
+                p.forEach(function (id) { batch.set(db.collection('tenant_ctrl').doc(id), { suspended: flag, suspendReason: flag ? reason : '', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); });
+                batch.commit().then(function () { p.forEach(function (id) { ctAudit(id, flag ? 'BEKUKAN_MASSAL' : 'AKTIFKAN_MASSAL', 'Provider ' + (flag ? 'membekukan' : 'mengaktifkan') + ' toko (massal)', '-', flag ? reason : 'aktif'); }); ov.close(); alert(p.length + ' toko ' + (flag ? 'dibekukan' : 'diaktifkan') + '.'); }).catch(function (e) { fmPermAlert(e); });
+            };
+            ov.el.querySelector('#tm-frz').onclick = function () { setSus(true); };
+            ov.el.querySelector('#tm-act').onclick = function () { setSus(false); };
+            ov.el.querySelector('#tm-msg').onclick = function () {
+                const p = need(); if (!p) return;
+                const title = prompt('Judul pesan:', ''); if (!title) return;
+                const msg = prompt('Isi pesan:', ''); if (!msg) return;
+                if (!confirm('Kirim pesan ke ' + p.length + ' toko?')) return;
+                sendNoticeTo(p, title.trim(), msg.trim(), 'info', 7).then(function () { ov.close(); alert('Pesan terkirim ke ' + p.length + ' toko.'); }).catch(function (e) { fmPermAlert(e); });
+            };
+            const setFeat = function (tier) {
+                const p = need(); if (!p) return;
+                const ok = p.filter(function (id) { return isManaged(byId(id)); });
+                if (!ok.length) return alert('Toko terpilih tidak dikelola Tower.');
+                if (!confirm('Pasang fitur bawaan ' + (tier === 'plus' ? 'Plus' : 'Basic') + ' ke ' + ok.length + ' toko? Fitur tambahan yang sekarang akan diganti.')) return;
+                Promise.all(ok.map(function (id) { return towerSaveFeatures(byId(id), FM_PLANS.tierDefaults(tier)).then(function () { ctAudit(id, 'FITUR_MASSAL', 'Provider memasang fitur bawaan ' + tier + ' (massal)', '-', tier); }); }))
+                    .then(function () { ov.close(); alert('Fitur ' + (tier === 'plus' ? 'Plus' : 'Basic') + ' terpasang di ' + ok.length + ' toko.'); }).catch(function (e) { fmPermAlert(e); });
+            };
+            ov.el.querySelector('#tm-fb').onclick = function () { setFeat('basic'); };
+            ov.el.querySelector('#tm-fp').onclick = function () { setFeat('plus'); };
+        }
+        window.towerMass = towerMass;
+
+        /* ---- Pengingat Jatuh Tempo ---- */
+        function towerDue() {
+            const now = Date.now(), SOON = 7 * 86400000;
+            const rows = listNetworkTenants().filter(function (t) { return !t.deletedByTower && !t.isMaster; }).map(function (t) {
+                const b = (getCtrl(t.id) || {}).billing || null;
+                if (!b || !FM_BILL.ok(b) || b.trial) return null;
+                const st = FM_BILL.status(b, now);
+                if (st.state === 'none' || st.state === 'belum') return null;
+                const due = (st.state === 'lunas') ? st.E : st.overdueFrom;
+                const late = st.state === 'lewat' || st.state === 'tempo';
+                if (!late && due - now > SOON) return null;
+                return { t: t, due: due, late: late, state: st.state, left: due - now };
+            }).filter(Boolean).sort(function (a, b) { return a.due - b.due; });
+            const body = '<div id="td-list" style="overflow:auto;padding:0 14px 10px"></div>' +
+                '<div style="padding:10px 18px 16px;border-top:1px solid rgba(255,255,255,.1);display:flex;gap:8px;flex-wrap:wrap"><button id="td-all" style="' + TW_BTN + 'background:#334155">Pilih semua</button><button id="td-send" style="' + TW_BTN + 'background:#2563eb">Kirim pengingat ke yang dicentang</button></div>';
+            const ov = towerOverlay('tw-due', 'Pengingat Jatuh Tempo', 'Toko yang jatuh tempo dalam 7 hari atau sudah terlambat', body);
+            const L = ov.el.querySelector('#td-list');
+            if (!rows.length) L.innerHTML = '<div style="padding:18px;text-align:center;opacity:.6;font-size:13px">Tidak ada toko yang jatuh tempo dalam 7 hari.</div>';
+            rows.forEach(function (r) {
+                const days = Math.ceil(Math.abs(r.left) / 86400000);
+                const label = r.late ? 'Terlambat ' + days + ' hari' : (r.left < 86400000 ? 'Jatuh tempo hari ini' : days + ' hari lagi');
+                const row = document.createElement('label');
+                row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 10px;margin-bottom:5px;border-radius:12px;background:rgba(255,255,255,.06);cursor:pointer';
+                row.innerHTML = '<input type="checkbox" data-id="' + escHtml(r.t.id) + '" data-late="' + (r.late ? 1 : 0) + '" data-due="' + r.due + '" ' + (r.late ? 'checked' : '') + ' style="width:16px;height:16px"><span style="flex:1"><b style="font-size:13px">' + escHtml(r.t.nama || r.t.id) + '</b><span style="display:block;opacity:.6;font-size:11px">Jatuh tempo ' + FM_BILL.dateText(r.due) + '</span></span>' +
+                    '<span style="font-size:10px;font-weight:900;padding:3px 9px;border-radius:99px;' + (r.late ? 'background:rgba(244,63,94,.2);color:#fda4af' : 'background:rgba(250,204,21,.2);color:#fde68a') + '">' + label + '</span>';
+                L.appendChild(row);
+            });
+            ov.el.querySelector('#td-all').onclick = function () { L.querySelectorAll('input').forEach(function (i) { i.checked = true; }); };
+            ov.el.querySelector('#td-send').onclick = function () {
+                const sel = [].slice.call(L.querySelectorAll('input:checked'));
+                if (!sel.length) return alert('Centang minimal satu toko.');
+                if (!confirm('Kirim pengingat pembayaran ke ' + sel.length + ' toko?')) return;
+                Promise.all(sel.map(function (i) {
+                    const late = i.getAttribute('data-late') === '1', d = FM_BILL.dateText(Number(i.getAttribute('data-due')));
+                    return sendNoticeTo([i.getAttribute('data-id')], 'Pengingat pembayaran layanan', (late ? 'Pembayaran layanan sudah melewati jatuh tempo (' + d + '). ' : 'Pembayaran layanan jatuh tempo pada ' + d + '. ') + 'Mohon segera diselesaikan agar layanan tetap berjalan.', late ? 'penting' : 'info', 7);
+                })).then(function () { ov.close(); alert('Pengingat terkirim ke ' + sel.length + ' toko.'); }).catch(function (e) { fmPermAlert(e); });
+            };
+        }
+        window.towerDue = towerDue;
+
         /* Pemilih toko untuk tile Kendali: popup daftar toko -> aksi langsung */
-        function towerPick(kind) {
+        function towerPick(kind, extra) {
             var T = {
                 profil: ['Profil Toko', 'Pilih toko: nama, slogan, warna, logo'],
                 fitur: ['Fitur Toko', 'Pilih toko: centang fitur per peran'],
@@ -843,10 +978,12 @@
                 versi: ['Versi Toko', 'Pilih toko untuk mengunci versinya'],
                 link: ['Salin Link Toko', 'Pilih toko, link login langsung tersalin'],
                 freeze: ['Bekukan / Aktifkan', 'Pilih toko untuk dibekukan atau diaktifkan kembali'],
-                hapus: ['Hapus / Pulihkan Klien', 'Pilih klien untuk dihapus atau dipulihkan']
+                hapus: ['Hapus / Pulihkan Klien', 'Pilih klien untuk dihapus atau dipulihkan'],
+                salin: ['Salin Fitur: pilih toko tujuan', 'Toko yang fiturnya akan diganti'],
+                salin2: ['Salin Fitur: pilih toko sumber', 'Fitur diambil dari toko ini' + (extra ? ' dan dipasang ke ' + (extra.nama || extra.id) : '')]
             }[kind];
             if (!T) return;
-            var NEED_MANAGED = { kuota: 1, paket: 1, versi: 1, hapus: 1 };
+            var NEED_MANAGED = { kuota: 1, paket: 1, versi: 1, hapus: 1, salin: 1 };
             var old = document.getElementById('tw-pick'); if (old) old.remove();
             var o = document.createElement('div'); o.id = 'tw-pick';
             o.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px';
@@ -861,7 +998,7 @@
             var q = document.getElementById('tw-pick-q'), L = document.getElementById('tw-pick-l');
             function draw() {
                 var k = q.value.trim().toLowerCase();
-                var list = listNetworkTenants().filter(function (t) { return (kind === 'hapus' || !t.deletedByTower) && (!NEED_MANAGED[kind] || isManaged(t)) && (!k || String(t.id).toLowerCase().indexOf(k) >= 0 || String(t.nama || '').toLowerCase().indexOf(k) >= 0); });
+                var list = listNetworkTenants().filter(function (t) { return (kind === 'hapus' || !t.deletedByTower) && (!NEED_MANAGED[kind] || isManaged(t)) && !(kind === 'salin2' && extra && t.id === extra.id) && (!k || String(t.id).toLowerCase().indexOf(k) >= 0 || String(t.nama || '').toLowerCase().indexOf(k) >= 0); });
                 L.innerHTML = '';
                 if (!list.length) { L.innerHTML = '<div style="padding:18px;text-align:center;opacity:.6;font-size:13px">Tidak ada toko yang cocok</div>'; return; }
                 list.forEach(function (t) {
@@ -880,6 +1017,8 @@
                         close();
                         if (kind === 'profil' || kind === 'fitur' || kind === 'coa' || kind === 'produk') openTenantSettings(t.id, kind);
                         else if (kind === 'kuota' || kind === 'paket' || kind === 'billing' || kind === 'lokasi' || kind === 'versi') openInspectUMKM(t.id, kind);
+                        else if (kind === 'salin') towerPick('salin2', t);
+                        else if (kind === 'salin2') { if (confirm('Salin fitur ' + (t.nama || t.id) + ' ke ' + (extra.nama || extra.id) + '? Fitur ' + (extra.nama || extra.id) + ' yang sekarang akan diganti.')) towerSaveFeatures(extra, towerEffFeatures(t)).then(function () { ctAudit(extra.id, 'SALIN_FITUR', 'Provider menyalin fitur dari ' + t.id, '-', t.id); alert('Fitur tersalin ke ' + (extra.nama || extra.id) + '.'); }).catch(function (e) { fmPermAlert(e); }); }
                         else if (kind === 'hapus') { if (t.deletedByTower) restoreMasterTenant(t.id); else if (confirm('Yakin menghapus klien ' + (t.nama || t.id) + ' [' + t.id + ']? Ada satu konfirmasi lagi setelah ini.')) deleteTenantRegistry(t.id); }
                         else setTenantSuspended(t.id, !sus);
                     };
@@ -979,6 +1118,16 @@
                 .filter(function (p) { return p.tenantId === tenantId && now - p.ms < PRESENCE_ACTIVE_MS; });
         }
 
+        // 'on' = ada layar aktif, 'afk' = layar terbuka tapi tidak disentuh, 'off' = tidak ada layar
+        function presenceState(tenantId) {
+            const s = onlineSessions(tenantId);
+            if (!s.length) return 'off';
+            return s.some(function (x) { return !x.idle; }) ? 'on' : 'afk';
+        }
+        function presenceDot(tenantId) {
+            const st = presenceState(tenantId);
+            return '<span class="fm-dot fm-dot-' + st + '" title="' + (st === 'on' ? 'Online' : st === 'afk' ? 'AFK (layar terbuka, tidak disentuh)' : 'Offline') + '"></span>';
+        }
         function lastActiveMs(tenantId) {
             let m = 0;
             Object.keys(presenceMap).forEach(function (k) { const p = presenceMap[k]; if (p.tenantId === tenantId && p.ms > m) m = p.ms; });
@@ -1016,7 +1165,7 @@
                 snap.forEach(function (doc) {
                     const d = doc.data();
                     const ms = tsMs(d.lastSeen);
-                    m[doc.id] = { tenantId: d.tenantId, role: d.role, who: d.who, startedAt: d.startedAt || 0, ms: ms, geo: d.geo || null };
+                    m[doc.id] = { tenantId: d.tenantId, role: d.role, who: d.who, startedAt: d.startedAt || 0, ms: ms, geo: d.geo || null, idle: d.idle === true };
                     if (ms && now - ms > 24 * 3600 * 1000) stale.push(doc.id);
                 });
                 presenceMap = m;
@@ -1027,8 +1176,8 @@
         }
 
         // ===== HARGA PAKET & TAGIHAN =====
-        let pricing = { basic: { monthly: 0 }, plus: { monthly: 0 }, pro: { monthly: 0 }, yearlyDiscountPct: 20 };
-        const TIER_LABEL = { basic: 'Basic', plus: 'Plus', pro: 'Pro' };
+        let pricing = { basic: { monthly: 0 }, plus: { monthly: 0 }, yearlyDiscountPct: 20 };
+        const TIER_LABEL = { basic: 'Basic', plus: 'Plus', pro: 'Plus' };
 
         function rp(n) { return formatThousand(Math.round(n || 0)); }
 
@@ -1054,7 +1203,6 @@
         function fillPricingForm() {
             document.getElementById('pr-basic').value = pricing.basic.monthly || 0;
             document.getElementById('pr-plus').value = pricing.plus.monthly || '';
-            document.getElementById('pr-pro').value = pricing.pro.monthly || '';
             document.getElementById('pr-disc').value = pricing.yearlyDiscountPct;
             previewPricing();
         }
@@ -1062,7 +1210,7 @@
         function previewPricing() {
             const g = function (id) { return Math.max(0, parseInt(document.getElementById(id).value) || 0); };
             const disc = Math.min(90, Math.max(0, parseFloat(document.getElementById('pr-disc').value) || 0));
-            const rows = [['Basic', g('pr-basic')], ['Plus', g('pr-plus')], ['Pro', g('pr-pro')]].map(function (x) {
+            const rows = [['Basic', g('pr-basic')], ['Plus', g('pr-plus')]].map(function (x) {
                 const yearly = Math.round(x[1] * 12 * (1 - disc / 100));
                 return '<div class="flex justify-between"><span>' + x[0] + '</span><span class="font-mono">' + rp(x[1]) + '/bln • ' + rp(yearly) + '/thn (hemat ' + rp(x[1] * 12 - yearly) + ')</span></div>';
             });
@@ -1114,7 +1262,7 @@
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const g = function (id) { return Math.max(0, parseInt(document.getElementById(id).value) || 0); };
             const disc = Math.min(90, Math.max(0, parseFloat(document.getElementById('pr-disc').value) || 0));
-            const data = { basic: { monthly: g('pr-basic') }, plus: { monthly: g('pr-plus') }, pro: { monthly: g('pr-pro') }, yearlyDiscountPct: disc, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+            const data = { basic: { monthly: g('pr-basic') }, plus: { monthly: g('pr-plus') }, yearlyDiscountPct: disc, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
             db.collection('provider_settings').doc('pricing').set(data).then(function () { alert('Harga paket tersimpan.'); })
                 .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
@@ -1127,7 +1275,6 @@
                     pricing = {
                         basic: { monthly: Number(d.basic && d.basic.monthly) || 0 },
                         plus: { monthly: Number(d.plus && d.plus.monthly) || 0 },
-                        pro: { monthly: Number(d.pro && d.pro.monthly) || 0 },
                         yearlyDiscountPct: (typeof d.yearlyDiscountPct === 'number') ? d.yearlyDiscountPct : 20
                     };
                 }
@@ -1188,11 +1335,13 @@
             const key = String(tenantId).toLowerCase();
             const tn = TENANTS_CONFIG[key];
             if (!isManaged(tn)) return alert('Paket hanya dapat diubah untuk toko yang dikelola Tower.');
+            if (tier === 'pro') tier = 'plus';
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const r = computePlan(tier, cycle, custom);
-            if (!r.amount && tier !== 'basic') return alert('Harga paket ' + TIER_LABEL[tier] + ' belum diatur. Atur dulu lewat tombol Harga Paket, atau isi Harga Khusus.');
-            if (!confirm('Ubah paket ' + tn.nama + ' menjadi ' + TIER_LABEL[tier] + ' (' + (cycle === 'yearly' ? 'Tahunan' : 'Bulanan') + ') seharga ' + rp(r.amount) + '?')) return;
+            if (!r.amount && tier !== 'basic') return alert('Harga paket ' + TIER_LABEL[tier] + ' belum diatur. Isi Harga Khusus, atau atur dulu harga bulanan Plus.');
+            if (!confirm('Ubah paket ' + tn.nama + ' menjadi ' + TIER_LABEL[tier] + ' (' + (cycle === 'yearly' ? 'Tahunan' : 'Bulanan') + ') seharga ' + rp(r.amount) + '?\n\nFitur tambahan toko akan diatur ulang ke bawaan paket ini.')) return;
             const cfg = Object.assign({}, tn); delete cfg.fromRegistry; cfg.tier = tier;
+            cfg.features = FM_PLANS.tierDefaults(tier); // fitur tambahan diatur ulang ke bawaan paket; Tower bisa centang ulang di Fitur Toko
             const batch = db.batch();
             batch.set(db.collection('tenants_registry').doc(key), { id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             batch.set(db.collection('tenant_ctrl').doc(tn.id), {
@@ -1285,7 +1434,7 @@
             ov.innerHTML =
                 '<div style="width:100%;max-width:420px;background:#0b0b10;border:1px solid rgba(167,139,250,.35);border-radius:20px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)">' +
                 '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="color:#fff;font-size:14px">Rollout Versi</b><button id="tw-rollout-close" style="all:unset;cursor:pointer;color:#94a3b8;font-size:13px">Tutup</button></div>' +
-                '<p style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:10px">Default versi untuk toko yang <b>tidak dikunci manual</b>. Plus otomatis dapat versi terbaru lebih dulu (ladang uji coba); Basic tetap di versi stabil sampai dinaikkan manual di sini. Untuk mengunci satu toko tertentu, buka Jaringan Mitra → Inspeksi toko tersebut.</p>' +
+                '<p style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:10px">Default versi untuk toko yang <b>tidak dikunci manual</b>. Plus otomatis dapat versi terbaru lebih dulu (ladang uji coba); Basic tetap di versi stabil sampai dinaikkan manual di sini. Untuk mengunci satu toko tertentu, pakai tombol Versi Toko di ruang Kendali.</p>' +
                 '<div id="tw-rollout-defaults"></div>' +
                 '</div>';
             document.body.appendChild(ov);
@@ -1954,7 +2103,7 @@
                     '<td class="py-2.5 px-3 text-slate-300">' + (st.E && st.state !== 'none' ? FM_BILL.dateText(st.E) : '-') + '</td>' +
                     '<td class="py-2.5 px-3 text-center">' + billBadge(st.state) + '</td>' +
                     '<td class="py-2.5 px-3 text-center font-mono text-slate-300">' + cic + '</td>' +
-                    '<td class="py-2.5 px-3 text-center whitespace-nowrap"><button class="px-2.5 py-1 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-[10px]" onclick="bnEdit(\'' + escHtml(tn.id) + '\')">Edit</button> <button class="px-2.5 py-1 rounded-xl bg-cyan-700 hover:bg-cyan-600 text-white font-bold text-[10px]" onclick="openInspectUMKM(\'' + escHtml(tn.id) + '\')">Inspeksi</button></td></tr>';
+                    '<td class="py-2.5 px-3 text-center whitespace-nowrap"><button class="px-2.5 py-1 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-[10px]" onclick="bnEdit(\'' + escHtml(tn.id) + '\')">Edit</button></td></tr>';
             }).join('');
             document.getElementById('bn-body').innerHTML = rows || '<tr><td colspan="9" class="py-6 text-center text-slate-500">Belum ada toko.</td></tr>';
             const card = function (lab, val, cls, id) { return '<div class="p-3 rounded-2xl bg-slate-900 border border-white/10"><span class="text-[10px] font-black text-slate-400 uppercase block">' + lab + '</span><b' + (id ? ' id="' + id + '"' : '') + ' class="text-sm font-mono ' + cls + '">' + val + '</b></div>'; };
@@ -1979,11 +2128,11 @@
                 '<label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-950 border border-white/15 font-bold"><input id="be-ppn" type="checkbox" ' + (!b || b.ppn !== false ? 'checked' : '') + '> PPN 12%</label>' +
                 '<button id="be-save" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black">Simpan</button>' +
                 '<button id="be-cancel" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold">Batal</button>' +
-                (FM_BILL.ok(b) ? '' : '<span class="text-amber-300">Billing toko ini belum diatur: isi biaya dasar dulu lewat Inspeksi.</span>') + '</div></td>';
+                (FM_BILL.ok(b) ? '' : '<span class="text-amber-300">Billing toko ini belum diatur: isi biaya dasar dulu lewat tombol Billing.</span>') + '</div></td>';
             rowsEl.parentNode.insertBefore(tr, rowsEl.nextSibling);
             document.getElementById('be-cancel').onclick = function () { bnEditing = null; renderBillingNet(); };
             document.getElementById('be-save').onclick = function () {
-                if (!FM_BILL.ok(b)) return alert('Atur biaya dasar toko ini dulu lewat Inspeksi.');
+                if (!FM_BILL.ok(b)) return alert('Atur biaya dasar toko ini dulu lewat tombol Billing.');
                 const kind = document.querySelector('input[name="be-kind"]:checked');
                 saveBillingFields(tn, {
                     base: b.base || 0, startMs: FM_BILL.fromLocalInput(document.getElementById('be-start').value),
@@ -2207,7 +2356,7 @@
                     </td>
                     <td class="py-3.5 px-4 font-mono">
                         <span class="font-bold text-emerald-400">${quotaLine(tenant.id)}</span>
-                        <span class="block text-[10px] ${onlineSessions(tenant.id).length ? 'text-emerald-300' : 'text-slate-500'}">${onlineSessions(tenant.id).length ? '● Online ' + onlineSessions(tenant.id).length + ' layar' : '○ Terakhir: ' + agoText(lastActiveMs(tenant.id))}</span>
+                        <span class="block text-[10px] ${presenceState(tenant.id) === 'on' ? 'text-emerald-300' : presenceState(tenant.id) === 'afk' ? 'text-yellow-300' : 'text-rose-300'}">${presenceDot(tenant.id)}${presenceState(tenant.id) === 'on' ? 'Online ' + onlineSessions(tenant.id).length + ' layar' : presenceState(tenant.id) === 'afk' ? 'AFK ' + onlineSessions(tenant.id).length + ' layar' : 'Offline · terakhir ' + agoText(lastActiveMs(tenant.id))}</span>
                     </td>
                     <td class="py-3.5 px-4 text-right font-black text-emerald-400 font-mono">${formatThousand(incMonth)}</td>
                     <td class="py-3.5 px-4 text-right font-black text-rose-400 font-mono">${formatThousand(outMonth)}</td>
@@ -2308,8 +2457,8 @@
             const cls = 'w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none';
             box.classList.remove('hidden');
             box.innerHTML = '<span class="font-black text-sm text-white block">Paket Toko</span>' +
-                '<p class="text-slate-400">Paket saat ini: <b class="text-white">' + (TIER_LABEL[tier] || tier) + '</b> (' + (cycle === 'yearly' ? 'tahunan' : 'bulanan') + ')</p>' +
-                '<div class="grid grid-cols-2 gap-3"><div><label class="font-bold text-slate-300 block mb-1">Paket</label><select id="ip-tier" class="' + cls + '"><option value="basic"' + sel('basic', tier) + '>Basic</option><option value="plus"' + sel('plus', tier) + '>Plus</option><option value="pro"' + sel('pro', tier) + '>Pro</option></select></div>' +
+                '<p class="text-slate-400">Paket saat ini: <b class="text-white">' + (TIER_LABEL[tier === 'pro' ? 'plus' : tier] || tier) + '</b> (' + (cycle === 'yearly' ? 'tahunan' : 'bulanan') + ')</p>' +
+                '<div class="grid grid-cols-2 gap-3"><div><label class="font-bold text-slate-300 block mb-1">Paket</label><select id="ip-tier" class="' + cls + '"><option value="basic"' + sel('basic', tier) + '>Basic</option><option value="plus"' + sel('plus', tier === 'pro' ? 'plus' : tier) + '>Plus</option></select></div>' +
                 '<div><label class="font-bold text-slate-300 block mb-1">Siklus</label><select id="ip-cycle" class="' + cls + '"><option value="monthly"' + sel('monthly', cycle) + '>Bulanan</option><option value="yearly"' + sel('yearly', cycle) + '>Tahunan</option></select></div>' +
                 '<div class="col-span-2"><label class="font-bold text-slate-300 block mb-1">Harga khusus (Rp, kosongkan bila standar)</label><input id="ip-custom" type="number" min="0" value="' + (c.customPrice || '') + '" class="' + cls + '"></div></div>' +
                 '<div id="ip-sum" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div>' +

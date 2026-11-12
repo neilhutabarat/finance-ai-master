@@ -224,6 +224,9 @@
         return 'lain';
     })();
     var startedAtMs = Date.now();
+    // AFK: layar terbuka tetapi tidak disentuh lebih dari 5 menit (dipakai Tower untuk lampu kuning)
+    var lastTouch = Date.now(), IDLE_MS = 5 * 60 * 1000;
+    ['mousemove', 'mousedown', 'keydown', 'touchstart', 'wheel', 'scroll'].forEach(function (ev) { document.addEventListener(ev, function () { lastTouch = Date.now(); }, { passive: true, capture: true }); });
     var presenceState = null; // null | 'started' | 'blocked'
     var quotaOverlayId = 'ctrl-quota-overlay';
     var QUOTA_FIELD = { kasir: 'allowedCashiers', manager: 'allowedManagers', owner: 'allowedOwners' };
@@ -238,7 +241,7 @@
     function beat(tenant) {
         var doc = {
             tenantId: tenant.id, role: ROLE, sessionId: SESSION_ID, who: String(whoAmI()).slice(0, 60),
-            startedAt: startedAtMs, lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            startedAt: startedAtMs, idle: (Date.now() - lastTouch > IDLE_MS) || !!document.hidden, lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         };
         var g = window.FM_GEO;
         if (g && isFinite(g.lat) && isFinite(g.lon)) doc.geo = { src: g.src === 'GPS' ? 'GPS' : 'Jaringan', lat: g.lat, lon: g.lon, name: String(g.name || '').slice(0, 140), acc: g.acc || 0, at: g.t || Date.now() };
