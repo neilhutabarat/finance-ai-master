@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.14';
+  var BETA = 'BETA 1.15';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.15)', '12 Nov 2026', [
+      '[Perbaikan] Tampilan Manager dan Owner dirapikan: tulisan kartu, menu, dan pop-up terbaca jelas di mode terang maupun gelap; bawaan tetap mode terang',
+      '[Perbaikan] Pop-up lebih mudah dibaca; menu bawah otomatis tersembunyi saat pop-up terbuka agar tidak menimpa isinya',
+      '[Keamanan] Pengecekan ulang aturan akses dan sesi login; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 1.14)', '12 Nov 2026', [
       '[Perbaikan] Kotak konfirmasi dan pemberitahuan kini tampil di tengah layar dengan desain baru yang rapi dan tembus pandang',
       '[Perbaikan] Tombol Tema kini ada di menu bawah, sekali tekan langsung berganti terang atau gelap; keterangan tema di Pengaturan dihapus',

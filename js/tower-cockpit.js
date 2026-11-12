@@ -77,6 +77,7 @@
   function fitLog(box) {
     // Log tidak pakai gulir: baris terlama dibuang begitu tidak muat di tinggi kotak, bukan di-scroll.
     var guard = 0;
+    if (!box.__ro && window.ResizeObserver) { box.__ro = new ResizeObserver(function () { fitLog(box); }); box.__ro.observe(box); }
     while (box.children.length > 1 && box.scrollHeight > box.clientHeight && guard++ < 200) box.removeChild(box.firstChild);
   }
   function addLog(kind, text, instant, sound) {
