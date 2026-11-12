@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.6';
+  var BETA = 'BETA 1.7';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.7)', '12 Nov 2026', [
+      '[Perbaikan] Sistem pembaruan diperkuat: rilis baru kini bisa diuji secara terbatas sebelum menyebar ke seluruh pengguna, mengurangi risiko gangguan saat ada pembaruan',
+      '[Keamanan] Pengecekan ulang aturan akses database untuk konfigurasi sistem baru; akses dibatasi hanya baca, dan hanya Tower yang bisa mengubah',
+      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server secara umum; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 1.6)', '12 Nov 2026', [
       '[Fitur] Obrolan ringan antar ID toko di jaringan Oneilverse (hanya teks; identitas toko tetap tersembunyi)',
       '[Fitur] Aplikasi kini bisa dipasang seperti aplikasi dari layar login (nama dan ikon mengikuti toko Anda), dan tetap bisa dibuka sebentar walau internet terputus',

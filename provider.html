@@ -663,6 +663,7 @@
                 <div id="popup-content-inspect" class="space-y-4 hidden">
                     <div id="inspect-header-card" class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-400/30 space-y-3 text-xs"></div>
                     <div id="inspect-plan-card" class="hidden p-4 rounded-2xl bg-amber-950/30 border border-amber-400/30 space-y-3 text-xs"></div>
+                    <div id="inspect-rollout-card" class="hidden p-4 rounded-2xl bg-violet-950/30 border border-violet-400/30 space-y-3 text-xs"></div>
                     <div id="inspect-bill-card" class="hidden p-4 rounded-2xl bg-emerald-950/30 border border-emerald-400/30 space-y-3 text-xs"></div>
 
                     <!-- KOTAK LOKASI GPS PRESISI 3 AKUN: KASIR, MANAGER, OWNER -->
@@ -1138,6 +1139,100 @@
                 customPrice: r.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
             batch.commit().then(function () { planPanelFor = null; billingSyncTier(tn.id, tier); alert('Paket tersimpan. Fitur baru aktif di toko klien saat halaman toko dibuka kembali.'); })
+                .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+        }
+
+        // ===== ROLLOUT BERTARGET (versi default per paket + kunci manual per toko) =====
+        // Daftar versi yang tersedia sebagai salinan lengkap di folder /rilis/<versi>/.
+        // Tambahkan slug versi baru di sini begitu folder rilisnya dibuat.
+        const FM_ROLLOUT_VERSIONS = ['BETA-1.6', 'BETA-1.7'];
+        let FM_ROLLOUT_CFG = { basic: 'BETA-1.6', plus: 'BETA-1.7' };
+        let rolloutPanelFor = null;
+
+        function startRolloutListener() {
+            if (!(typeof db !== 'undefined' && db)) return;
+            db.collection('app_meta').doc('rollout').onSnapshot(function (doc) {
+                try {
+                    if (doc.exists && doc.data().json) FM_ROLLOUT_CFG = JSON.parse(doc.data().json);
+                } catch (e) {}
+                renderRolloutDefaults();
+                if (rolloutPanelFor) { const tn = TENANTS_CONFIG[rolloutPanelFor]; if (tn) renderInspectRollout(tn); }
+            }, function () {});
+        }
+
+        function saveRolloutDefaults(basic, plus) {
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+            if (!confirm('Ubah default rollout?\nBasic → ' + basic + '\nPlus → ' + plus + '\n\nSemua toko yang tidak dikunci manual akan ikut berpindah saat laman mereka dibuka lagi.')) return;
+            db.collection('app_meta').doc('rollout').set({ json: JSON.stringify({ basic: basic, plus: plus }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+                .then(function () { alert('Default rollout tersimpan.'); })
+                .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+        }
+
+        // Dipanggil dari tile "Rollout Versi" di KENDALI (dibuat di tower-menu.js)
+        function renderRolloutDefaults() {
+            const el = document.getElementById('tw-rollout-defaults');
+            if (!el) return;
+            const opt = function (cur) { return FM_ROLLOUT_VERSIONS.map(function (v) { return '<option value="' + v + '"' + (v === cur ? ' selected' : '') + '>' + v + '</option>'; }).join(''); };
+            el.innerHTML =
+                '<div class="grid grid-cols-2 gap-3">' +
+                '<div><label class="block text-[11px] text-slate-400 mb-1">Default Basic</label><select id="rd-basic" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2 text-xs text-white outline-none">' + opt(FM_ROLLOUT_CFG.basic) + '</select></div>' +
+                '<div><label class="block text-[11px] text-slate-400 mb-1">Default Plus</label><select id="rd-plus" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2 text-xs text-white outline-none">' + opt(FM_ROLLOUT_CFG.plus) + '</select></div>' +
+                '</div><button id="rd-save" class="mt-3 w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-black text-xs transition">Simpan Default</button>';
+            document.getElementById('rd-save').onclick = function () {
+                saveRolloutDefaults(document.getElementById('rd-basic').value, document.getElementById('rd-plus').value);
+            };
+        }
+
+        function renderInspectRollout(tenant) {
+            const box = document.getElementById('inspect-rollout-card');
+            if (!box) return;
+            if (!isManaged(tenant)) { box.classList.add('hidden'); box.innerHTML = ''; rolloutPanelFor = null; return; }
+            if (rolloutPanelFor === tenant.id) return;
+            rolloutPanelFor = tenant.id;
+            const tier = tenant.tier || 'basic';
+            const ikut = FM_ROLLOUT_CFG[tier] || FM_ROLLOUT_CFG.basic || '-';
+            const opt = ['<option value="">Ikuti default paket (' + ikut + ')</option>'].concat(
+                FM_ROLLOUT_VERSIONS.map(function (v) { return '<option value="' + v + '"' + (tenant.pinnedVersion === v ? ' selected' : '') + '>Kunci ke ' + v + '</option>'; })
+            ).join('');
+            box.classList.remove('hidden');
+            box.innerHTML =
+                '<span class="font-black text-sm text-white block mb-1">Versi Aplikasi Toko Ini</span>' +
+                '<p class="text-[11px] text-slate-400 mb-2">Paket ' + (TIER_LABEL[tier] || tier) + ' — saat ini ikut versi: <b class="text-violet-300">' + (tenant.pinnedVersion || ikut) + '</b></p>' +
+                '<select id="ir-version" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">' + opt + '</select>' +
+                '<button id="ir-save" class="mt-2 w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-black text-xs transition">Simpan Versi</button>';
+            document.getElementById('ir-save').onclick = function () {
+                setTenantPinnedVersion(tenant.id, document.getElementById('ir-version').value);
+            };
+        }
+
+        function openRolloutModal() {
+            closeRolloutModal();
+            const ov = document.createElement('div');
+            ov.id = 'tw-rollout-modal';
+            ov.style.cssText = 'position:fixed;inset:0;z-index:2147483200;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px';
+            ov.innerHTML =
+                '<div style="width:100%;max-width:420px;background:#0b0b10;border:1px solid rgba(167,139,250,.35);border-radius:20px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)">' +
+                '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="color:#fff;font-size:14px">Rollout Versi</b><button id="tw-rollout-close" style="all:unset;cursor:pointer;color:#94a3b8;font-size:13px">Tutup</button></div>' +
+                '<p style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:10px">Default versi untuk toko yang <b>tidak dikunci manual</b>. Plus otomatis dapat versi terbaru lebih dulu (ladang uji coba); Basic tetap di versi stabil sampai dinaikkan manual di sini. Untuk mengunci satu toko tertentu, buka Jaringan Mitra → Inspeksi toko tersebut.</p>' +
+                '<div id="tw-rollout-defaults"></div>' +
+                '</div>';
+            document.body.appendChild(ov);
+            document.getElementById('tw-rollout-close').onclick = closeRolloutModal;
+            ov.addEventListener('click', function (e) { if (e.target === ov) closeRolloutModal(); });
+            renderRolloutDefaults();
+        }
+        function closeRolloutModal() { const ov = document.getElementById('tw-rollout-modal'); if (ov) ov.remove(); }
+        window.openRolloutModal = openRolloutModal;
+
+        function setTenantPinnedVersion(tenantId, version) {
+            const key = String(tenantId).toLowerCase();
+            const tn = TENANTS_CONFIG[key];
+            if (!isManaged(tn)) return alert('Versi hanya dapat dikunci untuk toko yang dikelola Tower.');
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+            const cfg = Object.assign({}, tn); delete cfg.fromRegistry;
+            if (version) cfg.pinnedVersion = version; else delete cfg.pinnedVersion;
+            db.collection('tenants_registry').doc(key).set({ id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+                .then(function () { rolloutPanelFor = null; alert(version ? ('Toko dikunci ke versi ' + version + '. Berlaku saat laman toko dibuka lagi.') : 'Toko kembali mengikuti default paket.'); })
                 .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
@@ -1900,6 +1995,7 @@
         function startTenantListeners() {
             startControlListeners();
             startRegistryListener();
+            startRolloutListener();
             ratesListen();
             logosListen();
             formerListen();
@@ -2193,6 +2289,7 @@
                 hdr.appendChild(row);
             })();
             renderInspectPlan(tenant);
+            renderInspectRollout(tenant);
             renderInspectBill(tenant);
             const sb = document.getElementById('btn-toggle-suspend');
             if (sb) sb.onclick = function () { setTenantSuspended(tenant.id, !isTenantSuspended(tenant.id)); };

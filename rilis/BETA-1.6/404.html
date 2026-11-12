@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oneilverse</title>
+<style>
+  html,body{height:100%;margin:0;background:#0b1020;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+  body{display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+  a{color:#67e8f9}
+</style>
+</head>
+<body>
+<div>
+  <p id="msg">Membuka toko...</p>
+  <noscript><p><a href="/index.html">Buka halaman login</a></p></noscript>
+</div>
+<script>
+/* Alamat pendek: app.oneilverse.com/ID26110901 -> index.html?toko=ID26110901
+   GitHub Pages menampilkan file ini untuk alamat yang tidak ada filenya. */
+(function () {
+  var parts = location.pathname.replace(/\/+$/, '').split('/');
+  var id = parts.pop() || '';
+  var base = parts.join('/') + '/';
+  var ok = /^[A-Za-z0-9_-]{3,40}$/.test(id) && id.indexOf('.') < 0;
+  location.replace(base + 'index.html' + (ok ? '?toko=' + encodeURIComponent(id) : ''));
+})();
+</script>
+</body>
+</html>
