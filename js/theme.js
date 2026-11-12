@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 5.7';
+  var BETA = 'BETA 5.8';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 5.8)', '13 Nov 2026', [
+      '[Perbaikan] Halaman owner dan manager kini otomatis memadatkan kartu dan tombol mengikuti tinggi layar, sehingga seluruh fitur muat dalam satu layar tanpa digulir. Semua keterangan di kartu dan tombol tetap ada',
+      '[Keamanan] Tidak ada perubahan data atau akses; pembaruan hanya pada tampilan'
+    ]],
     ['1.0.0 (BETA 5.7)', '13 Nov 2026', [
       '[Perbaikan] Halaman owner dan manager tidak lagi bertumpuk saat seluruh fitur aktif: kartu ringkasan, tabel, dan tombol aksi kini tersusun rapi dan halaman bisa digulir ke bawah',
       '[Keamanan] Tidak ada perubahan data atau akses; pembaruan hanya pada tampilan'
