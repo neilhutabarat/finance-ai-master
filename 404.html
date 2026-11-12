@@ -23,6 +23,7 @@
   var id = parts.pop() || '';
   var base = parts.join('/') + '/';
   var ok = /^[A-Za-z0-9_-]{3,40}$/.test(id) && id.indexOf('.') < 0;
+  if (id.indexOf('.') >= 0 && base !== '/') base = '/'; // file tidak ada di folder rilis: kembali ke akar, hindari putaran tanpa henti
   location.replace(base + 'index.html' + (ok ? '?toko=' + encodeURIComponent(id) : ''));
 })();
 </script>

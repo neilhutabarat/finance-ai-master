@@ -24,12 +24,14 @@
         .font-mono { font-family: 'JetBrains Mono', monospace; }
         .ios-glass {
             background: rgba(15, 23, 42, 0.88);
-border: 1px solid rgba(255, 255, 255, 0.08);
+            
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px;
         }
         .glass-capsule {
             background: rgba(0, 0, 0, 0.5);
-border: 1px solid rgba(255, 255, 255, 0.12);
+            
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 9999px;
         }
         .modal-sheet {
@@ -1140,11 +1142,22 @@ border: 1px solid rgba(255, 255, 255, 0.12);
                 .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
+        // Diagnosa izin: tampilkan akun yang sedang masuk supaya penyebab "Missing or insufficient permissions" jelas.
+        function fmPermAlert(e) {
+            var base = 'Gagal menyimpan: ' + (e && e.message ? e.message : e);
+            var u = null; try { u = firebase.auth().currentUser; } catch (x) {}
+            if (!u) return alert(base + '\n\nTidak ada akun Firebase yang sedang masuk. Keluar lalu masuk lagi ke Tower.');
+            u.getIdTokenResult().then(function (t) {
+                var prov = t && t.signInProvider;
+                alert(base + '\n\nAkun masuk: ' + u.uid + '\nMetode: ' + prov + '\nAturan Tower butuh UID FqCWf11K...MKz1 dan metode password. Jika berbeda, atau aturan Firestore terbaru belum dipublikasikan, penyimpanan akan ditolak.');
+            }).catch(function () { alert(base); });
+        }
+
         // ===== ROLLOUT BERTARGET (versi default per paket + kunci manual per toko) =====
         // Daftar versi yang tersedia sebagai salinan lengkap di folder /rilis/<versi>/.
         // Tambahkan slug versi baru di sini begitu folder rilisnya dibuat.
-        const FM_ROLLOUT_VERSIONS = ['BETA-1.6', 'BETA-1.7', 'BETA-1.8'];
-        let FM_ROLLOUT_CFG = { basic: 'BETA-1.7', plus: 'BETA-1.8' };
+        const FM_ROLLOUT_VERSIONS = ['BETA-1.6', 'BETA-1.7', 'BETA-1.9'];
+        let FM_ROLLOUT_CFG = { basic: 'BETA-1.7', plus: 'BETA-1.9' };
         let rolloutPanelFor = null;
 
         function startRolloutListener() {
@@ -1163,7 +1176,7 @@ border: 1px solid rgba(255, 255, 255, 0.12);
             if (!confirm('Ubah default rollout?\nBasic → ' + basic + '\nPlus → ' + plus + '\n\nSemua toko yang tidak dikunci manual akan ikut berpindah saat laman mereka dibuka lagi.')) return;
             db.collection('app_meta').doc('rollout').set({ json: JSON.stringify({ basic: basic, plus: plus }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
                 .then(function () { alert('Default rollout tersimpan.'); })
-                .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+                .catch(function (e) { fmPermAlert(e); });
         }
 
         // Dipanggil dari tile "Rollout Versi" di KENDALI (dibuat di tower-menu.js)
@@ -1231,7 +1244,7 @@ border: 1px solid rgba(255, 255, 255, 0.12);
             if (version) cfg.pinnedVersion = version; else delete cfg.pinnedVersion;
             db.collection('tenants_registry').doc(key).set({ id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
                 .then(function () { rolloutPanelFor = null; alert(version ? ('Toko dikunci ke versi ' + version + '. Berlaku saat laman toko dibuka lagi.') : 'Toko kembali mengikuti default paket.'); })
-                .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+                .catch(function (e) { fmPermAlert(e); });
         }
 
         // ===== PENGATURAN TOKO (profil, COA, produk) =====
@@ -1318,7 +1331,7 @@ border: 1px solid rgba(255, 255, 255, 0.12);
                 .then(function () {
                     ctAudit(tn.id, 'UBAH_PROFIL_TOKO', 'Provider mengubah profil/tampilan toko', tn.nama + ' | ' + tn.slogan, nama + ' | ' + cfg.slogan);
                     alert('Profil toko tersimpan. Tampilan di toko berubah saat halaman toko dibuka kembali (otomatis memuat ulang sekali).');
-                }).catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+                }).catch(function (e) { fmPermAlert(e); });
         }
 
         let tsDragCode = null;
@@ -1794,7 +1807,7 @@ border: 1px solid rgba(255, 255, 255, 0.12);
             };
             db.collection('tenant_ctrl').doc(tenant.id).set({ billing: billing, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
                 .then(function () { billPanelFor = null; bnEditing = null; ctAudit(tenant.id, 'UBAH_BILLING', 'Provider mengatur billing estimasi' + (billing.trial ? ' (uji coba)' : ''), old ? String(old.a || 0) : '-', String(a)); if (!quiet) alert('Billing tersimpan. Meter mulai berjalan dari ' + FM_BILL.dateText(startMs) + '.'); refreshProviderViews(); })
-                .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+                .catch(function (e) { fmPermAlert(e); });
         }
 
         function recordBillingPayment(tenant) {
@@ -1962,7 +1975,7 @@ border: 1px solid rgba(255, 255, 255, 0.12);
                 suspended: !!suspend,
                 suspendReason: suspend ? reason : '',
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true }).catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
+            }, { merge: true }).catch(function (e) { fmPermAlert(e); });
         }
 
         function startOneTenantListener(t) {

@@ -71,11 +71,23 @@
 
       var n = 0; try { n = parseInt(sessionStorage.getItem(SKIP_FLAG) || '0', 10) || 0; } catch (e) {}
       if (n >= MAX_REDIRECT) return; // sudah dialihkan beberapa kali di sesi ini, jangan paksa lagi (hindari loop)
-      try { sessionStorage.setItem(SKIP_FLAG, String(n + 1)); } catch (e) {}
 
       var page = (location.pathname.split('/').pop() || 'index.html');
-      var tujuan = '/rilis/' + target + '/' + page + location.search;
-      location.replace(tujuan);
+      var inRilis = /^\/rilis\/[^\/]+\//.test(location.pathname);
+      function go(url) {
+        try { sessionStorage.setItem(SKIP_FLAG, String(n + 1)); } catch (e) {}
+        location.replace(url + location.search);
+      }
+      // Folder /rilis/<versi>/ hanya ada untuk versi lama yang dibekukan. Versi terbaru ada di akar (tanpa folder).
+      // Jadi: cek dulu folder tujuan benar-benar ada; kalau tidak ada, jangan dialihkan ke alamat yang kosong.
+      var x = new XMLHttpRequest();
+      x.open('GET', '/rilis/' + target + '/version.json?c=' + Date.now(), true);
+      x.onload = function () {
+        if (x.status === 200) go('/rilis/' + target + '/' + page);
+        else if (inRilis) go('/' + page); // tujuan = versi terbaru di akar
+      };
+      x.onerror = function () {};
+      x.send();
     } catch (e) {}
   }
 

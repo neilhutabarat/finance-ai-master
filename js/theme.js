@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 1.8';
+  var BETA = 'BETA 1.9';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 1.9)', '12 Nov 2026', [
+      '[Perbaikan] Halaman toko tidak lagi memuat ulang terus-menerus saat sistem pembaruan mengarahkan ke versi yang belum tersedia; kini dicek dulu sebelum dialihkan',
+      '[Perbaikan] Tombol pengaturan (gear) dan panel pengaturan di halaman login kembali tampil rapi; tampilan yang sempat rusak akibat pembaruan sebelumnya diperbaiki',
+      '[Perbaikan] Pemeriksaan menyeluruh atas gaya tampilan di semua halaman setelah penghapusan efek blur; tidak ada lagi elemen yang bergeser atau terpotong',
+      '[Keamanan] Pengecekan ulang aturan akses database dan kebersihan server; tidak ditemukan celah baru'
+    ]],
     ['1.0.0 (BETA 1.8)', '12 Nov 2026', [
       '[Tampilan] Tampilan Kasir, Manager, dan Owner diperbarui: nuansa warna disatukan dan diberi latar lembut, kartu dan tombol dibuat lebih tembus pandang namun tulisan tetap jelas dan mudah dibaca',
       '[Perbaikan] Aplikasi dibuat jauh lebih ringan dan responsif di komputer dengan spesifikasi terbatas, dengan menghapus efek kaca-buram yang berat di seluruh halaman',
@@ -134,7 +140,9 @@
     'html[data-fm-accent] input:focus,html[data-fm-accent] select:focus,html[data-fm-accent] textarea:focus{border-color:var(--fm-accent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--fm-accent) 25%,transparent)!important}',
     'html[data-fm-accent] ::selection{background:var(--fm-accent);color:#fff}',
     // tombol & panel pengaturan
-    '#fm-gear{position:fixed;left:14px;bottom:14px;z-index:2147480000;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(18,18,22,.92);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.45);position:fixed;inset:0;z-index:2147481000;background:rgba(0,0,0,.66);align-items:flex-end;justify-content:center}',
+    '#fm-gear{position:fixed;left:14px;bottom:14px;z-index:2147480000;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(18,18,22,.92);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.45);}',
+    '#fm-gear:hover{transform:rotate(30deg)}',
+    '#fm-set{display:none;position:fixed;inset:0;z-index:2147481000;background:rgba(0,0,0,.66);align-items:flex-end;justify-content:center}',
     '@media(min-width:640px){#fm-set{align-items:center}}',
     '#fm-set .fm-sheet{width:100%;max-width:460px;max-height:90vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:26px 26px 0 0;padding:20px 18px 26px;animation:fmSheet .3s cubic-bezier(.16,1,.3,1)}',
     '@media(min-width:640px){#fm-set .fm-sheet{border-radius:26px}}',

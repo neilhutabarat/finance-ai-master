@@ -96,7 +96,9 @@
     'html[data-fm-page="kasir"] #fm-dock,html[data-fm-page="manager"] #fm-dock,html[data-fm-page="owner"] #fm-dock{background:rgba(255,255,255,.3)!important;border-color:rgba(71,85,105,.22)!important;color:#1e293b!important}',
 
     /* ---- header: bilah kaca ringkas ---- */
-    'html[data-fm-native] header.oneui-hero{margin:10px 12px 0!important;padding:8px 16px!important;border-radius:26px!important;background:linear-gradient(180deg,rgba(255,255,255,.22) 0,rgba(255,255,255,.06) 42%,rgba(255,255,255,0) 56%),linear-gradient(180deg,rgba(28,32,44,.55),rgba(5,7,12,.74))!important;border:1px solid rgba(255,255,255,.2)!important;border-top-color:rgba(255,255,255,.42)!important;border-bottom-color:rgba(255,255,255,.05)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.5),inset 0 -18px 28px -22px rgba(0,0,0,.6),0 3px 5px rgba(0,0,0,.2),0 16px 30px -12px rgba(0,0,0,.5),0 34px 54px -30px rgba(0,0,0,.55)!important;height:40px!important}}',
+    'html[data-fm-native] header.oneui-hero{margin:10px 12px 0!important;padding:8px 16px!important;border-radius:26px!important;background:linear-gradient(180deg,rgba(255,255,255,.22) 0,rgba(255,255,255,.06) 42%,rgba(255,255,255,0) 56%),linear-gradient(180deg,rgba(28,32,44,.55),rgba(5,7,12,.74))!important;border:1px solid rgba(255,255,255,.2)!important;border-top-color:rgba(255,255,255,.42)!important;border-bottom-color:rgba(255,255,255,.05)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.5),inset 0 -18px 28px -22px rgba(0,0,0,.6),0 3px 5px rgba(0,0,0,.2),0 16px 30px -12px rgba(0,0,0,.5),0 34px 54px -30px rgba(0,0,0,.55)!important;}',
+    '.oneui-hero>div{gap:8px 16px!important}',
+    '@media(min-width:640px){.oneui-hero [class*="w-12"][class*="h-12"]{width:40px!important;height:40px!important}}',
     '.oneui-hero h1{font-size:20px!important;line-height:1.15}',
     '.oneui-hero [id="topbar-store-slogan"]{font-size:11.5px!important;margin-top:1px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34ch}',
     '.oneui-hero button,.oneui-hero :has(> #user-role-display){background:rgba(255,255,255,.07)!important;background-image:none!important;color:#e5e7eb!important;border:1px solid rgba(255,255,255,.15)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.1)!important}',
@@ -105,10 +107,7 @@
     '.oneui-hero [class*="rounded-xl"][onclick],.oneui-hero [class*="glass-capsule"],.oneui-hero [class*="ios-pill"]{padding-top:5px!important;padding-bottom:5px!important}',
     '@media(max-width:1100px){.oneui-hero [id="topbar-store-slogan"]{display:none}}',
 
-    /* ---- bahan kartu kaca (rata, tanpa gradasi abu) ----
-       Catatan performa: backdrop-filter(blur) sengaja TIDAK dipakai di sini. Efek kaca-buram itu berat untuk
-       GPU/CPU perangkat lemah ketika dipakai di banyak kartu sekaligus; warna transparan rata (rgba) di bawah
-       ini memberi kesan serupa jauh lebih ringan. */
+    /* ---- bahan kartu kaca (rata, tanpa gradasi abu) ---- */
     '.ios-glass,.white-ice-glass-card{position:relative;background:var(--s-surf)!important;background-image:none!important;border:1px solid var(--s-line)!important;border-radius:24px!important;box-shadow:inset 0 1px 0 var(--s-hi),0 18px 36px -26px var(--s-shadow)!important;overflow:hidden}',
     '.ios-glass::before,.white-ice-glass-card::before{content:"";position:absolute;left:0;right:0;top:0;height:38%;background:linear-gradient(180deg,var(--s-gloss),transparent);border-radius:24px 24px 50% 50%/24px 24px 16px 16px;pointer-events:none;z-index:-1}',
     /* kartu gelap berkilau penanda (Saldo Kas Sah) */
@@ -164,7 +163,8 @@
     '@media(max-width:640px){html[data-fm-page] main>.grid:first-child{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px!important}html[data-fm-page="owner"] main>.grid:first-child .ios-glass p.text-\\[10px\\],html[data-fm-page] main>.grid:first-child .ios-glass:nth-child(4):not(#fm-bill)>div:last-child{display:none}html[data-fm-page] main>.grid:first-child .ios-glass{padding:12px 14px!important}html[data-fm-page] main>.grid:first-child h3[class*="text-2xl"]{font-size:19px!important}.fm-ins-grid{gap:8px}}',
     /* ---- pop-up kaca ---- */
     '@media screen{',
-    '.fixed.inset-0[id*="modal"]{background:rgba(6,8,14,.4)!important;animation:fmPop .42s cubic-bezier(.2,.9,.25,1.12) both;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 40px 90px -30px rgba(0,0,0,.7)!important;border:1px solid rgba(255,255,255,.16)!important}',
+    '.fixed.inset-0[id*="modal"]{background:rgba(6,8,14,.4)!important;}',
+    '.fixed.inset-0[id*="modal"]>div{border-radius:30px!important;animation:fmPop .42s cubic-bezier(.2,.9,.25,1.12) both;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 40px 90px -30px rgba(0,0,0,.7)!important;border:1px solid rgba(255,255,255,.16)!important}',
     'html[data-fm-native="dark"]:not([data-fm-invert]) .fixed.inset-0[id*="modal"]>div{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03)),rgba(16,18,25,.84)!important}',
     'html[data-fm-native="light"]:not([data-fm-invert]) .fixed.inset-0[id*="modal"]>div{background:rgba(255,255,255,.86)!important;border-color:rgba(255,255,255,.95)!important}',
     '@keyframes fmPop{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}',
@@ -173,7 +173,8 @@
     '}',
 
     /* ---- dock ---- */
-    '#fm-dock{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:45;display:flex;align-items:flex-end;gap:2px;padding:7px 9px;max-width:calc(100vw - 16px);border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.2) 0,rgba(255,255,255,.05) 44%,rgba(255,255,255,0) 58%),linear-gradient(180deg,rgba(28,32,44,.55),rgba(5,7,12,.72));border:1px solid rgba(255,255,255,.2);border-top-color:rgba(255,255,255,.42);border-bottom-color:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.45),inset 0 -16px 24px -20px rgba(0,0,0,.55),0 3px 5px rgba(0,0,0,.22),0 18px 30px -12px rgba(0,0,0,.55),0 36px 56px -30px rgba(0,0,0,.55);box-sizing:border-box;white-space:nowrap;width:58px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 5px;border-radius:19px;cursor:pointer;color:#e9ebf1;font:600 10.5px/1.1 ' + FONT + ';transition:transform .28s cubic-bezier(.2,.9,.25,1.2),background .2s;-webkit-tap-highlight-color:transparent}',
+    '#fm-dock{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:45;display:flex;align-items:flex-end;gap:2px;padding:7px 9px;max-width:calc(100vw - 16px);border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.2) 0,rgba(255,255,255,.05) 44%,rgba(255,255,255,0) 58%),linear-gradient(180deg,rgba(28,32,44,.55),rgba(5,7,12,.72));border:1px solid rgba(255,255,255,.2);border-top-color:rgba(255,255,255,.42);border-bottom-color:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.45),inset 0 -16px 24px -20px rgba(0,0,0,.55),0 3px 5px rgba(0,0,0,.22),0 18px 30px -12px rgba(0,0,0,.55),0 36px 56px -30px rgba(0,0,0,.55);}',
+    '#fm-dock .fm-dk{all:unset;box-sizing:border-box;white-space:nowrap;width:58px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 5px;border-radius:19px;cursor:pointer;color:#e9ebf1;font:600 10.5px/1.1 ' + FONT + ';transition:transform .28s cubic-bezier(.2,.9,.25,1.2),background .2s;-webkit-tap-highlight-color:transparent}',
     '#fm-dock .fm-dk svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}',
     '#fm-dock .fm-dk:hover{background:rgba(255,255,255,.1);transform:translateY(-6px) scale(1.12)}#fm-dock .fm-dk:active{transform:translateY(-2px) scale(.96)}',
     '#fm-dock .fm-dk.danger{color:#fda4af}',
@@ -181,7 +182,8 @@
     'html[data-fm-dock] #fm-gear{display:none!important}',
     '@media(max-width:420px){#fm-dock .fm-dk{width:52px;font-size:10px}#fm-dock{padding:6px 7px;gap:1px}}',
     '@media print{#fm-dock{display:none!important}}',
-    '#fm-more{position:fixed;inset:0;z-index:2147481500;display:none;align-items:flex-end;justify-content:center;background:rgba(6,8,14,.4);max-width:420px;margin:0 10px calc(92px + env(safe-area-inset-bottom));padding:10px;border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03)),rgba(16,18,25,.88);border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 40px 80px -30px #000;animation:fmPop .36s cubic-bezier(.2,.9,.25,1.12) both}',
+    '#fm-more{position:fixed;inset:0;z-index:2147481500;display:none;align-items:flex-end;justify-content:center;background:rgba(6,8,14,.4);}',
+    '#fm-more .fm-ms{width:100%;max-width:420px;margin:0 10px calc(92px + env(safe-area-inset-bottom));padding:10px;border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03)),rgba(16,18,25,.88);border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 40px 80px -30px #000;animation:fmPop .36s cubic-bezier(.2,.9,.25,1.12) both}',
     '#fm-more button{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border-radius:18px;color:#f3f4f6;font:600 14px ' + FONT + ';cursor:pointer}#fm-more button:hover{background:rgba(255,255,255,.09)}',
     '#fm-more svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}',
 
@@ -194,7 +196,15 @@
     '#fm-panel-modal .fm-ph h3{margin:0;font-size:17px;font-weight:800;letter-spacing:-.01em}#fm-panel-modal .fm-ph p{margin:2px 0 0;font-size:12px;opacity:.65}',
     '#fm-panel-modal .fm-px{all:unset;box-sizing:border-box;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--s-b2,rgba(148,163,184,.2));font-size:16px;font-weight:700}',
     '#fm-panel-modal .fm-pb{padding:4px 22px 22px;overflow:auto;min-height:0}',
-    '#fm-panel-modal .fm-pb>*{margin:0!important;box-shadow:none!important;background:transparent!important;border:0!important;padding:0!important;margin-left:auto!important;margin-right:auto!important;width:calc(100% - 24px)}',
+    '#fm-panel-modal .fm-pb>*{margin:0!important;box-shadow:none!important;background:transparent!important;border:0!important;padding:0!important;}',
+    '#fm-panel-modal .fm-pb>*::before{display:none!important}',
+    '#fm-panel-modal .fm-pb>*>.border-b:first-child,#fm-panel-modal .fm-pb>*>h2:first-child{display:none!important}',
+    '.fixed [class*="bg-purple-50"],.fixed [class*="bg-indigo-50"],.fixed [class*="bg-rose-50"],.fixed [class*="bg-emerald-50"],.fixed [class*="bg-amber-50"],.fixed [class*="bg-slate-50"]:not(button){background:var(--s-line)!important}',
+    '#fm-stash{display:none!important}',
+
+    /* ===== desktop: pas satu layar (tanpa gulir halaman) ===== */
+    '@media (min-width:1024px) and (min-height:540px){',
+    'html[data-fm-fit] .oneui-hero{max-width:1448px;margin-left:auto!important;margin-right:auto!important;width:calc(100% - 24px)}',
     'html[data-fm-fit] body{height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding-bottom:0!important}',
     'html[data-fm-fit] main{flex:1 1 0;min-height:0;display:flex!important;flex-direction:column;gap:10px;padding:10px 16px 78px!important;margin:0 auto!important;max-width:1480px!important}',
     'html[data-fm-fit] main>*{margin:0!important}',
