@@ -908,6 +908,11 @@
     ['Paket Klinik & Jasa', 'Clinic & Services Bundle'],
     ['Paket Konveksi', 'Garment Bundle'],
     ['Paket Minimarket', 'Minimarket Bundle'],
+    ['Masa Demo Selesai', 'Demo Period Ended'],
+    ['Terima kasih sudah mencoba Oneilverse. Data demo Anda tidak dihapus.', 'Thank you for trying Oneilverse. Your demo data has not been deleted.'],
+    ['Hubungi penyedia aplikasi untuk melanjutkan sebagai toko sungguhan.', 'Contact the app provider to continue as a real store.'],
+    ['DEMO · masa demo selesai', 'DEMO · demo period ended'],
+    ['DEMO · berakhir hari ini', 'DEMO · ends today'],
   ];
 
   var MAP = {}; D.forEach(function (p) { MAP[p[0]] = p[1]; });
@@ -920,6 +925,7 @@
      jadi ditangani dengan pola. Pola hanya dipakai bila SELURUH teks cocok,
      supaya nama produk dan catatan milik toko tidak ikut berubah. */
   var POLA = [
+    [/^DEMO · sisa (\d+) hari$/, 'DEMO · $1 days left'], [/^Sampai (.+) · (\d+) hari lagi$/, 'Until $1 · $2 days left'], [/^Disewa sampai (.+) \((\d+) hari\)$/, 'Rented until $1 ($2 days)'], [/^Coba sampai (.+) \((\d+) hari\)$/, 'Trial until $1 ($2 days)'],
     [/^(\d[\d.,]*) hari$/i, '$1 days'], [/^(\d[\d.,]*) hari lagi$/i, 'in $1 days'],
     [/^(\d[\d.,]*) hari yang lalu$/i, '$1 days ago'], [/^(\d[\d.,]*) jam$/i, '$1 hours'],
     [/^(\d[\d.,]*) menit$/i, '$1 minutes'], [/^(\d[\d.,]*) bulan$/i, '$1 months'],

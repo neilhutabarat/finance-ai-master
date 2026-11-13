@@ -38,6 +38,55 @@
         };
     }
 
+    // ===== MODE DEMO: tenant_ctrl.demoUntil (ms) diatur Tower. Label sisa hari; terkunci saat habis (data tidak disentuh) =====
+    function demoMs(d) { var v = d ? Number(d.demoUntil) : 0; return v > 0 ? v : 0; }
+    function showDemoEnd() {
+        var el = document.getElementById(overlayId);
+        if (!el) {
+            el = document.createElement('div');
+            el.id = overlayId;
+            el.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(2,6,23,.97);display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;';
+            document.body.appendChild(el);
+        }
+        el.innerHTML =
+            '<div style="max-width:420px;text-align:center;color:#e2e8f0">' +
+            '<div style="font-size:44px">⏳</div>' +
+            '<h2 style="font-size:20px;font-weight:900;margin:12px 0 8px">Masa Demo Selesai</h2>' +
+            '<p style="font-size:13px;line-height:1.6;color:#94a3b8">Terima kasih sudah mencoba Oneilverse. Data demo Anda tidak dihapus.' +
+            '<br><br>Hubungi penyedia aplikasi untuk melanjutkan sebagai toko sungguhan.</p>' +
+            '<button id="ctrl-demo-exit" style="margin-top:18px;padding:10px 22px;border-radius:12px;background:#0891b2;color:#fff;font-weight:800;font-size:13px;border:0;cursor:pointer">Keluar</button>' +
+            '</div>';
+        var b = document.getElementById('ctrl-demo-exit');
+        if (b) b.onclick = function () {
+            if (typeof window.logout === 'function') { try { window.logout(); return; } catch (e) {} }
+            window.location.replace('index.html');
+        };
+    }
+    function demoPill(dm) {
+        var el = document.getElementById('fm-demo-pill');
+        if (!dm) { if (el && el.parentNode) el.parentNode.removeChild(el); return; }
+        var left = dm - Date.now(), over = left <= 0, days = Math.ceil(left / 86400000);
+        var txt = over ? 'DEMO · masa demo selesai' : (left < 86400000 ? 'DEMO · berakhir hari ini' : 'DEMO · sisa ' + days + ' hari');
+        if (!el) {
+            el = document.createElement('div'); el.id = 'fm-demo-pill';
+            el.style.cssText = 'position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:2147482000;padding:3px 12px;border-radius:999px;font:800 11px system-ui,sans-serif;letter-spacing:.3px;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.35)';
+            document.body.appendChild(el);
+        }
+        el.textContent = txt;
+        el.style.background = (over || left < 86400000) ? '#be123c' : '#f59e0b';
+        el.style.color = '#fff';
+    }
+    var lastCtrl = null, demoTick = null;
+    function demoEnded(d) { var dm = demoMs(d); return !!dm && Date.now() > dm; }
+    function demoTickStart() {
+        if (demoTick) return;
+        demoTick = setInterval(function () {
+            if (!lastCtrl || !demoMs(lastCtrl)) return;
+            demoPill(demoMs(lastCtrl));
+            if (demoEnded(lastCtrl) && !(lastCtrl.suspended === true)) showDemoEnd();
+        }, 60000);
+    }
+
     function hideOverlay() {
         var el = document.getElementById(overlayId);
         if (el && el.parentNode) el.parentNode.removeChild(el);
@@ -382,8 +431,10 @@
             try { localStorage.setItem('fm_rentals_' + tenant.id, JSON.stringify((d && d.rentals) || {})); } catch (eR) {}
             try { window.dispatchEvent(new CustomEvent('fm:ctrl')); } catch (e) {}
             var billFreeze = !!(d && window.FM_BILL && FM_BILL.freezeNow(d.billing, Date.now()));
+            lastCtrl = d; demoPill(demoMs(d)); demoTickStart();
             if (d && d.suspended === true) showOverlay(d.suspendReason || '');
             else if (billFreeze) showOverlay('Pembayaran layanan belum diterima dan sudah melewati masa tenggang.');
+            else if (demoEnded(d)) showDemoEnd();
             else hideOverlay();
             proceedPresence(tenant, d); // saat diblokir kuota, dicek ulang tiap data kontrol berubah (mis. kuota ditambah)
         }, function (err) {

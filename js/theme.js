@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 6';
+  var BETA = 'Beta 7';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta 7', '13 Nov 2026', [
+      '[Baru] Mode demo: toko uji coba tampil label "DEMO · sisa N hari" di layar, dan terkunci otomatis saat masa demo habis. Data demo tidak dihapus',
+      '[Perbaikan] Layar kunci saat masa demo habis kini berbeda dari layar pembekuan pembayaran, dengan pesan yang lebih jelas',
+      '[Keamanan] Masa demo hanya dapat diatur dan dicabut oleh penyedia aplikasi (Tower); toko hanya membaca'
+    ]],
     ['Beta 6', '13 Nov 2026', [
       '[Baru] OneilStore: Manager dan Owner kini bisa menyewa fitur tambahan sesuai kebutuhan usaha, satuan atau lewat paket jenis usaha (laundry, kos, klinik, konveksi, minimarket), lengkap dengan masa coba 7 hari',
       '[Baru] Tab Punyaku menampilkan fitur yang disewa, sisa harinya, dan status permintaan',

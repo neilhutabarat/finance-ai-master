@@ -69,22 +69,22 @@
             { label: 'Pesan', icon: 'send', run: "openModal('broadcast_modal')" }
         ];
     </script>
-    <script src="js/billing.js?v=beta6"></script>
-    <script src="js/dialog.js?v=beta6"></script>
-    <script src="js/theme.js?v=beta6"></script>
-    <script src="js/logo.js?v=beta6"></script>
-    <script src="js/skin.js?v=beta6"></script>
-    <script src="js/tower-menu.js?v=beta6"></script>
-    <script src="js/tower-lab.js?v=beta6"></script>
-    <script src="js/admins.js?v=beta6"></script>
-    <script src="js/tower-monitor.js?v=beta6"></script>
-    <script src="js/tower-help.js?v=beta6"></script>
-    <script src="js/tower-store.js?v=beta6"></script>
-    <script src="js/tower-demo.js?v=beta6"></script>
-    <script src="js/tower-qa.js?v=beta6"></script>
-    <script src="js/tower-health.js?v=beta6"></script>
-    <script src="js/chat.js?v=beta6"></script>
-    <script src="js/tower-cockpit.js?v=beta6"></script>
+    <script src="js/billing.js?v=beta7"></script>
+    <script src="js/dialog.js?v=beta7"></script>
+    <script src="js/theme.js?v=beta7"></script>
+    <script src="js/logo.js?v=beta7"></script>
+    <script src="js/skin.js?v=beta7"></script>
+    <script src="js/tower-menu.js?v=beta7"></script>
+    <script src="js/tower-lab.js?v=beta7"></script>
+    <script src="js/admins.js?v=beta7"></script>
+    <script src="js/tower-monitor.js?v=beta7"></script>
+    <script src="js/tower-help.js?v=beta7"></script>
+    <script src="js/tower-store.js?v=beta7"></script>
+    <script src="js/tower-demo.js?v=beta7"></script>
+    <script src="js/tower-qa.js?v=beta7"></script>
+    <script src="js/tower-health.js?v=beta7"></script>
+    <script src="js/chat.js?v=beta7"></script>
+    <script src="js/tower-cockpit.js?v=beta7"></script>
     <style>#main-modal-container{z-index:70 !important}
     .fm-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
     .fm-dot-on{background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:fmBlink 1.4s infinite}
@@ -751,14 +751,14 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/auth.js?v=beta6"></script>
-    <script src="js/plans.js?v=beta6"></script>
-    <script src="js/templates.js?v=beta6"></script>
-    <script src="js/widgets.js?v=beta6"></script>
+    <script src="js/auth.js?v=beta7"></script>
+    <script src="js/plans.js?v=beta7"></script>
+    <script src="js/templates.js?v=beta7"></script>
+    <script src="js/widgets.js?v=beta7"></script>
     <script>window.NO_AUTO_STORE = true;</script>
-    <script src="js/config.js?v=beta6"></script>
-    <script src="js/core.js?v=beta6"></script>
-    <script src="js/store.js?v=beta6"></script>
+    <script src="js/config.js?v=beta7"></script>
+    <script src="js/core.js?v=beta7"></script>
+    <script src="js/store.js?v=beta7"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -2408,6 +2408,7 @@
                         <div class="flex items-center flex-wrap gap-1.5">
                             ${logoMap[tenant.id] ? '<img src="' + escHtml(logoMap[tenant.id]) + '" alt="" class="w-7 h-7 rounded-lg object-contain bg-white/10">' : ''}<span class="font-black text-white">${escHtml(tenant.nama)}</span>
                             ${tierBadgeHtml(tenant.tier)}
+                            ${(Number(getCtrl(tenant.id).demoUntil) > 0) ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-400/30">DEMO</span>' : ''}
                             ${(getCtrl(tenant.id).billingCycle === 'yearly') ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">TAHUNAN</span>' : ''}
                             ${masterTag}
                             ${localTag}

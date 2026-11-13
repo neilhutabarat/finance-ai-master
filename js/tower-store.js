@@ -91,6 +91,18 @@
       var ms = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 23, 59, 59).getTime(); if (!isFinite(ms)) return alert('Tanggal tidak valid.');
       var d2 = DB(); if (!d2) return; var u = {}; u['rentals.' + q[1] + '.until'] = ms;
       d2.collection('tenant_ctrl').doc(q[0]).update(u).catch(function (e) { alert('Gagal: ' + (e && e.message || e)); });
+    } else if (a === 'dm_on' || a === 'dm_ext') {
+      var dd = DB(); if (!dd) return alert('Firestore belum terhubung.');
+      var cur2 = Number((ctrls[id] || {}).demoUntil) || 0, base = (a === 'dm_ext' && cur2 > Date.now()) ? cur2 : Date.now();
+      var dy = prompt((a === 'dm_ext' ? 'Tambah berapa hari?' : 'Masa demo berapa hari?') + ' (' + nameOf(id) + ')', '7'); if (dy === null) return;
+      dy = Math.round(Number(dy)); if (!(dy >= 1 && dy <= 90)) return alert('Isi angka 1 sampai 90.');
+      dd.collection('tenant_ctrl').doc(id).set({ demoUntil: base + dy * 86400000, demo: true }, { merge: true }).catch(function (e) { alert('Gagal: ' + (e && e.message || e)); });
+    } else if (a === 'dm_off') {
+      if (!confirm('Jadikan ' + nameOf(id) + ' toko asli? Label dan batas demo dicabut. Data toko TIDAK dihapus (bersihkan data contoh lewat Kesehatan Sistem bila perlu).')) return;
+      var d3 = DB(); if (!d3) return; var u3 = { demo: firebase.firestore.FieldValue.delete(), demoUntil: firebase.firestore.FieldValue.delete() };
+      d3.collection('tenant_ctrl').doc(id).update(u3).catch(function (e) { alert('Gagal: ' + (e && e.message || e)); });
+    } else if (a === 'dm_new') { ov.style.display = 'none'; try { openModal('add_tenant'); } catch (e) { alert('Buka menu Klien Baru dari beranda Tower.'); }
+    } else if (a === 'dm_data') { ov.style.display = 'none'; try { FM_DEMO.open(); } catch (e) { alert('Data Demo belum dimuat.'); }
     } else if (a === 'give') {
       var tId = (ov.querySelector('#ts-t') || {}).value, item = (ov.querySelector('#ts-i') || {}).value, per = (ov.querySelector('#ts-p') || {}).value;
       if (!tId || !item) { note = 'Pilih toko dan item.'; return render(); }
@@ -141,16 +153,28 @@
       (note ? '<div style="font-size:12px;color:#fbbf24;margin-bottom:8px">' + H(note) + '</div>' : '') +
       '<button data-a="give" style="' + B + 'background:#7c3aed;width:100%;padding:10px">Aktifkan sewa</button>';
   }
+  function viewDemo() {
+    var now = Date.now(), list = tenantsList(), h = '<div style="font-size:12px;opacity:.7;margin-bottom:8px">Toko demo tampil label <b>DEMO · sisa N hari</b> di aplikasi klien, lalu terkunci otomatis saat habis. Data tidak dihapus.</div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><button data-a="dm_new" style="' + B + 'background:#7c3aed">+ Toko baru</button><button data-a="dm_data" style="' + B + 'background:#334155">Isi data contoh</button></div>';
+    if (!list.length) return h + '<p style="opacity:.65;text-align:center;padding:16px;font-size:13px">Belum ada toko.</p>';
+    list.forEach(function (t) {
+      var dm = Number((ctrls[t.id] || {}).demoUntil) || 0, on = dm > 0, left = Math.ceil((dm - now) / 86400000);
+      h += '<div style="padding:10px 12px;margin-bottom:8px;border-radius:14px;background:rgba(255,255,255,.05);font-size:12.5px"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><div><b>' + H(t.nama) + '</b><div style="opacity:.7;font-size:11.5px">[' + H(t.id) + ']</div></div>' +
+        '<div style="text-align:right;font-size:11.5px;color:' + (on ? (dm > now ? '#fbbf24' : '#fb7185') : '#94a3b8') + '">' + (on ? (dm > now ? 'DEMO · sisa ' + left + ' hari (sampai ' + dstr(dm) + ')' : 'DEMO · habis ' + dstr(dm)) : 'Toko asli') + '</div></div>' +
+        '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">' + (on ? '<button data-a="dm_ext" data-id="' + H(t.id) + '" style="' + B + 'background:#334155">Tambah hari</button><button data-a="dm_off" data-id="' + H(t.id) + '" style="' + B + 'background:#16a34a">Jadikan toko asli</button>' : '<button data-a="dm_on" data-id="' + H(t.id) + '" style="' + B + 'background:#d97706">Jadikan demo</button>') + '</div></div>';
+    });
+    return h;
+  }
   var filter = 'baru';
   function render() {
     if (!ov || ov.style.display === 'none') return;
     if (!ST()) { ov.innerHTML = '<div style="color:#fff;padding:20px">Katalog Store belum dimuat.</div>'; return; }
     var TB = function (id, t) { return '<button data-tab="' + id + '" style="' + B + (tab === id ? 'background:#7c3aed' : 'background:#334155') + '">' + t + '</button>'; };
-    var body = tab === 'aktif' ? viewAktif() : tab === 'beri' ? viewBeri() : viewMinta();
+    var body = tab === 'aktif' ? viewAktif() : tab === 'beri' ? viewBeri() : tab === 'demo' ? viewDemo() : viewMinta();
     var keep = { t: (ov.querySelector('#ts-t') || {}).value, i: (ov.querySelector('#ts-i') || {}).value, p: (ov.querySelector('#ts-p') || {}).value };
     ov.innerHTML = '<div style="width:100%;max-width:720px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px;font-family:-apple-system,Segoe UI,sans-serif">' +
       '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-weight:800;font-size:17px">OneilStore</div><div style="font-size:12px;opacity:.65">' + nBaru() + ' permintaan menunggu</div></div><button data-x style="' + B + 'background:#334155">Tutup</button></div>' +
-      '<div style="display:flex;gap:6px;margin:12px 0">' + TB('minta', 'Permintaan') + TB('aktif', 'Sewa aktif') + TB('beri', 'Beri sewa') + '</div>' + body + '</div>';
+      '<div style="display:flex;gap:6px;margin:12px 0">' + TB('minta', 'Permintaan') + TB('aktif', 'Sewa aktif') + TB('beri', 'Beri sewa') + TB('demo', 'Demo') + '</div>' + body + '</div>';
     if (tab === 'beri') { [['#ts-t', keep.t], ['#ts-i', keep.i], ['#ts-p', keep.p]].forEach(function (x) { var el = ov.querySelector(x[0]); if (el && x[1]) el.value = x[1]; }); }
   }
   function ensure() {
