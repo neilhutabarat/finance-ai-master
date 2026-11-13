@@ -3,11 +3,18 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 8';
+  var BETA = 'Beta 9';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta 9', '14 Nov 2026', [
+      '[Baru] Latar belakang baru bergaya lukisan (4 gambar) menggantikan latar lama. Gambar berganti otomatis tiap minggu',
+      '[Baru] Latar hidup: terang-gelap mengikuti matahari terbit dan terbenam di lokasi toko, malam cerah diterangi bulan, dan cuaca nyata (mendung, hujan, petir, kabut) tampil di layar',
+      '[Baru] Pengaturan Gerakan (Otomatis, Selalu, Diam): hujan bergerak hanya di layar lebar yang lancar, dan berhenti sendiri di perangkat yang berat',
+      '[Perbaikan] Latar lama dihapus sehingga aplikasi lebih ringan dan tampilan seragam di semua toko',
+      '[Keamanan] Lokasi hanya dipakai untuk mengambil cuaca dan jam matahari; tidak ada data toko yang dikirim keluar'
+    ]],
     ['Beta 8', '13 Nov 2026', [
       '[Baru] OneilStore kini tampil langsung di dock bawah (Manager dan Owner), tidak perlu lagi membuka menu dulu',
       '[Perbaikan] Tombol Tema dipindah ke Pengaturan agar dock cukup untuk OneilStore; nama tombol kini lengkap "OneilStore"',
@@ -109,7 +116,7 @@
     // Halaman yang markup aslinya terang (kasir & halaman masuk): warnanya diganti satu per satu,
     // supaya tidak lagi terlihat seperti kerusakan sistem saat mode gelap dinyalakan.
     'html[data-fm-black="1"][data-fm-native="light"]{--s-surf:var(--d-surf)!important;--s-line:var(--d-line)!important;--s-tint:rgba(255,255,255,.07)!important;--s-hi:rgba(255,255,255,.07)!important;--s-shadow:rgba(0,0,0,.7)!important;--s-gloss:rgba(255,255,255,.04)!important;--s-bg:var(--d-bg)!important;--s-b2:var(--d-surf)!important;--s-b2l:var(--d-line2)!important;--s-b2t:var(--d-t1)!important}',
-    'html[data-fm-black="1"][data-fm-native="light"] body{background-color:var(--d-bg)!important;background-image:linear-gradient(rgba(8,11,17,.86),rgba(8,11,17,.94)),var(--fm-wp,url("/img/wp-bukit.svg"))!important;background-size:cover!important;background-position:center bottom!important;background-repeat:no-repeat!important;background-attachment:fixed!important;color:var(--d-t1)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] body{background-color:var(--d-bg)!important;background-image:linear-gradient(rgba(8,11,17,.86),rgba(8,11,17,.94)),var(--fm-wp,url("/img/wp/1.jpg"))!important;background-size:cover!important;background-position:center bottom!important;background-repeat:no-repeat!important;background-attachment:fixed!important;color:var(--d-t1)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] .bg-white,html[data-fm-black="1"][data-fm-native="light"] [class*="bg-white/"]{background-color:var(--d-surf)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] .bg-slate-50,html[data-fm-black="1"][data-fm-native="light"] .bg-slate-100,html[data-fm-black="1"][data-fm-native="light"] .bg-slate-200{background-color:var(--d-surf2)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] .text-slate-900,html[data-fm-black="1"][data-fm-native="light"] .text-slate-800,html[data-fm-black="1"][data-fm-native="light"] .text-black{color:var(--d-t1)!important}',
@@ -188,22 +195,43 @@
     var L = 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
     return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.0543) ? '#fff' : '#0b0d12';
   }
-  /* Latar belakang bawaan (gambar buatan sendiri, bergaya Oneilverse). Tambahan baru hanya saat versi besar. */
-  var WALLPAPERS = [
-    { id: 'bukit', name: 'Perbukitan Pagi', file: 'img/wp-bukit.svg' },
-    { id: 'pantai', name: 'Pantai Senja', file: 'img/wp-pantai.svg' },
-    { id: 'kota', name: 'Kota Malam', file: 'img/wp-kota.svg' },
-    { id: 'sawah', name: 'Sawah Berundak', file: 'img/wp-sawah.svg' },
-    { id: 'gunung', name: 'Gunung & Danau', file: 'img/wp-gunung.svg' }
-  ];
-  function wpOf(id) { return WALLPAPERS.filter(function (w) { return w.id === id; })[0] || WALLPAPERS[0]; }
-  /* Latar gambar: layar lebar (desktop/tablet mendatar) memakai versi mendatar (-l), layar tegak (HP) memakai versi tegak */
-  function wpFile(w) { var land = (window.innerWidth || 0) > (window.innerHeight || 0); return land ? w.file.replace('.svg', '-l.svg') : w.file; }
-  function updateWp() {
-    try { document.documentElement.style.setProperty('--fm-wp', 'url("' + wpFile(wpOf(pref.wp)) + '")'); } catch (e) {}
+  /* Latar belakang: 4 gambar bergaya lukisan. Gambar yang tampil diatur dari Tower (app_meta/wallpaper):
+     otomatis bergilir tiap minggu, atau dikunci satu gambar. Jam, cuaca, dan lokasi diolah js/langit.js. */
+  var WP_FILES = ['img/wp/1.jpg', 'img/wp/2.jpg', 'img/wp/3.jpg', 'img/wp/4.jpg'];
+  var WP_TZ = 7 * 3600000; /* WIB: pergantian mingguan mengikuti jam Indonesia barat */
+  function wpCfg() { try { return JSON.parse(localStorage.getItem('fm_wp_cfg') || 'null') || {}; } catch (e) { return {}; } }
+  function wpDays(now, cfg) { var hr = Math.max(0, Math.min(23, parseInt(cfg.hour, 10) || 0)); return { t: now + WP_TZ - hr * 3600000, hr: hr }; }
+  function wpShift(cfg) { var d = parseInt(cfg.day, 10); if (!(d >= 0 && d <= 6)) d = 1; return (d - 1 + 7) % 7; }
+  function wpOrder(cfg) {
+    var o = (cfg.order || []).map(function (v) { return parseInt(v, 10); }).filter(function (v, i, a) { return v >= 1 && v <= WP_FILES.length && a.indexOf(v) === i; });
+    return o.length ? o : [1, 2, 3, 4];
   }
-  var wpTimer = null;
-  window.addEventListener('resize', function () { clearTimeout(wpTimer); wpTimer = setTimeout(updateWp, 200); });
+  /* indeks gambar (0..3) yang berlaku pada waktu now */
+  function wpPick(cfg, now) {
+    cfg = cfg || wpCfg(); now = now || Date.now();
+    if (cfg.mode === 'fixed') { var f = parseInt(cfg.fixed, 10); return (f >= 1 && f <= WP_FILES.length) ? f - 1 : 0; }
+    var o = wpOrder(cfg), days = Math.floor(wpDays(now, cfg).t / 86400000);
+    var wk = Math.floor((days - 4 - wpShift(cfg)) / 7), n = o.length, k = (((wk + (parseInt(cfg.start, 10) || 0)) % n) + n) % n;
+    return o[k] - 1;
+  }
+  /* kapan gambar berikutnya berganti (ms epoch); null bila dikunci */
+  function wpNext(cfg, now) {
+    cfg = cfg || wpCfg(); now = now || Date.now();
+    if (cfg.mode === 'fixed') return null;
+    var w = wpDays(now, cfg), days = Math.floor(w.t / 86400000), wk = Math.floor((days - 4 - wpShift(cfg)) / 7);
+    return (4 + wpShift(cfg) + (wk + 1) * 7) * 86400000 + w.hr * 3600000 - WP_TZ;
+  }
+  window.FM_THEME_PREF = function () { return pref; };
+  window.FM_WP = { files: WP_FILES, pick: wpPick, next: wpNext, cfg: wpCfg, order: wpOrder };
+  function updateWp() {
+    if (window.FM_LANGIT_ON) return;
+    try {
+      var idx = wpPick(), url = WP_FILES[idx];
+      /* kilasan terakhir yang sudah diolah (jam + cuaca) dipakai dulu supaya tidak ada kedipan terang saat malam */
+      try { var L = JSON.parse(localStorage.getItem('fm_wp_last') || 'null'); if (L && L.idx === idx && Date.now() - L.t < 12 * 3600000 && L.u) url = L.u; } catch (e) {}
+      document.documentElement.style.setProperty('--fm-wp', 'url("' + url + '")');
+    } catch (e) {}
+  }
   function apply() {
     var h = document.documentElement;
     updateWp();
@@ -254,8 +282,15 @@
     if (!document.documentElement.hasAttribute('data-fm-dock') || document.documentElement.hasAttribute('data-fm-theme-in-set')) h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (mode === 'light' ? 'on' : '') + '" data-mode="light"><div class="fm-prev" style="background:linear-gradient(135deg,#ffffff,#e2e8f0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (mode === 'dark' ? 'on' : '') + '" data-mode="dark"><div class="fm-prev" style="background:#000"></div>Gelap Pekat</button></div></div>';
-    if (ROLE !== 'lain' && ROLE !== 'login' && ROLE !== 'tower' && ROLE !== 'provider' && !(window.FM_PLANS && !FM_PLANS.has('wallpaper'))) h += '<div class="fm-sec"><div class="fm-lab">Latar Belakang</div><div class="fm-modes" style="grid-template-columns:1fr 1fr 1fr">' +
-      WALLPAPERS.map(function (w) { return '<button class="fm-mode ' + (wpOf(pref.wp).id === w.id ? 'on' : '') + '" data-wp="' + w.id + '" style="padding:8px"><div class="fm-prev" style="height:54px;background:url(' + w.file + ') center/cover"></div><span style="font-size:11.5px">' + w.name + '</span></button>'; }).join('') + '</div></div>';
+    if (ROLE !== 'lain' && ROLE !== 'login' && ROLE !== 'tower' && ROLE !== 'provider' && !(window.FM_PLANS && !FM_PLANS.has('wallpaper'))) {
+      var lv = pref.live || 'auto', G = window.FM_GEO || null;
+      h += '<div class="fm-sec"><div class="fm-lab">Latar Belakang</div><div class="fm-card" style="font-size:12px;line-height:1.55;color:#c7cbd6">' +
+        'Gambar diganti otomatis oleh Oneilverse. Terang-gelap dan cuaca mengikuti jam serta lokasi toko' + (G && G.name ? ': <b style="color:#fff">' + esc(G.short || G.name) + '</b>' : '') + '.</div>' +
+        '<div class="fm-lab" style="margin-top:10px">Gerakan (hujan, kilat)</div><div class="fm-modes" style="grid-template-columns:repeat(3,1fr)">' +
+        [['auto', 'Otomatis'], ['on', 'Selalu'], ['off', 'Diam']].map(function (m) { return '<button class="fm-mode ' + (lv === m[0] ? 'on' : '') + '" data-live="' + m[0] + '" style="padding:10px 4px">' + m[1] + '</button>'; }).join('') +
+        '</div><p style="font-size:11px;color:#94a3b8;margin:6px 0 0;line-height:1.5">Otomatis: bergerak hanya di layar lebar yang lancar, dan berhenti sendiri di perangkat yang berat.</p>' +
+        '<button class="fm-btn" data-geo style="width:100%;margin-top:8px;padding:10px">Perbarui lokasi cuaca</button></div>';
+    }
     if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
       ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +
       '</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px"><label style="font-size:12px;color:#c7cbd6">Warna bebas</label><input type="color" id="fm-acc-custom" value="' + esc(pick) + '" style="width:44px;height:30px;border:0;background:none;padding:0"><button class="fm-btn" data-accreset style="margin-left:auto">Kembali ke Bawaan</button></div></div></div>';
@@ -281,7 +316,8 @@
     var sh = box.querySelector('[data-shield]'); if (sh) sh.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_SHIELD) FM_SHIELD.openPanel(); };
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
     box.querySelectorAll('[data-mode]').forEach(function (b) { b.onclick = function () { pref.mode = b.getAttribute('data-mode'); savePref(pref); apply(); render(); }; });
-    box.querySelectorAll('[data-wp]').forEach(function (b) { b.onclick = function () { pref.wp = b.getAttribute('data-wp'); savePref(pref); apply(); render(); }; });
+    box.querySelectorAll('[data-live]').forEach(function (b) { b.onclick = function () { pref.live = b.getAttribute('data-live'); savePref(pref); try { window.dispatchEvent(new CustomEvent('fm:live')); } catch (e) {} render(); }; });
+    var gb = box.querySelector('[data-geo]'); if (gb) gb.onclick = function () { gb.textContent = 'Mencari lokasi...'; try { window.dispatchEvent(new CustomEvent('fm:geo-refresh')); } catch (e) {} setTimeout(render, 6000); };
     box.querySelectorAll('[data-lang]').forEach(function (b) { b.onclick = function () { if (window.FM_I18N) FM_I18N.set(b.getAttribute('data-lang')); }; });
     box.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { pref.accent = b.getAttribute('data-acc'); savePref(pref); apply(); render(); }; });
     var ac = box.querySelector('#fm-acc-custom');
