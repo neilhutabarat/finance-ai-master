@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 7.1';
+  var BETA = 'BETA 7.2';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 7.2)', '13 Nov 2026', [
+      '[Perbaikan] Aplikasi kini otomatis melaporkan gangguan teknis tanpa mengirim isi transaksi, sehingga masalah bisa diperbaiki lebih cepat',
+      '[Keamanan] Catatan masuk akun membantu mendeteksi penggunaan yang tidak wajar'
+    ]],
     ['1.0.0 (BETA 7.1)', '13 Nov 2026', [
       '[Baru] Admin tambahan (opsional): satu toko bisa punya banyak akun Admin, masing-masing dengan nama dan PIN sendiri',
       '[Baru] Admin bisa dikaitkan ke satu usaha, sehingga di Kasir hanya tampil barang dan akun usaha itu',
