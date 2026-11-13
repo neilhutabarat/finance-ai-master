@@ -656,12 +656,18 @@
     });
     var wide = window.innerWidth >= 480;
     var tail = [];
-    if (window.FM_THEME && FM_THEME.toggle) tail.push({ label: 'Tema', icon: 'moon', fn: function () { FM_THEME.toggle(); } });
+    var storeBtn = document.querySelector('button[onclick*="FM_OSTORE"]');
+    var storeItem = storeBtn ? { label: 'OneilStore', icon: 'store', fn: function () { if (window.FM_OSTORE) FM_OSTORE.open(); } } : null;
+    /* OneilStore selalu tampil di dock; tombol Tema pindah ke Pengaturan agar muat */
+    if (storeItem) document.documentElement.setAttribute('data-fm-theme-in-set', '1');
+    if (!storeItem && window.FM_THEME && FM_THEME.toggle) tail.push({ label: 'Tema', icon: 'moon', fn: function () { FM_THEME.toggle(); } });
     tail.push({ label: 'Pengaturan', icon: 'gear', fn: function () { var g = document.getElementById('fm-gear'); if (g) g.click(); }, settings: true });
     if (findLogout()) tail.push({ label: 'Keluar', icon: 'out', fn: window.FM_LOGOUT, danger: true });
     var maxShown = wide ? 9 : 5;
     var shown = items, extra = [];
-    if (items.length + tail.length > maxShown) { var keep = maxShown - tail.length - 1; shown = items.slice(0, keep); extra = items.slice(keep); }
+    var pin = storeItem ? 1 : 0;
+    if (items.length + pin + tail.length > maxShown) { var keep = maxShown - tail.length - 1 - pin; shown = items.slice(0, keep); extra = items.slice(keep); }
+    if (storeItem) shown = shown.concat([storeItem]);
     function act(it) { return function () { if (it.fn) it.fn(); else it.el.click(); }; }
     function btn(it) {
       var b = document.createElement('button'); b.className = 'fm-dk' + (it.danger ? ' danger' : ''); b.type = 'button';

@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 7';
+  var BETA = 'Beta 8';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta 8', '13 Nov 2026', [
+      '[Baru] OneilStore kini tampil langsung di dock bawah (Manager dan Owner), tidak perlu lagi membuka menu dulu',
+      '[Perbaikan] Tombol Tema dipindah ke Pengaturan agar dock cukup untuk OneilStore; nama tombol kini lengkap "OneilStore"',
+      '[Keamanan] Tidak ada perubahan akses data; OneilStore tetap hanya dapat dibuka akun Manager dan Owner'
+    ]],
     ['Beta 7', '13 Nov 2026', [
       '[Baru] Mode demo: toko uji coba tampil label "DEMO · sisa N hari" di layar, dan terkunci otomatis saat masa demo habis. Data demo tidak dihapus',
       '[Perbaikan] Layar kunci saat masa demo habis kini berbeda dari layar pembekuan pembayaran, dengan pesan yang lebih jelas',
@@ -246,7 +251,7 @@
     box.style.setProperty('--fm-pick', pick);
     var h = '<div style="display:flex;justify-content:space-between;align-items:center"><h3>Pengaturan</h3><button class="fm-btn" data-close>Tutup</button></div>';
     var THEME_ON = !(window.FM_PLANS && !FM_PLANS.has('theme'));
-    if (!document.documentElement.hasAttribute('data-fm-dock')) h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
+    if (!document.documentElement.hasAttribute('data-fm-dock') || document.documentElement.hasAttribute('data-fm-theme-in-set')) h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (mode === 'light' ? 'on' : '') + '" data-mode="light"><div class="fm-prev" style="background:linear-gradient(135deg,#ffffff,#e2e8f0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (mode === 'dark' ? 'on' : '') + '" data-mode="dark"><div class="fm-prev" style="background:#000"></div>Gelap Pekat</button></div></div>';
     if (ROLE !== 'lain' && ROLE !== 'login' && ROLE !== 'tower' && ROLE !== 'provider' && !(window.FM_PLANS && !FM_PLANS.has('wallpaper'))) h += '<div class="fm-sec"><div class="fm-lab">Latar Belakang</div><div class="fm-modes" style="grid-template-columns:1fr 1fr 1fr">' +

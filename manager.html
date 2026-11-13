@@ -60,10 +60,10 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=beta7"></script>
-    <script src="js/theme.js?v=beta7"></script>
-    <script src="js/logo.js?v=beta7"></script>
-    <script src="js/skin.js?v=beta7"></script>
+    <script src="js/dialog.js?v=beta8"></script>
+    <script src="js/theme.js?v=beta8"></script>
+    <script src="js/logo.js?v=beta8"></script>
+    <script src="js/skin.js?v=beta8"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -190,7 +190,7 @@
             <button data-fm-action data-ic="tag" onclick="FM_PAJAK.open()">Laporan Pajak</button>
             <button data-fm-action data-ic="users" onclick="FM_ABS.open()">Absensi</button>
             <button data-fm-action data-ic="box" onclick="FM_PROP.open()">Properti</button>
-            <button data-fm-action data-ic="store" onclick="FM_OSTORE.open()">Store</button>
+            <button data-fm-action data-ic="store" onclick="FM_OSTORE.open()">OneilStore</button>
             <button data-fm-action data-ic="box" onclick="FM_BACKUP.open()">Backup &amp; Ekspor</button>
             <button data-fm-action data-ic="send" onclick="FM_LAPBUL.open()">Laporan Bulanan</button>
             <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur Toko</button>
@@ -513,48 +513,48 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=beta7"></script>
-    <script src="js/monitor.js?v=beta7"></script>
-    <script src="js/plans.js?v=beta7"></script>
-    <script src="js/usaha.js?v=beta7"></script>
-    <script src="js/usaha-bar.js?v=beta7"></script>
-    <script src="js/i18n.js?v=beta7"></script>
-    <script src="js/mutasi-share.js?v=beta7"></script>
-    <script src="js/gaji.js?v=beta7"></script>
-    <script src="js/piutang.js?v=beta7"></script>
-    <script src="js/promo.js?v=beta7"></script>
-    <script src="js/bantuan.js?v=beta7"></script>
-    <script src="js/kas.js?v=beta7"></script>
-    <script src="js/neraca.js?v=beta7"></script>
-    <script src="js/oneilstore.js?v=beta7"></script>
-    <script src="js/pajak.js?v=beta7"></script>
-    <script src="js/absensi.js?v=beta7"></script>
-    <script src="js/properti.js?v=beta7"></script>
-    <script src="js/backup.js?v=beta7"></script>
-    <script src="js/laporan-bulanan.js?v=beta7"></script>
-    <script src="js/dash-usaha.js?v=beta7"></script>
-    <script src="js/stok.js?v=beta7"></script>
-    <script src="js/coa-drag.js?v=beta7"></script>
+    <script src="js/auth.js?v=beta8"></script>
+    <script src="js/monitor.js?v=beta8"></script>
+    <script src="js/plans.js?v=beta8"></script>
+    <script src="js/usaha.js?v=beta8"></script>
+    <script src="js/usaha-bar.js?v=beta8"></script>
+    <script src="js/i18n.js?v=beta8"></script>
+    <script src="js/mutasi-share.js?v=beta8"></script>
+    <script src="js/gaji.js?v=beta8"></script>
+    <script src="js/piutang.js?v=beta8"></script>
+    <script src="js/promo.js?v=beta8"></script>
+    <script src="js/bantuan.js?v=beta8"></script>
+    <script src="js/kas.js?v=beta8"></script>
+    <script src="js/neraca.js?v=beta8"></script>
+    <script src="js/oneilstore.js?v=beta8"></script>
+    <script src="js/pajak.js?v=beta8"></script>
+    <script src="js/absensi.js?v=beta8"></script>
+    <script src="js/properti.js?v=beta8"></script>
+    <script src="js/backup.js?v=beta8"></script>
+    <script src="js/laporan-bulanan.js?v=beta8"></script>
+    <script src="js/dash-usaha.js?v=beta8"></script>
+    <script src="js/stok.js?v=beta8"></script>
+    <script src="js/coa-drag.js?v=beta8"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return (typeof fmV === 'function') ? fmV(txList) : txList; } }); if (window.FM_GAJI) FM_GAJI.mount({ addTx: function (tx) { txList.unshift(tx); persistData(); if (typeof db !== 'undefined' && db) { db.collection(tenantFirestoreCol).add(Object.assign({}, tx, { timestamp: firebase.firestore.FieldValue.serverTimestamp() })).catch(console.error); } renderAllReports(); } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/insights.js?v=beta7"></script>
-    <script src="js/analisa.js?v=beta7"></script>
+    <script src="js/insights.js?v=beta8"></script>
+    <script src="js/analisa.js?v=beta8"></script>
     <script>
         (function(){ function go(){ if (window.FM_ANALISA && document.getElementById('fm-analisa-box')) FM_ANALISA.mount({ el: 'fm-analisa-box', tx: function(){ return txList; } }); }
           if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(go,0); }); else setTimeout(go,0);
           if (window.STORE) STORE.onChange(function(){ if (window.FM_ANALISA) FM_ANALISA.render(); }); })();
     </script>
-    <script src="js/labarugi.js?v=beta7"></script>
-    <script src="js/widgets.js?v=beta7"></script>
-    <script src="js/config.js?v=beta7"></script>
-    <script src="js/offline.js?v=beta7"></script>
-    <script src="js/core.js?v=beta7"></script>
-    <script src="js/billing.js?v=beta7"></script>
-    <script src="js/shield.js?v=beta7"></script>
-    <script src="js/ctrl.js?v=beta7"></script>
-    <script src="js/store.js?v=beta7"></script>
+    <script src="js/labarugi.js?v=beta8"></script>
+    <script src="js/widgets.js?v=beta8"></script>
+    <script src="js/config.js?v=beta8"></script>
+    <script src="js/offline.js?v=beta8"></script>
+    <script src="js/core.js?v=beta8"></script>
+    <script src="js/billing.js?v=beta8"></script>
+    <script src="js/shield.js?v=beta8"></script>
+    <script src="js/ctrl.js?v=beta8"></script>
+    <script src="js/store.js?v=beta8"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
