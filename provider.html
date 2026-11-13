@@ -70,7 +70,7 @@
     </script>
     <script src="js/billing.js?v=4.1"></script>
     <script src="js/dialog.js?v=1.13"></script>
-    <script src="js/theme.js?v=6.1"></script>
+    <script src="js/theme.js?v=6.2"></script>
     <script src="js/logo.js?v=5.0"></script>
     <script src="js/skin.js?v=5.8"></script>
     <script src="js/tower-menu.js?v=6.1"></script>
@@ -736,8 +736,8 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/auth.js?v=1.5.8"></script>
-    <script src="js/plans.js?v=6.0"></script>
+    <script src="js/auth.js?v=6.2"></script>
+    <script src="js/plans.js?v=6.2"></script>
     <script src="js/widgets.js?v=4.1"></script>
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
@@ -750,7 +750,8 @@
             let role = '';
             try { const u = JSON.parse(localStorage.getItem('currentUser')); role = (u && u.role) || ''; } catch (e) {}
             if (!role) role = localStorage.getItem('auth_role') || '';
-            return role === 'superadmin';
+            /* kunci khusus Tower: tidak ikut terhapus/tertimpa saat toko klien dibuka di browser yang sama */
+            return role === 'superadmin' || localStorage.getItem('fm_tower_ok') === '1';
         })();
         if (!PROVIDER_OK) { window.location.replace('index.html'); }
 
@@ -3260,7 +3261,7 @@ function closeWeatherModal() {
 /* Logout: hapus semua kunci sesi yang dipakai halaman (core.js hanya menghapus kunci lama) */
 window.logout = function () {
   if (!confirm("Keluar dari sistem?")) return;
-  try { ['currentUser','auth_role','auth_title','fm_session_user_v13'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+  try { ['currentUser','auth_role','auth_title','fm_session_user_v13','fm_tower_ok'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
   var t = new URLSearchParams(window.location.search).get('toko');
   window.location.replace('index.html' + (t ? '?toko=' + encodeURIComponent(t) : ''));
 };

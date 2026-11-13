@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 6.1';
+  var BETA = 'BETA 6.2';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 6.2)', '13 Nov 2026', [
+      '[Perbaikan] Setelah pembaruan, halaman cukup dimuat ulang dan Anda tetap masuk tanpa login ulang, termasuk saat sinyal lambat atau terputus sesaat',
+      '[Keamanan] Sesi login tetap diperiksa di latar belakang, dan akses yang dicabut tetap langsung mengeluarkan pengguna dari aplikasi',
+      '[Perbaikan] Halaman toko tidak lagi menghapus sesi login lain yang terbuka di browser yang sama'
+    ]],
     ['1.0.0 (BETA 6.1)', '13 Nov 2026', [
       '[Perbaikan] Atur Target Omzet kini lewat pop-up: Owner mengetuk kartu Target Omzet, mengisi target harian dan bulanan, lalu menyimpan. Kartu jadi lebih ringkas dan muat satu layar',
       '[Perbaikan] Menu Stok kini selalu menampilkan harga modal dan harga jual tiap barang, lengkap dengan pilihan "Jual" per barang untuk ditampilkan di kasir, tanpa perlu membuka pengaturan tambahan',

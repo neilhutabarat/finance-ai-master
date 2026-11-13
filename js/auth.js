@@ -31,7 +31,11 @@
   function cacheGet(uid) { try { return JSON.parse(localStorage.getItem('fm_access_' + uid) || 'null'); } catch (e) { return null; } }
   function cacheSet(uid, d) { try { if (d) localStorage.setItem('fm_access_' + uid, JSON.stringify({ tenant: d.tenant, role: d.role })); else localStorage.removeItem('fm_access_' + uid); } catch (e) {} }
   function readAccess(uid) {
-    return fs().collection('tenant_access').doc(uid).get().then(function (s) { var d = s.exists ? s.data() : null; cacheSet(uid, d); return { d: d, fresh: true }; });
+    return fs().collection('tenant_access').doc(uid).get().then(function (s) {
+      var d = s.exists ? s.data() : null, unsure = !!(s.metadata && s.metadata.fromCache && !s.exists);
+      if (!unsure) cacheSet(uid, d);
+      return { d: d, fresh: !unsure, unsure: unsure };
+    });
   }
 
   var ERR = {
@@ -120,8 +124,9 @@
       return roles.indexOf(u.role) > -1 && localStorage.getItem('fm_legacy_tenant') === tid;
     } catch (e) { return false; }
   }
-  function toLogin() {
-    try { ['currentUser', 'auth_role', 'auth_title'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+  function toLogin(isTower) {
+    /* kunci sesi lama hanya dibersihkan oleh Tower; halaman klien tidak boleh menghapus sesi Tower di browser yang sama */
+    if (isTower) { try { ['currentUser', 'auth_role', 'auth_title'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {} }
     var q = location.search || '';
     location.replace(loginUrl());
   }
@@ -129,7 +134,11 @@
     var tid = ''; try { tid = (typeof getActiveTenant === 'function' && getActiveTenant() || {}).id || ''; } catch (e) {}
     var un = null, settled = false;
     function pass() { if (settled) return; settled = true; document.documentElement.classList.remove('fm-authwait'); }
-    function fail() { if (settled) return; settled = true; toLogin(); }
+    function fail() { if (settled) return; settled = true; toLogin(roles === 'tower'); }
+    /* akun toko berbentuk <idtoko>.<peran>.<gen>@... : tenant dan peran bisa dipastikan dari email tanpa internet */
+    function mailOk(u) {
+      try { if (!u || !isSynthetic(u.email)) return false; var m = String(u.email).split('@')[0].split('.'); return m.length >= 3 && m[0] === key(tid) && roles.indexOf(m[1]) > -1; } catch (e) { return false; }
+    }
     try {
       un = auth().onAuthStateChanged(function (u) {
         if (un) { un(); un = null; }
@@ -139,7 +148,11 @@
         function okOf(d) { return !!d && d.tenant === tid && roles.indexOf(d.role) > -1; }
         if (c) {
           okOf(c) ? pass() : fail();
-          readAccess(u.uid).then(function (r) { if (!okOf(r.d)) { auth().signOut().catch(noop).then(toLogin); } }, noop);
+          readAccess(u.uid).then(function (r) { if (!r.unsure && !okOf(r.d)) { auth().signOut().catch(noop).then(function () { toLogin(false); }); } }, noop);
+        } else if (mailOk(u)) {
+          /* sesi sah menurut email: langsung masuk (tidak menunggu server). Pencabutan akses tetap dicek di latar belakang. */
+          pass();
+          readAccess(u.uid).then(function (r) { if (!r.unsure && !okOf(r.d)) { auth().signOut().catch(noop).then(function () { toLogin(false); }); } }, noop);
         } else {
           readAccess(u.uid).then(function (r) { okOf(r.d) ? pass() : fail(); }, function () { legacyOk(tid, roles) ? pass() : fail(); });
         }
@@ -185,7 +198,12 @@
     var st = document.createElement('style'); st.textContent = 'html.fm-authwait body{visibility:hidden!important}'; document.head.appendChild(st);
     var run = function () { guard(need); };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
-    setTimeout(function () { if (document.documentElement.classList.contains('fm-authwait')) toLogin(); }, 15000);
+    setTimeout(function () {
+      if (!document.documentElement.classList.contains('fm-authwait')) return;
+      /* terlalu lama menunggu: jika sesi sah ada, buka halaman; jika tidak, ke login */
+      try { var cu = auth().currentUser; if (cu && (need === 'tower' ? !isSynthetic(cu.email) : (isSynthetic(cu.email) && String(cu.email).split('@')[0].split('.')[1] && need.indexOf(String(cu.email).split('@')[0].split('.')[1]) > -1))) { document.documentElement.classList.remove('fm-authwait'); return; } } catch (e) {}
+      toLogin(need === 'tower');
+    }, 15000);
   }
   window.addEventListener('load', wrapLogout);
 })();
