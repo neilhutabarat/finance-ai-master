@@ -133,10 +133,10 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=7.2"></script>
-    <script src="js/theme.js?v=7.2"></script>
-    <script src="js/logo.js?v=7.2"></script>
-    <script src="js/skin.js?v=7.2"></script>
+    <script src="js/dialog.js?v=7.3"></script>
+    <script src="js/theme.js?v=7.3"></script>
+    <script src="js/logo.js?v=7.3"></script>
+    <script src="js/skin.js?v=7.3"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -411,6 +411,10 @@
                             <button type="button" onclick="changeQty(-1)" class="w-12 h-12 rounded-2xl bg-white border border-slate-300 text-xl font-black text-slate-700 active:scale-95">−</button>
                             <input type="number" id="tx-qty" min="1" value="1" oninput="onQtyChange()" class="flex-1 text-center glass-input rounded-2xl p-3 text-xl font-black outline-none">
                             <button type="button" onclick="changeQty(1)" class="w-12 h-12 rounded-2xl bg-white border border-slate-300 text-xl font-black text-slate-700 active:scale-95">+</button>
+                        </div>
+                        <div id="tx-disc-wrap" class="hidden mt-2">
+                            <div class="flex items-center gap-2"><label class="text-[11px] font-black text-slate-700 shrink-0">Diskon</label><input type="text" id="tx-disc" oninput="onQtyChange()" placeholder="mis. 5000 atau 10%" class="flex-1 glass-input rounded-xl px-3 py-2 text-xs font-bold outline-none"></div>
+                            <p id="tx-disc-note" class="mt-1 text-[11px] font-bold text-emerald-700"></p>
                         </div>
                     </div>
 
@@ -735,25 +739,26 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=7.2"></script>
-    <script src="js/monitor.js?v=7.2"></script>
-    <script src="js/plans.js?v=7.2"></script>
-    <script src="js/usaha.js?v=7.2"></script>
-    <script src="js/mutasi-share.js?v=7.2"></script>
-    <script src="js/struk-pdf.js?v=7.2"></script>
-    <script src="js/gaji.js?v=7.2"></script>
-    <script src="js/piutang.js?v=7.2"></script>
+    <script src="js/auth.js?v=7.3"></script>
+    <script src="js/monitor.js?v=7.3"></script>
+    <script src="js/plans.js?v=7.3"></script>
+    <script src="js/usaha.js?v=7.3"></script>
+    <script src="js/mutasi-share.js?v=7.3"></script>
+    <script src="js/struk-pdf.js?v=7.3"></script>
+    <script src="js/gaji.js?v=7.3"></script>
+    <script src="js/piutang.js?v=7.3"></script>
+    <script src="js/promo.js?v=7.3"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/widgets.js?v=7.2"></script>
-    <script src="js/config.js?v=7.2"></script>
+    <script src="js/widgets.js?v=7.3"></script>
+    <script src="js/config.js?v=7.3"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/billing.js?v=7.2"></script>
-    <script src="js/ctrl.js?v=7.2"></script>
-    <script src="js/chat.js?v=7.2"></script>
-    <script src="js/store.js?v=7.2"></script>
+    <script src="js/billing.js?v=7.3"></script>
+    <script src="js/ctrl.js?v=7.3"></script>
+    <script src="js/chat.js?v=7.3"></script>
+    <script src="js/store.js?v=7.3"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -929,6 +934,24 @@
             } catch (e) {}
             return list;
         }
+        // Harga baris setelah diskon: promo otomatis (Manager) atau diskon manual Admin (dibatasi Manager)
+        function fmDisc(p, un, qty, manual) {
+            const gross = un.price * qty;
+            let disc = 0, name = '';
+            try {
+                if (window.FM_PROMO) {
+                    const b = FM_PROMO.best(p, un, qty, gross); disc = b.disc; name = b.name;
+                    const mx = FM_PROMO.maxManualPct(), m = String(manual || '').trim();
+                    if (mx > 0 && m) {
+                        let v = m.endsWith('%') ? Math.round(gross * (parseFloat(m) || 0) / 100) : (parseInt(m.replace(/[^0-9]/g, ''), 10) || 0);
+                        v = Math.min(v, Math.floor(gross * mx / 100));
+                        if (v > 0) { disc = v; name = 'Diskon manual'; }
+                    }
+                }
+            } catch (e) {}
+            disc = Math.max(0, Math.min(disc, gross));
+            return { gross: gross, disc: disc, net: gross - disc, name: disc ? name : '' };
+        }
         function uLbl(d) { return d && d.unitName && (d.per || 1) > 1 ? ' ' + d.unitName : ''; }
         function curUnit(opt) {
             const p = STORE.getProducts().find(x => x.code === opt.value); if (!p) return null;
@@ -972,7 +995,10 @@
             qtyEl.value = qty;
             qtyEl.max = avail;
             document.getElementById('tx-stock-hint').innerText = `Tersedia: ${avail} ${un.name}`;
-            document.getElementById('tx-amount').value = formatThousandSeparator(un.price * qty);
+            const dc = fmDisc(p, un, qty, (document.getElementById('tx-disc') || {}).value);
+            const dw = document.getElementById('tx-disc-wrap');
+            if (dw) { const mx = (window.FM_PROMO && FM_PROMO.maxManualPct()) || 0; dw.classList.toggle('hidden', !(mx > 0 || dc.disc > 0)); const dn = document.getElementById('tx-disc'); if (dn) dn.parentElement.classList.toggle('hidden', !(mx > 0)); document.getElementById('tx-disc-note').innerText = dc.disc ? `${dc.name}: -Rp ${formatThousandSeparator(dc.disc)} (harga normal Rp ${formatThousandSeparator(dc.gross)})` : ''; }
+            document.getElementById('tx-amount').value = formatThousandSeparator(dc.net);
             document.getElementById('tx-desc').value = `Penjualan ${opt.dataset.name}${un.per > 1 ? ' (' + un.name + ')' : ''} x${qty}`;
             calculateTaxPreview();
         }
@@ -1068,7 +1094,7 @@
             const formattedDateFull = new Date(dateVal + 'T00:00:00').toLocaleDateString('id-ID');
             const isOutcome = (opt.dataset.category === 'cogs' || opt.dataset.category === 'expense');
             const isProd = (opt.dataset.isProduct === "true");
-            let qty = 1, unitPrice = 0, unitName = '', per = 1;
+            let qty = 1, unitPrice = 0, unitName = '', per = 1, dcRes = { disc: 0, name: '' }, discManual = '';
             if (isProd) {
                 qty = parseInt(document.getElementById('tx-qty').value) || 0;
                 const un = curUnit(opt) || { name: 'pcs', per: 1, price: Number(opt.dataset.price) || 0 };
@@ -1076,7 +1102,10 @@
                 const avail = Math.floor(availableStock(opt.value, editId) / per);
                 if (qty < 1) return alert("Jumlah minimal 1!");
                 if (qty > avail) return alert(`Stok tidak cukup. Tersedia ${avail} ${unitName}.`);
-                amount = unitPrice * qty; // harga selalu dari produk, tidak bisa diketik kasir
+                const prodObj = STORE.getProducts().find(x => x.code === opt.value);
+                discManual = (document.getElementById('tx-disc') || {}).value || '';
+                dcRes = prodObj ? fmDisc(prodObj, un, qty, discManual) : { gross: unitPrice * qty, disc: 0, net: unitPrice * qty, name: '' };
+                amount = dcRes.net; // harga selalu dari produk (dikurangi diskon), tidak bisa diketik kasir
             }
             const taxAmount = (isOutcome && !isProd) ? Math.round(amount * 0.12) : 0;
             const dppAmount = (isOutcome && !isProd) ? (amount - taxAmount) : amount;
@@ -1090,7 +1119,7 @@
                         accountName: opt.dataset.name,
                         category: opt.dataset.category,
                         isProduct: isProd,
-                        qty: qty, unitName: unitName, per: per,
+                        qty: qty, unitName: unitName, per: per, discount: dcRes.disc, promo: dcRes.name, discManual: discManual,
                         unitPrice: unitPrice,
                         amount: amount,
                         tax12: taxAmount,
@@ -1109,7 +1138,7 @@
                     accountName: opt.dataset.name,
                     category: opt.dataset.category,
                     isProduct: isProd,
-                    qty: qty, unitName: unitName, per: per,
+                    qty: qty, unitName: unitName, per: per, discount: dcRes.disc, promo: dcRes.name, discManual: discManual,
                     unitPrice: unitPrice,
                     amount: amount,
                     tax12: taxAmount,
@@ -1148,7 +1177,7 @@
                 item.innerHTML = `
                     <div>
                         <div class="flex items-center space-x-1.5">
-                            <span class="font-black text-slate-900">${d.isProduct ? '📦 ' : ''}[${fmEsc(d.accountCode)}] ${fmEsc(d.accountName)}${d.isProduct ? ' ×' + (d.qty || 1) + uLbl(d) : ''}</span>
+                            <span class="font-black text-slate-900">${d.isProduct ? '📦 ' : ''}[${fmEsc(d.accountCode)}] ${fmEsc(d.accountName)}${d.isProduct ? ' ×' + (d.qty || 1) + uLbl(d) : ''}${d.discount ? ' <span class="text-emerald-700 text-[10px]">(diskon -Rp ' + formatThousandSeparator(d.discount) + ')</span>' : ''}</span>
                             <span class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${d.category === 'sales' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${d.category.toUpperCase()}</span>
                         </div>
                         <p class="text-[11px] text-slate-500 font-medium">${d.desc || '-'}</p>
@@ -1187,7 +1216,7 @@
                     break;
                 }
             }
-            if (d.isProduct) { document.getElementById('tx-qty').value = d.qty || 1; window.__editUnit = d.unitName || null; document.getElementById('tx-unit').dataset.for = ''; }
+            if (d.isProduct) { document.getElementById('tx-qty').value = d.qty || 1; window.__editUnit = d.unitName || null; { const dd = document.getElementById('tx-disc'); if (dd) dd.value = d.discManual || ''; } document.getElementById('tx-unit').dataset.for = ''; }
             updateCategoryBadge(true);
             document.getElementById('btn-save-text').innerText = "Simpan Perubahan Draft";
             document.getElementById('btn-cancel-edit').classList.remove('hidden');
@@ -1210,6 +1239,7 @@
             document.getElementById('edit-draft-id').value = "";
             document.getElementById('tx-qty-wrap').classList.add('hidden');
             document.getElementById('tx-qty').value = 1;
+            { const dd = document.getElementById('tx-disc'); if (dd) dd.value = ''; }
             setAmountLocked(false);
             document.getElementById('tx-amount').value = "";
             document.getElementById('tx-desc').value = "";
@@ -1294,6 +1324,7 @@
                     ...((window.FM_BIZ && FM_BIZ.enabled()) ? { biz: FM_BIZ.ofDraft(d) } : {}),
                     qty: d.qty || 1,
                     ...((d.per || 1) > 1 ? { unitName: d.unitName, per: d.per } : {}),
+                    ...(d.discount ? { discount: d.discount, promo: d.promo || '' } : {}),
                     unitPrice: d.unitPrice || 0,
                     amount: d.amount,
                     tax12: d.tax12,
@@ -1331,7 +1362,7 @@
             lastReceipt = {
                 store: (document.getElementById('receipt-store-name') || {}).innerText || '',
                 when: nowFull + ' ' + nowTime, total: total, pay: PAYLBL[payNow] || payNow,
-                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) : '') + ' = ' + (d.category === 'sales' ? '' : '-') + 'Rp ' + formatThousandSeparator(d.amount)))
+                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) + (d.discount ? ' (diskon -' + formatThousandSeparator(d.discount) + ')' : '') : '') + ' = ' + (d.category === 'sales' ? '' : '-') + 'Rp ' + formatThousandSeparator(d.amount)))
             };
             const rList = document.getElementById('receipt-items-list');
             rList.innerHTML = "";
@@ -1741,13 +1772,14 @@
             const lbl = un.per > 1 ? ' (' + un.name + ')' : '';
             if (inDraft) {
                 inDraft.qty = (inDraft.qty || 1) + n;
-                inDraft.unitPrice = un.price; inDraft.amount = un.price * inDraft.qty; inDraft.dpp = inDraft.amount;
+                const dq = fmDisc(p, un, inDraft.qty, '');
+                inDraft.unitPrice = un.price; inDraft.amount = dq.net; inDraft.dpp = inDraft.amount; inDraft.discount = dq.disc; inDraft.promo = dq.name; inDraft.discManual = '';
                 inDraft.desc = `Penjualan ${p.name}${lbl} x${inDraft.qty}`;
             } else {
                 draftList.push({
                     id: 'draft_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
                     accountCode: p.code, accountName: p.name, category: 'sales', isProduct: true,
-                    qty: n, unitName: un.name, per: un.per, unitPrice: un.price, amount: un.price * n, tax12: 0, dpp: un.price * n,
+                    qty: n, unitName: un.name, per: un.per, unitPrice: un.price, amount: fmDisc(p, un, n, '').net, tax12: 0, dpp: fmDisc(p, un, n, '').net, discount: fmDisc(p, un, n, '').disc, promo: fmDisc(p, un, n, '').name, discManual: '',
                     desc: `Penjualan ${p.name}${lbl} x${n}`,
                     staff: (document.getElementById('tx-staff').value.trim() || user.title),
                     dateISO: dateVal,

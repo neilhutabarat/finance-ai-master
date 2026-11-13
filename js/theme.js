@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 7.2';
+  var BETA = 'BETA 7.3';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 7.3)', '13 Nov 2026', [
+      '[Baru] Diskon & Promo (opsional): promo otomatis per barang, per Induk, atau semua barang, lengkap dengan periode dan minimal jumlah',
+      '[Baru] Diskon manual Admin dengan batas persen yang ditentukan Manager',
+      '[Perbaikan] Struk dan antrean menampilkan potongan diskon; Manager melihat total diskon bulan ini',
+      '[Keamanan] Diskon manual tidak bisa melebihi batas yang ditetapkan Manager'
+    ]],
     ['1.0.0 (BETA 7.2)', '13 Nov 2026', [
       '[Perbaikan] Aplikasi kini otomatis melaporkan gangguan teknis tanpa mengirim isi transaksi, sehingga masalah bisa diperbaiki lebih cepat',
       '[Keamanan] Catatan masuk akun membantu mendeteksi penggunaan yang tidak wajar'
