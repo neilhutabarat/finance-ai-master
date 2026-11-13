@@ -656,7 +656,7 @@
     });
     var wide = window.innerWidth >= 480;
     var tail = [];
-    var storeBtn = document.querySelector('button[onclick*="FM_OSTORE"]');
+    var storeBtn = document.querySelector('script[src*="oneilstore.js"]') || window.FM_OSTORE;
     var storeItem = storeBtn ? { label: 'OneilStore', icon: 'store', fn: function () { if (window.FM_OSTORE) FM_OSTORE.open(); } } : null;
     /* OneilStore selalu tampil di dock; tombol Tema pindah ke Pengaturan agar muat */
     if (storeItem) document.documentElement.setAttribute('data-fm-theme-in-set', '1');
