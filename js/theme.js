@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 7.5';
+  var BETA = 'BETA 7.6';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 7.6)', '13 Nov 2026', [
+      '[Baru] Laporan Pajak Bulanan (opsional): perkiraan PPh Final dan PPN per bulan dari omzet toko',
+      '[Baru] Tarif bisa diatur, termasuk pembebasan omzet sampai Rp 500 juta per tahun',
+      '[Baru] Tandai bulan yang sudah disetor, salin laporan ke WhatsApp, dan unduh CSV',
+      '[Keamanan] Pengaturan pajak hanya bisa diubah Manager, Owner hanya melihat'
+    ]],
     ['1.0.0 (BETA 7.5)', '13 Nov 2026', [
       '[Baru] Neraca (Paket Plus): harta, utang, dan modal toko per tanggal pilihan, bisa disalin ke WhatsApp',
       '[Baru] Akun neraca tambahan: aset (peralatan, kendaraan), utang (pinjaman), dan tambahan modal pemilik',
