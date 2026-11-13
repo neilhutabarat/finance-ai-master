@@ -3,11 +3,18 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 12';
+  var BETA = 'Beta 13';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta 13', '14 Nov 2026', [
+      '[Baru] Efek tetesan hujan di atas kaca (kartu, tombol, header, dock, dan pop-up); ukuran butiran dan derasnya diatur pengelola layanan',
+      '[Baru] Halaman masuk (portal) kini berkaca dan memakai wallpaper sendiri',
+      '[Baru] Galeri wallpaper bisa ditambah dan dihapus oleh pengelola layanan, berganti tanpa perlu memuat ulang',
+      '[Perbaikan] Efek hujan berhenti sendiri bila komputer terasa berat, dan bisa dimatikan per toko',
+      '[Keamanan] Gambar dan efek hanya bisa diubah oleh pengelola layanan; aplikasi toko hanya membaca dan tidak mengirim data toko'
+    ]],
     ['Beta 12', '14 Nov 2026', [
       '[Baru] Tema Original (kaca bening) dan Base (putih polos) di Pengaturan; mode gelap dihapus',
       '[Baru] Kartu, tombol, header, dock, dan pop-up berdesain kaca yang sama di Kasir, Manager, dan Owner; tulisan tampak tercetak di atas kaca dan tetap jelas',
@@ -209,19 +216,29 @@
      otomatis bergilir tiap minggu, atau dikunci satu gambar. Kaca dan pembaruan otomatis di js/langit.js. */
   var WP_FILES = ['img/wp/1.jpg', 'img/wp/2.jpg', 'img/wp/3.jpg', 'img/wp/4.jpg'];
   var WP_TZ = 7 * 3600000; /* WIB: pergantian mingguan mengikuti jam Indonesia barat */
+  var WP_PID = 'finance-ai-master-byneilverse', WP_AK = 'AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI';
   function wpCfg() { try { return JSON.parse(localStorage.getItem('fm_wp_cfg') || 'null') || {}; } catch (e) { return {}; } }
+  /* daftar gambar: 'b1'..'b4' = bawaan, 'u_xxx' = diunggah dari Tower (disimpan di app_meta/wpimg_xxx) */
+  function wpItems(cfg) {
+    var it = cfg && cfg.items, out = [];
+    if (Array.isArray(it)) it.forEach(function (k) { if (typeof k === 'string' && /^(b[1-4]|u_[a-z0-9]{3,16})$/.test(k) && out.indexOf(k) < 0 && out.length < 12) out.push(k); });
+    return out.length ? out : ['b1', 'b2', 'b3', 'b4'];
+  }
   function wpDays(now, cfg) { var hr = Math.max(0, Math.min(23, parseInt(cfg.hour, 10) || 0)); return { t: now + WP_TZ - hr * 3600000, hr: hr }; }
   function wpShift(cfg) { var d = parseInt(cfg.day, 10); if (!(d >= 0 && d <= 6)) d = 1; return (d - 1 + 7) % 7; }
   function wpOrder(cfg) {
-    var o = (cfg.order || []).map(function (v) { return parseInt(v, 10); }).filter(function (v, i, a) { return v >= 1 && v <= WP_FILES.length && a.indexOf(v) === i; });
-    return o.length ? o : [1, 2, 3, 4];
+    var n = wpItems(cfg).length;
+    var o = (cfg.order || []).map(function (v) { return parseInt(v, 10); }).filter(function (v, i, a) { return v >= 1 && v <= n && a.indexOf(v) === i; });
+    if (o.length) return o;
+    o = []; for (var i = 1; i <= n; i++) o.push(i); return o;
   }
-  /* indeks gambar (0..3) yang berlaku pada waktu now */
+  /* indeks gambar (0..n-1) yang berlaku pada waktu now */
   function wpPick(cfg, now) {
     cfg = cfg || wpCfg(); now = now || Date.now();
-    if (cfg.mode === 'fixed') { var f = parseInt(cfg.fixed, 10); return (f >= 1 && f <= WP_FILES.length) ? f - 1 : 0; }
+    var n = wpItems(cfg).length;
+    if (cfg.mode === 'fixed') { var f = parseInt(cfg.fixed, 10); return (f >= 1 && f <= n) ? f - 1 : 0; }
     var o = wpOrder(cfg), days = Math.floor(wpDays(now, cfg).t / 86400000);
-    var wk = Math.floor((days - 4 - wpShift(cfg)) / 7), n = o.length, k = (((wk + (parseInt(cfg.start, 10) || 0)) % n) + n) % n;
+    var wk = Math.floor((days - 4 - wpShift(cfg)) / 7), m = o.length, k = (((wk + (parseInt(cfg.start, 10) || 0)) % m) + m) % m;
     return o[k] - 1;
   }
   /* kapan gambar berikutnya berganti (ms epoch); null bila dikunci */
@@ -233,9 +250,36 @@
   }
   window.FM_THEME_PREF = function () { return pref; };
   window.FM_ROLE = ROLE;
-  window.FM_WP = { files: WP_FILES, pick: wpPick, next: wpNext, cfg: wpCfg, order: wpOrder };
+  window.FM_WP = { files: WP_FILES, pick: wpPick, next: wpNext, cfg: wpCfg, order: wpOrder, items: wpItems };
+  function setBg(u) { document.documentElement.style.setProperty('--fm-wp', u === 'none' ? 'none' : 'url("' + u + '")'); }
+  function fetchUpload(key) {
+    var id = key.slice(2);
+    fetch('https://firestore.googleapis.com/v1/projects/' + WP_PID + '/databases/(default)/documents/app_meta/wpimg_' + id + '?key=' + WP_AK, { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        var f = d && d.fields, u = f && f.d && f.d.stringValue; if (!u || u.indexOf('data:image/') !== 0) return;
+        try { localStorage.setItem('fm_wpi_' + key, u); } catch (e) {}
+        if (curKey === key) setBg(u);
+      }).catch(function () {});
+  }
+  var curKey = '';
   function updateWp() {
-    try { document.documentElement.style.setProperty('--fm-wp', 'url("' + WP_FILES[wpPick()] + '")'); } catch (e) {}
+    try {
+      if (ROLE === 'tower') return;
+      var cfg = wpCfg(), items = wpItems(cfg), key = items[wpPick(cfg)];
+      if (ROLE === 'login') {
+        var pt = cfg.portal;
+        if (pt === 'none') { curKey = ''; setBg('none'); return; }
+        var pi = parseInt(pt, 10); if (pi >= 1 && pi <= items.length) key = items[pi - 1];
+      }
+      curKey = key;
+      if (/^b[1-4]$/.test(key)) { setBg(WP_FILES[+key.charAt(1) - 1]); }
+      else {
+        var c = null; try { c = localStorage.getItem('fm_wpi_' + key); } catch (e) {}
+        if (c) setBg(c); else { setBg(WP_FILES[0]); fetchUpload(key); }
+      }
+      /* bersihkan gambar unggahan lama yang sudah tidak dipakai */
+      try { for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (k && k.indexOf('fm_wpi_') === 0 && items.indexOf(k.slice(7)) < 0) localStorage.removeItem(k); } } catch (e) {}
+    } catch (e) {}
   }
   window.FM_WP.update = updateWp;
   function apply() {
