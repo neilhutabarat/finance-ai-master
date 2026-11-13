@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 6.9';
+  var BETA = 'BETA 7.0';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 7.0)', '13 Nov 2026', [
+      '[Baru] Piutang & Utang (opsional): catat pelanggan atau pemasok yang berutang, DP, bayar sebagian, dan jatuh tempo',
+      '[Baru] Daftar Pelanggan dan Pemasok, lengkap dengan tombol tagih lewat WhatsApp',
+      '[Perbaikan] Uang yang benar-benar diterima atau dibayar otomatis masuk ke Mutasi',
+      '[Keamanan] Pembayaran tidak bisa melebihi sisa tagihan, dan hanya Admin atau Manager yang dapat mencatat'
+    ]],
     ['1.0.0 (BETA 6.9)', '13 Nov 2026', [
       '[Baru] Satuan Ganda (opsional): satu barang bisa dijual per satuan berbeda, mis. 1 bal = 100 lembar, stok terpotong otomatis',
       '[Baru] Barcode (opsional): scan dengan alat, kamera HP, atau cari nama barang langsung di Kasir',

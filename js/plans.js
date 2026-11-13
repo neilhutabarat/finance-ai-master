@@ -23,6 +23,7 @@
     { key: 'stok_input', label: 'Stok & Closing: tambah jenis dan stok masuk', r: { manager: 'o', owner: 'o' } },
     { key: 'jual_produk', label: 'Jual barang dari stok di kasir (toko dagang)', r: { kasir: 'o', manager: 'o' } },
     { key: 'satuan_ganda', label: 'Satuan Ganda (mis. 1 bal = 100 lembar) di Stok dan Kasir', r: { kasir: 'o', manager: 'o' } },
+    { key: 'piutang', label: 'Piutang & Utang: DP, bayar sebagian, jatuh tempo, daftar pelanggan dan pemasok', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'barcode', label: 'Barcode: scan alat, scan kamera, dan cari nama di Kasir', r: { kasir: 'o', manager: 'o' } },
     { key: 'banyak_usaha', label: 'Banyak Usaha (mis. Jahit, Karung, Kelontong)', r: { manager: 'o', owner: 'o' } },
     { key: 'stok_closing', label: 'Stok & Closing: isi sisa stok dan Closing Mingguan', r: { manager: 'o', owner: 'o' } },
@@ -100,7 +101,7 @@
 
   /* ---- tabel centang untuk Tower: prefix 'nt' (toko baru) atau 'ts' (ubah toko) ---- */
   var CATS = [
-    { id: 'jual', label: 'Penjualan & Stok', keys: ['stok', 'stok_input', 'stok_closing', 'jual_produk', 'satuan_ganda', 'barcode', 'banyak_usaha', 'bukti', 'wa_receipt', 'tax'] },
+    { id: 'jual', label: 'Penjualan & Stok', keys: ['stok', 'stok_input', 'stok_closing', 'jual_produk', 'satuan_ganda', 'barcode', 'piutang', 'banyak_usaha', 'bukti', 'wa_receipt', 'tax'] },
     { id: 'lap', label: 'Laporan & Keuangan', keys: ['dashboard', 'analisa', 'audit', 'export_csv', 'mutasi_wa', 'gaji', 'gaji_auto', 'billing_card'] },
     { id: 'awas', label: 'Pengawasan & Tim', keys: ['instruksi'] },
     { id: 'tamp', label: 'Tampilan & Info', keys: ['clock', 'weather', 'rates', 'chat', 'wallpaper', 'theme'] }
@@ -167,14 +168,14 @@
     plus: { label: 'Paket Plus', keys: PLUS_KEYS },
     warung: { label: 'Warung / Kafe', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'clock'] },
     toko: { label: 'Toko Retail', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
-    jasa: { label: 'Jasa / Klinik', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
+    jasa: { label: 'Jasa / Klinik', keys: [ 'piutang','stok', 'stok_input:manager', 'stok_closing:manager', 'ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
     umum: { label: 'Usaha Umum', keys: ['ledger', 'coa', 'dashboard', 'mutasi_wa', 'export_csv', 'clock', 'bukti'] },
-    minimarket: { label: 'Minimarket', keys: ['satuan_ganda', 'barcode', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'tax', 'dashboard', 'analisa', 'audit', 'export_csv', 'gaji', 'gaji_auto', 'instruksi', 'clock'] },
-    konveksi: { label: 'Konveksi / Jahit', keys: ['satuan_ganda', 'stok', 'stok_input:manager', 'stok_closing:manager', 'banyak_usaha', 'gaji', 'gaji_auto', 'ledger', 'coa', 'dashboard', 'analisa', 'audit', 'export_csv', 'mutasi_wa', 'bukti', 'instruksi'] },
+    minimarket: { label: 'Minimarket', keys: ['satuan_ganda', 'barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'tax', 'dashboard', 'analisa', 'audit', 'export_csv', 'gaji', 'gaji_auto', 'instruksi', 'clock'] },
+    konveksi: { label: 'Konveksi / Jahit', keys: ['satuan_ganda', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'banyak_usaha', 'gaji', 'gaji_auto', 'ledger', 'coa', 'dashboard', 'analisa', 'audit', 'export_csv', 'mutasi_wa', 'bukti', 'instruksi'] },
     kafe: { label: 'Kafe & Resto', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'dashboard', 'tax', 'gaji', 'clock', 'ledger'] },
     laundry: { label: 'Laundry', keys: ['stok', 'stok_input:manager', 'ledger', 'gaji', 'wa_receipt', 'mutasi_wa', 'bukti', 'dashboard', 'export_csv'] },
     salon: { label: 'Salon & Barbershop', keys: ['jual_produk', 'stok', 'stok_input:manager', 'gaji', 'gaji_auto', 'wa_receipt', 'dashboard', 'mutasi_wa', 'ledger'] },
-    bengkel: { label: 'Bengkel', keys: ['barcode', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'gaji', 'wa_receipt', 'ledger', 'coa', 'dashboard', 'bukti', 'mutasi_wa', 'export_csv'] },
+    bengkel: { label: 'Bengkel', keys: ['barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'gaji', 'wa_receipt', 'ledger', 'coa', 'dashboard', 'bukti', 'mutasi_wa', 'export_csv'] },
     lengkap: { label: 'Lengkap', keys: null }
   };
   /* paket buatan sendiri (disimpan di browser Tower dan, bila ada, di provider_settings/plan_presets) */
@@ -252,6 +253,7 @@
     if (!has('wallpaper', role)) { try { document.documentElement.style.removeProperty('--fm-wp'); } catch (e) {} }
     if (!has('stok', role)) drop('button[onclick*="FM_STOK"]');
     if (!has('gaji', role)) drop('button[onclick*="FM_GAJI"]');
+    if (!has('piutang', role)) drop('button[onclick*="FM_PIU"]');
     if (!has('ledger', role)) drop('button[onclick*="openModal(\'ledger\')"]');
     if (!has('audit', role)) drop('button[onclick*="openModal(\'audit_trail\')"]');
     if (!has('export_csv', role)) drop('button[onclick*="exportCSV"], button[onclick*="FM_LAPORAN"]');
