@@ -831,6 +831,13 @@
     ['Prive (penarikan pribadi owner) — tidak mengurangi laba', 'Owner withdrawals — do not reduce profit'],
     ['Prive (penarikan pribadi owner)', 'Owner withdrawals'],
     ['TOTAL A. INCOME:', 'TOTAL A. INCOME:'],
+    ['Akumulasi 12% belanja tools.', 'Accumulated 12% of tool purchases.'],
+    ['(belum aktif untuk toko ini)', '(not active for this store)'],
+    ['-- Memuat Akun COA & Produk --', '-- Loading COA Accounts & Products --'],
+    ['Fiskal belanja', 'Purchase tax'],
+    ['mis. 5000 atau 10%', 'e.g. 5000 or 10%'],
+    ['Sebelum penarikan Prive Owner', 'Before Owner withdrawals'],
+    ['Kolom ini hanya catatan transparan agar kamu tahu berapa rupiah dari belanjaanmu yang sudah disumbangkan ke kas negara.', 'This field is just a transparent note so you know how many rupiah of your purchases have been contributed to the state through tax.'],
   ];
 
   var MAP = {}; D.forEach(function (p) { MAP[p[0]] = p[1]; });
@@ -846,7 +853,7 @@
     [/^(\d[\d.,]*) hari$/i, '$1 days'], [/^(\d[\d.,]*) hari lagi$/i, 'in $1 days'],
     [/^(\d[\d.,]*) hari yang lalu$/i, '$1 days ago'], [/^(\d[\d.,]*) jam$/i, '$1 hours'],
     [/^(\d[\d.,]*) menit$/i, '$1 minutes'], [/^(\d[\d.,]*) bulan$/i, '$1 months'],
-    [/^(\d[\d.,]*) transaksi$/i, '$1 transactions'], [/^(\d[\d.,]*) nota$/i, '$1 receipts'],
+    [/^(\d[\d.,]*) transaksi$/i, '$1 transactions'], [/^(\d[\d.,]*) antrean$/i, '$1 in queue'], [/^(\d[\d.,]*) nota$/i, '$1 receipts'],
     [/^(\d[\d.,]*) barang$/i, '$1 items'], [/^(\d[\d.,]*) produk$/i, '$1 products'],
     [/^(\d[\d.,]*) karyawan$/i, '$1 employees'], [/^(\d[\d.,]*) unit$/i, '$1 units'],
     [/^(\d[\d.,]*) pesan$/i, '$1 messages'], [/^(\d[\d.,]*) akun$/i, '$1 accounts'],

@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 3';
+  var BETA = 'Beta 4';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta 4', '13 Nov 2026', [
+      '[Perbaikan] Mode gelap di akun Kasir dirapikan menyeluruh: kolom isian, jam, tombol, menu bawah, dan semua jendela kini gelap dan jelas terbaca (sebelumnya sebagian masih terang atau hampir tak terlihat)',
+      '[Perbaikan] Tombol di akun Manager dan Owner kini seragam: lebar dan tinggi sama, baris dibagi rata',
+      '[Keamanan] Catatan keterangan transaksi kini disaring sebelum ditampilkan, menutup celah penyisipan skrip dari akun kasir ke akun manager/owner',
+      '[Baru] Terjemahan Bahasa Inggris dilengkapi lagi pada layar utama dan jendela-jendelanya'
+    ]],
     ['Beta 3', '13 Nov 2026', [
       '[Perbaikan] Mode gelap dirombak total: sebelumnya hanya membalik warna layar, kini memakai palet gelap yang dirancang khusus sehingga tulisan jernih dan tidak lagi terlihat rusak',
       '[Perbaikan] Mode terang dibuat lebih mudah dibaca: kartu sedikit lebih pekat dan garisnya lebih tegas, latar dedaunan tetap terlihat',
@@ -102,6 +108,9 @@
     'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-emerald-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-emerald-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-green-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-green-50"]{background-color:rgba(10,85,62,.52)!important;border-color:rgba(69,219,166,.3)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-cyan-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-cyan-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-sky-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-sky-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-indigo-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-indigo-50"]{background-color:rgba(18,62,106,.52)!important;border-color:rgba(95,216,240,.26)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-amber-1"] [class*="text-amber-9"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-amber-1"] [class*="text-amber-8"]{color:#ffd978!important}',
+    'html[data-fm-black="1"] .fixed button[class*="bg-white/10"]{color:#e2e8f0!important}',
+    // ikon ubin & tombol aksi: sedikit lebih terang agar jelas di atas latar gelap
+    'html[data-fm-black="1"] .fm-actions .fm-act i{color:#b4c0ff!important}',
     // Jendela/panel bawaan aplikasi (konfirmasi, stok, laporan) ikut digelapkan supaya tidak menyilaukan.
     'html[data-fm-black="1"] #fm-dlg .fm-dlg-box,html[data-fm-black="1"] #fm-lap .lp,html[data-fm-black="1"] #fm-stok .sk-box,html[data-fm-black="1"] #fm-stok .sk-ed>div,html[data-fm-black="1"] #fm-stokadm-modal .sa-box{background:rgba(21,26,36,.95)!important;border-color:rgba(255,255,255,.12)!important;color:#eef1f7!important}',
     'html[data-fm-black="1"] #fm-dlg .fm-dlg-box h3,html[data-fm-black="1"] #fm-dlg .fm-dlg-box p,html[data-fm-black="1"] #fm-lap .lp h3,html[data-fm-black="1"] #fm-lap .lp p,html[data-fm-black="1"] #fm-stok .sk-box h3,html[data-fm-black="1"] #fm-stokadm-modal .sa-box h3{color:#eef1f7!important}',

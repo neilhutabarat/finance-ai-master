@@ -34,13 +34,14 @@
   var SURFACES = ['amber', 'yellow', 'orange', 'emerald', 'green', 'teal', 'rose', 'red', 'pink', 'sky', 'cyan', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'slate', 'gray', 'zinc', 'stone'];
   function buildTextCss() {
     var out = [];
-    var combos = [['dark', false], ['light', false], ['dark', true], ['light', true]];
+    var combos = [['dark', false], ['light', false], ['dark', true], ['light', true], ['light', false, true]];   // elemen ke-3 = tema gelap sungguhan pada halaman berbasis terang
     var skip = ':not(.oneui-hero *):not([style*="0f172a"] *):not(#fm-dock *):not(#fm-set *):not(.fm-keep *)';
     combos.forEach(function (cb) {
       var native = cb[0], inverted = cb[1];
-      var finalDark = (native === 'dark') !== inverted;   // tampilan akhir gelap?
+      var realDark = !!cb[2];
+      var finalDark = realDark || (native === 'dark') !== inverted;   // tampilan akhir gelap?
       var idx = finalDark ? 1 : 0;
-      var P = 'html[data-fm-native="' + native + '"]' + (inverted ? '[data-fm-invert]' : ':not([data-fm-invert])');
+      var P = 'html[data-fm-native="' + native + '"]' + (inverted ? '[data-fm-invert]' : ':not([data-fm-invert])') + (realDark ? '[data-fm-black]' : (native === 'light' && !inverted ? ':not([data-fm-black])' : ''));
       Object.keys(FAM).forEach(function (f) {
         var solid = [4, 5, 6, 7, 8, 9].map(function (n) { return ':not([class*="bg-' + f + '-' + n + '00"])'; }).join('') + ':not([class*="bg-slate-9"]):not([class*="bg-slate-8"]):not([class*="bg-gradient"]):not([class*="from-"])';
         out.push(P + ' [class*="text-' + f + '-"]' + solid + skip + '{color:' + pre(FAM[f][idx], inverted) + '!important}');
@@ -54,8 +55,8 @@
     var surf = [];
     SURFACES.forEach(function (f) { ['50', '100', '200'].forEach(function (n) { surf.push('[class*="bg-' + f + '-' + n + '"]'); }); });
     combos.forEach(function (cb) {
-      var finalDark = (cb[0] === 'dark') !== cb[1], idx = finalDark ? 1 : 0;
-      var P = 'html[data-fm-native="' + cb[0] + '"]' + (cb[1] ? '[data-fm-invert]' : ':not([data-fm-invert])');
+      var rd = !!cb[2], finalDark = rd || (cb[0] === 'dark') !== cb[1], idx = finalDark ? 1 : 0;
+      var P = 'html[data-fm-native="' + cb[0] + '"]' + (cb[1] ? '[data-fm-invert]' : ':not([data-fm-invert])') + (rd ? '[data-fm-black]' : (cb[0] === 'light' && !cb[1] ? ':not([data-fm-black])' : ''));
       out.push(P + ' .fm-ic .pos,' + P + ' .fm-ok{color:' + pre(FAM.emerald[idx], cb[1]) + '!important}');
       out.push(P + ' .fm-ic .neg{color:' + pre(FAM.rose[idx], cb[1]) + '!important}');
     });
@@ -73,7 +74,7 @@
   SKINS['glass-2026'] = { name: 'Glass 2026', css: [
     /* ---- variabel bahan. Nilai sudah dibalik untuk mode kebalikan (filter invert) ---- */
     'html[data-fm-native="dark"]:not([data-fm-invert]){--s-surf:rgba(255,255,255,.06);--s-line:rgba(255,255,255,.1);--s-hi:rgba(255,255,255,.13);--s-shadow:rgba(0,0,0,.75);--s-gloss:rgba(255,255,255,.045);--s-bg:#05060a;--s-b2:rgba(255,255,255,.1);--s-b2l:rgba(255,255,255,.14);--s-b2t:#f3f4f6}',
-    'html[data-fm-native="light"]:not([data-fm-invert]){--s-surf:rgba(255,255,255,.76);--s-line:rgba(15,23,42,.07);--s-hi:rgba(255,255,255,.95);--s-shadow:rgba(15,23,42,.3);--s-gloss:rgba(255,255,255,.5);--s-bg:#e8ecf3;--s-b2:rgba(255,255,255,.82);--s-b2l:rgba(15,23,42,.12);--s-b2t:#0f172a}',
+    'html[data-fm-native="light"]:not([data-fm-invert]):not([data-fm-black]){--s-surf:rgba(255,255,255,.76);--s-line:rgba(15,23,42,.07);--s-hi:rgba(255,255,255,.95);--s-shadow:rgba(15,23,42,.3);--s-gloss:rgba(255,255,255,.5);--s-bg:#e8ecf3;--s-b2:rgba(255,255,255,.82);--s-b2l:rgba(15,23,42,.12);--s-b2t:#0f172a}',
     'html[data-fm-native="dark"][data-fm-invert]{--s-surf:rgba(0,0,0,.76);--s-line:rgba(240,232,213,.07);--s-hi:rgba(0,0,0,.95);--s-shadow:rgba(240,232,213,.3);--s-gloss:rgba(0,0,0,.5);--s-bg:#17130c;--s-b2:rgba(0,0,0,.82);--s-b2l:rgba(240,232,213,.12);--s-b2t:#f0e8d5}',
     'html[data-fm-native="light"][data-fm-invert]{--s-surf:rgba(0,0,0,.06);--s-line:rgba(0,0,0,.1);--s-hi:rgba(0,0,0,.13);--s-shadow:rgba(255,255,255,.75);--s-gloss:rgba(0,0,0,.045);--s-bg:#fafaf5;--s-b2:rgba(0,0,0,.1);--s-b2l:rgba(0,0,0,.14);--s-b2t:#0c0b09}',
 
@@ -144,6 +145,15 @@
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-set .fm-sheet *,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-set .fm-sheet *,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-set .fm-sheet *{color:#1e293b!important;border-color:rgba(71,85,105,.25)!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-panel-modal table,html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] table,html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-panel-modal tbody tr,html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-panel-modal .fm-pb>*,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-panel-modal table,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] table,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-panel-modal tbody tr,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-panel-modal .fm-pb>*,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-panel-modal table,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] table,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-panel-modal tbody tr,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-panel-modal .fm-pb>*{background:transparent!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-panel-modal thead,html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-panel-modal thead th,html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] thead th,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-panel-modal thead,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-panel-modal thead th,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] thead th,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-panel-modal thead,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-panel-modal thead th,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] thead th{background:rgba(255,255,255,.45)!important}',
+    /* kasir: jendela/panel pada TEMA GELAP sungguhan */
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"],html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-panel-modal,html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-set{background:rgba(2,4,8,.6)!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"]>div,html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-panel-modal>div,html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .modal-sheet-glass{background:rgba(18,22,31,.95)!important;background-image:none!important;border:1px solid rgba(255,255,255,.14)!important;box-shadow:0 24px 60px -24px rgba(0,0,0,.85)!important;color:#eef1f7!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"]>div [class*="bg-white"],html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"]>div [class*="bg-slate-50"],html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"]>div [class*="bg-slate-100"],html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .modal-sheet-glass [class*="bg-white"]{background:rgba(255,255,255,.055)!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] thead,html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] thead th,html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-panel-modal thead,html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-panel-modal thead th{background:rgba(255,255,255,.07)!important;color:#c2cad9!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] [class*="border-slate-"],html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .modal-sheet-glass [class*="border-"]{border-color:rgba(255,255,255,.12)!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] button[class*="bg-slate-100"],html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body .fixed.inset-0[id*="modal"] button[class*="bg-slate-200"]{background:rgba(255,255,255,.1)!important;color:#eef1f7!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-set .fm-sheet{background:rgba(18,22,31,.96)!important;color:#eef1f7!important;border:1px solid rgba(255,255,255,.14)!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-set .fm-sheet *{color:#eef1f7!important;border-color:rgba(255,255,255,.14)!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-set .fm-card,html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-set .fm-mode,html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-set .fm-btn,html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-set details,html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-set .fm-rel,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-set .fm-card,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-set .fm-mode,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-set .fm-btn,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-set details,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-set .fm-rel,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-set .fm-card,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-set .fm-mode,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-set .fm-btn,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-set details,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-set .fm-rel{background:rgba(255,255,255,.55)!important;color:#1e293b!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body #fm-set .fm-mode *,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-set .fm-mode *,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-set .fm-mode *{background-color:transparent}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body button[class*="from-"],html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body button[class*="from-"] *,html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body button[class*="bg-gradient"] *,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body button[class*="from-"],html[data-fm-page="manager"][data-fm-native][data-fm-fit] body button[class*="from-"] *,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body button[class*="bg-gradient"] *,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body button[class*="from-"],html[data-fm-page="owner"][data-fm-native][data-fm-fit] body button[class*="from-"] *,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body button[class*="bg-gradient"] *{color:#fff!important}',
@@ -153,6 +163,12 @@
     'html[data-fm-page="kasir"][data-fm-invert="1"][data-fm-native][data-fm-fit] body header.oneui-hero .glass-capsule-dark,html[data-fm-page="kasir"][data-fm-invert="1"][data-fm-native][data-fm-fit] body header.oneui-hero #tier-badge-indicator,html[data-fm-page="kasir"][data-fm-invert="1"][data-fm-native][data-fm-fit] body header.oneui-hero #pwa-install-btn{background:rgba(255,255,255,.14)!important;border-color:rgba(255,255,255,.3)!important;color:#f1f5f9!important}',
     'html[data-fm-page="kasir"][data-fm-invert="1"][data-fm-native][data-fm-fit] body #fm-dock{background:rgba(15,23,42,.72)!important;border-color:rgba(255,255,255,.22)!important}',
     'html[data-fm-page="kasir"][data-fm-invert="1"][data-fm-native][data-fm-fit] body #fm-dock *{color:#f1f5f9!important}',
+    /* kasir + tema gelap sungguhan: pakai gaya yang sama dengan tampilan gelap */
+    'html[data-fm-page="kasir"][data-fm-black="1"][data-fm-native][data-fm-fit] body header.oneui-hero{background:rgba(15,23,42,.66)!important;border-color:rgba(255,255,255,.22)!important;box-shadow:0 6px 18px -10px rgba(0,0,0,.5)!important}',
+    'html[data-fm-page="kasir"][data-fm-black="1"][data-fm-native][data-fm-fit] body header.oneui-hero *{color:#f1f5f9!important}',
+    'html[data-fm-page="kasir"][data-fm-black="1"][data-fm-native][data-fm-fit] body header.oneui-hero .glass-capsule-dark,html[data-fm-page="kasir"][data-fm-black="1"][data-fm-native][data-fm-fit] body header.oneui-hero #tier-badge-indicator,html[data-fm-page="kasir"][data-fm-black="1"][data-fm-native][data-fm-fit] body header.oneui-hero #pwa-install-btn{background:rgba(255,255,255,.14)!important;border-color:rgba(255,255,255,.3)!important;color:#f1f5f9!important}',
+    'html[data-fm-page="kasir"][data-fm-black="1"][data-fm-native][data-fm-fit] body #fm-dock{background:rgba(15,23,42,.72)!important;border-color:rgba(255,255,255,.22)!important}',
+    'html[data-fm-page="kasir"][data-fm-black="1"][data-fm-native][data-fm-fit] body #fm-dock *{color:#f1f5f9!important}',
     /* manager & owner: markup asli bertema gelap (dibalik untuk tampilan terang) -> kaca gelap tembus pandang, hasilnya terang saat dibalik */
     'html[data-fm-page="manager"],html[data-fm-page="owner"]{--s-surf:rgba(15,23,42,.7)!important;--s-line:rgba(255,255,255,.16)!important;--s-hi:rgba(255,255,255,.1)!important;--s-shadow:rgba(255,255,255,.2)!important;--s-gloss:rgba(255,255,255,.08)!important;--s-bg:#0b1220!important;--s-b2:rgba(15,23,42,.5)!important;--s-b2l:rgba(255,255,255,.2)!important;--s-b2t:#f1f5f9!important}',
     'html[data-fm-page="manager"][data-fm-native] body,html[data-fm-page="owner"][data-fm-native] body{background:transparent!important;background-image:none!important;padding-bottom:104px}',
@@ -241,7 +257,7 @@
 
     /* ---- kolom isian ---- */
     'input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]),select,textarea{border-radius:14px!important;min-width:0}',
-    'html[data-fm-native="light"]:not([data-fm-invert]) input:not([type=checkbox]):not([type=radio]):not([type=color]),html[data-fm-native="light"]:not([data-fm-invert]) select,html[data-fm-native="light"]:not([data-fm-invert]) textarea{background-color:rgba(255,255,255,.78)!important;border-color:rgba(148,163,184,.45)!important;box-shadow:inset 0 1px 2px rgba(15,23,42,.05)!important}',
+    'html[data-fm-native="light"]:not([data-fm-invert]):not([data-fm-black]) input:not([type=checkbox]):not([type=radio]):not([type=color]),html[data-fm-native="light"]:not([data-fm-invert]):not([data-fm-black]) select,html[data-fm-native="light"]:not([data-fm-invert]):not([data-fm-black]) textarea{background-color:rgba(255,255,255,.78)!important;border-color:rgba(148,163,184,.45)!important;box-shadow:inset 0 1px 2px rgba(15,23,42,.05)!important}',
     /* halaman manager/owner saat tampilan terang (dibalik): kolom isian ditulis versi gelap
        supaya setelah dibalik hasilnya kotak putih bertulisan gelap, bukan kotak hitam */
     'html[data-fm-native="dark"][data-fm-invert] input:not([type=checkbox]):not([type=radio]):not([type=color]),html[data-fm-native="dark"][data-fm-invert] select,html[data-fm-native="dark"][data-fm-invert] textarea{background-color:rgba(12,16,24,.82)!important;color:#f1f5f9!important;border-color:rgba(148,163,184,.45)!important;box-shadow:none!important}',
@@ -281,7 +297,7 @@
     '.fixed.inset-0[id*="modal"]{background:rgba(6,8,14,.4)!important;}',
     '.fixed.inset-0[id*="modal"]>div{border-radius:30px!important;animation:fmPop .42s cubic-bezier(.2,.9,.25,1.12) both;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 40px 90px -30px rgba(0,0,0,.7)!important;border:1px solid rgba(255,255,255,.16)!important}',
     'html[data-fm-native="dark"]:not([data-fm-invert]) .fixed.inset-0[id*="modal"]>div{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03)),rgba(16,18,25,.84)!important}',
-    'html[data-fm-native="light"]:not([data-fm-invert]) .fixed.inset-0[id*="modal"]>div{background:rgba(255,255,255,.86)!important;border-color:rgba(255,255,255,.95)!important}',
+    'html[data-fm-native="light"]:not([data-fm-invert]):not([data-fm-black]) .fixed.inset-0[id*="modal"]>div{background:rgba(255,255,255,.86)!important;border-color:rgba(255,255,255,.95)!important}',
     '@keyframes fmPop{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}',
     '@keyframes fmUp{from{opacity:.4;transform:translateY(100%)}to{opacity:1;transform:none}}',
     '@media(max-width:640px){.fixed.inset-0[id*="modal"]{align-items:flex-end!important;padding:0!important}.fixed.inset-0[id*="modal"]>div{width:100%!important;max-width:none!important;max-height:90vh!important;border-radius:30px 30px 0 0!important;animation:fmUp .42s cubic-bezier(.2,.9,.25,1) both;padding-bottom:env(safe-area-inset-bottom);position:relative}.fixed.inset-0[id*="modal"]>div::after{content:"";position:absolute;left:50%;top:7px;width:40px;height:5px;margin-left:-20px;border-radius:9px;background:rgba(148,163,184,.55);pointer-events:none}}',
@@ -303,8 +319,8 @@
     '#fm-more svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}',
 
     /* ---- panel popup (bagian halaman yang dibuka dari tombol tindakan) ---- */
-    'html[data-fm-native="light"]:not([data-fm-invert="1"]) header.oneui-hero{background:linear-gradient(180deg,rgba(255,255,255,.2) 0,rgba(255,255,255,.05) 42%,rgba(255,255,255,0) 56%),linear-gradient(180deg,rgba(28,32,44,.74),rgba(5,7,12,.88))!important}',
-    'html[data-fm-native="light"]:not([data-fm-invert="1"]) #fm-dock{background:linear-gradient(180deg,rgba(255,255,255,.2) 0,rgba(255,255,255,.05) 44%,rgba(255,255,255,0) 58%),linear-gradient(180deg,rgba(28,32,44,.74),rgba(5,7,12,.86))!important}',
+    'html[data-fm-native="light"]:not([data-fm-invert="1"]):not([data-fm-black]) header.oneui-hero{background:linear-gradient(180deg,rgba(255,255,255,.2) 0,rgba(255,255,255,.05) 42%,rgba(255,255,255,0) 56%),linear-gradient(180deg,rgba(28,32,44,.74),rgba(5,7,12,.88))!important}',
+    'html[data-fm-native="light"]:not([data-fm-invert="1"]):not([data-fm-black]) #fm-dock{background:linear-gradient(180deg,rgba(255,255,255,.2) 0,rgba(255,255,255,.05) 44%,rgba(255,255,255,0) 58%),linear-gradient(180deg,rgba(28,32,44,.74),rgba(5,7,12,.86))!important}',
     '#fm-panel-modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:16px}',
     '#fm-panel-modal>div{width:100%;max-width:760px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;color:inherit;font-family:' + FONT + '}',
     '#fm-panel-modal .fm-ph{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px 12px}',
@@ -401,6 +417,9 @@
     'html[data-fm-fit] #fm-insights .fm-ins-main .fm-scroll{flex:1 1 auto;max-height:clamp(60px,13vh,150px)}',
     'html[data-fm-fit] .fm-ic table{font-size:11px}html[data-fm-fit] .fm-ic td{padding:2px 8px}html[data-fm-fit] .fm-ic th{padding:2px 8px}',
     'html[data-fm-fit][data-fm-page="owner"] #fm-actions,html[data-fm-fit][data-fm-page="manager"] #fm-actions{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;grid-auto-rows:auto!important;align-content:start!important;gap:clamp(5px,1vh,8px)!important}',
+    /* manager & owner: ubin seragam (lebar & tinggi sama), jumlah kolom dibagi rata supaya tidak ada baris yang timpang */
+    'html[data-fm-fit][data-fm-page="owner"] #fm-actions,html[data-fm-fit][data-fm-page="manager"] #fm-actions{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-content:flex-start!important;gap:clamp(6px,1.1vh,10px)!important}',
+    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act{flex:0 0 calc((100% - (var(--fm-cols,6) - 1) * clamp(6px,1.1vh,10px)) / var(--fm-cols,6))!important;min-width:0!important;min-height:clamp(44px,7vh,58px)!important;box-sizing:border-box!important;align-items:center!important}',
     'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz],html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act[data-sz],html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act{grid-column:auto!important;grid-row:auto!important;flex-direction:row!important;text-align:left!important;justify-content:flex-start!important;min-height:0!important;padding:clamp(4px,.9vh,8px) 10px!important;gap:8px!important;font-size:clamp(11px,1.7vh,12.5px)!important;font-weight:700!important;border-radius:14px!important}',
     'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act i,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] i,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act i,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] i{width:clamp(22px,3.6vh,28px)!important;height:clamp(22px,3.6vh,28px)!important;border-radius:9px!important}',
     'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act svg,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] svg,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act svg,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] svg{width:clamp(13px,2.2vh,17px)!important;height:clamp(13px,2.2vh,17px)!important}',
@@ -592,7 +611,21 @@
     });
     /* Fitur Toko cukup di tepi (paling akhir): tukar tempat dengan tile lain */
     [].slice.call(grid.children).forEach(function (t) { if (/^\s*Fitur Toko\s*$/.test(t.textContent || '')) grid.appendChild(t); });
+    balanceCols(grid);
   }
+
+  /* membagi ubin ke baris yang seimbang (mis. 11 ubin -> 6+5, bukan 7+4) */
+  function balanceCols(g) {
+    g = g || document.getElementById('fm-actions'); if (!g) return;
+    var n = [].filter.call(g.children, function (c) { return c.classList && c.classList.contains('fm-act'); }).length;
+    if (!n) return;
+    var W = g.clientWidth || window.innerWidth, minW = W < 560 ? 140 : 156, gap = 8;
+    var maxCols = Math.max(2, Math.floor((W + gap) / (minW + gap)));
+    var rows = Math.ceil(n / maxCols), cols = Math.ceil(n / rows);
+    g.style.setProperty('--fm-cols', String(cols));
+  }
+  var _balT = null;
+  window.addEventListener('resize', function () { clearTimeout(_balT); _balT = setTimeout(function () { balanceCols(); }, 120); });
 
   /* ===================== dock ===================== */
   var MAP = {
