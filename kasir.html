@@ -133,10 +133,10 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=1.13"></script>
-    <script src="js/theme.js?v=6.8"></script>
-    <script src="js/logo.js?v=5.0"></script>
-    <script src="js/skin.js?v=5.8"></script>
+    <script src="js/dialog.js?v=6.9"></script>
+    <script src="js/theme.js?v=6.9"></script>
+    <script src="js/logo.js?v=6.9"></script>
+    <script src="js/skin.js?v=6.9"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -371,7 +371,8 @@
                     <div id="barcode-block" class="hidden">
                         <label class="text-xs font-black text-slate-700 block mb-1">Scan Barcode Produk <span id="bc-ready" class="ml-1 text-[10px] font-bold text-slate-400">• scanner siap</span></label>
                         <div class="flex gap-2">
-                            <input type="text" id="barcode-input" autocomplete="off" placeholder="Tembak barcode dengan scanner, otomatis masuk antrean" class="flex-1 glass-input rounded-2xl p-3 text-xs font-mono font-bold outline-none">
+                            <input type="text" id="barcode-input" autocomplete="off" placeholder="Tembak barcode atau ketik nama barang lalu Enter" class="flex-1 glass-input rounded-2xl p-3 text-xs font-mono font-bold outline-none">
+                            <button type="button" onclick="openCamScan()" class="px-3 rounded-2xl bg-slate-800 text-white text-xs font-black">Kamera</button>
                         </div>
                         <p id="barcode-status" class="hidden mt-1.5 text-[11px] font-bold"></p>
                     </div>
@@ -403,7 +404,7 @@
 
                     <div id="tx-qty-wrap" class="hidden">
                         <div class="flex justify-between items-center mb-1">
-                            <label class="text-xs font-black text-slate-700">Jumlah (pcs)</label>
+                            <label class="text-xs font-black text-slate-700">Jumlah <select id="tx-unit" onchange="onQtyChange()" class="hidden ml-1 text-[11px] font-black rounded-lg border border-slate-300 bg-white px-1.5 py-0.5"></select></label>
                             <span id="tx-stock-hint" class="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-mono">Tersedia: 0</span>
                         </div>
                         <div class="flex items-center gap-2">
@@ -734,23 +735,23 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=6.3"></script>
-    <script src="js/plans.js?v=6.8"></script>
-    <script src="js/usaha.js?v=6.0"></script>
-    <script src="js/mutasi-share.js?v=1.5.8"></script>
-    <script src="js/struk-pdf.js?v=2.1"></script>
-    <script src="js/gaji.js?v=1.5.8"></script>
+    <script src="js/auth.js?v=6.9"></script>
+    <script src="js/plans.js?v=6.9"></script>
+    <script src="js/usaha.js?v=6.9"></script>
+    <script src="js/mutasi-share.js?v=6.9"></script>
+    <script src="js/struk-pdf.js?v=6.9"></script>
+    <script src="js/gaji.js?v=6.9"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/widgets.js?v=4.1"></script>
-    <script src="js/config.js?v=18.0"></script>
+    <script src="js/widgets.js?v=6.9"></script>
+    <script src="js/config.js?v=6.9"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/billing.js?v=4.1"></script>
-    <script src="js/ctrl.js?v=5.6"></script>
-    <script src="js/chat.js?v=4.2"></script>
-    <script src="js/store.js?v=6.8"></script>
+    <script src="js/billing.js?v=6.9"></script>
+    <script src="js/ctrl.js?v=6.9"></script>
+    <script src="js/chat.js?v=6.9"></script>
+    <script src="js/store.js?v=6.9"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -907,8 +908,24 @@
             const p = STORE.getProducts().find(x => x.code === code);
             if (!p) return 0;
             const inDraft = draftList.filter(d => d.isProduct && d.accountCode === code && d.id !== excludeDraftId)
-                .reduce((sum, d) => sum + (d.qty || 1), 0);
+                .reduce((sum, d) => sum + (d.qty || 1) * (d.per || 1), 0);
             return Math.max(0, p.stock - inDraft);
+        }
+        function saleUnits(p) {
+            const base = { name: p.unit || 'pcs', per: 1, price: Number(p.sellPrice) || 0, barcode: p.barcode || '' };
+            let list = [base];
+            try {
+                if (window.FM_PLANS && FM_PLANS.has('satuan_ganda', 'kasir') && Array.isArray(p.units)) {
+                    p.units.forEach(u => { if (u && u.name && u.per >= 2) list.push({ name: u.name, per: Number(u.per), price: Number(u.price) > 0 ? Number(u.price) : base.price * Number(u.per), barcode: u.barcode || '' }); });
+                }
+            } catch (e) {}
+            return list;
+        }
+        function uLbl(d) { return d && d.unitName && (d.per || 1) > 1 ? ' ' + d.unitName : ''; }
+        function curUnit(opt) {
+            const p = STORE.getProducts().find(x => x.code === opt.value); if (!p) return null;
+            const sel = document.getElementById('tx-unit'), list = saleUnits(p);
+            return list[Number(sel.value) || 0] || list[0];
         }
 
         function setAmountLocked(lock) {
@@ -928,16 +945,27 @@
         function applyQtyToForm() {
             const opt = selectedProductOption();
             if (!opt) return;
-            const avail = availableStock(opt.value, document.getElementById('edit-draft-id').value);
+            const p = STORE.getProducts().find(x => x.code === opt.value); if (!p) return;
+            const usel = document.getElementById('tx-unit'), list = saleUnits(p);
+            if (usel.dataset.for !== p.code) {
+                usel.innerHTML = list.map((u, i) => `<option value="${i}">${fmEsc(u.name)}${u.per > 1 ? ' (isi ' + u.per + ')' : ''}</option>`).join('');
+                usel.dataset.for = p.code;
+                const want = window.__editUnit; window.__editUnit = null;
+                const wi = want ? list.findIndex(u => u.name === want) : 0;
+                usel.value = wi > 0 ? wi : 0;
+            }
+            usel.classList.toggle('hidden', list.length < 2);
+            const un = list[Number(usel.value) || 0] || list[0];
+            const avail = Math.floor(availableStock(opt.value, document.getElementById('edit-draft-id').value) / un.per);
             const qtyEl = document.getElementById('tx-qty');
             let qty = parseInt(qtyEl.value) || 1;
             if (qty > avail) qty = avail;
             if (qty < 1) qty = 1;
             qtyEl.value = qty;
             qtyEl.max = avail;
-            document.getElementById('tx-stock-hint').innerText = `Tersedia: ${avail}`;
-            document.getElementById('tx-amount').value = formatThousandSeparator((Number(opt.dataset.price) || 0) * qty);
-            document.getElementById('tx-desc').value = `Penjualan ${opt.dataset.name} x${qty}`;
+            document.getElementById('tx-stock-hint').innerText = `Tersedia: ${avail} ${un.name}`;
+            document.getElementById('tx-amount').value = formatThousandSeparator(un.price * qty);
+            document.getElementById('tx-desc').value = `Penjualan ${opt.dataset.name}${un.per > 1 ? ' (' + un.name + ')' : ''} x${qty}`;
             calculateTaxPreview();
         }
 
@@ -1032,13 +1060,14 @@
             const formattedDateFull = new Date(dateVal + 'T00:00:00').toLocaleDateString('id-ID');
             const isOutcome = (opt.dataset.category === 'cogs' || opt.dataset.category === 'expense');
             const isProd = (opt.dataset.isProduct === "true");
-            let qty = 1, unitPrice = 0;
+            let qty = 1, unitPrice = 0, unitName = '', per = 1;
             if (isProd) {
                 qty = parseInt(document.getElementById('tx-qty').value) || 0;
-                unitPrice = Number(opt.dataset.price) || 0;
-                const avail = availableStock(opt.value, editId);
-                if (qty < 1) return alert("Jumlah minimal 1 pcs!");
-                if (qty > avail) return alert(`Stok tidak cukup. Tersedia ${avail} pcs.`);
+                const un = curUnit(opt) || { name: 'pcs', per: 1, price: Number(opt.dataset.price) || 0 };
+                unitPrice = un.price; unitName = un.name; per = un.per;
+                const avail = Math.floor(availableStock(opt.value, editId) / per);
+                if (qty < 1) return alert("Jumlah minimal 1!");
+                if (qty > avail) return alert(`Stok tidak cukup. Tersedia ${avail} ${unitName}.`);
                 amount = unitPrice * qty; // harga selalu dari produk, tidak bisa diketik kasir
             }
             const taxAmount = (isOutcome && !isProd) ? Math.round(amount * 0.12) : 0;
@@ -1053,7 +1082,7 @@
                         accountName: opt.dataset.name,
                         category: opt.dataset.category,
                         isProduct: isProd,
-                        qty: qty,
+                        qty: qty, unitName: unitName, per: per,
                         unitPrice: unitPrice,
                         amount: amount,
                         tax12: taxAmount,
@@ -1072,7 +1101,7 @@
                     accountName: opt.dataset.name,
                     category: opt.dataset.category,
                     isProduct: isProd,
-                    qty: qty,
+                    qty: qty, unitName: unitName, per: per,
                     unitPrice: unitPrice,
                     amount: amount,
                     tax12: taxAmount,
@@ -1111,7 +1140,7 @@
                 item.innerHTML = `
                     <div>
                         <div class="flex items-center space-x-1.5">
-                            <span class="font-black text-slate-900">${d.isProduct ? '📦 ' : ''}[${fmEsc(d.accountCode)}] ${fmEsc(d.accountName)}${d.isProduct ? ' ×' + (d.qty || 1) : ''}</span>
+                            <span class="font-black text-slate-900">${d.isProduct ? '📦 ' : ''}[${fmEsc(d.accountCode)}] ${fmEsc(d.accountName)}${d.isProduct ? ' ×' + (d.qty || 1) + uLbl(d) : ''}</span>
                             <span class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${d.category === 'sales' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${d.category.toUpperCase()}</span>
                         </div>
                         <p class="text-[11px] text-slate-500 font-medium">${d.desc || '-'}</p>
@@ -1150,7 +1179,7 @@
                     break;
                 }
             }
-            if (d.isProduct) document.getElementById('tx-qty').value = d.qty || 1;
+            if (d.isProduct) { document.getElementById('tx-qty').value = d.qty || 1; window.__editUnit = d.unitName || null; document.getElementById('tx-unit').dataset.for = ''; }
             updateCategoryBadge(true);
             document.getElementById('btn-save-text').innerText = "Simpan Perubahan Draft";
             document.getElementById('btn-cancel-edit').classList.remove('hidden');
@@ -1226,7 +1255,7 @@
                 if (!d.isProduct) continue;
                 const p = STORE.getProducts().find(x => x.code === d.accountCode);
                 const have = p ? p.stock : 0;
-                if (have < (d.qty || 1)) return alert(`Stok ${d.accountName} tidak cukup (tersisa ${have} pcs). Ubah jumlah di draft terlebih dahulu.`);
+                if (have < (d.qty || 1) * (d.per || 1)) return alert(`Stok ${d.accountName} tidak cukup (tersisa ${have}). Ubah jumlah di draft terlebih dahulu.`);
             }
 
             let total = 0;
@@ -1240,7 +1269,7 @@
 
             // 1. Kurangi stok produk (tersimpan di server, aman bila beberapa kasir menjual bersamaan)
             draftList.forEach(d => {
-                if (d.isProduct) STORE.decrementStock(d.accountCode, d.qty || 1);
+                if (d.isProduct) STORE.decrementStock(d.accountCode, (d.qty || 1) * (d.per || 1));
             });
 
             // 2. Simpan Transaksi Sah
@@ -1255,6 +1284,7 @@
                     isProduct: d.isProduct || false,
                     ...((window.FM_BIZ && FM_BIZ.enabled()) ? { biz: FM_BIZ.ofDraft(d) } : {}),
                     qty: d.qty || 1,
+                    ...((d.per || 1) > 1 ? { unitName: d.unitName, per: d.per } : {}),
                     unitPrice: d.unitPrice || 0,
                     amount: d.amount,
                     tax12: d.tax12,
@@ -1292,14 +1322,14 @@
             lastReceipt = {
                 store: (document.getElementById('receipt-store-name') || {}).innerText || '',
                 when: nowFull + ' ' + nowTime, total: total, pay: PAYLBL[payNow] || payNow,
-                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) : '') + ' = ' + (d.category === 'sales' ? '' : '-') + 'Rp ' + formatThousandSeparator(d.amount)))
+                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) : '') + ' = ' + (d.category === 'sales' ? '' : '-') + 'Rp ' + formatThousandSeparator(d.amount)))
             };
             const rList = document.getElementById('receipt-items-list');
             rList.innerHTML = "";
             draftList.forEach(d => {
                 const row = document.createElement('div');
                 row.className = "flex justify-between";
-                row.innerHTML = `<span>${d.isProduct ? '📦 ' : ''}${fmEsc(d.accountName)}${d.isProduct ? ' x' + (d.qty || 1) : ''}</span><span>${d.category === 'sales' ? '' : '-'}Rp ${formatThousandSeparator(d.amount)}</span>`;
+                row.innerHTML = `<span>${d.isProduct ? '📦 ' : ''}${fmEsc(d.accountName)}${d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) : ''}</span><span>${d.category === 'sales' ? '' : '-'}Rp ${formatThousandSeparator(d.amount)}</span>`;
                 rList.appendChild(row);
             });
 
@@ -1682,7 +1712,7 @@
         });
 
         // ===== SCAN BARCODE =====
-        const BARCODE_ON = false; /* produk tidak dijual di Kasir */
+        const BARCODE_ON = (function () { try { return !!(window.FM_PLANS && FM_PLANS.has('barcode', 'kasir')); } catch (e) { return false; } })();
 
         function bcStatus(msg, ok) {
             const el = document.getElementById('barcode-status');
@@ -1693,27 +1723,23 @@
             bcStatus._t = setTimeout(() => el.classList.add('hidden'), 4000);
         }
 
-        function handleScannedCode(raw) {
-            const code = String(raw || '').trim();
-            if (!code) return false;
-            const p = null;
-            if (!p) { bcStatus(`Barcode ${code} tidak ditemukan di daftar produk.`, false); return false; }
-            if (availableStock(p.code, '') <= 0) { bcStatus(`Stok ${p.name} habis.`, false); return false; }
-
-            const existing = draftList.find(d => d.isProduct && d.accountCode === p.code);
+        function addSaleToDraft(p, un, n) {
+            n = n || 1;
+            const inDraft = draftList.find(d => d.isProduct && d.accountCode === p.code && (d.per || 1) === un.per);
+            const avail = Math.floor(availableStock(p.code, '') / un.per);
+            if (avail < n) { bcStatus(`Stok ${p.name} (${un.name}) tidak cukup.`, false); return false; }
             const dateVal = document.getElementById('tx-date-input').value || localISO();
-            if (existing) {
-                existing.qty = (existing.qty || 1) + 1;
-                existing.unitPrice = p.sellPrice;
-                existing.amount = p.sellPrice * existing.qty;
-                existing.dpp = existing.amount;
-                existing.desc = `Penjualan ${p.name} x${existing.qty}`;
+            const lbl = un.per > 1 ? ' (' + un.name + ')' : '';
+            if (inDraft) {
+                inDraft.qty = (inDraft.qty || 1) + n;
+                inDraft.unitPrice = un.price; inDraft.amount = un.price * inDraft.qty; inDraft.dpp = inDraft.amount;
+                inDraft.desc = `Penjualan ${p.name}${lbl} x${inDraft.qty}`;
             } else {
                 draftList.push({
                     id: 'draft_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
                     accountCode: p.code, accountName: p.name, category: 'sales', isProduct: true,
-                    qty: 1, unitPrice: p.sellPrice, amount: p.sellPrice, tax12: 0, dpp: p.sellPrice,
-                    desc: `Penjualan ${p.name} x1`,
+                    qty: n, unitName: un.name, per: un.per, unitPrice: un.price, amount: un.price * n, tax12: 0, dpp: un.price * n,
+                    desc: `Penjualan ${p.name}${lbl} x${n}`,
                     staff: (document.getElementById('tx-staff').value.trim() || user.title),
                     dateISO: dateVal,
                     dateFull: new Date(dateVal + 'T00:00:00').toLocaleDateString('id-ID'),
@@ -1721,10 +1747,51 @@
                 });
             }
             localStorage.setItem('fm_kasir_drafts', JSON.stringify(draftList));
-            renderDraftList();
-            const q = draftList.find(d => d.accountCode === p.code).qty;
-            bcStatus(`✓ ${p.name} ×${q} masuk antrean.`, true);
+            renderDraftList(); try { renderProductGrid(); } catch (e) {}
+            const q = draftList.find(d => d.isProduct && d.accountCode === p.code && (d.per || 1) === un.per).qty;
+            bcStatus(`✓ ${p.name}${lbl} ×${q} masuk antrean.`, true);
             return true;
+        }
+
+        function handleScannedCode(raw) {
+            const code = String(raw || '').trim();
+            if (!code) return false;
+            const all = fmSaleProducts();
+            for (const p of all) {
+                const un = saleUnits(p).find(u => u.barcode && String(u.barcode) === code);
+                if (un) return addSaleToDraft(p, un, 1);
+            }
+            // bukan barcode: cari lewat nama / kode
+            const q = code.toLowerCase();
+            const hits = all.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase() === q);
+            if (hits.length === 1) return addSaleToDraft(hits[0], saleUnits(hits[0])[0], 1);
+            if (hits.length > 1) {
+                const ge = document.getElementById('product-grid-search');
+                if (ge) { ge.value = code; renderProductGrid(); }
+                bcStatus(`${hits.length} produk cocok. Pilih di Produk Cepat.`, true); return false;
+            }
+            bcStatus(`"${code}" tidak ditemukan (barcode maupun nama).`, false); return false;
+        }
+
+        function openCamScan() {
+            if (!('BarcodeDetector' in window) || !navigator.mediaDevices) { bcStatus('Kamera scan belum didukung browser ini. Pakai scanner atau ketik nama.', false); return; }
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px';
+            wrap.innerHTML = '<video autoplay playsinline muted style="width:min(480px,100%);border-radius:18px;background:#000"></video><div style="color:#fff;font:700 13px sans-serif">Arahkan kamera ke barcode</div><button type="button" style="padding:10px 22px;border-radius:14px;background:#fff;font-weight:800">Tutup</button>';
+            document.body.appendChild(wrap);
+            const v = wrap.querySelector('video'); let stream, alive = true, last = '', lastT = 0;
+            const stop = () => { alive = false; try { stream && stream.getTracks().forEach(t => t.stop()); } catch (e) {} wrap.remove(); };
+            wrap.querySelector('button').onclick = stop;
+            const det = new BarcodeDetector();
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(st => {
+                stream = st; v.srcObject = st;
+                (function loop() {
+                    if (!alive) return;
+                    det.detect(v).then(r => {
+                        if (r && r[0] && r[0].rawValue) { const c = r[0].rawValue, now = Date.now(); if (c !== last || now - lastT > 1500) { last = c; lastT = now; handleScannedCode(c); } }
+                    }).catch(() => {}).then(() => setTimeout(loop, 250));
+                })();
+            }).catch(() => { stop(); bcStatus('Kamera tidak bisa dibuka. Izinkan akses kamera.', false); });
         }
 
         function initBarcodeUI() {

@@ -96,6 +96,7 @@
                     unit: p.unit != null ? String(p.unit).trim() : (old && old.unit) || '',
                     forSale: p.forSale != null ? !!p.forSale : !!(old && old.forSale),
                     biz: p.biz != null ? String(p.biz).trim() : ((old && old.biz) || ''),
+                    units: Array.isArray(p.units) ? p.units.map(function (u) { return { name: String((u && u.name) || '').trim(), per: Math.floor(num(u && u.per)), price: num(u && u.price), barcode: u && u.barcode ? String(u.barcode).trim() : '' }; }).filter(function (u) { return u.name && u.per >= 2; }).slice(0, 4) : ((old && old.units) || []),
                     openStock: p.openStock != null ? Math.max(0, Math.floor(num(p.openStock))) : (old && typeof old.openStock === 'number' ? old.openStock : Math.max(0, Math.floor(num(p.stock)))),
                     endStock: p.endStock !== undefined ? (p.endStock === null || p.endStock === '' ? null : Math.max(0, Math.floor(num(p.endStock)))) : (old && typeof old.endStock === 'number' ? old.endStock : null)
                 };

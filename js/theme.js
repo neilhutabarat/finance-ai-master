@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 6.8';
+  var BETA = 'BETA 6.9';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 6.9)', '13 Nov 2026', [
+      '[Baru] Satuan Ganda (opsional): satu barang bisa dijual per satuan berbeda, mis. 1 bal = 100 lembar, stok terpotong otomatis',
+      '[Baru] Barcode (opsional): scan dengan alat, kamera HP, atau cari nama barang langsung di Kasir',
+      '[Perbaikan] Stok dan struk menampilkan satuan yang dipilih saat penjualan',
+      '[Keamanan] Barcode ganda ditolak agar satu kode tidak mewakili dua barang'
+    ]],
     ['1.0.0 (BETA 6.8)', '13 Nov 2026', [
       '[Baru] Stok: tombol Salin pada Jenis dan Induk, hasil salinan langsung muncul tepat di bawah aslinya dengan stok 0',
       '[Baru] Stok: tombol Ubah untuk mengganti nama jenis, satuan, harga beli, harga jual, dan nama Induk',
