@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 7.7';
+  var BETA = 'BETA 7.8';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 7.8)', '13 Nov 2026', [
+      '[Baru] Mode Offline Penuh (opsional): transaksi yang dicatat saat internet putus tetap tersimpan di perangkat dan terkirim otomatis saat online',
+      '[Baru] Penanda jumlah catatan yang menunggu dikirim, dan pemberitahuan saat semua sudah tersinkron',
+      '[Perbaikan] Data toko terakhir tetap bisa dibuka tanpa internet',
+      '[Keamanan] Data offline hanya tersimpan di perangkat toko itu sendiri dan hanya aktif bila fitur dinyalakan'
+    ]],
     ['1.0.0 (BETA 7.7)', '13 Nov 2026', [
       '[Baru] Absensi Karyawan (opsional): karyawan memilih nama lalu menekan Masuk atau Pulang di Kasir',
       '[Baru] Manager mengatur daftar karyawan, jam kerja, dan toleransi terlambat, serta mengoreksi atau mencatat izin, sakit, alpha',
