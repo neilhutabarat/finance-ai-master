@@ -297,7 +297,7 @@
       /* gelap = tema gelap sungguhan (tidak lagi memakai efek balik warna yang bikin tampilan rusak);
          terang di halaman yang markup-nya memang gelap (manager/owner) tetap memakai pembalik seperti semula */
       if (mode === 'dark') h.setAttribute('data-fm-black', '1');
-      else if (mode !== NATIVE) h.setAttribute('data-fm-invert', '1');
+      else if (mode !== NATIVE && !/provider\.html/.test(location.pathname)) h.setAttribute('data-fm-invert', '1');
       if (pref.accent) { h.setAttribute('data-fm-accent', '1'); h.style.setProperty('--fm-accent', pref.accent); }
       else h.style.removeProperty('--fm-accent');
       h.style.setProperty('--fm-on', onColor(pref.accent || '#3d63dd'));

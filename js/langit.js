@@ -35,7 +35,7 @@
   /* ---------- kaca ---------- */
   /* tingkat 1..5: kepekatan lapisan kaca (atas, tengah, bawah), kekaburan, kejenuhan latar */
   var LV = { 1: { a: [.9, .78, .86], b: 24, s: 1.1 }, 2: { a: [.7, .52, .64], b: 19, s: 1.25 }, 3: { a: [.5, .22, .4], b: 14, s: 1.45 }, 4: { a: [.3, .09, .22], b: 9, s: 1.6 }, 5: { a: [.16, .03, .1], b: 5, s: 1.7 } };
-  var MIRR = ['#tw-bar', '#tw-strip', '#tw-tbw', '#tw-bot .bx', '.ios-glass', '.white-ice-glass-card:not([style*="0f172a"])', '.fixed.inset-0[id*="modal"]>div'];
+  var MIRR = ['.ios-glass', '.white-ice-glass-card:not([style*="0f172a"])', '.fixed.inset-0[id*="modal"]>div'];
   var AUTH = ['header.oneui-hero', '#fm-dock', '.fm-act', '.fm-fab', '#fm-dlg .fm-dlg-box', '.white-ice-glass-card[style*="0f172a"]'];
   var PLUGOV = '[style*="inset: 0px"][style*="z-index: 21474"][style*="background: rgba(0, 0, 0,"]', PLUG = [PLUGOV + '>div'];
   var COLORS = ['#1d4ed8', '#047857', '#b91c1c', '#7c3aed', '#b45309', '#0e7490', '#be185d', '#4d7c0f'];
@@ -90,7 +90,9 @@
     o += 'html[data-fm-portal] body{background-image:var(--fm-wp)!important;background-size:cover!important;background-position:center!important;background-attachment:fixed!important;background-repeat:no-repeat!important}';
     o += 'html[data-fm-invert="1"] #fm-rain{filter:invert(1) hue-rotate(180deg)}';
     /* Tower memakai latar dan kaca yang sama dengan toko */
-    o += 'html[data-fm-page="tower"]::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;background:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,.2)),var(--fm-wp,url("/img/wp/1.jpg")) center bottom/cover no-repeat}html[data-fm-page="tower"] body{background:transparent!important}';
+    o += 'html[data-fm-page="tower"]::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;background:linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,.12)),var(--fm-wp,url("/img/wp/1.jpg")) center bottom/cover no-repeat}html[data-fm-page="tower"] body{background:transparent!important}';
+    o += 'html[data-fm-page="tower"] #tw-bar,html[data-fm-page="tower"] #tw-strip,html[data-fm-page="tower"] #tw-tbw,html[data-fm-page="tower"] #tw-bot .bx{background:linear-gradient(160deg,rgba(8,14,26,.62),rgba(8,14,26,.46))!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(255,255,255,.35)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 14px 28px -16px rgba(0,0,0,.6)!important;color:#f1f5f9!important}html[data-fm-page="tower"] #tw-tbw th{color:#cbd5e1!important}';
+    o += 'html[data-tw-ck] body>header,html[data-tw-ck] body>main,html[data-tw-ck] body>section,html[data-tw-ck] body>footer,html[data-tw-ck] body>nav{visibility:hidden!important}html[data-fm-page="tower"] #tw-root{color:#e2e8f0!important}html[data-fm-page="tower"] #tw-root .tw-chat .fmc-t,html[data-fm-page="tower"] #tw-strip *,html[data-fm-page="tower"] #tw-tbw th,html[data-fm-page="tower"] #tw-bot .bx>*:first-child{color:#cbd5e1!important}html[data-fm-page="tower"] #tw-strip .g,html[data-fm-page="tower"] #tw-tbw .g,html[data-fm-page="tower"] #tw-root .g{color:#4ade80!important}';
     o += 'html[data-fm-page="tower"] #tw-root{background:transparent!important}html[data-fm-page="tower"] #tw-bar{margin:10px 16px 8px;border-radius:18px!important;padding:9px 16px}html[data-fm-page="tower"] #tw-strip,html[data-fm-page="tower"] #tw-tbw,html[data-fm-page="tower"] #tw-bot .bx{border-radius:18px!important}html[data-fm-page="tower"] #tw-strip{margin-top:2px}html[data-fm-page="tower"] #tw-tbw{margin-top:8px;padding:4px 10px}html[data-fm-page="tower"] #tw-bot .bx{padding:10px 14px}html[data-fm-page="tower"] #tw-tbw th{background:transparent!important}';
     /* Base: putih polos, tanpa latar gambar */
     o += 'html[data-fm-look="base"]{--fm-wp:none!important}';
