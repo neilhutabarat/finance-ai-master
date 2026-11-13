@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta';
+  var BETA = 'Beta 2';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta 2', '13 Nov 2026', [
+      '[Perbaikan] Tombol Stok, Absen, dan Bantuan dipindah ke bawah agar tidak lagi menutupi formulir kasir',
+      '[Perbaikan] Pemberitahuan "versi baru siap" kini muncul otomatis saat ada pembaruan aplikasi'
+    ]],
     ['Beta', '13 Nov 2026', [
       '[Baru] Oneil Shield — pusat keamanan toko: lihat perlindungan datamu langsung di menu Pengaturan',
       '[Baru] Ganti bahasa Indonesia / English kini rapi di dalam menu Pengaturan',
