@@ -75,7 +75,8 @@
     o += 'html[data-fm-page] .fm-actions .fm-act{flex:0 0 auto!important;grid-column:auto!important;min-height:0!important;height:38px!important;padding:0 15px 0 8px!important;border-radius:999px!important;font-size:12.5px!important;font-weight:800!important;gap:8px!important;flex-direction:row!important;text-align:left!important}';
     o += 'html[data-fm-page] .fm-actions .fm-act i{width:24px!important;height:24px!important;border-radius:50%!important}.fm-actions .fm-act svg{width:14px!important;height:14px!important}';
     o += 'html[data-fm-page="manager"] [class*="text-[9px]"],html[data-fm-page="owner"] [class*="text-[9px]"],html[data-fm-page="manager"] [class*="text-[10px]"],html[data-fm-page="owner"] [class*="text-[10px]"]{font-size:11.5px!important}html[data-fm-page="manager"] [class*="text-[11px]"],html[data-fm-page="owner"] [class*="text-[11px]"],html[data-fm-page="manager"] .text-xs,html[data-fm-page="owner"] .text-xs{font-size:12.5px!important}';
-    o += 'html[data-fm-page] #fm-dock .fm-dk svg{color:#ef4444!important;stroke:#ef4444!important;width:26px!important;height:26px!important;stroke-width:2!important}html[data-fm-page] #fm-dock .fm-dk,html[data-fm-page] #fm-dock .fm-dk span,html[data-fm-page] #fm-dock .fm-dk b{font-size:12.5px!important;font-weight:700!important}html[data-fm-page] body #fm-dock .fm-dk{width:70px!important;height:62px!important}html[data-fm-page] body #fm-dock .fm-dk .fm-bd,html[data-fm-page] body #fm-dock .fm-dk em{font-size:11px!important}';
+    o += 'html[data-fm-page][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass] body #fm-dock .fm-dk svg,html[data-fm-page] body #fm-dock .fm-dk svg{color:#000!important;stroke:#000!important;width:26px!important;height:26px!important;stroke-width:2!important}html[data-fm-page][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass] body #fm-dock .fm-dk,html[data-fm-page][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass] body #fm-dock .fm-dk span,html[data-fm-page][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass] body #fm-dock .fm-dk b,html[data-fm-page] body #fm-dock .fm-dk,html[data-fm-page] body #fm-dock .fm-dk span,html[data-fm-page] body #fm-dock .fm-dk b{color:#000!important;text-shadow:none!important;font-size:13px!important;font-weight:800!important}html[data-fm-page][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass] body #fm-dock .fm-dk,html[data-fm-page] body #fm-dock .fm-dk{width:72px!important;height:64px!important}';
+    o += '@media(max-width:560px){html[data-fm-page][data-fm-glass] body #fm-dock .fm-dk,html[data-fm-page] body #fm-dock .fm-dk{width:50px!important;height:58px!important}html[data-fm-page][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass] body #fm-dock .fm-dk,html[data-fm-page][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass] body #fm-dock .fm-dk span{font-size:10.5px!important;width:auto}html[data-fm-page][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass] body #fm-dock .fm-dk{width:50px!important}html[data-fm-page][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass][data-fm-glass] body #fm-dock .fm-dk svg{width:22px!important;height:22px!important}}';
     o += '.fm-actions .fm-act span{display:block!important;white-space:nowrap!important;-webkit-line-clamp:unset!important}';
     /* tombol melayang Absen / Stok / Piutang */
     o += '.fm-fab{border-radius:999px!important;font-weight:800!important;font-size:12.5px!important;padding:0 16px!important;height:38px!important;line-height:36px!important;cursor:pointer;background:rgba(255,255,255,.88)!important;border:1px solid rgba(255,255,255,.9)!important;box-shadow:0 6px 16px -6px rgba(15,23,42,.35)!important}';
@@ -222,7 +223,13 @@
   window.addEventListener('fm:theme', setLook);
   function boot() {
     setLook();
-    refresh();
+    refresh().then(function () {
+      var done = function () { if (window.FM_BOOT_DONE) FM_BOOT_DONE(); };
+      try {
+        var m = /url\("?([^")]+)"?\)/.exec(document.documentElement.style.getPropertyValue('--fm-wp') || '');
+        if (m) { var im = new Image(); im.onload = im.onerror = done; im.src = m[1]; setTimeout(done, 1200); } else done();
+      } catch (e) { done(); }
+    });
     setInterval(function () { if (!document.hidden) refresh(); }, 30000);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) refresh(); });
   }

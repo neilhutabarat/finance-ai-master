@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 14';
+  var BETA = 'RC 1';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['RC 1', '14 Nov 2026', [
+      '[Baru] Versi Release Candidate: tampilan kaca sudah final untuk semua akun, termasuk Control Tower',
+      '[Perbaikan] Warna Control Tower tidak lagi terbalik; tombol dan panel kini bening',
+      '[Perbaikan] Halaman tidak lagi berkedip memuat tampilan atau wallpaper lama; tombol dock hitam dengan huruf lebih jelas',
+      '[Keamanan] Tampilan hanya bisa diatur oleh pengelola layanan; aplikasi toko hanya membaca dan tidak mengirim data toko'
+    ]],
     ['Beta 14', '14 Nov 2026', [
       '[Baru] Tema kaca juga dipakai di Control Tower',
       '[Perbaikan] Teks tombol berwarna kini hitam agar jelas terbaca; ikon dock merah dan huruf dock lebih besar',
@@ -254,6 +260,17 @@
     var w = wpDays(now, cfg), days = Math.floor(w.t / 86400000), wk = Math.floor((days - 4 - wpShift(cfg)) / 7);
     return (4 + wpShift(cfg) + (wk + 1) * 7) * 86400000 + w.hr * 3600000 - WP_TZ;
   }
+  /* tirai muat: halaman disembunyikan sampai kaca + wallpaper siap, supaya tidak berkedip tampilan/gambar lama */
+  (function () {
+    try {
+      var h = document.documentElement;
+      if (LITE || ['kasir', 'manager', 'owner', 'login', 'tower'].indexOf(ROLE) < 0 || pref.look === 'base') return;
+      var st = document.createElement('style'); st.id = 'fm-boot-css'; st.textContent = 'html[data-fm-boot] body{opacity:0!important}html body{transition:opacity .25s}';
+      (document.head || h).appendChild(st); h.setAttribute('data-fm-boot', '1');
+      window.FM_BOOT_DONE = function () { h.removeAttribute('data-fm-boot'); };
+      setTimeout(window.FM_BOOT_DONE, 2500);
+    } catch (e) {}
+  })();
   window.FM_THEME_PREF = function () { return pref; };
   window.FM_ROLE = ROLE;
   window.FM_WP = { files: WP_FILES, pick: wpPick, next: wpNext, cfg: wpCfg, order: wpOrder, items: wpItems };
@@ -280,7 +297,7 @@
       if (/^b[1-4]$/.test(key)) { setBg(WP_FILES[+key.charAt(1) - 1]); }
       else {
         var c = null; try { c = localStorage.getItem('fm_wpi_' + key); } catch (e) {}
-        if (c) setBg(c); else { setBg(WP_FILES[0]); fetchUpload(key); }
+        if (c) setBg(c); else { fetchUpload(key); }
       }
       /* bersihkan gambar unggahan lama yang sudah tidak dipakai */
       try { for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (k && k.indexOf('fm_wpi_') === 0 && items.indexOf(k.slice(7)) < 0) localStorage.removeItem(k); } } catch (e) {}
