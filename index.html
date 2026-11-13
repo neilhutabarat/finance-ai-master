@@ -106,10 +106,10 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=7.0"></script>
-    <script src="js/theme.js?v=7.0"></script>
-    <script src="js/logo.js?v=7.0"></script>
-    <script src="js/skin.js?v=7.0"></script>
+    <script src="js/dialog.js?v=7.1"></script>
+    <script src="js/theme.js?v=7.1"></script>
+    <script src="js/logo.js?v=7.1"></script>
+    <script src="js/skin.js?v=7.1"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -241,6 +241,11 @@
                 </div>
             </div>
 
+            <div id="admin-pick-wrap" class="hidden">
+                <label class="text-[11px] font-black text-slate-700 uppercase tracking-wider block mb-1.5">Pilih Admin:</label>
+                <select id="admin-pick" class="w-full glass-input rounded-2xl p-3 text-sm font-black outline-none text-slate-900"></select>
+            </div>
+
             <!-- 3. KOLOM PASSWORD / PIN -->
             <div>
                 <label class="text-[11px] font-black text-slate-700 uppercase tracking-wider block mb-1.5">
@@ -258,7 +263,7 @@
         </div>
 
         <div class="pt-3 text-[10px] text-slate-500 border-t border-slate-200/80 flex items-center justify-between relative z-20 font-semibold">
-            <span class="font-mono" data-fm-ver>v1.0.0 (BETA 7.0)</span>
+            <span class="font-mono" data-fm-ver>v1.0.0 (BETA 7.1)</span>
             <span class="text-emerald-600 font-bold flex items-center">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
                 Perlindungan sistem aktif
@@ -294,8 +299,8 @@
 
 
     <script src="js/tenants.js"></script>
-    <script src="js/config.js?v=7.0"></script>
-    <script src="js/auth.js?v=7.0"></script>
+    <script src="js/config.js?v=7.1"></script>
+    <script src="js/auth.js?v=7.1"></script>
     <script>
         let currentRole = 'staff';
         const urlParams = new URLSearchParams(window.location.search);
@@ -434,7 +439,25 @@
             });
             document.getElementById('input-pin').value = "";
             document.getElementById('input-pin').focus();
+            refreshAdminPicker();
         }
+
+        function refreshAdminPicker() {
+            const wrap = document.getElementById('admin-pick-wrap'), sel = document.getElementById('admin-pick');
+            if (!wrap || !sel) return;
+            wrap.classList.add('hidden');
+            if (currentRole !== 'staff' || !window.FM_AUTH || !FM_AUTH.admins) return;
+            let tk = ''; try { tk = lookupTenant(resolveTenantKey(document.getElementById('tenant-picker'))).id || ''; } catch (e) {}
+            if (!tk) return;
+            FM_AUTH.admins(tk).then(function (list) {
+                if (currentRole !== 'staff' || !list.length) return;
+                const prev = sel.value;
+                sel.innerHTML = '<option value="">Admin utama</option>' + list.map(function (a) { return '<option value="' + a.slot + '">' + String(a.name).replace(/[&<>"]/g, '') + (a.biz ? ' — ' + String(a.biz).replace(/[&<>"]/g, '') : '') + '</option>'; }).join('');
+                if (prev) sel.value = prev;
+                wrap.classList.remove('hidden');
+            });
+        }
+        setTimeout(refreshAdminPicker, 1500);
 
         function setLoginBrand(tn) {
             const h = document.getElementById('login-brand'), trig = document.getElementById('login-logo-trigger');
@@ -533,7 +556,8 @@
             const done = function () { btn.disabled = false; };
             if (!window.FM_AUTH) { done(); return alert("Modul keamanan belum termuat. Periksa internet lalu muat ulang halaman."); }
 
-            FM_AUTH.login(tenantKey, role, pin).then(function (r) {
+            const adminSlot = (role === 'staff' && !document.getElementById('admin-pick-wrap').classList.contains('hidden')) ? document.getElementById('admin-pick').value : '';
+            FM_AUTH.login(tenantKey, role, pin, adminSlot).then(function (r) {
                 done();
                 if (r.legacy) return alert("Akun login untuk peran ini belum diaktifkan. Hubungi provider (Tower Kontrol).");
                 if (!r.ok) {
@@ -543,7 +567,7 @@
                 const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
                 let userObj, targetUrl;
                 if (role === 'partner') { userObj = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey }; targetUrl = "partner.html"; }
-                else if (role === 'staff') { userObj = { role: 'staff', title: customRoles.staff || 'Admin', permissions: ['kasir'] }; targetUrl = "kasir.html"; }
+                else if (role === 'staff') { const ac = r.access || {}; userObj = { role: 'staff', title: ac.name || customRoles.staff || 'Admin', permissions: ['kasir'], slot: ac.slot || '', biz: ac.biz || '' }; targetUrl = "kasir.html"; }
                 else if (role === 'manager') { userObj = { role: 'manager', title: customRoles.manager || 'Supervisor / Manager', permissions: ['manager'] }; targetUrl = "manager.html"; }
                 else { userObj = { role: 'owner', title: customRoles.owner || 'Owner Eksekutif', permissions: ['all'] }; targetUrl = "dashboard.html"; }
                 completeLogin(userObj, targetUrl, currentTokoParam);

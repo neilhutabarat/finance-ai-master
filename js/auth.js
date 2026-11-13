@@ -30,6 +30,7 @@
   function fs() { return TOWER_CTX ? tapp().firestore() : (app(), firebase.firestore()); }
   function key(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
   function email(t, role, gen) { return key(t) + '.' + role + '.' + gen + DOMAIN; }
+  function adminEmail(t, slot, gen) { return key(t) + '.staff.' + String(slot).replace(/[^a-z0-9]/gi, '') + 'g' + gen + DOMAIN; }
   function isSynthetic(em) { return !!em && em.slice(-DOMAIN.length) === DOMAIN; }
   function cfgRef(t) { return fs().collection('tenant_access_cfg').doc(t); }
   function getCfg(t) { return cfgRef(t).get().then(function (s) { return s.exists ? s.data() : null; }); }
@@ -61,13 +62,21 @@
   }
 
   /* ---- login toko ---- */
-  function login(tid, role, pin) {
+  function login(tid, role, pin, slot) {
     return getCfg(tid).then(function (cfg) {
-      if (!cfg || !cfg.gen || !cfg.gen[role]) return { legacy: true };
-      return auth().signInWithEmailAndPassword(email(tid, role, cfg.gen[role]), pin).then(function (cr) {
+      var em;
+      if (role === 'staff' && slot) {
+        var a = cfg && cfg.admins && cfg.admins[slot];
+        if (!a) return { ok: false, reason: 'denied' };
+        em = adminEmail(tid, slot, a.gen);
+      } else {
+        if (!cfg || !cfg.gen || !cfg.gen[role]) return { legacy: true };
+        em = email(tid, role, cfg.gen[role]);
+      }
+      return auth().signInWithEmailAndPassword(em, pin).then(function (cr) {
         return readAccess(cr.user.uid).then(function (r) {
           var d = r.d;
-          if (!d || d.tenant !== tid || d.role !== role) return auth().signOut().catch(noop).then(function () { return { ok: false, reason: 'denied' }; });
+          if (!d || d.tenant !== tid || d.role !== role || (slot ? d.slot !== slot : !!d.slot)) return auth().signOut().catch(noop).then(function () { return { ok: false, reason: 'denied' }; });
           try { localStorage.removeItem('fm_legacy_tenant'); } catch (e) {}
           return { ok: true, access: d };
         });
@@ -102,6 +111,49 @@
           return b.commit();
         });
       }, function (e) { try { sec.delete(); } catch (x) {} throw e; });
+    });
+  }
+  /* ---- Admin tambahan: banyak akun Admin per toko, tiap akun PIN sendiri, boleh terikat ke satu usaha ---- */
+  function admins(tid) { return getCfg(tid).then(function (c) { var a = (c && c.admins) || {}; return Object.keys(a).map(function (k) { return { slot: k, name: a[k].name || k, biz: a[k].biz || '', gen: a[k].gen }; }).sort(function (x, y) { return String(x.name).localeCompare(String(y.name)); }); }, function () { return []; }); }
+  function provisionAdmin(tid, slot, pin, name, biz) {
+    pin = String(pin || '');
+    if (pin.length < 6) return Promise.reject(new Error('PIN minimal 6 karakter (disarankan 6 angka).'));
+    slot = String(slot || '').replace(/[^a-z0-9]/gi, '');
+    if (!slot) return Promise.reject(new Error('Kode admin tidak valid.'));
+    return cfgRef(tid).get().then(function (s) {
+      var cfg = s.exists ? s.data() : {}, cur = (cfg.admins || {})[slot] || null;
+      var g = ((cur && cur.gen) || 0) + 1, em = adminEmail(tid, slot, g), oldUid = cur && cur.uid;
+      var sec = firebase.initializeApp(fbConf(), 'prov' + Date.now());
+      return sec.auth().createUserWithEmailAndPassword(em, pin).then(function (cr) {
+        var nu = cr.user.uid;
+        return sec.auth().signOut().catch(noop).then(function () { return sec.delete().catch(noop); }).then(function () {
+          var b = fs().batch(), nm = String(name || (cur && cur.name) || slot).trim(), bz = biz !== undefined ? String(biz || '') : ((cur && cur.biz) || '');
+          b.set(fs().collection('tenant_access').doc(nu), { tenant: tid, role: 'staff', slot: slot, name: nm, biz: bz, gen: g, email: em, at: Date.now() });
+          if (oldUid) b.delete(fs().collection('tenant_access').doc(oldUid));
+          var upd = {}; upd[slot] = { gen: g, uid: nu, name: nm, biz: bz };
+          b.set(cfgRef(tid), { tenant: tid, admins: upd, updatedAt: Date.now() }, { merge: true });
+          return b.commit();
+        });
+      }, function (e) { try { sec.delete(); } catch (x) {} throw e; });
+    });
+  }
+  function updateAdmin(tid, slot, name, biz) {
+    return cfgRef(tid).get().then(function (s) {
+      var cur = s.exists ? ((s.data().admins || {})[slot]) : null; if (!cur) throw new Error('Admin tidak ditemukan.');
+      var b = fs().batch(), nm = String(name || cur.name).trim(), bz = String(biz || '');
+      var u = {}; u['admins.' + slot + '.name'] = nm; u['admins.' + slot + '.biz'] = bz;
+      b.update(cfgRef(tid), u);
+      if (cur.uid) b.update(fs().collection('tenant_access').doc(cur.uid), { name: nm, biz: bz });
+      return b.commit();
+    });
+  }
+  function removeAdmin(tid, slot) {
+    return cfgRef(tid).get().then(function (s) {
+      var cur = s.exists ? ((s.data().admins || {})[slot]) : null; if (!cur) return;
+      var b = fs().batch(), u = {}; u['admins.' + slot] = firebase.firestore.FieldValue.delete();
+      if (cur.uid) b.delete(fs().collection('tenant_access').doc(cur.uid));
+      b.update(cfgRef(tid), u);
+      return b.commit();
     });
   }
   /* beberapa peran sekaligus: harus berurutan (membaca & menulis dokumen cfg yang sama) */
@@ -197,7 +249,7 @@
     });
   }
 
-  window.FM_AUTH = { curUser: function () { try { return auth().currentUser; } catch (e) { return null; } }, towerDb: function () { return tapp().firestore(); }, LEGACY: LEGACY, login: login, loginTower: loginTower, provision: provision, provisionMany: provisionMany, changeOwnPin: changeOwnPin, status: status, randomPin: randomPin, errText: function (r) { return ERR[r] || ERR.err; }, isSynthetic: isSynthetic, signOut: doSignOut, auth: auth };
+  window.FM_AUTH = { admins: admins, updateAdmin: updateAdmin, provisionAdmin: provisionAdmin, removeAdmin: removeAdmin, curUser: function () { try { return auth().currentUser; } catch (e) { return null; } }, towerDb: function () { return tapp().firestore(); }, LEGACY: LEGACY, login: login, loginTower: loginTower, provision: provision, provisionMany: provisionMany, changeOwnPin: changeOwnPin, status: status, randomPin: randomPin, errText: function (r) { return ERR[r] || ERR.err; }, isSynthetic: isSynthetic, signOut: doSignOut, auth: auth };
 
   var page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   var need = ROLES_BY_PAGE[page];

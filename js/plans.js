@@ -23,6 +23,7 @@
     { key: 'stok_input', label: 'Stok & Closing: tambah jenis dan stok masuk', r: { manager: 'o', owner: 'o' } },
     { key: 'jual_produk', label: 'Jual barang dari stok di kasir (toko dagang)', r: { kasir: 'o', manager: 'o' } },
     { key: 'satuan_ganda', label: 'Satuan Ganda (mis. 1 bal = 100 lembar) di Stok dan Kasir', r: { kasir: 'o', manager: 'o' } },
+    { key: 'admin_usaha', label: 'Admin tambahan per usaha: banyak akun Admin, PIN sendiri-sendiri, Owner bisa mengatur', r: { owner: 'o' } },
     { key: 'piutang', label: 'Piutang & Utang: DP, bayar sebagian, jatuh tempo, daftar pelanggan dan pemasok', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'barcode', label: 'Barcode: scan alat, scan kamera, dan cari nama di Kasir', r: { kasir: 'o', manager: 'o' } },
     { key: 'banyak_usaha', label: 'Banyak Usaha (mis. Jahit, Karung, Kelontong)', r: { manager: 'o', owner: 'o' } },
@@ -101,7 +102,7 @@
 
   /* ---- tabel centang untuk Tower: prefix 'nt' (toko baru) atau 'ts' (ubah toko) ---- */
   var CATS = [
-    { id: 'jual', label: 'Penjualan & Stok', keys: ['stok', 'stok_input', 'stok_closing', 'jual_produk', 'satuan_ganda', 'barcode', 'piutang', 'banyak_usaha', 'bukti', 'wa_receipt', 'tax'] },
+    { id: 'jual', label: 'Penjualan & Stok', keys: ['stok', 'stok_input', 'stok_closing', 'jual_produk', 'satuan_ganda', 'barcode', 'piutang', 'banyak_usaha', 'admin_usaha', 'bukti', 'wa_receipt', 'tax'] },
     { id: 'lap', label: 'Laporan & Keuangan', keys: ['dashboard', 'analisa', 'audit', 'export_csv', 'mutasi_wa', 'gaji', 'gaji_auto', 'billing_card'] },
     { id: 'awas', label: 'Pengawasan & Tim', keys: ['instruksi'] },
     { id: 'tamp', label: 'Tampilan & Info', keys: ['clock', 'weather', 'rates', 'chat', 'wallpaper', 'theme'] }
@@ -253,6 +254,8 @@
     if (!has('wallpaper', role)) { try { document.documentElement.style.removeProperty('--fm-wp'); } catch (e) {} }
     if (!has('stok', role)) drop('button[onclick*="FM_STOK"]');
     if (!has('gaji', role)) drop('button[onclick*="FM_GAJI"]');
+    if (!has('banyak_usaha', role)) drop('button[onclick*="FM_USAHA_SUM"]');
+    if (!has('admin_usaha', role)) drop('button[onclick*="FM_ADMINS"]');
     if (!has('piutang', role)) drop('button[onclick*="FM_PIU"]');
     if (!has('ledger', role)) drop('button[onclick*="openModal(\'ledger\')"]');
     if (!has('audit', role)) drop('button[onclick*="openModal(\'audit_trail\')"]');

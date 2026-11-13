@@ -68,16 +68,17 @@
             { label: 'Pesan', icon: 'send', run: "openModal('broadcast_modal')" }
         ];
     </script>
-    <script src="js/billing.js?v=7.0"></script>
-    <script src="js/dialog.js?v=7.0"></script>
-    <script src="js/theme.js?v=7.0"></script>
-    <script src="js/logo.js?v=7.0"></script>
-    <script src="js/skin.js?v=7.0"></script>
-    <script src="js/tower-menu.js?v=7.0"></script>
-    <script src="js/tower-lab.js?v=7.0"></script>
-    <script src="js/tower-health.js?v=7.0"></script>
-    <script src="js/chat.js?v=7.0"></script>
-    <script src="js/tower-cockpit.js?v=7.0"></script>
+    <script src="js/billing.js?v=7.1"></script>
+    <script src="js/dialog.js?v=7.1"></script>
+    <script src="js/theme.js?v=7.1"></script>
+    <script src="js/logo.js?v=7.1"></script>
+    <script src="js/skin.js?v=7.1"></script>
+    <script src="js/tower-menu.js?v=7.1"></script>
+    <script src="js/tower-lab.js?v=7.1"></script>
+    <script src="js/admins.js?v=7.1"></script>
+    <script src="js/tower-health.js?v=7.1"></script>
+    <script src="js/chat.js?v=7.1"></script>
+    <script src="js/tower-cockpit.js?v=7.1"></script>
     <style>#main-modal-container{z-index:70 !important}
     .fm-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
     .fm-dot-on{background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:fmBlink 1.4s infinite}
@@ -739,14 +740,14 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/auth.js?v=7.0"></script>
-    <script src="js/plans.js?v=7.0"></script>
-    <script src="js/templates.js?v=7.0"></script>
-    <script src="js/widgets.js?v=7.0"></script>
+    <script src="js/auth.js?v=7.1"></script>
+    <script src="js/plans.js?v=7.1"></script>
+    <script src="js/templates.js?v=7.1"></script>
+    <script src="js/widgets.js?v=7.1"></script>
     <script>window.NO_AUTO_STORE = true;</script>
-    <script src="js/config.js?v=7.0"></script>
+    <script src="js/config.js?v=7.1"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/store.js?v=7.0"></script>
+    <script src="js/store.js?v=7.1"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -3031,6 +3032,7 @@
             document.getElementById('al-fields').innerHTML = alRolesOf(tn).map(function (r) {
                 return '<label class="block"><span class="font-bold text-slate-300 block mb-1">PIN ' + AL_ROLES[r] + '</span><input type="text" inputmode="numeric" maxlength="32" data-alrole="' + r + '" placeholder="kosong = tidak diubah" class="w-full bg-slate-950 border border-white/15 rounded-xl p-2.5 font-mono font-bold text-white"></label>';
             }).join('');
+            document.getElementById('al-fields').insertAdjacentHTML('beforeend', '<button type="button" onclick="FM_ADMINS.open(alTid)" class="px-3 py-2 rounded-lg bg-violet-700 hover:bg-violet-600 text-white font-bold">Admin tambahan per usaha…</button>');
             document.getElementById('al-result').classList.add('hidden');
             document.getElementById('al-form').classList.remove('hidden');
         }

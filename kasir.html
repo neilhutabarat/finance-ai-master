@@ -133,10 +133,10 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=7.0"></script>
-    <script src="js/theme.js?v=7.0"></script>
-    <script src="js/logo.js?v=7.0"></script>
-    <script src="js/skin.js?v=7.0"></script>
+    <script src="js/dialog.js?v=7.1"></script>
+    <script src="js/theme.js?v=7.1"></script>
+    <script src="js/logo.js?v=7.1"></script>
+    <script src="js/skin.js?v=7.1"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -735,24 +735,24 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=7.0"></script>
-    <script src="js/plans.js?v=7.0"></script>
-    <script src="js/usaha.js?v=7.0"></script>
-    <script src="js/mutasi-share.js?v=7.0"></script>
-    <script src="js/struk-pdf.js?v=7.0"></script>
-    <script src="js/gaji.js?v=7.0"></script>
-    <script src="js/piutang.js?v=7.0"></script>
+    <script src="js/auth.js?v=7.1"></script>
+    <script src="js/plans.js?v=7.1"></script>
+    <script src="js/usaha.js?v=7.1"></script>
+    <script src="js/mutasi-share.js?v=7.1"></script>
+    <script src="js/struk-pdf.js?v=7.1"></script>
+    <script src="js/gaji.js?v=7.1"></script>
+    <script src="js/piutang.js?v=7.1"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/widgets.js?v=7.0"></script>
-    <script src="js/config.js?v=7.0"></script>
+    <script src="js/widgets.js?v=7.1"></script>
+    <script src="js/config.js?v=7.1"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/billing.js?v=7.0"></script>
-    <script src="js/ctrl.js?v=7.0"></script>
-    <script src="js/chat.js?v=7.0"></script>
-    <script src="js/store.js?v=7.0"></script>
+    <script src="js/billing.js?v=7.1"></script>
+    <script src="js/ctrl.js?v=7.1"></script>
+    <script src="js/chat.js?v=7.1"></script>
+    <script src="js/store.js?v=7.1"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -814,7 +814,13 @@
 
         let activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
         const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
-        const user = { role: 'staff', title: customRoles.staff || 'Admin' };
+        const user = { role: 'staff', title: customRoles.staff || 'Admin', slot: '', biz: '' };
+        try { const cu = JSON.parse(localStorage.getItem('currentUser') || 'null'); if (cu && cu.role === 'staff' && cu.slot) { user.title = cu.title || user.title; user.slot = cu.slot; user.biz = cu.biz || ''; } } catch (e) {}
+        function adminBizOk(b) {
+            if (!user.biz) return true;
+            const c = (window.FM_BIZ && FM_BIZ.canon) ? FM_BIZ.canon(b) : String(b || '');
+            return !c || c.toLowerCase() === String(user.biz).toLowerCase();
+        }
 
         if (document.getElementById('user-role-display')) {
             document.getElementById('user-role-display').innerText = `Role: ${user.title}`;
@@ -864,7 +870,7 @@
             Object.keys(categories).forEach(catKey => {
                 const group = document.createElement('optgroup');
                 group.label = categories[catKey];
-                coa.filter(c => c.category === catKey).forEach(c => {
+                coa.filter(c => c.category === catKey && adminBizOk(c.biz)).forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c.code;
                     opt.innerText = `[${c.code}] ${c.name}`;
@@ -902,7 +908,7 @@
         function fmSaleProducts() {
             try {
                 if (!(window.FM_PLANS && FM_PLANS.has('jual_produk', 'kasir'))) return [];
-                return STORE.getProducts().filter(p => p.forSale && Number(p.sellPrice) > 0);
+                return STORE.getProducts().filter(p => p.forSale && Number(p.sellPrice) > 0 && adminBizOk(p.biz));
             } catch (e) { return []; }
         }
         function availableStock(code, excludeDraftId) {
@@ -1283,6 +1289,7 @@
                     accountName: d.accountName,
                     category: d.category,
                     isProduct: d.isProduct || false,
+                    ...(user.slot ? { adminSlot: user.slot } : {}),
                     ...((window.FM_BIZ && FM_BIZ.enabled()) ? { biz: FM_BIZ.ofDraft(d) } : {}),
                     qty: d.qty || 1,
                     ...((d.per || 1) > 1 ? { unitName: d.unitName, per: d.per } : {}),

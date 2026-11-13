@@ -3,11 +3,18 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 7.0';
+  var BETA = 'BETA 7.1';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 7.1)', '13 Nov 2026', [
+      '[Baru] Admin tambahan (opsional): satu toko bisa punya banyak akun Admin, masing-masing dengan nama dan PIN sendiri',
+      '[Baru] Admin bisa dikaitkan ke satu usaha, sehingga di Kasir hanya tampil barang dan akun usaha itu',
+      '[Baru] Ringkasan per Usaha untuk Manager dan Owner, lengkap dengan rincian per Admin',
+      '[Perbaikan] Struk dan mutasi mencatat nama Admin yang melayani',
+      '[Keamanan] Admin yang dihapus langsung tidak bisa masuk, dan tiap Admin hanya bisa masuk dengan PIN miliknya'
+    ]],
     ['1.0.0 (BETA 7.0)', '13 Nov 2026', [
       '[Baru] Piutang & Utang (opsional): catat pelanggan atau pemasok yang berutang, DP, bayar sebagian, dan jatuh tempo',
       '[Baru] Daftar Pelanggan dan Pemasok, lengkap dengan tombol tagih lewat WhatsApp',
