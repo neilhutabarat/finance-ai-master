@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 7.4';
+  var BETA = 'BETA 7.5';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 7.5)', '13 Nov 2026', [
+      '[Baru] Neraca (Paket Plus): harta, utang, dan modal toko per tanggal pilihan, bisa disalin ke WhatsApp',
+      '[Baru] Akun neraca tambahan: aset (peralatan, kendaraan), utang (pinjaman), dan tambahan modal pemilik',
+      '[Perbaikan] Kas dihitung otomatis dari transaksi, piutang dan utang dari modul Piutang & Utang, persediaan dari stok',
+      '[Keamanan] Saldo awal dan akun neraca hanya bisa diubah Manager, Owner hanya melihat'
+    ]],
     ['1.0.0 (BETA 7.4)', '13 Nov 2026', [
       '[Baru] Arus Kas (opsional): uang masuk dan keluar per bulan, per minggu, dan per cara bayar',
       '[Baru] Anggaran Bulanan: batas pengeluaran per akun dan target pemasukan, dengan penanda aman, hampir habis, atau lewat',
