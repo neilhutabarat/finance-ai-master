@@ -759,7 +759,10 @@
     try { buildDock(); } catch (e) { console.warn('dock', e); }
     try { buildNarrow(); } catch (e) { console.warn('narrow', e); }
     try { watchTiles(); } catch (e) { console.warn('tiles', e); }
+    /* tampilan sudah tersusun: baru ditampilkan (sebelumnya terlihat tata letak lama sekitar 1 detik) */
+    setTimeout(function () { document.documentElement.classList.add('fm-ready'); }, 140);
   }
+  window.addEventListener('load', function () { setTimeout(function () { document.documentElement.classList.add('fm-ready'); }, 700); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 0); });
   else setTimeout(init, 0);
 })();

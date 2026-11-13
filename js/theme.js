@@ -3,11 +3,14 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 9.0';
+  var BETA = 'BETA 9.1';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 9.1)', '13 Nov 2026', [
+      '[Perbaikan] Setelah masuk, halaman Admin, Manager, dan Owner tidak lagi menampilkan tata letak lama sekitar 1 detik sebelum tampilan yang benar muncul'
+    ]],
     ['1.0.0 (BETA 9.0)', '13 Nov 2026', [
       '[Perbaikan] Halaman masuk tidak lagi menampilkan tampilan lama sesaat sebelum logo dan nama muncul dengan benar saat dimuat ulang'
     ]],
