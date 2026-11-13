@@ -8,7 +8,7 @@
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
   function fmt(n) { return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(Math.round(Math.abs(n) || 0)); }
   function rp(n) { return (n < 0 ? '-' : '') + 'Rp ' + fmt(n); }
-  function txs() { try { return (typeof txList !== 'undefined' && txList) ? txList : []; } catch (e) { return []; } }
+  function txs() { try { var l = (typeof txList !== 'undefined' && txList) ? txList : []; return (window.FM_BIZ && FM_BIZ.vf) ? FM_BIZ.vf(l) : l; } catch (e) { return []; } }
   function ten() { try { return getActiveTenant() || {}; } catch (e) { return {}; } }
   function dOf(t) { return t.dateISO || (t.timestamp ? iso(new Date(t.timestamp)) : ''); }
   var BLN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];

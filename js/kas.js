@@ -12,7 +12,7 @@
   function rp(n) { return (n < 0 ? '-' : '') + 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.abs(Math.round(n || 0))); }
   function iso(d) { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function f(k) { try { return !!(window.FM_PLANS && FM_PLANS.has(k)); } catch (e) { return false; } }
-  function txs() { try { return typeof txList !== 'undefined' ? txList : []; } catch (e) { return []; } }
+  function txs() { try { var l = (typeof txList !== 'undefined' && txList) ? txList : []; return (window.FM_BIZ && FM_BIZ.vf) ? FM_BIZ.vf(l) : l; } catch (e) { return []; } }
   function pay(t) { return t.pay || 'tunai'; }
   var PAYL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer' };
 
@@ -152,5 +152,6 @@
     });
     document.body.appendChild(ov);
   }
+  window.addEventListener('fm-biz-view', function () { render(); });
   window.FM_KAS = { open: function () { ensure(); start(); month = iso().slice(0, 7); rdate = iso(); note = ''; ov.style.display = 'flex'; render(); }, flow: flow, expectedCash: expectedCash, _set: function (b, r) { budgets = b || {}; recons = r || {}; } };
 })();

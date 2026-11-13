@@ -68,6 +68,12 @@
   }
   function start() { var n = 0, iv = setInterval(function () { if (watch() || ++n > 40) clearInterval(iv); }, 300); }
 
-  window.FM_BIZ = { list: list, enabled: enabled, ofAccount: ofAccount, ofProduct: ofProduct, ofGroup: ofGroup, ofTx: ofTx, ofDraft: ofDraft, options: options, canon: canon };
+  /* ---- pilihan usaha untuk Manager dan Owner: '' = semua usaha (gabungan) ---- */
+  function vkey() { var t = tn(); return 'fm_biz_view_' + ((t && t.id) || 'x'); }
+  function view() { if (!enabled()) return ''; try { return canon(sessionStorage.getItem(vkey()) || ''); } catch (e) { return ''; } }
+  function setView(v) { try { sessionStorage.setItem(vkey(), v || ''); } catch (e) {} try { window.dispatchEvent(new CustomEvent('fm-biz-view', { detail: v || '' })); } catch (e) {} }
+  function vf(l) { var v = view(); if (!v || !Array.isArray(l)) return l; return l.filter(function (t) { return ofTx(t) === v; }); }
+
+  window.FM_BIZ = { view: view, setView: setView, vf: vf, list: list, enabled: enabled, ofAccount: ofAccount, ofProduct: ofProduct, ofGroup: ofGroup, ofTx: ofTx, ofDraft: ofDraft, options: options, canon: canon };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

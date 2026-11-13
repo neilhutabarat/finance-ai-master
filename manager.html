@@ -59,10 +59,10 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=8.0"></script>
-    <script src="js/theme.js?v=8.0"></script>
-    <script src="js/logo.js?v=8.0"></script>
-    <script src="js/skin.js?v=8.0"></script>
+    <script src="js/dialog.js?v=8.3"></script>
+    <script src="js/theme.js?v=8.3"></script>
+    <script src="js/logo.js?v=8.3"></script>
+    <script src="js/skin.js?v=8.3"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -189,6 +189,7 @@
             <button data-fm-action data-ic="tag" onclick="FM_PAJAK.open()">Laporan Pajak</button>
             <button data-fm-action data-ic="users" onclick="FM_ABS.open()">Absensi</button>
             <button data-fm-action data-ic="box" onclick="FM_BACKUP.open()">Backup &amp; Ekspor</button>
+            <button data-fm-action data-ic="send" onclick="FM_LAPBUL.open()">Laporan Bulanan</button>
             <button data-fm-action data-ic="spark" onclick="FM_PLANS.openModal()">Fitur Toko</button>
         </div>
 
@@ -509,42 +510,44 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=8.0"></script>
-    <script src="js/monitor.js?v=8.0"></script>
-    <script src="js/plans.js?v=8.0"></script>
-    <script src="js/usaha.js?v=8.0"></script>
-    <script src="js/mutasi-share.js?v=8.0"></script>
-    <script src="js/gaji.js?v=8.0"></script>
-    <script src="js/piutang.js?v=8.0"></script>
-    <script src="js/promo.js?v=8.0"></script>
-    <script src="js/bantuan.js?v=8.0"></script>
-    <script src="js/kas.js?v=8.0"></script>
-    <script src="js/neraca.js?v=8.0"></script>
-    <script src="js/pajak.js?v=8.0"></script>
-    <script src="js/absensi.js?v=8.0"></script>
-    <script src="js/backup.js?v=8.0"></script>
-    <script src="js/dash-usaha.js?v=8.0"></script>
-    <script src="js/stok.js?v=8.0"></script>
-    <script src="js/coa-drag.js?v=8.0"></script>
+    <script src="js/auth.js?v=8.3"></script>
+    <script src="js/monitor.js?v=8.3"></script>
+    <script src="js/plans.js?v=8.3"></script>
+    <script src="js/usaha.js?v=8.3"></script>
+    <script src="js/usaha-bar.js?v=8.3"></script>
+    <script src="js/mutasi-share.js?v=8.3"></script>
+    <script src="js/gaji.js?v=8.3"></script>
+    <script src="js/piutang.js?v=8.3"></script>
+    <script src="js/promo.js?v=8.3"></script>
+    <script src="js/bantuan.js?v=8.3"></script>
+    <script src="js/kas.js?v=8.3"></script>
+    <script src="js/neraca.js?v=8.3"></script>
+    <script src="js/pajak.js?v=8.3"></script>
+    <script src="js/absensi.js?v=8.3"></script>
+    <script src="js/backup.js?v=8.3"></script>
+    <script src="js/laporan-bulanan.js?v=8.3"></script>
+    <script src="js/dash-usaha.js?v=8.3"></script>
+    <script src="js/stok.js?v=8.3"></script>
+    <script src="js/coa-drag.js?v=8.3"></script>
     <script>
-        (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); if (window.FM_GAJI) FM_GAJI.mount({ addTx: function (tx) { txList.unshift(tx); persistData(); if (typeof db !== 'undefined' && db) { db.collection(tenantFirestoreCol).add(Object.assign({}, tx, { timestamp: firebase.firestore.FieldValue.serverTimestamp() })).catch(console.error); } renderAllReports(); } }); }
+        (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return (typeof fmV === 'function') ? fmV(txList) : txList; } }); if (window.FM_GAJI) FM_GAJI.mount({ addTx: function (tx) { txList.unshift(tx); persistData(); if (typeof db !== 'undefined' && db) { db.collection(tenantFirestoreCol).add(Object.assign({}, tx, { timestamp: firebase.firestore.FieldValue.serverTimestamp() })).catch(console.error); } renderAllReports(); } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/insights.js?v=8.0"></script>
-    <script src="js/analisa.js?v=8.0"></script>
+    <script src="js/insights.js?v=8.3"></script>
+    <script src="js/analisa.js?v=8.3"></script>
     <script>
         (function(){ function go(){ if (window.FM_ANALISA && document.getElementById('fm-analisa-box')) FM_ANALISA.mount({ el: 'fm-analisa-box', tx: function(){ return txList; } }); }
           if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(go,0); }); else setTimeout(go,0);
           if (window.STORE) STORE.onChange(function(){ if (window.FM_ANALISA) FM_ANALISA.render(); }); })();
     </script>
-    <script src="js/labarugi.js?v=8.0"></script>
-    <script src="js/widgets.js?v=8.0"></script>
-    <script src="js/config.js?v=8.0"></script>
-    <script src="js/offline.js?v=8.0"></script>
+    <script src="js/labarugi.js?v=8.3"></script>
+    <script src="js/widgets.js?v=8.3"></script>
+    <script src="js/config.js?v=8.3"></script>
+    <script src="js/offline.js?v=8.3"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/billing.js?v=8.0"></script>
-    <script src="js/ctrl.js?v=8.0"></script>
-    <script src="js/store.js?v=8.0"></script>
+    <script src="js/billing.js?v=8.3"></script>
+    <script src="js/ctrl.js?v=8.3"></script>
+    <script src="js/store.js?v=8.3"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -583,6 +586,7 @@
         if (window.lucide) lucide.createIcons();
 
         let txList = [];
+        function fmV(l) { return (window.FM_BIZ && FM_BIZ.vf) ? FM_BIZ.vf(l) : l; }
         let closingHistory = JSON.parse(localStorage.getItem('fm_closing_history') || "[]");
 
         const tenantStorageKey = (activeTenant && activeTenant.id) ? `fm_v11_tx_${activeTenant.id}` : 'fm_v11_tx';
@@ -637,7 +641,7 @@
             renderPerAccountManager();
             renderCOATable();
             const _badge = document.getElementById('total-tx-badge');
-            if (_badge) _badge.innerText = `${txList.length} Transaksi Sah`;
+            if (_badge) _badge.innerText = `${fmV(txList).length} Transaksi Sah`;
         }
 
         function renderManagerTable() {
@@ -647,7 +651,7 @@
 
             let totalIn = 0;
             let totalOut = 0;
-            const chronoList = fmSortChrono(txList);
+            const chronoList = fmSortChrono(fmV(txList));
             let runningBalance = 0;
             const withBalance = chronoList.map(tx => {
                 if (tx.category === 'sales') runningBalance += tx.amount;
@@ -902,7 +906,7 @@
             if (!tbody) return;
             tbody.innerHTML = "";
             let totalTax = 0;
-            const outcomes = txList.filter(t => t.category !== 'sales');
+            const outcomes = fmV(txList).filter(t => t.category !== 'sales');
             outcomes.forEach(tx => {
                 const tax = tx.tax12 || Math.round(tx.amount * 0.12);
                 totalTax += tax;
@@ -930,7 +934,7 @@
             const groups = {};
             coaList.forEach(c => { groups[c.code] = { code: c.code, name: c.name, category: c.category, total: 0, items: [] }; });
 
-            txList.forEach(t => {
+            fmV(txList).forEach(t => {
                 if (groups[t.accountCode]) {
                     groups[t.accountCode].total += t.amount;
                     groups[t.accountCode].items.push(t);
@@ -1019,7 +1023,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadTransactions();
-            if (window.FM_INSIGHTS) FM_INSIGHTS.mount({ el: 'fm-insights', tx: () => txList, editTargets: false });
+            if (window.FM_INSIGHTS) FM_INSIGHTS.mount({ el: 'fm-insights', tx: () => fmV(txList), editTargets: false });
         });
     
 

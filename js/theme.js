@@ -3,11 +3,29 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 8.0';
+  var BETA = 'BETA 8.3';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 8.3)', '13 Nov 2026', [
+      '[Baru] Toko multi-usaha: tiap Admin punya buku sendiri, transaksi, saldo kas, dan closing terpisah dari Admin lain',
+      '[Baru] Manager dan Owner bisa memilih tampilan Semua usaha atau satu usaha, berlaku untuk kartu, Mutasi, Laba Rugi, Arus Kas, dan Laporan Bulanan',
+      '[Baru] Titik indikator di samping nama Admin: hijau online, kuning diam, abu-abu offline',
+      '[Perbaikan] Closing Admin kini tersimpan di server, tidak hidup lagi saat halaman dimuat ulang dan tidak mengganggu Admin lain',
+      '[Keamanan] Buku tiap Admin dipisahkan di aplikasi, dan transaksi baru selalu membawa label Admin dan usahanya'
+    ]],
+    ['1.0.0 (BETA 8.2)', '13 Nov 2026', [
+      '[Perbaikan] Pemeriksaan menyeluruh dan penyempurnaan kestabilan aplikasi serta kebersihan data di server',
+      '[Perbaikan] Laporan Bulanan menunggu data transaksi selesai dimuat sebelum tampil otomatis, sehingga tidak ada bulan yang terlewat',
+      '[Keamanan] Penguatan pemisahan data toko dan penjagaan agar data asli klien tidak tercampur dengan data contoh'
+    ]],
+    ['1.0.0 (BETA 8.1)', '13 Nov 2026', [
+      '[Baru] Laporan Bulanan (opsional): ringkasan pemasukan, pengeluaran, laba, perbandingan bulan lalu, dan akun terbesar untuk Owner',
+      '[Baru] Laporan bulan lalu muncul otomatis sekali saat Owner membuka aplikasi di bulan baru, siap dikirim lewat WhatsApp atau disalin',
+      '[Perbaikan] Nomor WhatsApp tujuan dan tampilan otomatis bisa diatur sendiri',
+      '[Keamanan] Laporan dibuat di perangkat Owner dan hanya dikirim lewat tindakan Owner sendiri'
+    ]],
     ['1.0.0 (BETA 8.0)', '13 Nov 2026', [
       '[Baru] Bantuan di dalam aplikasi: tombol "?" berisi panduan singkat per fitur dengan kolom pencarian, hanya menampilkan fitur yang aktif untuk toko Anda',
       '[Baru] Tanya Tim: kirim pertanyaan atau laporan masalah langsung dari aplikasi, balasan tim muncul di sana lengkap dengan penanda balasan baru',

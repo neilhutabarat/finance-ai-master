@@ -59,6 +59,7 @@
     var tx = { id: 'tx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4), accountCode: acc.code, accountName: acc.name, category: acc.category, isProduct: false, qty: 1, unitPrice: amount, amount: amount,
       tax12: 0, dpp: amount, desc: (masuk ? 'Terima bayar piutang ' : 'Bayar utang ') + e.partyName + (e.desc ? ' — ' + e.desc : ''), staff: who(), isClosed: false, pay: pay || 'tunai', dateISO: iso(now), date: t, dateFull: full, timestamp: Date.now(), piutangId: e.id };
     try { if (window.FM_BIZ && FM_BIZ.enabled() && e.biz) tx.biz = e.biz; } catch (x) {}
+    try { var cu = JSON.parse(localStorage.getItem('currentUser') || 'null'); if (cu && cu.role === 'staff' && cu.slot) { tx.adminSlot = cu.slot; if (cu.biz && !tx.biz) tx.biz = cu.biz; } } catch (x) {}
     txList.unshift(tx);
     try { persistData(); } catch (x) {}
     try { if (typeof db !== 'undefined' && db && typeof tenantFirestoreCol !== 'undefined') db.collection(tenantFirestoreCol).add(Object.assign({}, tx, { timestamp: firebase.firestore.FieldValue.serverTimestamp() })).catch(console.error); } catch (x) {}

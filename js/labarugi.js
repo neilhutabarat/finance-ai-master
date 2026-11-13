@@ -16,7 +16,7 @@
   function num(n) { return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(Math.round(n || 0)); }
   function rp(n) { return (n < 0 ? '-Rp ' : 'Rp ') + num(Math.abs(n)); }
   function pct(a, b) { return b > 0 ? (Math.round(a / b * 1000) / 10).toLocaleString('id-ID') + '%' : '-'; }
-  function txs() { try { return (typeof txList !== 'undefined' && txList) ? txList : []; } catch (e) { return []; } }
+  function txs() { try { var l = (typeof txList !== 'undefined' && txList) ? txList : []; return (window.FM_BIZ && FM_BIZ.vf) ? FM_BIZ.vf(l) : l; } catch (e) { return []; } }
   function txDate(t) { if (t.dateISO) return t.dateISO; if (t.timestamp) return iso(new Date(t.timestamp)); return ''; }
   function tenant() { try { return getActiveTenant() || {}; } catch (e) { return {}; } }
 
