@@ -281,6 +281,19 @@ const COA_TEMPLATES = {
     { code: "306", name: "Promosi & Iklan", category: "expense" },
     { code: "401", name: "Prive (Pengambilan Pribadi Owner)", category: "prive" }
   ] },
+  properti: { label: "Properti / Kost / Sewa", coa: [
+    { code: "101", name: "Pendapatan Sewa Kamar / Unit", category: "sales" },
+    { code: "102", name: "Pendapatan Sewa Ruko / Kios", category: "sales" },
+    { code: "103", name: "Pendapatan Listrik & Air Penyewa", category: "sales" },
+    { code: "104", name: "Pendapatan Denda & Lain-lain", category: "sales" },
+    { code: "301", name: "Gaji Penjaga & Petugas Kebersihan", category: "expense" },
+    { code: "302", name: "Listrik, Air & Internet", category: "expense" },
+    { code: "303", name: "Perawatan & Perbaikan Bangunan", category: "expense" },
+    { code: "304", name: "Kebersihan & Perlengkapan", category: "expense" },
+    { code: "305", name: "Pajak Bumi dan Bangunan (PBB)", category: "expense" },
+    { code: "306", name: "Promosi & Iklan", category: "expense" },
+    { code: "401", name: "Prive (Pengambilan Pribadi Owner)", category: "prive" }
+  ] },
   bengkel: { label: "Bengkel", coa: [
     { code: "101", name: "Pendapatan Jasa Servis", category: "sales" },
     { code: "102", name: "Penjualan Suku Cadang", category: "sales" },

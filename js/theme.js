@@ -3,11 +3,24 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 8.6';
+  var BETA = 'BETA 8.9';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 8.9)', '13 Nov 2026', [
+      '[Baru] Properti: tagihan sewa bulanan dibuat otomatis dari daftar penyewa aktif, pembayaran (tunai, transfer, QRIS, bisa dicicil) langsung masuk ke Mutasi',
+      '[Baru] Tombol Ingatkan WA di tiap tagihan, berisi pesan siap kirim ke penyewa',
+      '[Baru] Backup & Ekspor kini menyertakan lembar Properti (Unit, Penyewa, Tagihan)'
+    ]],
+    ['1.0.0 (BETA 8.8)', '13 Nov 2026', [
+      '[Baru] Modul Properti untuk kost, kontrakan, dan ruko: daftar Unit, daftar Penyewa (tanggal mulai, jatuh tempo, deposit), dan Ringkasan okupansi serta tunggakan',
+      '[Baru] Jenis usaha Properti / Kost / Sewa dengan daftar akun siap pakai'
+    ]],
+    ['1.0.0 (BETA 8.7)', '13 Nov 2026', [
+      '[Perbaikan] Pemeriksaan menyeluruh modul Stok Admin, Banyak Bahasa, dan katalog: perbaikan terjemahan yang ambigu dan kebersihan data Backup',
+      '[Perbaikan] Data Piutang dan Utang tidak lagi tercampur dengan data Properti di Backup'
+    ]],
     ['1.0.0 (BETA 8.6)', '13 Nov 2026', [
       '[Baru] Katalog awal siap pakai untuk usaha Kafe & Resto, Laundry, Salon & Barbershop, dan Bengkel (harga perkiraan, wajib disesuaikan oleh toko)',
       '[Perbaikan] Paket fitur Laundry kini menyertakan penjualan produk agar katalog tampil di kasir'

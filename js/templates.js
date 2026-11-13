@@ -211,7 +211,7 @@
     bengkel: { label: 'Bengkel Motor & Mobil (suku cadang dan jasa)', type: 'bengkel', preset: 'bengkel', lines: BENGKEL }
   };
   /* jenis usaha (COA_TEMPLATES) -> paket fitur bawaan (PRESETS di plans.js) */
-  var TYPE_PRESET = { umum: 'umum', warung: 'kafe', toko: 'minimarket', minimarket: 'minimarket', jasa: 'jasa', konveksi: 'konveksi', laundry: 'laundry', salon: 'salon', bengkel: 'bengkel' };
+  var TYPE_PRESET = { umum: 'umum', warung: 'kafe', toko: 'minimarket', minimarket: 'minimarket', jasa: 'jasa', konveksi: 'konveksi', laundry: 'laundry', salon: 'salon', bengkel: 'bengkel', properti: 'properti' };
 
   function featuresOf(presetKey) {
     var pr = window.FM_PLANS && FM_PLANS.PRESETS[presetKey], out = {};

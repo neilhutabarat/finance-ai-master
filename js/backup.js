@@ -63,7 +63,8 @@
     var piu = [], abs = null;
     try { if (f('piutang') && window.FM_PIU && FM_PIU.all) piu = FM_PIU.all(); } catch (e) {}
     try { if (f('absensi') && window.FM_ABS && FM_ABS.all) abs = FM_ABS.all(); } catch (e) {}
-    return { tx: tx, prods: prods, coa: coa, piu: piu, abs: abs };
+    var pr = []; try { if (f('properti') && window.FM_PROP && FM_PROP.all) pr = FM_PROP.all(); } catch (e) {}
+    return { tx: tx, prods: prods, coa: coa, piu: piu.filter(function (x) { return x.t === 'p' || x.t === 'e'; }), abs: abs, properti: pr };
   }
   function build(D) {
     var biz = function (t) { try { return (window.FM_BIZ && FM_BIZ.ofTx && FM_BIZ.ofTx(t)) || ''; } catch (e) { return ''; } };
@@ -77,6 +78,14 @@
     var ents = D.piu.filter(function (x) { return x.t === 'e'; });
     if (ents.length) S.push({ name: 'Piutang & Utang', rows: [['Jenis', 'Pihak', 'Keterangan', 'Total', 'Terbayar', 'Sisa', 'Jatuh tempo', 'Status']].concat(ents.map(function (e) { return [e.kind === 'piutang' ? 'Piutang' : 'Utang', e.partyName || '', e.desc || '', Number(e.total) || 0, Number(e.paid) || 0, Math.max(0, (Number(e.total) || 0) - (Number(e.paid) || 0)), e.dueISO || '', e.status || '']; })) });
     if (D.abs && D.abs.rows.length) S.push({ name: 'Absensi', rows: [['Tanggal', 'Karyawan', 'Status', 'Masuk', 'Pulang']].concat(D.abs.rows.slice().sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); }).map(function (r) { return [r.date || '', r.name || '', r.status || 'hadir', r.inAt || '', r.outAt || '']; })) });
+    var P = D.properti || [];
+    if (P.length) {
+      var un = {}; P.forEach(function (x) { if (x.t === 'xu') un[x.id] = x; });
+      var sw = {}; P.forEach(function (x) { if (x.t === 'xs') sw[x.id] = x; });
+      S.push({ name: 'Properti Unit', rows: [['Unit', 'Jenis', 'Tarif sewa per bulan', 'Catatan']].concat(P.filter(function (x) { return x.t === 'xu'; }).map(function (u) { return [u.name || '', u.kind || '', Number(u.rate) || 0, u.note || '']; })) });
+      S.push({ name: 'Properti Penyewa', rows: [['Penyewa', 'Unit', 'No. WhatsApp', 'Sewa per bulan', 'Mulai', 'Selesai', 'Deposit', 'Status']].concat(P.filter(function (x) { return x.t === 'xs'; }).map(function (x) { return [x.name || '', (un[x.unitId] || {}).name || '', x.phone || '', Number(x.rate) || 0, x.startISO || '', x.endISO || '', Number(x.deposit) || 0, x.status || '']; })) });
+      S.push({ name: 'Properti Tagihan', rows: [['Bulan', 'Unit', 'Penyewa', 'Tagihan', 'Terbayar', 'Sisa', 'Jatuh tempo', 'Status']].concat(P.filter(function (x) { return x.t === 'xb'; }).sort(function (a, b) { return String(a.month).localeCompare(String(b.month)); }).map(function (b) { return [b.month || '', (un[b.unitId] || {}).name || '', (sw[b.sewaId] || {}).name || '', Number(b.amount) || 0, Number(b.paid) || 0, Math.max(0, (Number(b.amount) || 0) - (Number(b.paid) || 0)), b.dueISO || '', b.status || '']; })) });
+    }
     return S;
   }
   function save(blob, name) {
@@ -101,11 +110,11 @@
   async function run(kind) {
     if (busy) return; busy = true; note = 'Menyiapkan data…'; render();
     try {
-      try { if (f('piutang') && window.FM_PIU && FM_PIU.start) FM_PIU.start(); if (f('absensi') && window.FM_ABS && FM_ABS.all) FM_ABS.all(); } catch (e) {}
+      try { if (f('piutang') && window.FM_PIU && FM_PIU.start) FM_PIU.start(); if (f('absensi') && window.FM_ABS && FM_ABS.all) FM_ABS.all(); if (f('properti') && window.FM_PROP && FM_PROP.all) FM_PROP.all(); } catch (e) {}
       await wait(1200);
       var D = getAll();
       if (kind === 'xlsx') save(xlsx(build(D)), name('xlsx'));
-      else save(new Blob([JSON.stringify({ toko: (tn() || {}).nama || tid(), dibuat: new Date().toISOString(), transaksi: D.tx, produk: D.prods, akun: D.coa, piutangUtang: D.piu, absensi: D.abs }, null, 1)], { type: 'application/json' }), name('json'));
+      else save(new Blob([JSON.stringify({ toko: (tn() || {}).nama || tid(), dibuat: new Date().toISOString(), transaksi: D.tx, produk: D.prods, akun: D.coa, piutangUtang: D.piu, absensi: D.abs, properti: D.properti }, null, 1)], { type: 'application/json' }), name('json'));
       stamp(); note = 'File sudah diunduh (' + D.tx.length + ' transaksi, ' + D.prods.length + ' produk).';
     } catch (e) { note = 'Gagal membuat file: ' + (e && e.message || e); }
     busy = false; render();

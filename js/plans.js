@@ -39,6 +39,7 @@
     { key: 'banyak_usaha', label: 'Banyak Usaha (mis. Jahit, Karung, Kelontong)', r: { manager: 'o', owner: 'o' } },
     { key: 'stok_admin', label: 'Stok untuk Admin: lihat stok usaha sendiri (tombol Stok di Kasir)', r: { kasir: 'o' } },
     { key: 'stok_scan', label: 'Scan Stok Masuk: Admin scan barcode untuk menambah stok, tercatat nama dan waktunya', r: { kasir: 'o' } },
+    { key: 'properti', label: 'Modul Properti: unit sewa, penyewa, tagihan bulanan, dan pengingat WhatsApp', r: { manager: 'o', owner: 'o' } },
     { key: 'bahasa', label: 'Banyak Bahasa: tombol ID | EN untuk mengganti tampilan ke English', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'stok_closing', label: 'Stok & Closing: isi sisa stok dan Closing Mingguan', r: { manager: 'o', owner: 'o' } },
     { key: 'bukti', label: 'Foto Bukti Struk (Kamera / Berkas)', r: { kasir: 'o' } },
@@ -115,7 +116,7 @@
 
   /* ---- tabel centang untuk Tower: prefix 'nt' (toko baru) atau 'ts' (ubah toko) ---- */
   var CATS = [
-    { id: 'jual', label: 'Penjualan & Stok', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'piutang', 'diskon', 'banyak_usaha', 'admin_usaha', 'bukti', 'wa_receipt', 'tax'] },
+    { id: 'jual', label: 'Penjualan & Stok', keys: ['properti', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'piutang', 'diskon', 'banyak_usaha', 'admin_usaha', 'bukti', 'wa_receipt', 'tax'] },
     { id: 'lap', label: 'Laporan & Keuangan', keys: ['dashboard', 'analisa', 'audit', 'export_csv', 'mutasi_wa', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'backup', 'laporan_bulanan', 'gaji', 'gaji_auto', 'billing_card'] },
     { id: 'awas', label: 'Pengawasan & Tim', keys: ['instruksi', 'absensi'] },
     { id: 'tamp', label: 'Tampilan & Info', keys: ['bahasa', 'offline_penuh', 'clock', 'weather', 'rates', 'chat', 'wallpaper', 'theme'] }
@@ -182,6 +183,7 @@
     plus: { label: 'Paket Plus', keys: PLUS_KEYS },
     warung: { label: 'Warung / Kafe', keys: ['laporan_bulanan', 'backup', 'stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'clock'] },
     toko: { label: 'Toko Retail', keys: ['laporan_bulanan', 'backup', 'stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
+    properti: { label: 'Properti / Kost / Sewa', keys: ['properti', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca', 'arus_kas', 'anggaran', 'rekon', 'piutang', 'gaji', 'ledger', 'coa', 'dashboard', 'bukti', 'wa_receipt', 'mutasi_wa', 'export_csv', 'audit'] },
     jasa: { label: 'Jasa / Klinik', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca', 'arus_kas', 'anggaran', 'rekon',  'piutang','stok', 'stok_input:manager', 'stok_closing:manager', 'ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
     umum: { label: 'Usaha Umum', keys: ['laporan_bulanan', 'backup', 'ledger', 'coa', 'dashboard', 'mutasi_wa', 'export_csv', 'clock', 'bukti'] },
     minimarket: { label: 'Minimarket', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca', 'arus_kas', 'anggaran', 'rekon', 'diskon', 'satuan_ganda', 'barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'tax', 'dashboard', 'analisa', 'audit', 'export_csv', 'gaji', 'gaji_auto', 'instruksi', 'clock'] },
@@ -272,6 +274,7 @@
     if (!has('laporan_bulanan', role)) drop('button[onclick*="FM_LAPBUL"]');
     if (!has('backup', role)) drop('button[onclick*="FM_BACKUP"]');
     if (!has('absensi', role)) drop('button[onclick*="FM_ABS"]');
+    if (!has('properti', role)) drop('button[onclick*="FM_PROP"]');
     if (!has('pajak_bulanan', role)) drop('button[onclick*="FM_PAJAK"]');
     if (!has('neraca', role)) drop('button[onclick*="FM_NERACA"]');
     if (!has('arus_kas', role) && !has('anggaran', role) && !has('rekon', role)) drop('button[onclick*="FM_KAS"]');
