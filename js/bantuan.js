@@ -37,6 +37,7 @@
     ['neraca', M, 'Neraca', ['Isi tanggal mulai, kas awal, dan modal awal sekali di awal.', 'Tambah aset tetap, utang lain, atau tambahan modal bila ada.', 'Tombol Salin teks membagikan neraca ke WhatsApp.']],
     ['pajak_bulanan', M, 'Laporan pajak', ['Atur tarif di bagian Pengaturan pajak.', 'Tabel menampilkan perkiraan pajak tiap bulan; tandai yang sudah disetor.', 'Angkanya perkiraan, konfirmasi ke konsultan pajak.']],
     ['backup', M, 'Backup & ekspor', ['Buka Backup & Ekspor, pilih Excel atau salinan lengkap.', 'Simpan file di tempat aman secara berkala.']],
+    [null, M, 'OneilStore (sewa fitur)', ['Buka tombol Store di menu Manager atau Owner.', 'Pilih fitur di tab Jelajah atau paket jenis usaha di tab Paket, lalu tekan Sewa.', 'Pilih Bulanan, Tahunan, atau Coba 7 hari (sekali per fitur), lalu Kirim permintaan.', 'Fitur aktif setelah pembayaran dikonfirmasi penyedia aplikasi. Lihat statusnya di tab Punyaku, lalu muat ulang halaman.', 'Saat masa sewa habis, fitur hanya terkunci. Data toko tetap utuh.']],
     [null, M, 'Fitur toko', ['Tombol Fitur Toko menampilkan fitur yang aktif.', 'Untuk menambah atau mematikan fitur, hubungi tim lewat tab Tanya Tim.']]
   ];
   function topics() { return TOPICS.filter(function (t) { return t[1].indexOf(role()) >= 0 && (!t[0] || f(t[0])); }); }

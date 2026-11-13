@@ -60,10 +60,10 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=beta4"></script>
-    <script src="js/theme.js?v=beta4"></script>
-    <script src="js/logo.js?v=beta4"></script>
-    <script src="js/skin.js?v=beta4"></script>
+    <script src="js/dialog.js?v=beta6"></script>
+    <script src="js/theme.js?v=beta6"></script>
+    <script src="js/logo.js?v=beta6"></script>
+    <script src="js/skin.js?v=beta6"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -215,6 +215,7 @@
             <button data-fm-action data-ic="tag" onclick="FM_PAJAK.open()">Laporan Pajak</button>
             <button data-fm-action data-ic="users" onclick="FM_ABS.open()">Absensi</button>
             <button data-fm-action data-ic="box" onclick="FM_PROP.open()">Properti</button>
+            <button data-fm-action data-ic="store" onclick="FM_OSTORE.open()">Store</button>
             <button data-fm-action data-ic="box" onclick="FM_BACKUP.open()">Backup &amp; Ekspor</button>
             <button data-fm-action data-ic="send" onclick="FM_LAPBUL.open()">Laporan Bulanan</button>
             <button data-fm-action data-ic="users" onclick="FM_ADMINS.open()">Admin Tambahan</button>
@@ -571,50 +572,51 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=beta4"></script>
-    <script src="js/monitor.js?v=beta4"></script>
-    <script src="js/plans.js?v=beta4"></script>
-    <script src="js/usaha.js?v=beta4"></script>
-    <script src="js/usaha-bar.js?v=beta4"></script>
-    <script src="js/i18n.js?v=beta4"></script>
-    <script src="js/mutasi-share.js?v=beta4"></script>
-    <script src="js/gaji.js?v=beta4"></script>
-    <script src="js/piutang.js?v=beta4"></script>
-    <script src="js/promo.js?v=beta4"></script>
-    <script src="js/bantuan.js?v=beta4"></script>
-    <script src="js/kas.js?v=beta4"></script>
-    <script src="js/neraca.js?v=beta4"></script>
-    <script src="js/pajak.js?v=beta4"></script>
-    <script src="js/absensi.js?v=beta4"></script>
-    <script src="js/properti.js?v=beta4"></script>
-    <script src="js/backup.js?v=beta4"></script>
-    <script src="js/laporan-bulanan.js?v=beta4"></script>
-    <script src="js/dash-usaha.js?v=beta4"></script>
-    <script src="js/admins.js?v=beta4"></script>
-    <script src="js/stok.js?v=beta4"></script>
-    <script src="js/coa-drag.js?v=beta4"></script>
-    <script src="js/laporan-pdf.js?v=beta4"></script>
+    <script src="js/auth.js?v=beta6"></script>
+    <script src="js/monitor.js?v=beta6"></script>
+    <script src="js/plans.js?v=beta6"></script>
+    <script src="js/usaha.js?v=beta6"></script>
+    <script src="js/usaha-bar.js?v=beta6"></script>
+    <script src="js/i18n.js?v=beta6"></script>
+    <script src="js/mutasi-share.js?v=beta6"></script>
+    <script src="js/gaji.js?v=beta6"></script>
+    <script src="js/piutang.js?v=beta6"></script>
+    <script src="js/promo.js?v=beta6"></script>
+    <script src="js/bantuan.js?v=beta6"></script>
+    <script src="js/kas.js?v=beta6"></script>
+    <script src="js/neraca.js?v=beta6"></script>
+    <script src="js/oneilstore.js?v=beta6"></script>
+    <script src="js/pajak.js?v=beta6"></script>
+    <script src="js/absensi.js?v=beta6"></script>
+    <script src="js/properti.js?v=beta6"></script>
+    <script src="js/backup.js?v=beta6"></script>
+    <script src="js/laporan-bulanan.js?v=beta6"></script>
+    <script src="js/dash-usaha.js?v=beta6"></script>
+    <script src="js/admins.js?v=beta6"></script>
+    <script src="js/stok.js?v=beta6"></script>
+    <script src="js/coa-drag.js?v=beta6"></script>
+    <script src="js/laporan-pdf.js?v=beta6"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return (typeof fmV === 'function') ? fmV(txList) : txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/insights.js?v=beta4"></script>
-    <script src="js/analisa.js?v=beta4"></script>
+    <script src="js/insights.js?v=beta6"></script>
+    <script src="js/analisa.js?v=beta6"></script>
     <script>
         (function(){ function go(){ if (window.FM_ANALISA && document.getElementById('fm-analisa-box')) FM_ANALISA.mount({ el: 'fm-analisa-box', tx: function(){ return txList; } }); }
           if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(go,0); }); else setTimeout(go,0);
           if (window.STORE) STORE.onChange(function(){ if (window.FM_ANALISA) FM_ANALISA.render(); }); })();
     </script>
-    <script src="js/labarugi.js?v=beta4"></script>
-    <script src="js/widgets.js?v=beta4"></script>
-    <script src="js/config.js?v=beta4"></script>
-    <script src="js/offline.js?v=beta4"></script>
-    <script src="js/core.js?v=beta4"></script>
-    <script src="js/billing.js?v=beta4"></script>
-    <script src="js/shield.js?v=beta4"></script>
-    <script src="js/ctrl.js?v=beta4"></script>
-    <script src="js/chat.js?v=beta4"></script>
-    <script src="js/store.js?v=beta4"></script>
+    <script src="js/labarugi.js?v=beta6"></script>
+    <script src="js/widgets.js?v=beta6"></script>
+    <script src="js/config.js?v=beta6"></script>
+    <script src="js/offline.js?v=beta6"></script>
+    <script src="js/core.js?v=beta6"></script>
+    <script src="js/billing.js?v=beta6"></script>
+    <script src="js/shield.js?v=beta6"></script>
+    <script src="js/ctrl.js?v=beta6"></script>
+    <script src="js/chat.js?v=beta6"></script>
+    <script src="js/store.js?v=beta6"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -738,7 +740,7 @@
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-white/5 text-xs";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono ${isInc ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isInc ? 'INCOME' : 'OUTCOME'} [${item.code}]</span></td>
+                    <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono ${isInc ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isInc ? 'INCOME' : 'OUTCOME'} [${fmEsc(item.code)}]</span></td>
                     <td class="py-2.5 px-3 font-bold">${fmEsc(item.name)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-500">${item.count} nota</td>
                     <td class="py-2.5 px-3 text-right font-black font-mono ${isInc ? 'text-emerald-700' : 'text-rose-700'}">Rp ${formatThousandSeparator(item.total)}</td>
@@ -883,7 +885,7 @@
             if (!tx) return;
             document.getElementById('owner-edit-tx-id').value = tx.id;
             document.getElementById('owner-edit-tx-title').innerText = `[${tx.accountName}] - Rp ${formatThousandSeparator(tx.amount)}`;
-            document.getElementById('owner-edit-new-date').value = tx.dateISO || new Date().toISOString().split('T')[0];
+            document.getElementById('owner-edit-new-date').value = tx.dateISO || (function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})(new Date());
             document.getElementById('modal-owner-edit-date').classList.remove('hidden');
         }
 
@@ -1259,13 +1261,13 @@ window.logout = async function () {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-white/5 text-xs"; tr.dataset.coa = c.code;
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-mono font-bold text-white">${c.code}</td>
+                    <td class="py-2.5 px-3 font-mono font-bold text-white">${fmEsc(c.code)}</td>
                     <td class="py-2.5 px-3 font-bold text-white">${fmEsc(c.name)}</td>
-                    <td class="py-2.5 px-3 uppercase text-[10px] text-slate-500">${c.category}</td>
+                    <td class="py-2.5 px-3 uppercase text-[10px] text-slate-500">${fmEsc(c.category)}</td>
                     <td class="py-2.5 px-3 text-center space-x-1">
                         <span class="coa-h" title="Klik dan seret untuk memindah urutan" style="cursor:grab;display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(148,163,184,.2);font-weight:900;touch-action:none;user-select:none">⠿ Seret</span>
-                        <button onclick="editCOAItem('${c.code}')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-slate-200 text-slate-300 font-bold text-[10px]">Edit</button>
-                        <button onclick="deleteCOAItem('${c.code}')" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px]">Hapus</button>
+                        <button data-c="${fmEsc(c.code)}" onclick="editCOAItem(this.dataset.c)" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-slate-200 text-slate-300 font-bold text-[10px]">Edit</button>
+                        <button data-c="${fmEsc(c.code)}" onclick="deleteCOAItem(this.dataset.c)" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px]">Hapus</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1295,7 +1297,7 @@ window.logout = async function () {
                 card.innerHTML = `
                     <div class="flex justify-between items-start border-b border-white/10/60 pb-2">
                         <div>
-                            <span class="text-[10px] font-mono font-bold text-slate-500">[${acc.code}]</span>
+                            <span class="text-[10px] font-mono font-bold text-slate-500">[${fmEsc(acc.code)}]</span>
                             <h4 class="font-bold text-white">${fmEsc(acc.name)}</h4>
                         </div>
                         <span class="font-black text-white font-mono">Rp ${formatThousandSeparator(acc.total)}</span>

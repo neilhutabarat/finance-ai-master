@@ -176,7 +176,7 @@
   }
   function fname(c, ext) { var t = tenant(); return 'laba_rugi_' + (t.id || 'toko') + (c.bizLabel ? '_' + c.bizLabel.replace(/[^A-Za-z0-9]+/g, '-') : '') + '_' + c.from + '_' + c.to + '.' + ext; }
   function exportCSV(c) {
-    var q = function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+    var q = function (v) { var s = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(s) && isNaN(Number(s))) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
     var lines = [['Laporan Laba Rugi', tenant().nama || ''], ['Periode', c.from + ' s/d ' + c.to]].concat(c.bizLabel ? [['Usaha', c.bizLabel]] : []).concat([[], ['Bagian', 'Keterangan', 'Nota', 'Nominal']]).concat(flat(c));
     var blob = new Blob(['﻿' + lines.map(function (r) { return r.map(q).join(','); }).join('\n')], { type: 'text/csv;charset=utf-8' });
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname(c, 'csv');

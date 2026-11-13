@@ -58,7 +58,7 @@
   function box(t, v) { return '<div style="padding:10px;border-radius:14px;background:rgba(255,255,255,.07)"><div style="font-size:11px;opacity:.7">' + t + '</div><div style="font-weight:800;font-size:14px;margin-top:2px">' + v + '</div></div>'; }
   function render() {
     if (!ov || ov.style.display === 'none') return;
-    var ed = canEdit(), m = calc(year), nowYm = new Date().toISOString().slice(0, 7);
+    var ed = canEdit(), m = calc(year), nowYm = (function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); })(new Date());
     var tO = 0, tP = 0, tN = 0; m.forEach(function (r) { tO += r.omzet; tP += r.pph; tN += Math.max(0, r.ppn); });
     var h = '<div style="width:100%;max-width:820px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
       '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Laporan Pajak Bulanan</div><div style="font-size:12px;opacity:.65">Perkiraan pajak dari omzet toko. Konfirmasi ke konsultan atau kantor pajak sebelum menyetor.</div></div><button data-x style="' + btn + '">Tutup</button></div>';

@@ -43,7 +43,7 @@
   }
   function exportCSV() {
     var txList = cfg ? cfg.tx() : [];
-    var q = function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+    var q = function (v) { var s = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(s) && isNaN(Number(s))) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
     var head = ['Tanggal', 'Jam', 'Kode Akun', 'Nama', 'Kategori', 'Qty', 'Harga Satuan', 'Jumlah', 'PPN', 'Metode Bayar', 'Petugas', 'Keterangan'];
     var rows = txList.map(function (t) { return [t.dateISO || t.dateFull, t.date, t.accountCode, t.accountName, t.category, t.qty || '', t.unitPrice || '', t.amount, t.tax12 || 0, t.pay || '', t.staff || '', t.desc || ''].map(q).join(','); });
     var blob = new Blob(['﻿' + head.map(q).join(',') + '\n' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });

@@ -101,7 +101,7 @@
   }
   var ALIAS = { weather: 'weather_rates', rates: 'weather_rates' };
   var NEW_ON = ['clock', 'weather', 'rates', 'billing_card', 'chat', 'wallpaper'];
-  function has(key, role, tn) {
+  function hasBase(key, role, tn) {
     var f = find(key); if (!f) return false;
     role = role || pageRole();
     var m = f.r[role]; if (!m) return false;
@@ -115,6 +115,73 @@
     if (v && typeof v === 'object' && typeof v[role] === 'boolean') return v[role];
     return legacyValue(f, role, tn);
   }
+
+  /* ===== OneilStore: katalog sewa fitur =====
+     Produk = kumpulan fitur teknis yang dijual satu paket. Harga per bulan (rupiah); tahunan = bayar 10 bulan.
+     Sewa aktif disimpan Tower di tenant_ctrl/<toko>.rentals = { <idProduk|idPaket|plus_all>: { until: ms, trial: bool } }.
+     Fitur yang sudah aktif sebelum Store (dicentang Tower) tetap aktif: sewa hanya MENAMBAH, tidak pernah mencabut. */
+  var SPRODUCTS = [
+    { id: 'stok', name: 'Modul Stok', grp: 'Stok & Barang', price: 25000, d: 'Daftar stok, stok masuk, closing, jual dari stok, dan stok untuk Admin', keys: ['stok', 'stok_input', 'stok_closing', 'jual_produk', 'stok_admin'] },
+    { id: 'barcode', name: 'Barcode & Scan Stok', grp: 'Stok & Barang', price: 15000, d: 'Scan dengan alat atau kamera, scan stok masuk', keys: ['barcode', 'stok_scan'] },
+    { id: 'satuan', name: 'Satuan Ganda', grp: 'Stok & Barang', price: 10000, d: 'Contoh: 1 bal = 100 lembar', keys: ['satuan_ganda'] },
+    { id: 'diskon', name: 'Diskon & Promo', grp: 'Transaksi', price: 10000, d: 'Promo otomatis dan diskon manual', keys: ['diskon'] },
+    { id: 'struk', name: 'Struk & Bukti', grp: 'Transaksi', price: 10000, d: 'Kirim struk lewat WhatsApp dan foto bukti', keys: ['wa_receipt', 'bukti'] },
+    { id: 'ppn', name: 'PPN 12%', grp: 'Transaksi', price: 10000, d: 'Hitung pajak langsung di nota', keys: ['tax'] },
+    { id: 'piutang', name: 'Piutang & Utang', grp: 'Keuangan', price: 20000, d: 'DP, bayar sebagian, jatuh tempo, daftar pelanggan dan pemasok', keys: ['piutang'] },
+    { id: 'neraca', name: 'Neraca', grp: 'Keuangan', price: 10000, d: 'Harta, utang, dan modal toko', keys: ['neraca'] },
+    { id: 'kontrol', name: 'Kontrol Keuangan', grp: 'Keuangan', price: 20000, d: 'Arus kas, anggaran bulanan, rekonsiliasi kas', keys: ['arus_kas', 'anggaran', 'rekon'] },
+    { id: 'pajak', name: 'Pajak Bulanan', grp: 'Keuangan', price: 15000, d: 'Perkiraan PPh Final dan PPN tiap bulan', keys: ['pajak_bulanan'] },
+    { id: 'lapbul', name: 'Laporan Bulanan', grp: 'Laporan', price: 10000, d: 'Ringkasan tiap bulan untuk Owner, kirim lewat WhatsApp', keys: ['laporan_bulanan'] },
+    { id: 'backup', name: 'Backup & Ekspor', grp: 'Laporan', price: 10000, d: 'Unduh data toko ke Excel dan arsip', keys: ['backup'] },
+    { id: 'absensi', name: 'Absensi', grp: 'Operasional', price: 15000, d: 'Catat masuk dan pulang, rekap kehadiran bulanan', keys: ['absensi'] },
+    { id: 'properti', name: 'Properti & Kost', grp: 'Operasional', price: 30000, d: 'Unit sewa, penyewa, tagihan bulanan, pengingat WhatsApp', keys: ['properti'] },
+    { id: 'usaha', name: 'Banyak Usaha', grp: 'Toko & Akun', price: 20000, d: 'Beberapa usaha dalam satu toko', keys: ['banyak_usaha'] },
+    { id: 'admin', name: 'Admin Tambahan', grp: 'Toko & Akun', price: 10000, d: 'Banyak akun Admin dengan PIN sendiri-sendiri', keys: ['admin_usaha'] },
+    { id: 'instruksi', name: 'Instruksi & Pengawasan', grp: 'Toko & Akun', price: 10000, d: 'Manager mengawasi dan memberi instruksi ke Admin', keys: ['instruksi'] }
+  ];
+  var SPACKS = [
+    { id: 'pk_laundry', name: 'Paket Laundry', price: 39000, items: ['piutang', 'struk', 'lapbul', 'backup'] },
+    { id: 'pk_kos', name: 'Paket Kos & Kontrakan', price: 55000, items: ['properti', 'piutang', 'lapbul', 'backup'] },
+    { id: 'pk_klinik', name: 'Paket Klinik & Jasa', price: 59000, items: ['piutang', 'neraca', 'pajak', 'lapbul', 'backup', 'absensi'] },
+    { id: 'pk_konveksi', name: 'Paket Konveksi', price: 69000, items: ['stok', 'satuan', 'piutang', 'usaha', 'lapbul', 'backup'] },
+    { id: 'pk_minimarket', name: 'Paket Minimarket', price: 79000, items: ['stok', 'barcode', 'satuan', 'diskon', 'struk', 'ppn', 'pajak', 'absensi'] }
+  ];
+  var SALL = { id: 'plus_all', name: 'Semua Fitur Store', price: 149000 }; /* batas atas: sewa satuan tak perlu melebihi ini */
+  var TRIAL_DAYS = 7;
+  function sprod(id) { return SPRODUCTS.filter(function (p) { return p.id === id; })[0]; }
+  function spack(id) { return SPACKS.filter(function (p) { return p.id === id; })[0]; }
+  function sitem(id) { return id === SALL.id ? SALL : (sprod(id) || spack(id)); }
+  function packKeys(id) {
+    if (id === SALL.id) return STORE_KEYS.slice();
+    var pk = spack(id), pr = sprod(id), out = [];
+    if (pk) pk.items.forEach(function (i) { var x = sprod(i); if (x) out = out.concat(x.keys); });
+    else if (pr) out = pr.keys.slice();
+    return out;
+  }
+  /* Saat halaman baru dibuka, data Tower (TENANT_CTRL) belum sampai padahal applyDom() sudah jalan. Karena itu sewa terakhir
+     disimpan di cache lokal (ditulis ctrl.js) dan dipakai sampai data Tower datang. */
+  function rentCacheKey() { var t = tenant(); return 'fm_rentals_' + (t && t.id ? t.id : ''); }
+  function rentCached() { try { var v = JSON.parse(localStorage.getItem(rentCacheKey()) || '{}'); return (v && typeof v === 'object') ? v : {}; } catch (e) { return {}; } }
+  function rentals() {
+    var c = window.TENANT_CTRL;
+    if (c) return (c.rentals && typeof c.rentals === 'object') ? c.rentals : {};
+    return rentCached();
+  }
+  function rentalActive(id, now) { var e = rentals()[id]; return !!(e && Number(e.until) > (now || Date.now())); }
+  function rentSig() { var R = rentals(), now = Date.now(); return Object.keys(R).filter(function (k) { return rentalActive(k, now); }).sort().join(','); }
+  var LOADED_SIG = null;
+  function rentedKey(key) {
+    var R = rentals(), now = Date.now();
+    for (var id in R) { if (!Object.prototype.hasOwnProperty.call(R, id)) continue; if (rentalActive(id, now) && packKeys(id).indexOf(key) >= 0) return true; }
+    return false;
+  }
+  function has(key, role, tn) {
+    if (hasBase(key, role, tn)) return true;
+    var f = find(key); if (!f || f.soon) return false;
+    role = role || pageRole();
+    return !!f.r[role] && rentedKey(key);
+  }
+
   function activeList(role, tn) { role = role || pageRole(); return FEATURES.filter(function (f) { return f.r[role] && !f.soon && has(f.key, role, tn); }); }
 
   /* ---- tabel centang untuk Tower: prefix 'nt' (toko baru) atau 'ts' (ubah toko) ---- */
@@ -336,6 +403,7 @@
       [].slice.call(document.querySelectorAll('label')).forEach(function (l) { if (/Bukti Struk/i.test(l.textContent) && l.parentElement) hide(l.parentElement); });
     }
   }
+  try { LOADED_SIG = rentSig(); } catch (e) { LOADED_SIG = ''; }
   if (!/provider\.html$/i.test(location.pathname)) applyDom();
 
   /* ---- jendela "Fitur Toko" (daftar yang aktif di mode ini) ---- */
@@ -354,6 +422,6 @@
     m.style.display = 'flex';
   }
 
-  window.FM_PLANS = { FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml,
+  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml,
     readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();

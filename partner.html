@@ -86,10 +86,10 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=beta4"></script>
-    <script src="js/theme.js?v=beta4"></script>
-    <script src="js/logo.js?v=beta4"></script>
-    <script src="js/skin.js?v=beta4"></script>
+    <script src="js/dialog.js?v=beta6"></script>
+    <script src="js/theme.js?v=beta6"></script>
+    <script src="js/logo.js?v=beta6"></script>
+    <script src="js/skin.js?v=beta6"></script>
     <script src="js/sw-register.js" defer></script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white">
@@ -364,10 +364,10 @@
 
 
     <script src="js/tenants.js"></script>
-    <script src="js/config.js?v=beta4"></script>
-    <script src="js/auth.js?v=beta4"></script>
-    <script src="js/monitor.js?v=beta4"></script>
-    <script src="js/widgets.js?v=beta4"></script>
+    <script src="js/config.js?v=beta6"></script>
+    <script src="js/auth.js?v=beta6"></script>
+    <script src="js/monitor.js?v=beta6"></script>
+    <script src="js/widgets.js?v=beta6"></script>
     <script>
         if (window.lucide) lucide.createIcons();
 
@@ -499,10 +499,10 @@
                     card.className = "p-3 rounded-xl bg-white/5 border border-white/10 space-y-1";
                     card.innerHTML = `
                         <div class="flex justify-between items-center">
-                            <span class="font-black text-white text-xs">${n.title}</span>
-                            <span class="text-[9px] text-slate-400 font-mono">${n.date}</span>
+                            <span class="font-black text-white text-xs">${fmEsc(n.title)}</span>
+                            <span class="text-[9px] text-slate-400 font-mono">${fmEsc(n.date)}</span>
                         </div>
-                        <p class="text-slate-300 text-[11px] leading-relaxed">${n.message}</p>
+                        <p class="text-slate-300 text-[11px] leading-relaxed">${fmEsc(n.message)}</p>
                     `;
                     container.appendChild(card);
                 });

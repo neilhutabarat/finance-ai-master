@@ -3,11 +3,24 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 4';
+  var BETA = 'Beta 6';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta 6', '13 Nov 2026', [
+      '[Baru] OneilStore: Manager dan Owner kini bisa menyewa fitur tambahan sesuai kebutuhan usaha, satuan atau lewat paket jenis usaha (laundry, kos, klinik, konveksi, minimarket), lengkap dengan masa coba 7 hari',
+      '[Baru] Tab Punyaku menampilkan fitur yang disewa, sisa harinya, dan status permintaan',
+      '[Perbaikan] Fitur yang sudah aktif di toko tetap gratis. Sewa hanya menambah fitur, dan saat masa sewa habis fitur hanya terkunci, data toko tidak pernah dihapus atau diubah',
+      '[Keamanan] Permintaan sewa dikirim lewat jalur tiket yang sudah dilindungi aturan toko, dan hanya penyedia aplikasi yang dapat mengaktifkan atau mencabut sewa'
+    ]],
+    ['Beta 5', '13 Nov 2026', [
+      '[Perbaikan] Nota yang tanggalnya dikosongkan di Kasir kini otomatis memakai tanggal hari ini (sebelumnya tersimpan sebagai "Invalid Date")',
+      '[Perbaikan] Tanggal koreksi Owner dan bulan berjalan di laporan pajak kini mengikuti waktu setempat (sebelumnya bisa mundur satu hari antara pukul 00.00 dan 07.00)',
+      '[Perbaikan] Tombol Edit dan Hapus akun COA tidak lagi rusak bila kode akun memuat tanda kutip',
+      '[Keamanan] Kode akun, kategori, jam tutup kasir, dan notifikasi Partner kini disaring sebelum ditampilkan di semua akun',
+      '[Keamanan] File CSV hasil ekspor kini aman dari rumus tersembunyi (keterangan yang diawali tanda = + - @ tidak lagi dijalankan Excel)'
+    ]],
     ['Beta 4', '13 Nov 2026', [
       '[Perbaikan] Mode gelap di akun Kasir dirapikan menyeluruh: kolom isian, jam, tombol, menu bawah, dan semua jendela kini gelap dan jelas terbaca (sebelumnya sebagian masih terang atau hampir tak terlihat)',
       '[Perbaikan] Tombol di akun Manager dan Owner kini seragam: lebar dan tinggi sama, baris dibagi rata',

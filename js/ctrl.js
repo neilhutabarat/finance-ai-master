@@ -379,6 +379,7 @@
             if (!snap.metadata.fromCache && window.FM_SHIELD) FM_SHIELD.touch(); // kontak server nyata: segarkan Kunci Total
             var d = snap.exists ? snap.data() : null;
             window.TENANT_CTRL = d || {};
+            try { localStorage.setItem('fm_rentals_' + tenant.id, JSON.stringify((d && d.rentals) || {})); } catch (eR) {}
             try { window.dispatchEvent(new CustomEvent('fm:ctrl')); } catch (e) {}
             var billFreeze = !!(d && window.FM_BILL && FM_BILL.freezeNow(d.billing, Date.now()));
             if (d && d.suspended === true) showOverlay(d.suspendReason || '');

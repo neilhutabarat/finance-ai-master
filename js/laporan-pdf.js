@@ -104,7 +104,7 @@
   function fname(ext) { var r = range(), t = ten(); return 'laporan_' + String(t.id || 'toko').toLowerCase() + '_' + r[0] + (r[0] !== r[1] ? '_sd_' + r[1] : '') + '.' + ext; }
   function pdf() { save(build(), fname('pdf')); }
   function csv() {
-    var q = function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+    var q = function (v) { var s = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(s) && isNaN(Number(s))) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
     var head = ['Tanggal', 'Jam', 'Kode Akun', 'Nama', 'Kategori', 'Qty', 'Harga Satuan', 'Jumlah', 'PPN', 'Metode Bayar', 'Petugas', 'Keterangan'];
     var body = rows().map(function (t) { return [dOf(t), t.date, t.accountCode, t.accountName, t.category, t.qty || '', t.unitPrice || '', t.amount, t.tax12 || 0, t.pay || '', t.staff || '', t.desc || ''].map(q).join(','); });
     save(new Blob(['﻿' + head.map(q).join(',') + '\n' + body.join('\n')], { type: 'text/csv;charset=utf-8' }), fname('csv'));
