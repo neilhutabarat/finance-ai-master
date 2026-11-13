@@ -151,7 +151,7 @@
   }
   function floatBtn() {
     if (role() !== 'kasir' || !on() || document.getElementById('fm-absen-fab')) return;
-    var b = document.createElement('button'); b.id = 'fm-absen-fab'; b.type = 'button'; b.textContent = 'Absen';
+    var b = document.createElement('button'); b.id = 'fm-absen-fab'; b.className = 'fm-fab'; b.setAttribute('data-fc', 'abs'); b.type = 'button'; b.textContent = 'Absen';
     b.style.cssText = 'position:fixed;right:214px;bottom:14px;z-index:2147482000;padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:#0ea5e9;color:#04121c;font-weight:800;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer;' + S;
     b.onclick = function () { FM_ABS.open(); }; document.body.appendChild(b);
   }

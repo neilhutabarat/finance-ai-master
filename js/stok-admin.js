@@ -157,7 +157,7 @@
 
   function floatBtn() {
     if (!isKasir() || !(has('stok_admin') || has('stok_scan')) || document.getElementById('fm-stokadm-fab')) return;
-    var b = document.createElement('button'); b.id = 'fm-stokadm-fab'; b.type = 'button'; b.textContent = 'Stok';
+    var b = document.createElement('button'); b.id = 'fm-stokadm-fab'; b.className = 'fm-fab'; b.setAttribute('data-fc', 'stk'); b.type = 'button'; b.textContent = 'Stok';
     b.style.cssText = 'position:fixed;right:120px;bottom:14px;z-index:2147482000;padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:#10b981;color:#04201a;font-weight:800;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer';
     b.onclick = function () { FM_STOKADM.open(); }; document.body.appendChild(b);
   }

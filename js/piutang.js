@@ -236,7 +236,7 @@
     try { if (!(window.FM_PLANS && FM_PLANS.has('piutang'))) return; } catch (e) { return; }
     start();
     if (document.querySelector('[onclick*="FM_PIU"]')) return;
-    var b = document.createElement('button'); b.type = 'button'; b.setAttribute('onclick', 'FM_PIU.open()');
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'fm-fab'; b.setAttribute('data-fc', 'piu'); b.setAttribute('onclick', 'FM_PIU.open()');
     b.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:2147482000;padding:11px 16px;border-radius:999px;background:#2f55d4;color:#fff;font:800 12.5px -apple-system,sans-serif;border:0;box-shadow:0 8px 24px rgba(0,0,0,.35)';
     b.innerHTML = 'Piutang<span data-piu-badge></span>'; document.body.appendChild(b); badge();
   }

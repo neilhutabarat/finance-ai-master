@@ -422,11 +422,11 @@
     'html[data-fm-fit][data-fm-page="owner"] #fm-actions,html[data-fm-fit][data-fm-page="manager"] #fm-actions{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;grid-auto-rows:auto!important;align-content:start!important;gap:clamp(5px,1vh,8px)!important}',
     /* manager & owner: ubin seragam (lebar & tinggi sama), jumlah kolom dibagi rata supaya tidak ada baris yang timpang */
     'html[data-fm-fit][data-fm-page="owner"] #fm-actions,html[data-fm-fit][data-fm-page="manager"] #fm-actions{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-content:flex-start!important;gap:clamp(6px,1.1vh,10px)!important}',
-    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act{flex:0 0 calc((100% - (var(--fm-cols,6) - 1) * clamp(6px,1.1vh,10px)) / var(--fm-cols,6))!important;min-width:0!important;min-height:clamp(44px,7vh,58px)!important;box-sizing:border-box!important;align-items:center!important}',
-    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz],html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act[data-sz],html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act{grid-column:auto!important;grid-row:auto!important;flex-direction:row!important;text-align:left!important;justify-content:flex-start!important;min-height:0!important;padding:clamp(4px,.9vh,8px) 10px!important;gap:8px!important;font-size:clamp(11px,1.7vh,12.5px)!important;font-weight:700!important;border-radius:14px!important}',
-    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act i,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] i,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act i,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] i{width:clamp(22px,3.6vh,28px)!important;height:clamp(22px,3.6vh,28px)!important;border-radius:9px!important}',
-    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act svg,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] svg,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act svg,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] svg{width:clamp(13px,2.2vh,17px)!important;height:clamp(13px,2.2vh,17px)!important}',
-    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act span,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] span,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act span,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] span{white-space:normal!important;overflow:hidden!important;text-overflow:clip!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;line-height:1.15!important;overflow-wrap:anywhere!important}',
+    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act{flex:0 0 auto!important;min-width:0!important;height:38px!important;min-height:0!important;box-sizing:border-box!important;align-items:center!important}',
+    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz],html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act[data-sz],html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act{grid-column:auto!important;grid-row:auto!important;flex-direction:row!important;text-align:left!important;justify-content:flex-start!important;min-height:0!important;padding:0 15px 0 7px!important;gap:8px!important;font-size:12.5px!important;font-weight:800!important;border-radius:999px!important}',
+    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act i,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] i,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act i,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] i{width:24px!important;height:24px!important;border-radius:50%!important}',
+    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act svg,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] svg,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act svg,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] svg{width:14px!important;height:14px!important}',
+    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act span,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] span,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act span,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] span{white-space:nowrap!important;overflow:visible!important;display:block!important;line-height:1.15!important}',
     'html[data-fm-fit] #fm-insights:empty{display:none}',
     'html[data-fm-fit] main:has(#fm-insights:empty) #fm-actions{flex:1 1 0;min-height:0}',
     'html[data-fm-page="manager"] main>.grid.lg\\:grid-cols-12{display:none!important}',
@@ -660,7 +660,7 @@
     var storeItem = storeBtn ? { label: 'OneilStore', icon: 'store', fn: function () { if (window.FM_OSTORE) FM_OSTORE.open(); } } : null;
     /* OneilStore selalu tampil di dock; tombol Tema pindah ke Pengaturan agar muat */
     if (storeItem) document.documentElement.setAttribute('data-fm-theme-in-set', '1');
-    if (!storeItem && window.FM_THEME && FM_THEME.toggle) tail.push({ label: 'Tema', icon: 'moon', fn: function () { FM_THEME.toggle(); } });
+    if (!storeItem && window.FM_THEME && FM_THEME.toggle) tail.push({ label: 'Tema', icon: 'spark', fn: function () { FM_THEME.toggle(); } });
     tail.push({ label: 'Pengaturan', icon: 'gear', fn: function () { var g = document.getElementById('fm-gear'); if (g) g.click(); }, settings: true });
     if (findLogout()) tail.push({ label: 'Keluar', icon: 'out', fn: window.FM_LOGOUT, danger: true });
     var maxShown = wide ? 9 : 5;
@@ -682,8 +682,6 @@
     var sp = document.createElement('div'); sp.className = 'fm-sep'; dock.appendChild(sp);
     tail.forEach(function (it) { dock.appendChild(btn(it)); });
     document.body.appendChild(dock);
-    /* ruang kosong di dasar halaman setinggi dock supaya baris tombol terakhir tidak tertimpa (Manager dan Owner) */
-    if (!document.getElementById('fm-dock-gap') && (document.documentElement.getAttribute('data-fm-page') === 'manager' || document.documentElement.getAttribute('data-fm-page') === 'owner')) { var gap = document.createElement('div'); gap.id = 'fm-dock-gap'; gap.setAttribute('aria-hidden', 'true'); gap.style.cssText = 'height:112px;width:100%;pointer-events:none'; document.body.insertBefore(gap, dock); }
     document.documentElement.setAttribute('data-fm-dock', '1');
   }
   function showMore(list, act) {

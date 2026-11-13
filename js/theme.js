@@ -3,19 +3,20 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 11';
+  var BETA = 'Beta 12';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
-    ['Beta 11', '14 Nov 2026', [
-      '[Baru] Tampilan kaca bening yang sama untuk Kasir, Manager, dan Owner; latar tetap terlihat jelas di balik kartu dan tombol',
-      '[Baru] Latar berganti otomatis dalam sekitar 30 detik saat diatur pengelola layanan, tanpa perlu memuat ulang',
-      '[Baru] Alamat toko tampil di bawah nama toko di Manager dan Owner, sama seperti Kasir',
+    ['Beta 12', '14 Nov 2026', [
+      '[Baru] Tema Original (kaca bening) dan Base (putih polos) di Pengaturan; mode gelap dihapus',
+      '[Baru] Kartu, tombol, header, dock, dan pop-up berdesain kaca yang sama di Kasir, Manager, dan Owner; tulisan tampak tercetak di atas kaca dan tetap jelas',
+      '[Baru] Tombol menu Manager dan Owner kini ringkas seukuran Absen, Stok, dan Piutang, berwarna berbeda-beda, sehingga halaman tidak perlu digulir',
+      '[Baru] Tingkat kejelasan kaca (1 buram sampai 5 bening) diatur pengelola layanan, per toko bila perlu',
+      '[Perbaikan] Tampilan Manager dan Owner yang rusak (kartu gelap, tulisan tidak terbaca) sudah diperbaiki dan sama dengan Kasir',
+      '[Perbaikan] Alamat toko tampil penuh dan turun ke baris berikutnya; tombol bantuan (?) dipindah ke atas tombol Piutang',
       '[Perbaikan] Saldo kas laci tidak lagi kembali setelah closing lalu memuat ulang halaman',
-      '[Perbaikan] Dock bawah tidak lagi menimpa baris tombol terakhir di Manager dan Owner',
-      '[Perbaikan] Tampilan disederhanakan (tanpa animasi hujan dan cuaca) agar ringan di semua komputer',
-      '[Keamanan] Latar hanya bisa diubah oleh pengelola layanan; aplikasi toko hanya membaca dan tidak mengirim data toko'
+      '[Keamanan] Tingkat kaca dan latar hanya bisa diubah oleh pengelola layanan; aplikasi toko hanya membaca dan tidak mengirim data toko'
     ]],
     ['Beta 9', '14 Nov 2026', [
       '[Baru] Latar belakang baru bergaya lukisan (4 gambar) menggantikan latar lama. Gambar berganti otomatis tiap minggu',
@@ -240,7 +241,7 @@
   function apply() {
     var h = document.documentElement;
     updateWp();
-    var mode = pref.mode || DEFAULT_MODE;     // 'light' | 'dark'
+    var mode = (ROLE === 'tower') ? (pref.mode || DEFAULT_MODE) : 'light';     /* mode gelap dihapus (Beta 12): hanya Original (kaca) dan Base (putih polos) */
     h.setAttribute('data-fm-native', NATIVE);
     ['data-fm-black', 'data-fm-invert', 'data-fm-accent'].forEach(function (a) { h.removeAttribute(a); });
     if (!LITE && ROLE !== 'lain') {
@@ -252,6 +253,7 @@
       else h.style.removeProperty('--fm-accent');
       h.style.setProperty('--fm-on', onColor(pref.accent || '#3d63dd'));
     }
+    try { window.dispatchEvent(new CustomEvent('fm:theme')); } catch (e) {}
   }
   apply();
   if (LITE || ROLE === 'lain') return;
@@ -284,9 +286,10 @@
     box.style.setProperty('--fm-pick', pick);
     var h = '<div style="display:flex;justify-content:space-between;align-items:center"><h3>Pengaturan</h3><button class="fm-btn" data-close>Tutup</button></div>';
     var THEME_ON = !(window.FM_PLANS && !FM_PLANS.has('theme'));
-    if (!document.documentElement.hasAttribute('data-fm-dock') || document.documentElement.hasAttribute('data-fm-theme-in-set')) h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
-      '<button class="fm-mode ' + (mode === 'light' ? 'on' : '') + '" data-mode="light"><div class="fm-prev" style="background:linear-gradient(135deg,#ffffff,#e2e8f0)"></div>Terang</button>' +
-      '<button class="fm-mode ' + (mode === 'dark' ? 'on' : '') + '" data-mode="dark"><div class="fm-prev" style="background:#000"></div>Gelap Pekat</button></div></div>';
+    var look = pref.look === 'base' ? 'base' : 'original';
+    h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
+      '<button class="fm-mode ' + (look === 'original' ? 'on' : '') + '" data-look="original"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#bfe3ff,#e8f6ff 45%,#9fd6c0)"></div>Original</button>' +
+      '<button class="fm-mode ' + (look === 'base' ? 'on' : '') + '" data-look="base"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#eceff4)"></div>Base</button></div></div>';
     if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
       ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +
       '</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px"><label style="font-size:12px;color:#c7cbd6">Warna bebas</label><input type="color" id="fm-acc-custom" value="' + esc(pick) + '" style="width:44px;height:30px;border:0;background:none;padding:0"><button class="fm-btn" data-accreset style="margin-left:auto">Kembali ke Bawaan</button></div></div></div>';
@@ -311,7 +314,7 @@
     var pb = box.querySelector('[data-plans]'); if (pb) pb.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_PLANS) FM_PLANS.openModal(); };
     var sh = box.querySelector('[data-shield]'); if (sh) sh.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_SHIELD) FM_SHIELD.openPanel(); };
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
-    box.querySelectorAll('[data-mode]').forEach(function (b) { b.onclick = function () { pref.mode = b.getAttribute('data-mode'); savePref(pref); apply(); render(); }; });
+    box.querySelectorAll('[data-look]').forEach(function (b) { b.onclick = function () { pref.look = b.getAttribute('data-look'); savePref(pref); apply(); render(); }; });
     box.querySelectorAll('[data-lang]').forEach(function (b) { b.onclick = function () { if (window.FM_I18N) FM_I18N.set(b.getAttribute('data-lang')); }; });
     box.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { pref.accent = b.getAttribute('data-acc'); savePref(pref); apply(); render(); }; });
     var ac = box.querySelector('#fm-acc-custom');
@@ -447,6 +450,6 @@
       if (typeof o === 'function') window.applyTenantBranding = function (tn) { o(tn); applyLoginLogo(); };
     }
   }
-  window.FM_THEME = { version: APP_VERSION, toggle: function () { pref.mode = ((pref.mode || DEFAULT_MODE) === 'dark') ? 'light' : 'dark'; savePref(pref); apply(); return pref.mode; }, mode: function () { return pref.mode || DEFAULT_MODE; }, open: function () { document.getElementById('fm-gear').click(); } };
+  window.FM_THEME = { version: APP_VERSION, toggle: function () { pref.look = (pref.look === 'base') ? 'original' : 'base'; savePref(pref); apply(); return pref.look; }, mode: function () { return pref.mode || DEFAULT_MODE; }, open: function () { document.getElementById('fm-gear').click(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

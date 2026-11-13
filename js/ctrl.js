@@ -429,6 +429,8 @@
             var d = snap.exists ? snap.data() : null;
             window.TENANT_CTRL = d || {};
             try { localStorage.setItem('fm_rentals_' + tenant.id, JSON.stringify((d && d.rentals) || {})); } catch (eR) {}
+            /* kejelasan kaca per toko (1-5), diatur Tower; kosong = ikut pengaturan umum */
+            try { var gv = d ? parseInt(d.glass, 10) : 0; var gs = JSON.stringify({ id: tenant.id, v: (gv >= 1 && gv <= 5) ? gv : null }); if (localStorage.getItem('fm_glass_s') !== gs) { localStorage.setItem('fm_glass_s', gs); window.dispatchEvent(new CustomEvent('fm:glass')); } } catch (eG) {}
             try { window.dispatchEvent(new CustomEvent('fm:ctrl')); } catch (e) {}
             var billFreeze = !!(d && window.FM_BILL && FM_BILL.freezeNow(d.billing, Date.now()));
             lastCtrl = d; demoPill(demoMs(d)); demoTickStart();
