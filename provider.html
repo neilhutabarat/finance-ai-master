@@ -69,21 +69,21 @@
             { label: 'Pesan', icon: 'send', run: "openModal('broadcast_modal')" }
         ];
     </script>
-    <script src="js/billing.js?v=8.9"></script>
-    <script src="js/dialog.js?v=8.9"></script>
-    <script src="js/theme.js?v=9.1"></script>
-    <script src="js/logo.js?v=8.9"></script>
-    <script src="js/skin.js?v=9.1"></script>
-    <script src="js/tower-menu.js?v=8.9"></script>
-    <script src="js/tower-lab.js?v=8.9"></script>
-    <script src="js/admins.js?v=8.9"></script>
-    <script src="js/tower-monitor.js?v=8.9"></script>
-    <script src="js/tower-help.js?v=8.9"></script>
-    <script src="js/tower-demo.js?v=8.9"></script>
-    <script src="js/tower-qa.js?v=9.2"></script>
-    <script src="js/tower-health.js?v=8.9"></script>
-    <script src="js/chat.js?v=8.9"></script>
-    <script src="js/tower-cockpit.js?v=8.9"></script>
+    <script src="js/billing.js?v=beta"></script>
+    <script src="js/dialog.js?v=beta"></script>
+    <script src="js/theme.js?v=beta"></script>
+    <script src="js/logo.js?v=beta"></script>
+    <script src="js/skin.js?v=beta"></script>
+    <script src="js/tower-menu.js?v=beta"></script>
+    <script src="js/tower-lab.js?v=beta"></script>
+    <script src="js/admins.js?v=beta"></script>
+    <script src="js/tower-monitor.js?v=beta"></script>
+    <script src="js/tower-help.js?v=beta"></script>
+    <script src="js/tower-demo.js?v=beta"></script>
+    <script src="js/tower-qa.js?v=beta"></script>
+    <script src="js/tower-health.js?v=beta"></script>
+    <script src="js/chat.js?v=beta"></script>
+    <script src="js/tower-cockpit.js?v=beta"></script>
     <style>#main-modal-container{z-index:70 !important}
     .fm-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
     .fm-dot-on{background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:fmBlink 1.4s infinite}
@@ -501,6 +501,7 @@
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-900 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
                                 <tr>
+                                    <th class="py-2.5 px-2" title="Seret untuk ubah urutan"></th>
                                     <th class="py-2.5 px-3">Kode</th>
                                     <th class="py-2.5 px-3">Nama Pos Akun</th>
                                     <th class="py-2.5 px-3">Kategori</th>
@@ -749,14 +750,14 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/auth.js?v=8.9"></script>
-    <script src="js/plans.js?v=8.9"></script>
-    <script src="js/templates.js?v=8.9"></script>
-    <script src="js/widgets.js?v=8.9"></script>
+    <script src="js/auth.js?v=beta"></script>
+    <script src="js/plans.js?v=beta"></script>
+    <script src="js/templates.js?v=beta"></script>
+    <script src="js/widgets.js?v=beta"></script>
     <script>window.NO_AUTO_STORE = true;</script>
-    <script src="js/config.js?v=8.9"></script>
-    <script src="js/core.js?v=18.0"></script>
-    <script src="js/store.js?v=8.9"></script>
+    <script src="js/config.js?v=beta"></script>
+    <script src="js/core.js?v=beta"></script>
+    <script src="js/store.js?v=beta"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -930,8 +931,8 @@
                 const p = need(); if (!p) return;
                 const ok = p.filter(function (id) { return isManaged(byId(id)); });
                 if (!ok.length) return alert('Toko terpilih tidak dikelola Tower.');
-                if (!confirm('Pasang fitur bawaan ' + (tier === 'plus' ? 'Plus' : 'Basic') + ' ke ' + ok.length + ' toko? Fitur tambahan yang sekarang akan diganti.')) return;
-                Promise.all(ok.map(function (id) { return towerSaveFeatures(byId(id), FM_PLANS.tierDefaults(tier)).then(function () { ctAudit(id, 'FITUR_MASSAL', 'Provider memasang fitur bawaan ' + tier + ' (massal)', '-', tier); }); }))
+                if (!confirm('Pasang fitur bawaan ' + (tier === 'plus' ? 'Plus' : 'Basic') + ' ke ' + ok.length + ' toko? Fitur tambahan yang sekarang akan diganti.\n\nFitur yang digembok (🔒) tetap dipertahankan.')) return;
+                Promise.all(ok.map(function (id) { return towerSaveFeatures(byId(id), FM_PLANS.applyTierLocked(byId(id), tier)).then(function () { ctAudit(id, 'FITUR_MASSAL', 'Provider memasang fitur bawaan ' + tier + ' (massal, gembok dipertahankan)', '-', tier); }); }))
                     .then(function () { ov.close(); alert('Fitur ' + (tier === 'plus' ? 'Plus' : 'Basic') + ' terpasang di ' + ok.length + ' toko.'); }).catch(function (e) { fmPermAlert(e); });
             };
             ov.el.querySelector('#tm-fb').onclick = function () { setFeat('basic'); };
@@ -1353,10 +1354,9 @@
             if (tier === 'pro') tier = 'plus';
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const r = computePlan(tier, cycle, custom, disc);
-            if (!r.amount && tier !== 'basic') return alert('Harga paket ' + TIER_LABEL[tier] + ' belum diatur. Isi Harga Khusus, atau atur dulu harga bulanan Plus.');
-            if (!confirm('Ubah paket ' + tn.nama + ' menjadi ' + TIER_LABEL[tier] + ' (' + (cycle === 'yearly' ? 'Tahunan' : 'Bulanan') + ') seharga ' + rp(r.amount) + '?\n\nFitur tambahan toko akan diatur ulang ke bawaan paket ini.')) return;
+            if (!confirm('Ubah paket ' + tn.nama + ' menjadi ' + (tier === 'basic' ? 'BASIC' : '+') + '?\n\nFitur tambahan toko akan diatur ulang ke bawaan paket ini. Fitur yang digembok (🔒) tetap dipertahankan.')) return;
             const cfg = Object.assign({}, tn); delete cfg.fromRegistry; cfg.tier = tier;
-            cfg.features = FM_PLANS.tierDefaults(tier); // fitur tambahan diatur ulang ke bawaan paket; Tower bisa centang ulang di Fitur Toko
+            cfg.features = FM_PLANS.applyTierLocked(tn, tier); // bawaan paket, tapi fitur yang digembok tetap ada
             const batch = db.batch();
             batch.set(db.collection('tenants_registry').doc(key), { id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             batch.set(db.collection('tenant_ctrl').doc(tn.id), {
@@ -1561,6 +1561,7 @@
             let nama = cfg.nama;
             if (tsPart === 'fitur') {
                 cfg.features = Object.assign({}, cfg.features || {}, FM_PLANS.readChecklist('ts'));
+                cfg.featureLocks = FM_PLANS.readLocks('ts');
                 const ub = document.getElementById('ts-usaha');
                 if (ub) { const seen = {}; cfg.usaha = ub.value.split(',').map(s => s.trim()).filter(s => { const k = s.toLowerCase(); if (!s || seen[k]) return false; seen[k] = 1; return true; }).slice(0, 8); }
             } else {
@@ -2516,17 +2517,11 @@
             const cls = 'w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none';
             box.classList.remove('hidden');
             box.innerHTML = '<span class="font-black text-sm text-white block">Paket Toko</span>' +
-                '<p class="text-slate-400">Paket saat ini: <b class="text-white">' + (TIER_LABEL[tier === 'pro' ? 'plus' : tier] || tier) + '</b> (' + (cycle === 'yearly' ? 'tahunan' : 'bulanan') + ')</p>' +
-                '<div class="grid grid-cols-2 gap-3"><div><label class="font-bold text-slate-300 block mb-1">Paket</label><select id="ip-tier" class="' + cls + '"><option value="basic"' + sel('basic', tier) + '>Basic</option><option value="plus"' + sel('plus', tier === 'pro' ? 'plus' : tier) + '>Plus</option></select></div>' +
-                '<div><label class="font-bold text-slate-300 block mb-1">Siklus</label><select id="ip-cycle" class="' + cls + '"><option value="monthly"' + sel('monthly', cycle) + '>Bulanan</option><option value="yearly"' + sel('yearly', cycle) + '>Tahunan</option></select></div>' +
-                '<div class="col-span-2"><label class="font-bold text-slate-300 block mb-1">Diskon tahunan (%) — kosongkan bila ikut standar ' + pricing.yearlyDiscountPct + '%</label><input id="ip-disc" type="number" min="0" max="90" value="' + (typeof c.yearlyDiscountPct === 'number' ? c.yearlyDiscountPct : '') + '" class="' + cls + '"></div>' +
-                '<div class="col-span-2"><label class="font-bold text-slate-300 block mb-1">Harga khusus (Rp, kosongkan bila standar)</label><input id="ip-custom" type="number" min="0" value="' + (c.customPrice || '') + '" class="' + cls + '"></div></div>' +
-                '<div id="ip-sum" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div>' +
-                '<button id="ip-save" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs transition">Simpan Paket</button>';
-            const g = function (id) { return document.getElementById(id).value; };
-            const sum = function () { document.getElementById('ip-sum').innerHTML = planSummaryHtml(g('ip-tier'), g('ip-cycle'), g('ip-custom'), g('ip-disc')); };
-            ['ip-tier', 'ip-cycle'].forEach(function (i) { document.getElementById(i).onchange = sum; }); document.getElementById('ip-custom').oninput = sum; document.getElementById('ip-disc').oninput = sum; sum();
-            document.getElementById('ip-save').onclick = function () { setTenantPlan(tenant.id, g('ip-tier'), g('ip-cycle'), g('ip-custom'), g('ip-disc')); };
+                '<p class="text-slate-400">Paket saat ini: <b class="text-white">' + (tier === 'basic' ? 'BASIC' : '+') + '</b></p>' +
+                '<div><label class="font-bold text-slate-300 block mb-1">Paket</label><select id="ip-tier" class="' + cls + '"><option value="basic"' + sel('basic', tier) + '>BASIC</option><option value="plus"' + sel('plus', tier === 'pro' ? 'plus' : tier) + '>+</option></select></div>' +
+                '<p class="text-[11px] text-slate-500 mt-2">Harga diatur manual di luar aplikasi. Mengubah paket akan mengatur ulang fitur tambahan ke bawaan paket; fitur yang digembok (🔒) tetap ada.</p>' +
+                '<button id="ip-save" class="w-full mt-3 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs transition">Simpan Paket</button>';
+            document.getElementById('ip-save').onclick = function () { setTenantPlan(tenant.id, document.getElementById('ip-tier').value, 'monthly', '', ''); };
         }
 
         function renderInspect(tenantId) {
@@ -2789,17 +2784,70 @@
             coa.forEach(c => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-white/5";
+                tr.dataset.coa = c.code;
                 tr.innerHTML = `
+                    <td class="py-2 px-2 text-center text-slate-500 cursor-grab select-none prov-coa-h" title="Seret untuk ubah urutan" style="touch-action:none">⠿</td>
                     <td class="py-2 px-3 font-mono font-bold text-cyan-400">${c.code}</td>
                     <td class="py-2 px-3 font-bold text-white">${c.name}</td>
                     <td class="py-2 px-3 uppercase text-[10px] ${c.category === 'income' ? 'text-emerald-400' : 'text-rose-400'}">${c.category}</td>
-                    <td class="py-2 px-3 text-center">
+                    <td class="py-2 px-3 text-center whitespace-nowrap">
+                        <button onclick="editProviderCOA('${c.code}')" class="px-2 py-0.5 rounded bg-cyan-500/20 hover:bg-cyan-500 text-cyan-300 font-bold text-[10px] mr-1">Edit</button>
                         <button onclick="deleteProviderCOA('${c.code}')" class="px-2 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500 text-rose-300 font-bold text-[10px]">Hapus</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
+
+        function editProviderCOA(code) {
+            let coa = JSON.parse(localStorage.getItem('fm_provider_coa') || "[]");
+            if (coa.length === 0) coa = [...DEFAULT_PROVIDER_COA];
+            const it = coa.find(c => c.code === code);
+            if (!it) return;
+            const nn = prompt('Ubah nama akun [' + it.code + ']:', it.name);
+            if (nn === null) return;
+            const name = nn.trim();
+            if (!name) return alert('Nama akun tidak boleh kosong.');
+            const inc = confirm('Kategori akun ini:\n\nOK = Pendapatan (Income)\nBatal = Beban (Outcome)');
+            it.name = name; it.category = inc ? 'income' : 'outcome';
+            localStorage.setItem('fm_provider_coa', JSON.stringify(coa));
+            renderProviderCOATable();
+            populateProviderCOASelect();
+        }
+
+        function reorderProviderCOA(fromCode, toCode) {
+            if (fromCode === toCode) return;
+            let coa = JSON.parse(localStorage.getItem('fm_provider_coa') || "[]");
+            if (coa.length === 0) coa = [...DEFAULT_PROVIDER_COA];
+            const fi = coa.findIndex(c => c.code === fromCode), ti = coa.findIndex(c => c.code === toCode);
+            if (fi < 0 || ti < 0) return;
+            const m = coa.splice(fi, 1)[0]; coa.splice(ti, 0, m);
+            localStorage.setItem('fm_provider_coa', JSON.stringify(coa));
+            renderProviderCOATable();
+            populateProviderCOASelect();
+        }
+
+        /* seret baris COA Provider untuk mengubah urutan (pegang ikon ⠿) */
+        (function () {
+            let drag = null;
+            function body() { return document.getElementById('provider-coa-table-body'); }
+            function clearMarks() { const b = body(); if (b) [].forEach.call(b.querySelectorAll('tr'), r => r.style.boxShadow = ''); }
+            document.addEventListener('pointerdown', function (e) {
+                const h = e.target.closest ? e.target.closest('.prov-coa-h') : null; if (!h) return;
+                const tr = h.closest('tr'); if (!tr || !tr.dataset.coa) return;
+                drag = { code: tr.dataset.coa, tr: tr, over: null }; tr.style.opacity = '.5'; e.preventDefault();
+            });
+            document.addEventListener('pointermove', function (e) {
+                if (!drag) return;
+                const el = document.elementFromPoint(e.clientX, e.clientY);
+                const tr = el && el.closest ? el.closest('tr') : null;
+                clearMarks(); drag.over = null;
+                if (tr && tr.dataset.coa && tr.parentNode === drag.tr.parentNode && tr !== drag.tr) { drag.over = tr; tr.style.boxShadow = 'inset 0 3px 0 #22d3ee'; }
+            });
+            function end() { if (!drag) return; const d = drag; drag = null; if (d.tr) d.tr.style.opacity = ''; clearMarks(); if (d.over && d.over.dataset.coa) reorderProviderCOA(d.code, d.over.dataset.coa); }
+            document.addEventListener('pointerup', end);
+            document.addEventListener('pointercancel', end);
+        })();
 
         let noticesList = [];
 

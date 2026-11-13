@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Prototype';
+  var BETA = 'Beta';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta', '13 Nov 2026', [
+      '[Baru] Oneil Shield — pusat keamanan toko: lihat perlindungan datamu langsung di menu Pengaturan',
+      '[Baru] Ganti bahasa Indonesia / English kini rapi di dalam menu Pengaturan',
+      '[Perbaikan] Tombol-tombol di layar Kasir ditata ulang agar tidak lagi saling bertumpuk',
+      '[Keamanan] Oneil Shield menjaga akses dan data toko, dan mengunci aplikasi otomatis bila lama tak tersambung ke server'
+    ]],
     ['Prototype', '13 Nov 2026', [
       '[Baru] Kasir untuk toko, kafe, laundry, salon, bengkel, dan jasa, lengkap dengan tunai, QRIS, transfer, struk, dan piutang',
       '[Baru] Pembukuan otomatis: laba rugi, arus kas, neraca, pajak, dan gaji, langsung dari transaksi kasir',
@@ -182,7 +188,9 @@
         '<div style="display:flex;gap:8px;margin-top:10px"><label class="fm-btn pri" style="cursor:pointer">Pilih Gambar<input type="file" id="fm-logo-file" accept="image/*" style="display:none"></label>' + (logoData ? '<button class="fm-btn" data-logodel>Hapus Logo</button>' : '') + '</div>' +
         '<p id="fm-logo-msg" style="font-size:12px;margin:8px 0 0;color:#fca5a5"></p></div></div>';
     }
+    if (window.FM_I18N && FM_I18N.has && FM_I18N.has()) { var _ln = FM_I18N.lang(); h += '<div class="fm-sec"><div class="fm-lab">Bahasa / Language</div><div class="fm-modes"><button class="fm-mode ' + (_ln === 'id' ? 'on' : '') + '" data-lang="id">Indonesia</button><button class="fm-mode ' + (_ln === 'en' ? 'on' : '') + '" data-lang="en">English</button></div></div>'; }
     if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur Toko</button></div>';
+    if (window.FM_SHIELD) h += '<div class="fm-sec"><button class="fm-btn" data-shield style="width:100%;padding:13px">🛡️ Oneil Shield — Keamanan</button></div>';
     if (false) h += '<div class="fm-sec"><button class="fm-btn" data-logout style="width:100%;padding:13px;color:#fda4af">Keluar dari Akun</button></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>v' + APP_VERSION + ' · ' + BETA + '</b></div></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.slice(0, SHOW_LAST).map(function (n, i) {
@@ -192,9 +200,11 @@
 
     var lo = box.querySelector('[data-logout]'); if (lo) lo.onclick = function () { document.getElementById('fm-set').style.display = 'none'; window.FM_LOGOUT(); };
     var pb = box.querySelector('[data-plans]'); if (pb) pb.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_PLANS) FM_PLANS.openModal(); };
+    var sh = box.querySelector('[data-shield]'); if (sh) sh.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_SHIELD) FM_SHIELD.openPanel(); };
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
     box.querySelectorAll('[data-mode]').forEach(function (b) { b.onclick = function () { pref.mode = b.getAttribute('data-mode'); savePref(pref); apply(); render(); }; });
     box.querySelectorAll('[data-wp]').forEach(function (b) { b.onclick = function () { pref.wp = b.getAttribute('data-wp'); savePref(pref); apply(); render(); }; });
+    box.querySelectorAll('[data-lang]').forEach(function (b) { b.onclick = function () { if (window.FM_I18N) FM_I18N.set(b.getAttribute('data-lang')); }; });
     box.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { pref.accent = b.getAttribute('data-acc'); savePref(pref); apply(); render(); }; });
     var ac = box.querySelector('#fm-acc-custom');
     if (ac) { ac.oninput = function (e) { pref.accent = e.target.value; savePref(pref); apply(); }; ac.onchange = function () { render(); }; }

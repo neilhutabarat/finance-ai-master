@@ -117,7 +117,7 @@
   function fab() {
     if (document.getElementById('fm-help-fab')) return;
     var b = document.createElement('button'); b.id = 'fm-help-fab'; b.type = 'button'; b.setAttribute('aria-label', 'Bantuan'); b.innerHTML = '?<i style="display:none;position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:#ef4444;border:2px solid #0b0b0f"></i>';
-    b.style.cssText = 'position:fixed;left:12px;bottom:62px;z-index:2147482000;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:#1e293b;color:#f5f5f7;font-weight:800;font-size:17px;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer;' + S;
+    b.style.cssText = 'position:fixed;left:12px;bottom:66px;z-index:2147482000;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:#1e293b;color:#f5f5f7;font-weight:800;font-size:17px;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer;' + S;
     b.onclick = function () { FM_HELP.open(); }; document.body.appendChild(b);
   }
   window.FM_HELP = { open: function (t) { ensure(); start(); tab = t || 'panduan'; note = ''; q = ''; openIdx = -1; ov.style.display = 'flex'; if (tab === 'tanya') { try { localStorage.setItem(seenKey(), String(Date.now())); } catch (e) {} badge(); } render(); }, topics: topics };

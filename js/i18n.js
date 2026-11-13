@@ -132,10 +132,10 @@
   function boot() {
     var n = 0, iv = setInterval(function () {
       n++;
-      if (has()) { clearInterval(iv); btn(); if (lang() === 'en') run(); }
+      if (has()) { clearInterval(iv); if (lang() === 'en') run(); }
       else if (n > 25) clearInterval(iv);
     }, 400);
   }
-  window.FM_I18N = { lang: lang, tr: tr, active: function () { return lang() === 'en' && has(); } };
+  window.FM_I18N = { lang: lang, tr: tr, active: function () { return lang() === 'en' && has(); }, has: has, set: function (l) { try { localStorage.setItem(KEY, l === 'en' ? 'en' : 'id'); } catch (e) {} location.reload(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

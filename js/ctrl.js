@@ -376,6 +376,7 @@
         attachNotices(tenant);
         if (tenant.fromRegistry) watchDeletion(tenant);
         db.collection('tenant_ctrl').doc(tenant.id).onSnapshot(function (snap) {
+            if (!snap.metadata.fromCache && window.FM_SHIELD) FM_SHIELD.touch(); // kontak server nyata: segarkan Kunci Total
             var d = snap.exists ? snap.data() : null;
             window.TENANT_CTRL = d || {};
             try { window.dispatchEvent(new CustomEvent('fm:ctrl')); } catch (e) {}

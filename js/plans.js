@@ -76,6 +76,10 @@
   var PLUS_KEYS = ['neraca', 'dashboard', 'analisa', 'audit', 'export_csv', 'ledger', 'stok', 'stok_input:manager', 'stok_closing:manager', 'gaji', 'mutasi_wa', 'wa_receipt', 'bukti'];
   function tierOf(tn) { var t = tn && tn.tier; return ORDER[t] != null && ORDER[t] >= 1 ? 'plus' : 'basic'; }
   var ALWAYS_ON = ['wallpaper', 'theme']; /* tampilan dasar: menyala di semua paket */
+  /* Penanda tingkat untuk tampilan Tower: PLUS = fitur premium (pantas bayar), sisanya BASIC. Hanya label + urutan, tidak mengubah hak akses. */
+  var PLUS_FEATURES = ['barcode', 'stok_scan', 'banyak_usaha', 'admin_usaha', 'properti', 'dashboard', 'analisa', 'audit', 'export_csv', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'backup', 'laporan_bulanan', 'gaji', 'gaji_auto', 'ledger', 'instruksi', 'billing_card'];
+  function featTier(f) { return PLUS_FEATURES.indexOf(f.key) >= 0 ? 'plus' : 'basic'; }
+  var _lockCol = false; /* tampilkan kolom gembok (hanya di layar ubah fitur toko) */
   function defaultFor(key, role, tier) {
     if (ALWAYS_ON.indexOf(key) >= 0) return true;
     if (tier !== 'plus') return false;
@@ -142,8 +146,14 @@
     [].forEach.call(document.querySelectorAll('input[id^="' + prefix + '-f-"][data-cat="' + cat + '"]'), function (el) { if (!el.disabled) el.checked = !!on; });
     cnt(prefix);
   }
+  function tierTag(f) {
+    if (f.soon || isCore(f)) return '';
+    return featTier(f) === 'plus'
+      ? ' <span style="font-size:9px;font-weight:900;padding:1px 6px;border-radius:99px;background:rgba(245,158,11,.18);color:#fbbf24;vertical-align:middle">PLUS</span>'
+      : ' <span style="font-size:9px;font-weight:900;padding:1px 6px;border-radius:99px;background:rgba(34,197,94,.16);color:#4ade80;vertical-align:middle">BASIC</span>';
+  }
   function rowHtml(prefix, f, isNew, editable, tn, cat) {
-    var h = '<tr style="border-top:1px solid rgba(255,255,255,.08);' + (f.soon ? 'opacity:.5' : '') + '"><td style="padding:5px 6px">' + f.label + (f.soon ? ' <i>(segera)</i>' : '') + '</td>';
+    var h = '<tr style="border-top:1px solid rgba(255,255,255,.08);' + (f.soon ? 'opacity:.5' : '') + '"><td style="padding:5px 6px">' + f.label + tierTag(f) + (f.soon ? ' <i>(segera)</i>' : '') + '</td>';
     ROLES.forEach(function (r) {
       var m = f.r[r], cell;
       if (m === 'c') cell = '<span title="Fitur inti: terkunci, tidak bisa dicabut" style="display:inline-flex;width:18px;height:18px;border-radius:5px;background:#ef4444;color:#fff;font-weight:900;font-size:13px;line-height:18px;align-items:center;justify-content:center">✓</span>';
@@ -151,18 +161,23 @@
       else cell = '<input type="checkbox" id="' + prefix + '-f-' + f.key + '-' + r + '" data-cat="' + cat + '" onchange="FM_PLANS.cnt(\'' + prefix + '\')" ' + (((isNew ? defaultFor(f.key, r, 'basic') : has(f.key, r, tn))) ? 'checked ' : '') + ((f.soon || editable === false) ? 'disabled ' : '') + 'style="width:16px;height:16px;accent-color:#22c55e">';
       h += '<td style="text-align:center;padding:5px;width:64px">' + cell + '</td>';
     });
+    if (_lockCol) {
+      if (!f.soon && !isCore(f)) h += '<td style="text-align:center;padding:5px;width:54px"><input type="checkbox" id="' + prefix + '-lock-' + f.key + '" ' + ((tn && tn.featureLocks && tn.featureLocks[f.key]) ? 'checked ' : '') + (editable === false ? 'disabled ' : '') + 'title="Gembok: fitur ini tetap ada walau toko dikembalikan ke Basic" style="width:16px;height:16px;accent-color:#f59e0b"></td>';
+      else h += '<td></td>';
+    }
     return h + '</tr>';
   }
   function tableHtml(rows) {
     var th = 'text-align:center;padding:3px 5px;font-weight:800;white-space:nowrap';
-    return '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:3px 6px;opacity:.6;font-weight:700">Fitur</th>' + ROLES.map(function (r) { return '<th style="' + th + '">' + RLABEL[r] + '</th>'; }).join('') + '</tr></thead><tbody>' + rows + '</tbody></table>';
+    return '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:3px 6px;opacity:.6;font-weight:700">Fitur</th>' + ROLES.map(function (r) { return '<th style="' + th + '">' + RLABEL[r] + '</th>'; }).join('') + (_lockCol ? '<th style="' + th + '" title="Gembok: fitur tetap ada walau balik ke Basic">🔒</th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table>';
   }
   function checklistHtml(prefix, features, editable, tnFull) {
     var tn = tnFull || { features: features || null }, isNew = !features;
+    _lockCol = (prefix === 'ts'); /* kolom gembok hanya saat mengubah fitur toko yang sudah ada */
     var box = 'border:1px solid rgba(255,255,255,.1);border-radius:12px;margin-bottom:8px;overflow:hidden';
     var sm = 'padding:8px 10px;cursor:pointer;font-weight:800;font-size:12.5px;display:flex;align-items:center;gap:8px;list-style:none';
     var h = '<div style="font-weight:800;margin-bottom:2px">Fitur toko</div>' +
-      '<div style="opacity:.65;margin-bottom:6px">Merah = fitur inti (terkunci). Hijau = bebas dicentang atau dicabut; yang tidak dicentang hilang dari tampilan klien.</div>' +
+      '<div style="opacity:.65;margin-bottom:6px">Merah = fitur inti (terkunci). Hijau = bebas dicentang atau dicabut; yang tidak dicentang hilang dari tampilan klien. Penanda <b style="color:#4ade80">BASIC</b>/<b style="color:#fbbf24">PLUS</b> hanya pembeda tingkat.' + (_lockCol ? ' Kolom <b>🔒</b> = gembok: fitur yang digembok tetap ada walau toko dikembalikan ke Basic.' : '') + '</div>' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span style="opacity:.65;font-size:11px">Template cepat:</span><span id="' + prefix + '-presets" style="display:contents">' + presetButtons(prefix) + '</span></div>' +
       '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><b id="' + prefix + '-cnt-all" style="font-size:11.5px"></b><span style="flex:1"></span><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',true);FM_PLANS.cnt(\'' + prefix + '\')" style="' + BSM + '">Centang semua</button><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',false);FM_PLANS.cnt(\'' + prefix + '\')" style="' + BSM + '">Kosongkan semua</button></div>';
     var core = FEATURES.filter(function (f) { return !f.soon && isCore(f); });
@@ -171,6 +186,7 @@
     cats.forEach(function (c) {
       var fs = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && catOf(f) === c.id; });
       if (!fs.length) return;
+      fs.sort(function (a, b) { return (featTier(a) === 'plus' ? 1 : 0) - (featTier(b) === 'plus' ? 1 : 0); }); /* BASIC dulu, PLUS belakangan */
       h += '<details open style="' + box + '"><summary style="' + sm + '"><span>' + c.label + '</span><span id="' + prefix + '-cnt-' + c.id + '" style="opacity:.7;font-weight:700;font-size:11px"></span><span style="flex:1"></span>' + (editable === false ? '' : '<button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',true)" style="' + BSM + '">Centang</button><button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',false)" style="' + BSM + '">Kosongkan</button>') + '</summary><div style="padding:2px 8px 8px">' + tableHtml(fs.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, c.id); }).join('')) + '</div></details>';
     });
     var soon = FEATURES.filter(function (f) { return f.soon; });
@@ -257,6 +273,22 @@
     });
     return out;
   }
+  /* gembok: baca centang kunci dari tabel fitur Tower */
+  function readLocks(prefix) {
+    var out = {};
+    FEATURES.forEach(function (f) { if (f.soon || isCore(f)) return; var el = document.getElementById(prefix + '-lock-' + f.key); if (el && el.checked) out[f.key] = true; });
+    return out;
+  }
+  /* terapkan bawaan paket TAPI pertahankan fitur yang digembok (dipakai saat toko dikembalikan ke Basic/Plus) */
+  function applyTierLocked(tn, tier) {
+    var def = tierDefaults(tier), locks = (tn && tn.featureLocks) || {};
+    Object.keys(locks).forEach(function (key) {
+      if (!locks[key]) return;
+      var f = find(key); if (!f) return;
+      ROLES.forEach(function (r) { if (f.r[r] === 'o') { def[key] = def[key] || {}; def[key][r] = !!has(key, r, tn); } });
+    });
+    return def;
+  }
 
   /* ---- sembunyikan fitur yang tidak aktif (dijalankan sebelum tampilan dirakit) ---- */
   function cardOf(el) { return el ? (el.closest('.ios-glass') || (el.parentElement && el.parentElement.parentElement)) : null; }
@@ -311,5 +343,5 @@
   }
 
   window.FM_PLANS = { FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml,
-    readChecklist: readChecklist, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
+    readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();

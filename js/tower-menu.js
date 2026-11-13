@@ -10,7 +10,7 @@
       { t: '2. Profil Toko', ic: 'store', run: "towerPick('profil')", d: 'Nama, slogan, warna, logo' },
       { t: '3. Fitur Toko', ic: 'grid', run: "towerPick('fitur')", d: 'Centang fitur per peran' },
       { t: '4. COA Toko', ic: 'list', run: "towerPick('coa')", d: 'Daftar akun toko' },
-      { t: '5. Stok & Katalog', ic: 'box', run: "FM_LAB.open('template')", d: 'Isi katalog awal lewat paket bawaan' },
+      { t: '5. Stok & Katalog', ic: 'box', run: "FM_LAB.open('template')", d: 'Isi katalog awal, simpan & salin template toko' },
       { t: '6. Akun Login', ic: 'key', find: 'Akun Login', d: 'PIN Admin, Manager, Owner toko' },
       { t: '7. Kuota Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Kasir, Manager, Owner' },
       { t: '8. Paket & Billing', ic: 'tag', run: "towerPick('paket')", d: 'Basic atau Plus, lalu tagihan' },
@@ -18,10 +18,9 @@
     ] },
     { id: 'serah', title: 'Uji & Serah', hint: 'Lanjutkan 10 → 14 sampai diserahkan', c: '#e0a47a', items: [
       { t: '10. Rakit & Uji', ic: 'grid', run: "FM_LAB.open('rakit')", d: 'Aktifkan fitur satu per satu, catat hasil uji' },
-      { t: '11. Template', ic: 'box', run: "FM_LAB.open('template')", d: 'Simpan dan salin pengaturan toko' },
-      { t: '12. Reset Statistik', ic: 'trash', run: "FM_LAB.open('reset')", d: 'Kembalikan statistik uji coba ke 0' },
-      { t: '13. Ubah ID', ic: 'key', run: "FM_LAB.open('rename')", d: 'Ganti ID toko yang belum Published' },
-      { t: '14. Published', ic: 'send', run: "FM_LAB.open('publish')", d: 'Tandai toko yang sudah diserahkan' }
+      { t: '11. Reset Statistik', ic: 'trash', run: "FM_LAB.open('reset')", d: 'Kembalikan statistik uji coba ke 0' },
+      { t: '12. Ubah ID', ic: 'key', run: "FM_LAB.open('rename')", d: 'Ganti ID toko yang belum Published' },
+      { t: '13. Published', ic: 'send', run: "FM_LAB.open('publish')", d: 'Tandai toko yang sudah diserahkan' }
     ] },
     { id: 'klien', title: 'Kelola Klien', hint: 'Toko yang sudah berjalan', c: '#8fb8e8', items: [
       { t: 'Jaringan Mitra', ic: 'building', find: 'Jaringan Mitra', d: 'Pantau daftar toko (hanya lihat)' },

@@ -50,7 +50,8 @@
     flap: function () { tone(900, 0.02, 'square', 0.03); tone(600, 0.025, 'square', 0.03, 0.03); },
     fanfare: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.16, 'triangle', 0.08, i * 0.11); }); tone(1319, 0.4, 'triangle', 0.08, 0.46); },
     goal: function () { [392, 523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.14, 'sawtooth', 0.05, i * 0.09); }); },
-    ok: function () { tone(520, 0.08, 'sine', 0.06); tone(780, 0.08, 'sine', 0.06, 0.09); tone(1040, 0.12, 'sine', 0.06, 0.18); }
+    ok: function () { tone(520, 0.08, 'sine', 0.06); tone(780, 0.08, 'sine', 0.06, 0.09); tone(1040, 0.12, 'sine', 0.06, 0.18); },
+    radar: function () { tone(1760, 0.16, 'sine', 0.045, 0, 1120); tone(1760, 0.11, 'sine', 0.018, 0.2, 1120); }
   };
   var lastSpeak = 0;
   function speak(txt) {
@@ -412,7 +413,9 @@
       setInterval(function () { if (!document.hidden && mode === 'mon') renderJam(); }, 60000),
       setInterval(function () { if (!document.hidden) scanEvents(); }, 2000),
       setInterval(function () { if (!document.hidden && seeded) trend(); }, 180000),
-      setInterval(function () { if (mode === 'ken' && !modalOpen() && Date.now() - lastTouch > IDLE_MS) setMode('mon'); }, 5000)
+      setInterval(function () { if (mode === 'ken' && !modalOpen() && Date.now() - lastTouch > IDLE_MS) setMode('mon'); }, 5000),
+      /* sapuan radar: berbunyi di layar MONITOR selama masih ada toko online (ikut kedipan lampu hijau) */
+      setInterval(function () { if (document.hidden || mode !== 'mon' || !S.on || S.eco) return; if (tenants().some(function (t) { return online(t.id).length; })) SND.radar(); }, 2600)
     );
   }
   function restartTimers() { clearTimers(); startTimers(); }
