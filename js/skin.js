@@ -59,7 +59,9 @@
       out.push(P + ' .fm-ic .pos,' + P + ' .fm-ok{color:' + pre(FAM.emerald[idx], cb[1]) + '!important}');
       out.push(P + ' .fm-ic .neg{color:' + pre(FAM.rose[idx], cb[1]) + '!important}');
     });
-    out.push(':is(' + surf.join(',') + '):not(button):not(.fm-keep):not(.oneui-hero *){background:var(--s-line)!important}');
+    /* dipakai --s-tint (bukan --s-line, yang warnanya setipis garis) supaya kotak bernuansa
+       tetap cukup pekat untuk dibaca walau latar dedaunan ramai di belakangnya */
+    out.push(':is(' + surf.join(',') + '):not(button):not(.fm-keep):not(.oneui-hero *){background:var(--s-tint,var(--s-line))!important}');
     return out.join('\n');
   }
   var TEXTCSS = buildTextCss();
@@ -94,6 +96,26 @@
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body header.oneui-hero,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body header.oneui-hero,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body header.oneui-hero{background:rgba(255,255,255,.66)!important;border-color:rgba(71,85,105,.25)!important;box-shadow:0 6px 18px -10px rgba(30,41,59,.35)!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] body header.oneui-hero *,html[data-fm-page="manager"][data-fm-native][data-fm-fit] body header.oneui-hero *,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body header.oneui-hero *{color:#1e293b!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] #fm-dock,html[data-fm-page="manager"][data-fm-native][data-fm-fit] #fm-dock,html[data-fm-page="owner"][data-fm-native][data-fm-fit] #fm-dock{background:rgba(255,255,255,.7)!important;border-color:rgba(71,85,105,.25)!important;color:#1e293b!important}',
+
+    /* ---- MODE TERANG: kaca dibuat sedikit lebih pekat & garis/tulisan lebih tegas,
+       supaya jauh lebih enak dibaca TAPI latar belakang masih tembus pandang. ---- */
+    /* kasir: markup aslinya terang, warnanya dipakai apa adanya */
+    'html[data-fm-page="kasir"]:not([data-fm-black]):not([data-fm-invert]){--s-surf:rgba(255,255,255,.84)!important;--s-line:rgba(51,65,85,.28)!important;--s-tint:rgba(243,247,252,.88)!important;--s-shadow:rgba(30,41,59,.26)!important;--s-b2:rgba(255,255,255,.62)!important;--s-b2l:rgba(51,65,85,.3)!important;--s-b2t:#0f172a!important}',
+    'html[data-fm-page="kasir"]:not([data-fm-black]):not([data-fm-invert]) .ios-glass,html[data-fm-page="kasir"]:not([data-fm-black]):not([data-fm-invert]) .white-ice-glass-card{color:#0f172a!important}',
+    /* manager & owner: warna ditulis versi gelap karena halamannya dibalik untuk tampilan terang
+       (nilai di bawah ini akan terbaca sebagai putih .84 setelah dibalik) */
+    'html[data-fm-page="manager"][data-fm-invert="1"],html[data-fm-page="owner"][data-fm-invert="1"]{--s-surf:rgba(15,23,42,.84)!important;--s-line:rgba(255,255,255,.26)!important;--s-tint:rgba(10,14,22,.88)!important;--s-b2:rgba(15,23,42,.62)!important;--s-b2l:rgba(255,255,255,.3)!important}',
+    /* latar dedaunan diredam sedikit di belakang kartu: tetap terlihat, tapi tidak lagi mengganggu bacaan */
+    'html[data-fm-page="kasir"][data-fm-native][data-fm-fit]:not([data-fm-black]) body[class]{background-image:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,.34)),var(--fm-wp,url("/img/wp-bukit.svg"))!important}',
+    'html[data-fm-page="kasir"][data-fm-native][data-fm-fit]:not([data-fm-black]) body header.oneui-hero,html[data-fm-page="manager"][data-fm-native][data-fm-fit]:not([data-fm-black]) body header.oneui-hero,html[data-fm-page="owner"][data-fm-native][data-fm-fit]:not([data-fm-black]) body header.oneui-hero{background:rgba(255,255,255,.82)!important;border-color:rgba(51,65,85,.28)!important}',
+    'html[data-fm-page="kasir"][data-fm-native][data-fm-fit]:not([data-fm-black]) #fm-dock,html[data-fm-page="manager"][data-fm-native][data-fm-fit]:not([data-fm-black]) #fm-dock,html[data-fm-page="owner"][data-fm-native][data-fm-fit]:not([data-fm-black]) #fm-dock{background:rgba(255,255,255,.86)!important;border-color:rgba(51,65,85,.28)!important}',
+
+    /* ---- MODE GELAP di halaman kasir: menimpa warna terang di atas dengan palet gelap yang dirancang. ---- */
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body[class]{background-color:#080b11!important;background-image:linear-gradient(rgba(8,11,17,.86),rgba(8,11,17,.94)),var(--fm-wp,url("/img/wp-bukit.svg"))!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"] .ios-glass,html[data-fm-black="1"][data-fm-page="kasir"] .white-ice-glass-card{background:rgba(21,26,36,.9)!important;border-color:rgba(255,255,255,.1)!important;color:#eef1f7!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body header.oneui-hero{background:rgba(15,19,27,.9)!important;border-color:rgba(255,255,255,.14)!important;box-shadow:0 6px 18px -10px rgba(0,0,0,.8)!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] body header.oneui-hero *{color:#eef1f7!important}',
+    'html[data-fm-black="1"][data-fm-page="kasir"][data-fm-native][data-fm-fit] #fm-dock{background:rgba(15,19,27,.92)!important;border-color:rgba(255,255,255,.14)!important;color:#eef1f7!important}',
 
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] .white-ice-glass-card[style*="0f172a"],html[data-fm-page="manager"][data-fm-native][data-fm-fit] .white-ice-glass-card[style*="0f172a"],html[data-fm-page="owner"][data-fm-native][data-fm-fit] .white-ice-glass-card[style*="0f172a"]{background:var(--s-surf)!important;border-color:var(--s-line)!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit] .white-ice-glass-card[style*="0f172a"] *,html[data-fm-page="manager"][data-fm-native][data-fm-fit] .white-ice-glass-card[style*="0f172a"] *,html[data-fm-page="owner"][data-fm-native][data-fm-fit] .white-ice-glass-card[style*="0f172a"] *{color:#1e293b!important}',
@@ -137,6 +159,11 @@
     'html[data-fm-page="manager"]::before,html[data-fm-page="owner"]::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;background:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,.2)),var(--fm-wp,url("/img/wp-bukit.svg")) center bottom/cover no-repeat}',
     'html[data-fm-page="manager"][data-fm-invert="1"]::before,html[data-fm-page="owner"][data-fm-invert="1"]::before{filter:invert(1) hue-rotate(180deg)}',
     'html[data-fm-page="manager"]:not([data-fm-invert])::before,html[data-fm-page="owner"]:not([data-fm-invert])::before{filter:brightness(.5) saturate(.9)}',
+    /* manager & owner saat mode gelap: kaca + bayangan versi gelap (sebelumnya masih memakai
+       bayangan putih sisa mode terang, itu yang membuat tampilannya terasa rusak) */
+    'html[data-fm-black="1"][data-fm-page="manager"],html[data-fm-black="1"][data-fm-page="owner"]{--s-surf:rgba(21,26,36,.88)!important;--s-line:rgba(255,255,255,.1)!important;--s-tint:rgba(255,255,255,.07)!important;--s-hi:rgba(255,255,255,.06)!important;--s-shadow:rgba(0,0,0,.7)!important;--s-gloss:rgba(255,255,255,.04)!important;--s-bg:#080b11!important;--s-b2:rgba(21,26,36,.88)!important;--s-b2l:rgba(255,255,255,.17)!important;--s-b2t:#eef1f7!important}',
+    'html[data-fm-black="1"][data-fm-page="manager"]::before,html[data-fm-black="1"][data-fm-page="owner"]::before{background:linear-gradient(rgba(8,11,17,.82),rgba(8,11,17,.92)),var(--fm-wp,url("/img/wp-bukit.svg")) center bottom/cover no-repeat!important;filter:none!important}',
+    'html[data-fm-black="1"][data-fm-page="manager"] .ios-glass,html[data-fm-black="1"][data-fm-page="manager"] .white-ice-glass-card,html[data-fm-black="1"][data-fm-page="owner"] .ios-glass,html[data-fm-black="1"][data-fm-page="owner"] .white-ice-glass-card{background:rgba(21,26,36,.88)!important;border-color:rgba(255,255,255,.1)!important;color:#eef1f7!important}',
     'html[data-fm-page="manager"] .ios-glass,html[data-fm-page="manager"] .white-ice-glass-card,html[data-fm-page="owner"] .ios-glass,html[data-fm-page="owner"] .white-ice-glass-card{background:var(--s-surf)!important;border-color:var(--s-line)!important;color:#f1f5f9}',
     'html[data-fm-page="manager"] .ios-glass *,html[data-fm-page="manager"] .white-ice-glass-card *,html[data-fm-page="owner"] .ios-glass *,html[data-fm-page="owner"] .white-ice-glass-card *{color:inherit}',
     'html[data-fm-page="manager"][data-fm-native][data-fm-fit] body #fm-whatsnew,html[data-fm-page="owner"][data-fm-native][data-fm-fit] body #fm-whatsnew{background:rgba(15,23,42,.66)!important;color:#f1f5f9!important;border:1px solid rgba(255,255,255,.2)!important}',
@@ -215,15 +242,18 @@
     /* ---- kolom isian ---- */
     'input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]),select,textarea{border-radius:14px!important;min-width:0}',
     'html[data-fm-native="light"]:not([data-fm-invert]) input:not([type=checkbox]):not([type=radio]):not([type=color]),html[data-fm-native="light"]:not([data-fm-invert]) select,html[data-fm-native="light"]:not([data-fm-invert]) textarea{background-color:rgba(255,255,255,.78)!important;border-color:rgba(148,163,184,.45)!important;box-shadow:inset 0 1px 2px rgba(15,23,42,.05)!important}',
+    /* halaman manager/owner saat tampilan terang (dibalik): kolom isian ditulis versi gelap
+       supaya setelah dibalik hasilnya kotak putih bertulisan gelap, bukan kotak hitam */
+    'html[data-fm-native="dark"][data-fm-invert] input:not([type=checkbox]):not([type=radio]):not([type=color]),html[data-fm-native="dark"][data-fm-invert] select,html[data-fm-native="dark"][data-fm-invert] textarea{background-color:rgba(12,16,24,.82)!important;color:#f1f5f9!important;border-color:rgba(148,163,184,.45)!important;box-shadow:none!important}',
 
     /* ---- tombol tindakan (grid seragam) ---- */
     '.fm-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}',
     '.fm-actions:empty{display:none}',
-    '.fm-actions .fm-act{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:11px;min-height:54px;padding:10px 14px;border-radius:20px;cursor:pointer;background:var(--s-surf);border:1px solid var(--s-line);box-shadow:inset 0 1px 0 var(--s-hi),0 14px 28px -22px var(--s-shadow);font:700 13px/1.2 ' + FONT + ';letter-spacing:-.005em;transition:transform .2s,filter .2s;-webkit-tap-highlight-color:transparent}',
+    '.fm-actions .fm-act{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:11px;min-height:54px;padding:10px 14px;border-radius:20px;cursor:pointer;background:var(--s-surf);color:var(--s-b2t);border:1px solid var(--s-line);box-shadow:inset 0 1px 0 var(--s-hi),0 14px 28px -22px var(--s-shadow);font:700 13px/1.2 ' + FONT + ';letter-spacing:-.005em;transition:transform .2s,filter .2s;-webkit-tap-highlight-color:transparent}',
     '.fm-actions .fm-act:hover{transform:translateY(-2px);filter:brightness(1.05)}.fm-actions .fm-act:active{transform:scale(.97)}',
     '.fm-actions .fm-act i{width:34px;height:34px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,' + A + ' 16%,transparent);color:' + A + '}',
     '.fm-actions .fm-act svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}',
-    '.fm-actions .fm-act span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+    '.fm-actions .fm-act span{min-width:0;overflow:hidden;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.18;overflow-wrap:anywhere}',
     /* ubin dinamis: bentuk dan ukuran dihitung dari ruang kosong (lihat layoutTiles) */
     '.fm-actions[data-fm-mosaic]{align-content:stretch}',
     '.fm-actions[data-fm-mosaic] .fm-act{min-width:0}',
@@ -374,7 +404,7 @@
     'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz],html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act[data-sz],html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act{grid-column:auto!important;grid-row:auto!important;flex-direction:row!important;text-align:left!important;justify-content:flex-start!important;min-height:0!important;padding:clamp(4px,.9vh,8px) 10px!important;gap:8px!important;font-size:clamp(11px,1.7vh,12.5px)!important;font-weight:700!important;border-radius:14px!important}',
     'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act i,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] i,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act i,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] i{width:clamp(22px,3.6vh,28px)!important;height:clamp(22px,3.6vh,28px)!important;border-radius:9px!important}',
     'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act svg,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] svg,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act svg,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] svg{width:clamp(13px,2.2vh,17px)!important;height:clamp(13px,2.2vh,17px)!important}',
-    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act span,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] span,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act span,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] span{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}',
+    'html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act span,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] span,html[data-fm-fit][data-fm-page="manager"] #fm-actions .fm-act span,html[data-fm-fit][data-fm-page="owner"] #fm-actions .fm-act[data-sz] span{white-space:normal!important;overflow:hidden!important;text-overflow:clip!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;line-height:1.15!important;overflow-wrap:anywhere!important}',
     'html[data-fm-fit] #fm-insights:empty{display:none}',
     'html[data-fm-fit] main:has(#fm-insights:empty) #fm-actions{flex:1 1 0;min-height:0}',
     'html[data-fm-page="manager"] main>.grid.lg\\:grid-cols-12{display:none!important}',
@@ -544,11 +574,13 @@
     var grid = document.getElementById('fm-actions'); if (!grid) return;
     // tombol tindakan yang sudah ada (data-fm-action) -> ubin seragam
     [].slice.call(grid.querySelectorAll('[data-fm-action]')).forEach(function (b) {
+      /* nama tombol diambil dari teks langsung dulu; <span> kosong (mis. badge Piutang) jangan dipakai agar nama tidak hilang */
+      var direct = [].slice.call(b.childNodes).filter(function (n) { return n.nodeType === 3; }).map(function (n) { return n.nodeValue; }).join('');
       var sp = b.querySelector('span');
-      var label = ((sp ? sp.textContent : b.textContent) || '').replace(/^\s*\+\s*/, '').replace(/\s+/g, ' ').trim();
+      var label = ((direct.trim() ? direct : (sp ? sp.textContent : b.textContent)) || '').replace(/^\s*\+\s*/, '').replace(/\s+/g, ' ').trim();
       var onclick = b.getAttribute('onclick') || '';
       var t = actionTile(label, b.getAttribute('data-ic') || 'grid', function () { new Function(onclick).call(t); });
-      [].slice.call(b.querySelectorAll('[id]')).forEach(function (el) { t.appendChild(el); });
+      [].slice.call(b.querySelectorAll('[id],[data-piu-badge]')).forEach(function (el) { t.appendChild(el); });
       b.parentNode.replaceChild(t, b);
     });
     // bagian halaman -> panel popup

@@ -3,11 +3,18 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 2';
+  var BETA = 'Beta 3';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta 3', '13 Nov 2026', [
+      '[Perbaikan] Mode gelap dirombak total: sebelumnya hanya membalik warna layar, kini memakai palet gelap yang dirancang khusus sehingga tulisan jernih dan tidak lagi terlihat rusak',
+      '[Perbaikan] Mode terang dibuat lebih mudah dibaca: kartu sedikit lebih pekat dan garisnya lebih tegas, latar dedaunan tetap terlihat',
+      '[Perbaikan] Nama tombol yang panjang kini turun ke dua baris, tidak lagi terpotong menjadi titik-titik',
+      '[Perbaikan] Tombol Piutang & Utang yang sempat tampil tanpa nama sudah kembali normal',
+      '[Baru] Cakupan Bahasa Inggris diperluas lebih dari tiga kali lipat, termasuk tanggal, nama bulan, dan kalimat berangka'
+    ]],
     ['Beta 2', '13 Nov 2026', [
       '[Perbaikan] Tombol Stok, Absen, dan Bantuan dipindah ke bawah agar tidak lagi menutupi formulir kasir',
       '[Perbaikan] Pemberitahuan "versi baru siap" kini muncul otomatis saat ada pembaruan aplikasi'
@@ -62,12 +69,45 @@
     '@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}',
     // keterbacaan: teks sangat kecil dinaikkan sedikit
     '.text-\\[9px\\]{font-size:10.5px!important}.text-\\[10px\\]{font-size:11.5px!important}.text-\\[11px\\]{font-size:12px!important}',
-    // gelap pekat (halaman bawaan gelap)
-    'html[data-fm-black="1"] body{background:#000!important;background-image:none!important;color:#f5f5f7}',
-    'html[data-fm-black="1"] .ios-glass{background:rgba(10,10,12,.97)!important;border-color:rgba(255,255,255,.1)!important;box-shadow:0 1px 0 rgba(255,255,255,.05) inset!important}',
-    'html[data-fm-black="1"] .glass-capsule,html[data-fm-black="1"] .glass-capsule-dark{background:#000!important;border-color:rgba(255,255,255,.14)!important}',
-    'html[data-fm-black="1"] .bg-slate-900,html[data-fm-black="1"] .bg-slate-950{background-color:#050507!important}',
-    'html[data-fm-black="1"] .text-slate-500{color:#aab2c5!important}html[data-fm-black="1"] .text-slate-400{color:#b6bece!important}html[data-fm-black="1"] .text-slate-600{color:#7f8799!important}',
+    // ===== MODE GELAP =====
+    // Palet gelap yang dirancang khusus (bukan efek balik warna), jadi kontras tulisan tetap nyaman dibaca.
+    'html[data-fm-black="1"]{color-scheme:dark;--d-bg:#080b11;--d-surf:rgba(21,26,36,.9);--d-surf2:rgba(30,36,48,.92);--d-line:rgba(255,255,255,.1);--d-line2:rgba(255,255,255,.17);--d-t1:#eef1f7;--d-t2:#c2cad9;--d-t3:#939db1}',
+    'html[data-fm-black="1"] body{background:var(--d-bg)!important;background-image:none!important;color:var(--d-t1)}',
+    'html[data-fm-black="1"] .ios-glass{background:var(--d-surf)!important;border-color:var(--d-line)!important;box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 10px 30px -18px rgba(0,0,0,.9)!important}',
+    'html[data-fm-black="1"] .glass-capsule,html[data-fm-black="1"] .glass-capsule-dark{background:rgba(12,15,21,.92)!important;border-color:var(--d-line2)!important}',
+    'html[data-fm-black="1"] .bg-slate-900,html[data-fm-black="1"] .bg-slate-950{background-color:#05070b!important}',
+    'html[data-fm-black="1"] .text-slate-400{color:var(--d-t2)!important}html[data-fm-black="1"] .text-slate-500{color:var(--d-t3)!important}html[data-fm-black="1"] .text-slate-600{color:var(--d-t3)!important}',
+    // Halaman yang markup aslinya terang (kasir & halaman masuk): warnanya diganti satu per satu,
+    // supaya tidak lagi terlihat seperti kerusakan sistem saat mode gelap dinyalakan.
+    'html[data-fm-black="1"][data-fm-native="light"]{--s-surf:var(--d-surf)!important;--s-line:var(--d-line)!important;--s-tint:rgba(255,255,255,.07)!important;--s-hi:rgba(255,255,255,.07)!important;--s-shadow:rgba(0,0,0,.7)!important;--s-gloss:rgba(255,255,255,.04)!important;--s-bg:var(--d-bg)!important;--s-b2:var(--d-surf)!important;--s-b2l:var(--d-line2)!important;--s-b2t:var(--d-t1)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] body{background-color:var(--d-bg)!important;background-image:linear-gradient(rgba(8,11,17,.86),rgba(8,11,17,.94)),var(--fm-wp,url("/img/wp-bukit.svg"))!important;background-size:cover!important;background-position:center bottom!important;background-repeat:no-repeat!important;background-attachment:fixed!important;color:var(--d-t1)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] .bg-white,html[data-fm-black="1"][data-fm-native="light"] [class*="bg-white/"]{background-color:var(--d-surf)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] .bg-slate-50,html[data-fm-black="1"][data-fm-native="light"] .bg-slate-100,html[data-fm-black="1"][data-fm-native="light"] .bg-slate-200{background-color:var(--d-surf2)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] .text-slate-900,html[data-fm-black="1"][data-fm-native="light"] .text-slate-800,html[data-fm-black="1"][data-fm-native="light"] .text-black{color:var(--d-t1)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] .text-slate-700,html[data-fm-black="1"][data-fm-native="light"] .text-slate-600{color:var(--d-t2)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="border-slate-"],html[data-fm-black="1"][data-fm-native="light"] .border-white,html[data-fm-black="1"][data-fm-native="light"] [class*="border-white/"]{border-color:var(--d-line2)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] input:not([type=checkbox]):not([type=radio]):not([type=color]),html[data-fm-black="1"][data-fm-native="light"] select,html[data-fm-black="1"][data-fm-native="light"] textarea{background-color:rgba(10,13,19,.94)!important;color:var(--d-t1)!important;border-color:var(--d-line2)!important;box-shadow:none!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] input::placeholder,html[data-fm-black="1"][data-fm-native="light"] textarea::placeholder,html[data-fm-black="1"][data-fm-native="light"] [class*="placeholder-slate-"]::placeholder{color:#7f899d!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] table thead th{background-color:rgba(12,15,21,.9)!important;color:var(--d-t2)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] tbody tr:nth-child(even){background-color:rgba(255,255,255,.025)!important}',
+    // Warna penanda (merah/hijau/kuning/biru) dinaikkan terangnya agar tetap terbaca di atas gelap.
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="text-rose-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-red-"]{color:#fb8a9c!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="text-emerald-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-green-"]{color:#45dba6!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="text-amber-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-yellow-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-orange-"]{color:#fbc02d!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="text-indigo-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-blue-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-violet-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-purple-"]{color:#a3b0fc!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="text-cyan-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-sky-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-teal-"]{color:#5fd8f0!important}',
+    // Kotak peringatan/info berwarna muda: dasarnya dijadikan gelap bernuansa, bukan putih menyilaukan.
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-amber-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-amber-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-yellow-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-yellow-50"]{background-color:rgba(120,78,8,.52)!important;border-color:rgba(251,192,45,.34)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-rose-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-rose-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-red-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-red-50"]{background-color:rgba(118,29,45,.52)!important;border-color:rgba(251,138,156,.32)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-emerald-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-emerald-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-green-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-green-50"]{background-color:rgba(10,85,62,.52)!important;border-color:rgba(69,219,166,.3)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-cyan-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-cyan-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-sky-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-sky-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-indigo-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-indigo-50"]{background-color:rgba(18,62,106,.52)!important;border-color:rgba(95,216,240,.26)!important}',
+    'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-amber-1"] [class*="text-amber-9"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-amber-1"] [class*="text-amber-8"]{color:#ffd978!important}',
+    // Jendela/panel bawaan aplikasi (konfirmasi, stok, laporan) ikut digelapkan supaya tidak menyilaukan.
+    'html[data-fm-black="1"] #fm-dlg .fm-dlg-box,html[data-fm-black="1"] #fm-lap .lp,html[data-fm-black="1"] #fm-stok .sk-box,html[data-fm-black="1"] #fm-stok .sk-ed>div,html[data-fm-black="1"] #fm-stokadm-modal .sa-box{background:rgba(21,26,36,.95)!important;border-color:rgba(255,255,255,.12)!important;color:#eef1f7!important}',
+    'html[data-fm-black="1"] #fm-dlg .fm-dlg-box h3,html[data-fm-black="1"] #fm-dlg .fm-dlg-box p,html[data-fm-black="1"] #fm-lap .lp h3,html[data-fm-black="1"] #fm-lap .lp p,html[data-fm-black="1"] #fm-stok .sk-box h3,html[data-fm-black="1"] #fm-stokadm-modal .sa-box h3{color:#eef1f7!important}',
+    'html[data-fm-black="1"] #fm-dlg .fm-dlg-no{background:rgba(148,163,184,.26)!important;color:#e7ebf3!important}',
+    'html[data-fm-black="1"] #fm-stok .sk-chip:not(.on){background:rgba(148,163,184,.22)!important;color:#c7cfdd!important}',
+    'html[data-fm-black="1"] #fm-stok .sk-box table th{background:rgba(12,15,21,.9)!important;color:#c2cad9!important}',
     // mode kebalikan (terang pada halaman gelap / gelap pada halaman terang)
     'html[data-fm-invert="1"]{filter:invert(1) hue-rotate(180deg);background:#fff}',
     'html[data-fm-invert="1"] body{background-color:#fff!important;background-image:none!important}',
@@ -139,8 +179,10 @@
     h.setAttribute('data-fm-native', NATIVE);
     ['data-fm-black', 'data-fm-invert', 'data-fm-accent'].forEach(function (a) { h.removeAttribute(a); });
     if (!LITE && ROLE !== 'lain') {
-      if (mode !== NATIVE) h.setAttribute('data-fm-invert', '1');
-      else if (mode === 'dark') h.setAttribute('data-fm-black', '1');
+      /* gelap = tema gelap sungguhan (tidak lagi memakai efek balik warna yang bikin tampilan rusak);
+         terang di halaman yang markup-nya memang gelap (manager/owner) tetap memakai pembalik seperti semula */
+      if (mode === 'dark') h.setAttribute('data-fm-black', '1');
+      else if (mode !== NATIVE) h.setAttribute('data-fm-invert', '1');
       if (pref.accent) { h.setAttribute('data-fm-accent', '1'); h.style.setProperty('--fm-accent', pref.accent); }
       else h.style.removeProperty('--fm-accent');
       h.style.setProperty('--fm-on', onColor(pref.accent || '#3d63dd'));
