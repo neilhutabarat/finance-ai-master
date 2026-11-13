@@ -2400,12 +2400,12 @@
                 tr.className = "border-b border-white/5 transition";
                 tr.innerHTML = `
                     <td class="py-3.5 px-4">
-                        <span class="font-mono font-bold text-cyan-400 block">${tenant.id}</span>
+                        <span class="font-mono font-bold text-cyan-400 block">${escHtml(tenant.id)}</span>
                         <span class="text-[10px] text-slate-400 font-mono">Usia: ${idAgeText}</span>
                     </td>
                     <td class="py-3.5 px-4">
                         <div class="flex items-center flex-wrap gap-1.5">
-                            ${logoMap[tenant.id] ? '<img src="' + logoMap[tenant.id] + '" alt="" class="w-7 h-7 rounded-lg object-contain bg-white/10">' : ''}<span class="font-black text-white">${escHtml(tenant.nama)}</span>
+                            ${logoMap[tenant.id] ? '<img src="' + escHtml(logoMap[tenant.id]) + '" alt="" class="w-7 h-7 rounded-lg object-contain bg-white/10">' : ''}<span class="font-black text-white">${escHtml(tenant.nama)}</span>
                             ${tierBadgeHtml(tenant.tier)}
                             ${(getCtrl(tenant.id).billingCycle === 'yearly') ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">TAHUNAN</span>' : ''}
                             ${masterTag}
@@ -2734,7 +2734,7 @@
             coa.forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c.code;
-                opt.innerText = `[${c.code}] ${c.name} (${c.category.toUpperCase()})`;
+                opt.textContent = `[${c.code}] ${c.name} (${String(c.category||'').toUpperCase()})`;
                 opt.dataset.category = c.category;
                 opt.dataset.name = c.name;
                 select.appendChild(opt);
@@ -2788,7 +2788,7 @@
                 tr.innerHTML = `
                     <td class="py-2 px-2 text-center text-slate-500 cursor-grab select-none prov-coa-h" title="Seret untuk ubah urutan" style="touch-action:none">⠿</td>
                     <td class="py-2 px-3 font-mono font-bold text-cyan-400">${c.code}</td>
-                    <td class="py-2 px-3 font-bold text-white">${c.name}</td>
+                    <td class="py-2 px-3 font-bold text-white">${escHtml(c.name)}</td>
                     <td class="py-2 px-3 uppercase text-[10px] ${c.category === 'income' ? 'text-emerald-400' : 'text-rose-400'}">${c.category}</td>
                     <td class="py-2 px-3 text-center whitespace-nowrap">
                         <button onclick="editProviderCOA('${c.code}')" class="px-2 py-0.5 rounded bg-cyan-500/20 hover:bg-cyan-500 text-cyan-300 font-bold text-[10px] mr-1">Edit</button>
@@ -2975,25 +2975,25 @@
                 card.innerHTML = `
                     <div>
                         <div class="flex items-center space-x-2">
-                            <span class="font-mono font-bold text-cyan-400">[${t.tenantId}]</span>
-                            <span class="font-black text-white">${t.tenantName}</span>
-                            <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${isPending ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'}">${t.status}</span>
+                            <span class="font-mono font-bold text-cyan-400">[${escHtml(t.tenantId)}]</span>
+                            <span class="font-black text-white">${escHtml(t.tenantName)}</span>
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${isPending ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'}">${escHtml(t.status)}</span>
                         </div>
-                        <p class="text-slate-300 mt-1">Mengajukan <b>+${t.qty} Terminal ${ROLE_LABEL[t.role || 'kasir'] || 'Kasir'} Baru</b> (${t.terminalName || 'Terminal Tambahan'})</p>
-                        <span class="text-[10px] text-slate-500 font-mono">Diajukan: ${t.requestedAt} oleh ${t.requestedBy}</span>
+                        <p class="text-slate-300 mt-1">Mengajukan <b>+${escHtml(t.qty)} Terminal ${ROLE_LABEL[t.role || 'kasir'] || 'Kasir'} Baru</b> (${escHtml(t.terminalName || 'Terminal Tambahan')})</p>
+                        <span class="text-[10px] text-slate-500 font-mono">Diajukan: ${escHtml(t.requestedAt)} oleh ${escHtml(t.requestedBy)}</span>
                     </div>
 
                     ${isPending ? `
                     <div class="flex items-center space-x-2">
                         <button onclick="approveTicket(${idx})" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition">
-                            Setujui (+${t.qty} ${ROLE_LABEL[t.role || 'kasir'] || 'Kasir'})
+                            Setujui (+${escHtml(t.qty)} ${ROLE_LABEL[t.role || 'kasir'] || 'Kasir'})
                         </button>
                         <button onclick="rejectTicket(${idx})" class="px-3 py-1.5 rounded-xl bg-rose-600/30 hover:bg-rose-600 text-rose-200 font-bold text-xs transition">
                             Tolak
                         </button>
                     </div>
                     ` : `
-                    <div class="flex items-center gap-2"><span class="text-[10px] text-slate-400 font-bold">Diproses pada ${t.processedAt || ''}</span>
+                    <div class="flex items-center gap-2"><span class="text-[10px] text-slate-400 font-bold">Diproses pada ${escHtml(t.processedAt || '')}</span>
                     <button data-del="${idx}" class="px-2.5 py-1 rounded-xl bg-slate-700 hover:bg-rose-600 text-white font-bold text-[10px] transition">Hapus</button></div>
                     `}
                 `;
