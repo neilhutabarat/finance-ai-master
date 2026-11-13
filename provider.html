@@ -70,10 +70,12 @@
     </script>
     <script src="js/billing.js?v=4.1"></script>
     <script src="js/dialog.js?v=1.13"></script>
-    <script src="js/theme.js?v=6.3"></script>
+    <script src="js/theme.js?v=6.5"></script>
     <script src="js/logo.js?v=5.0"></script>
     <script src="js/skin.js?v=5.8"></script>
-    <script src="js/tower-menu.js?v=6.1"></script>
+    <script src="js/tower-menu.js?v=6.5"></script>
+    <script src="js/tower-lab.js?v=6.4"></script>
+    <script src="js/tower-health.js?v=6.5"></script>
     <script src="js/chat.js?v=4.2"></script>
     <script src="js/tower-cockpit.js?v=4.4"></script>
     <style>#main-modal-container{z-index:70 !important}
@@ -1763,7 +1765,9 @@
                     '<p class="text-slate-300">Kirim link ini ke klien:</p>' +
                     '<input readonly id="nt-link" value="' + escHtml(link) + '" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-[11px] text-cyan-300 font-mono outline-none">' +
                     '<button id="nt-copy" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]">Salin Link</button>' +
-                    '<p class="text-amber-300 text-[11px]">Akun login toko belum dibuat. Buka menu Akun Login, atur PIN Kasir, Manager, dan Owner, lalu berikan PIN ke klien.</p>';
+                    '<p class="text-amber-300 text-[11px]">Akun login toko belum dibuat. Buka menu Akun Login, atur PIN Kasir, Manager, dan Owner, lalu berikan PIN ke klien.</p>' +
+                    '<button id="nt-tpl" class="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-[11px]">Terapkan template / salin pengaturan toko lain</button>';
+                const tb = document.getElementById('nt-tpl'); if (tb) tb.onclick = function () { if (window.FM_LAB) FM_LAB.open('template', id); };
                 const cb = document.getElementById('nt-copy');
                 cb.onclick = function () { const i = document.getElementById('nt-link'); i.select(); try { document.execCommand('copy'); cb.innerText = 'Tersalin'; } catch (e) {} };
                 ['nt-id', 'nt-nama', 'nt-slogan', 'nt-alamat', 'nt-custom'].forEach(function (x) { document.getElementById(x).value = ''; });
@@ -2339,7 +2343,7 @@
                     }
                 });
                 const netOmzet = incMonth - outMonth;
-                const masterTag = tenant.isMaster ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">MASTER</span>' : '';
+                const masterTag = tenant.isMaster ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">MASTER</span>' : '' + (window.FM_LAB ? FM_LAB.badge(tenant.id) : '');
                 const localTag = tenantSource[tenant.id] === 'firestore' ? '' : '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-400/30" title="Data dibaca dari browser ini, bukan dari server">LOKAL</span>';
 
                 const tr = document.createElement('tr');

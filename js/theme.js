@@ -3,11 +3,19 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 6.3';
+  var BETA = 'BETA 6.5';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 6.5)', '13 Nov 2026', [
+      '[Perbaikan] Pemeriksaan kerapian data toko lebih menyeluruh, sehingga data stok dan harga jual yang tidak wajar dapat dirapikan dengan cepat',
+      '[Keamanan] Sisa data dan akun lama yang tidak terpakai kini dibersihkan secara berkala dari server, sehingga hanya data toko yang masih aktif yang tersimpan'
+    ]],
+    ['1.0.0 (BETA 6.4)', '13 Nov 2026', [
+      '[Perbaikan] Penyempurnaan penyiapan toko baru: pengaturan awal toko kini lebih rapi dan konsisten saat pertama kali dipakai',
+      '[Keamanan] Pengaturan dan data uji coba toko kini dipisahkan dengan aman dari data operasional, sehingga data toko yang sudah dipakai tidak bisa terhapus tidak sengaja'
+    ]],
     ['1.0.0 (BETA 6.3)', '13 Nov 2026', [
       '[Perbaikan] Sesi login kini tersimpan terpisah per jenis akun, sehingga membuka beberapa halaman di browser yang sama tidak lagi menyebabkan login ulang atau gagal menyimpan',
       '[Keamanan] Sesi akun pengelola dipisahkan dari sesi toko sehingga tidak bisa tertimpa akun lain'
