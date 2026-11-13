@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 7.8';
+  var BETA = 'BETA 7.9';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 7.9)', '13 Nov 2026', [
+      '[Baru] Backup & Ekspor Data: Owner dan Manager bisa mengunduh data toko sendiri ke file Excel (.xlsx) dengan lembar Transaksi, Produk & Stok, Daftar Akun, Piutang & Utang, dan Absensi',
+      '[Baru] Unduh salinan lengkap (.json) sebagai arsip utuh, dan penanda waktu backup terakhir',
+      '[Perbaikan] File dibuat langsung di perangkat tanpa perlu internet tambahan',
+      '[Keamanan] Hanya Owner dan Manager yang dapat mengunduh, data tidak dikirim ke pihak lain'
+    ]],
     ['1.0.0 (BETA 7.8)', '13 Nov 2026', [
       '[Baru] Mode Offline Penuh (opsional): transaksi yang dicatat saat internet putus tetap tersimpan di perangkat dan terkirim otomatis saat online',
       '[Baru] Penanda jumlah catatan yang menunggu dikirim, dan pemberitahuan saat semua sudah tersinkron',
