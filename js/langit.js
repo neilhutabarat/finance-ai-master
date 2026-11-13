@@ -260,20 +260,136 @@
     }).catch(function () {});
   }
 
+  /* ---------- tingkat tampilan: ditentukan Tower (per peran, per toko), klien tidak bisa mengubah ---------- */
+  var LEVELS = ['off', 'img', 'static', '720', '1080', '1440'], LADDER = ['static', '720', '1080', '1440'];
+  var DEF = { kasir: '1080', manager: 'off', owner: 'off', login: 'img', partner: 'img' };
+  function myRole() { return window.FM_ROLE || ''; }
+  function lookOf() { try { var o = JSON.parse(localStorage.getItem('fm_look_cur') || 'null'); return (o && o.look) || null; } catch (e) { return null; } }
+  function resolve() {
+    var r = myRole(); if (!(r in DEF)) return null;
+    var g = (window.FM_WP && FM_WP.cfg()) || {}, L = lookOf(), now = Date.now();
+    var lv = (L && L.roles && L.roles[r]) || (g.roles && g.roles[r]) || DEF[r];
+    if (LEVELS.indexOf(lv) < 0) lv = DEF[r];
+    var cond = null;
+    [L && L.cond, g.cond].some(function (c) {
+      if (!c || !c.mode) return false;
+      if (c.until && Number(c.until) < now) return false;
+      cond = c.mode; return true;
+    });
+    if (cond === 'auto' || (cond && !PRESETS[cond])) cond = null;
+    return { level: lv, cond: cond };
+  }
+  /* PC lemah: turun satu tingkat dari yang ditetapkan Tower (hanya pelindung agar tidak macet) */
+  function capLevel(lv) {
+    var p = window.FM_PERF; if (!p || LADDER.indexOf(lv) < 0) return lv;
+    var i = LADDER.indexOf(lv), ri = LADDER.indexOf(p.rec);
+    if (p.fps < 14) return 'static';
+    if (ri >= 0 && ri < i) return LADDER[i - 1];
+    return lv;
+  }
+
+  /* ---------- ukur kemampuan PC (dibaca Tower lewat data kehadiran) ---------- */
+  function browserOf() { var u = navigator.userAgent || ''; return /Edg\//.test(u) ? 'Edge' : /OPR\/|Opera/.test(u) ? 'Opera' : /Firefox\//.test(u) ? 'Firefox' : /Chrome\//.test(u) ? 'Chrome' : /Safari\//.test(u) ? 'Safari' : 'Lain'; }
+  function recFrom(fps, cores, mem) {
+    if (fps < 20 || cores <= 1 || (mem && mem < 1)) return 'static';
+    if (fps < 35 || (cores <= 2 && mem && mem <= 2)) return '720';
+    if (fps < 55 || cores < 6) return '1080';
+    return '1440';
+  }
+  function measure() {
+    try { var prev = JSON.parse(localStorage.getItem('fm_perf_v1') || 'null'); if (prev && Date.now() - prev.t < 3 * 864e5 && prev.w === screen.width) { window.FM_PERF = prev; return; } } catch (e) {}
+    if (document.hidden) { document.addEventListener('visibilitychange', function once() { if (!document.hidden) { document.removeEventListener('visibilitychange', once); setTimeout(measure, 3000); } }); return; }
+    var c = mk(1280, 720), x = c.getContext('2d'), t0 = 0, fr = 0;
+    function step(ts) {
+      if (document.hidden) { return; }
+      if (!t0) t0 = ts; fr++;
+      for (var i = 0; i < 46; i++) { var px = (i * 97 + fr * 13) % 1280, py = (i * 61 + fr * 7) % 720, g = x.createRadialGradient(px, py, 0, px, py, 160); g.addColorStop(0, 'rgba(' + (i * 5 % 255) + ',140,220,.35)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(px - 160, py - 160, 320, 320); }
+      if (ts - t0 >= 2200) {
+        var fps = Math.min(60, Math.round(fr / ((ts - t0) / 1000) * 10) / 10), cores = navigator.hardwareConcurrency || 4, mem = navigator.deviceMemory || 0;
+        var P = { t: Date.now(), fps: fps, cores: cores, mem: mem, w: screen.width, h: screen.height, dpr: Math.round((window.devicePixelRatio || 1) * 100) / 100, br: browserOf(), rec: recFrom(fps, cores, mem) };
+        window.FM_PERF = P; try { localStorage.setItem('fm_perf_v1', JSON.stringify(P)); window.dispatchEvent(new CustomEvent('fm:perf')); } catch (e) {}
+        return;
+      }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ---------- kartu kaca (hanya saat tingkat >= statis); dikendalikan Tower ---------- */
+  var CHROMIUM = /Chrome\//.test(navigator.userAgent || '') && !/OPR\//.test(navigator.userAgent || '') || /Edg\//.test(navigator.userAgent || '');
+  var ELS = '.ios-glass,.white-ice-glass-card,header.oneui-hero,#fm-dock,.fm-act';
+  function glassCss(kind) {
+    var P = 'html' + '[data-fm-glass]'.repeat(6), D = P + '[data-fm-black="1"]', L = P + ':not([data-fm-black="1"])';
+    function sel(pre) { return ELS.split(',').map(function (e) { return pre + ' ' + e; }).join(','); }
+    var bfLight, bfDark, extraLight = '', extraDark = '', shadowL, shadowD;
+    if (kind === 'blur') {
+      bfLight = bfDark = 'blur(14px) saturate(1.4)';
+      shadowL = 'inset 0 1px 0 rgba(255,255,255,.8),0 14px 28px -14px rgba(4,22,48,.45)'; shadowD = 'inset 0 1px 0 rgba(255,255,255,.3),0 14px 28px -14px rgba(0,0,0,.7)';
+    } else {
+      bfLight = bfDark = (CHROMIUM ? 'url(#fm-refr) blur(3px) saturate(1.5) brightness(1.06)' : 'blur(12px) saturate(1.6) brightness(1.08)');
+      shadowL = 'inset 0 0 0 1px rgba(255,255,255,.3),inset 0 2px 1px rgba(255,255,255,.9),inset 0 -2px 2px rgba(255,255,255,.3),inset 0 0 22px rgba(255,255,255,.22),0 20px 38px -16px rgba(4,22,48,.5)';
+      shadowD = 'inset 0 0 0 1px rgba(255,255,255,.16),inset 0 2px 1px rgba(255,255,255,.4),inset 0 -2px 2px rgba(255,255,255,.12),inset 0 0 22px rgba(255,255,255,.08),0 20px 38px -16px rgba(0,0,0,.75)';
+      if (kind === 'ice') {
+        extraLight = 'linear-gradient(112deg,transparent 14%,rgba(255,255,255,.55) 21%,rgba(255,255,255,.06) 25%,transparent 31%),linear-gradient(112deg,transparent 60%,rgba(255,255,255,.3) 64%,transparent 68%),radial-gradient(circle at 18% 78%,rgba(255,255,255,.8) 0 1.8px,transparent 2.8px),radial-gradient(circle at 82% 26%,rgba(255,255,255,.75) 0 2px,transparent 3px),radial-gradient(ellipse at 50% 125%,rgba(130,200,255,.3),transparent 60%),';
+        extraDark = 'linear-gradient(112deg,transparent 14%,rgba(255,255,255,.22) 21%,rgba(255,255,255,.03) 25%,transparent 31%),radial-gradient(circle at 18% 78%,rgba(255,255,255,.5) 0 1.8px,transparent 2.8px),radial-gradient(circle at 82% 26%,rgba(255,255,255,.5) 0 2px,transparent 3px),';
+      } else {
+        extraLight = 'linear-gradient(112deg,transparent 16%,rgba(255,255,255,.32) 22%,transparent 27%),'; extraDark = 'linear-gradient(112deg,transparent 16%,rgba(255,255,255,.12) 22%,transparent 27%),';
+      }
+    }
+    var css = '';
+    css += sel(L) + '{background:' + extraLight + 'linear-gradient(160deg,rgba(255,255,255,var(--fm-ga,.42)),rgba(255,255,255,var(--fm-gb,.14)) 55%,rgba(255,255,255,var(--fm-gc,.3)))!important;backdrop-filter:' + bfLight + '!important;-webkit-backdrop-filter:' + bfLight.replace('url(#fm-refr) ', '') + '!important;border:1px solid rgba(255,255,255,.6)!important;box-shadow:' + shadowL + '!important;text-shadow:0 1px 0 rgba(255,255,255,.6)}';
+    css += sel(D) + '{background:' + extraDark + 'linear-gradient(160deg,rgba(18,26,42,var(--fm-da,.5)),rgba(18,26,42,var(--fm-db,.3)) 55%,rgba(18,26,42,var(--fm-dc,.45)))!important;backdrop-filter:' + bfDark + '!important;-webkit-backdrop-filter:' + bfDark.replace('url(#fm-refr) ', '') + '!important;border:1px solid rgba(255,255,255,.2)!important;box-shadow:' + shadowD + '!important}';
+    /* selubung latar dikurangi agar gambar terlihat; kartu yang menjaga keterbacaan */
+    css += L + ' body[class]{background-image:linear-gradient(rgba(255,255,255,.05),rgba(255,255,255,.03)),var(--fm-wp)!important}';
+    css += D + ' body[class]{background-image:linear-gradient(rgba(8,11,17,.3),rgba(8,11,17,.42)),var(--fm-wp)!important}';
+    return css;
+  }
+  function setGlass(kind) {
+    var h = document.documentElement, st = document.getElementById('fm-glass-css');
+    if (!kind) { h.removeAttribute('data-fm-glass'); if (st) st.remove(); var sv = document.getElementById('fm-refr-svg'); if (sv) sv.remove(); return; }
+    if (!st) { st = document.createElement('style'); st.id = 'fm-glass-css'; document.head.appendChild(st); }
+    if (st.getAttribute('data-k') !== kind) { st.setAttribute('data-k', kind); st.textContent = glassCss(kind); }
+    if (kind !== 'blur' && CHROMIUM && !document.getElementById('fm-refr-svg') && document.body) {
+      var d = document.createElement('div'); d.id = 'fm-refr-svg'; d.setAttribute('aria-hidden', 'true'); d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+      d.innerHTML = '<svg width="0" height="0"><filter id="fm-refr" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".012 .02" numOctaves="2" seed="4" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="' + (kind === 'ice' ? 30 : 24) + '" xChannelSelector="R" yChannelSelector="G"/></filter></svg>';
+      document.body.appendChild(d);
+    }
+    h.setAttribute('data-fm-glass', '1');
+  }
+  /* kecerahan rata-rata latar -> seberapa pekat kartu agar tulisan tetap terbaca (siang cerah vs malam gelap) */
+  function setTint(cv) {
+    try {
+      var t = mk(16, 9), x = t.getContext('2d'); x.drawImage(cv, 0, 0, 16, 9); var d = x.getImageData(0, 0, 16, 9).data, s = 0;
+      for (var i = 0; i < d.length; i += 4) s += (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255;
+      var lum = s / (d.length / 4), st = document.documentElement.style;
+      var ga = clamp(.36 + (1 - lum) * .36, .36, .72), da = clamp(.36 + lum * .34, .36, .7);
+      st.setProperty('--fm-ga', ga.toFixed(2)); st.setProperty('--fm-gb', (ga * .36).toFixed(2)); st.setProperty('--fm-gc', (ga * .66).toFixed(2));
+      st.setProperty('--fm-da', da.toFixed(2)); st.setProperty('--fm-db', (da * .6).toFixed(2)); st.setProperty('--fm-dc', (da * .9).toFixed(2));
+    } catch (e) {}
+  }
+
   /* ---------- pemasangan ke halaman ---------- */
-  var lastSig = '', busy = false, curUrl = null, out = null, S = null, idxNow = 0;
-  function setBg(url) { document.documentElement.style.setProperty('--fm-wp', 'url("' + url + '")'); window.FM_LANGIT_ON = true; }
-  function compute() { idxNow = FM_WP.pick(); S = stateFrom(wx, Date.now()); return S; }
-  var again = false;
+  var lastSig = '', busy = false, again = false, curUrl = null, out = null, S = null, idxNow = 0, LV = 'off', rainK = 0;
+  function setBg(url) { document.documentElement.style.setProperty('--fm-wp', url === 'none' ? 'none' : 'url("' + url + '")'); window.FM_LANGIT_ON = true; }
+  var OUTW = { static: 1280, '720': 1280, '1080': 1600, '1440': 1600 };
   function apply(force) {
-    if (busy) { again = again || !!force; return; } compute(); var sg = sig(idxNow, S); if (!force && sg === lastSig) { syncFx(); return; }
+    if (busy) { again = again || !!force; return; }
+    var R = resolve(); if (!R) return;
+    var lv = capLevel(R.level); LV = lv; idxNow = FM_WP.pick();
+    if (lv === 'off') { var sg0 = 'off'; if (!force && sg0 === lastSig) return; lastSig = sg0; setGlass(null); setBg('none'); S = null; syncFx(); return; }
+    if (lv === 'img') { var sg1 = 'img|' + idxNow; if (!force && sg1 === lastSig) return; lastSig = sg1; setGlass(null); setBg(FILES[idxNow]); S = null; syncFx(); return; }
+    if (R.cond) { S = JSON.parse(JSON.stringify(PRESETS[R.cond])); S.t = Date.now(); S.thunder = !!S.thunder; } else S = stateFrom(wx, Date.now());
+    var sg = lv + '|' + (R.cond || '') + '|' + sig(idxNow, S);
+    if (!force && sg === lastSig) { syncFx(); return; }
     busy = true;
     loadImg(idxNow).then(function (img) {
-      var W = OUT_W, H = Math.round(W * img.height / img.width);
+      var W = OUTW[lv] || 1600, H = Math.round(W * img.height / img.width);
       if (!out) out = mk(W, H); out.width = W; out.height = H;
       paint(out, img, idxNow, S);
-      var done = function (url, small) {
+      setTint(out);
+      var done = function (url) {
         var old = curUrl; curUrl = url; setBg(url); lastSig = sg;
+        setGlass(lv === 'static' || lv === '720' ? 'blur' : lv === '1080' ? 'liquid' : 'ice');
         if (old && old.indexOf('blob:') === 0) setTimeout(function () { try { URL.revokeObjectURL(old); } catch (e) {} }, 2000);
         try { var t = mk(480, Math.round(480 * H / W)); t.getContext('2d').drawImage(out, 0, 0, t.width, t.height); localStorage.setItem('fm_wp_last', JSON.stringify({ idx: idxNow, t: Date.now(), u: t.toDataURL('image/jpeg', .72) })); } catch (e) {}
         busy = false; syncFx(); if (again) { again = false; apply(true); }
@@ -283,25 +399,13 @@
     }).catch(function () { busy = false; again = false; });
   }
 
-  /* ---------- gerakan: hujan & kilat (hanya saat benar-benar hujan) ---------- */
+  /* ---------- gerakan: hujan & kilat (hanya saat benar-benar hujan; kepadatan sesuai tingkat Tower) ---------- */
   var fx = null, fxCtx = null, drops = [], raf = 0, lastT = 0, flash = 0, nextFlash = 0, frames = 0, sumDt = 0, slow = false;
-  function mode() { try { return (window.FM_THEME_PREF && FM_THEME_PREF().live) || 'auto'; } catch (e) { return 'auto'; } }
-  function canAnimate() {
-    var m = mode();
-    if (m === 'off') return false;
-    if (m === 'on') return true;
-    if (slow) return false;
-    try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return false; } catch (e) {}
-    if ((window.innerWidth || 0) < 1024) return false;
-    if (navigator.connection && navigator.connection.saveData) return false;
-    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 3) return false;
-    if (navigator.deviceMemory && navigator.deviceMemory < 2) return false;
-    try { if (sessionStorage.getItem('fm_live_slow')) return false; } catch (e) {}
-    return true;
-  }
+  var DENS = { '720': .4, '1080': 1, '1440': 1.5 };
   function stopFx() { if (raf) cancelAnimationFrame(raf); raf = 0; if (fx) { fx.remove(); fx = null; fxCtx = null; } drops = []; }
   function syncFx() {
-    var want = S && (S.r > 0 || S.thunder) && canAnimate() && !document.hidden;
+    rainK = DENS[LV] || 0;
+    var want = S && rainK > 0 && (S.r > 0 || (S.thunder && LV !== '720')) && !slow && !document.hidden && (window.innerWidth || 0) >= 700;
     if (!want) { stopFx(); return; }
     if (!fx) {
       fx = document.createElement('canvas'); fx.id = 'fm-fx'; fx.setAttribute('aria-hidden', 'true');
@@ -311,15 +415,15 @@
     if (!raf) raf = requestAnimationFrame(loop);
   }
   function sizeFx() {
-    if (!fx) return; var dpr = 1, w = Math.ceil(window.innerWidth * dpr), h = Math.ceil(window.innerHeight * dpr); fx.width = w; fx.height = h;
-    var N = Math.round((S ? S.r : .5) * Math.min(520, w * h / 4200)), r = rnd(5); drops = [];
+    if (!fx) return; var w = Math.ceil(window.innerWidth), h = Math.ceil(window.innerHeight); fx.width = w; fx.height = h;
+    var N = Math.round(Math.max(.15, S ? S.r : .5) * rainK * Math.min(520, w * h / 4200)), r = rnd(5); drops = [];
     for (var i = 0; i < N; i++) drops.push({ x: r() * w, y: r() * h, l: 9 + r() * 16, v: 700 + r() * 600, a: .1 + r() * .16 });
   }
   function loop(ts) {
     raf = 0; if (!fx || !S) return;
     var dt = lastT ? Math.min(100, ts - lastT) : 16; if (lastT && dt < 30) { raf = requestAnimationFrame(loop); return; }
     lastT = ts; frames++; sumDt += dt;
-    if (frames === 60 && mode() === 'auto' && sumDt / 60 > 48) { slow = true; try { sessionStorage.setItem('fm_live_slow', '1'); } catch (e) {} stopFx(); return; }
+    if (frames === 60 && sumDt / 60 > 48) { slow = true; stopFx(); return; }   // pelindung: PC macet -> hujan berhenti (latar tetap)
     var w = fx.width, h = fx.height, x = fxCtx, s = dt / 1000; x.clearRect(0, 0, w, h);
     x.strokeStyle = 'rgba(214,226,244,1)'; x.lineWidth = 1;
     for (var i = 0; i < drops.length; i++) {
@@ -327,7 +431,7 @@
       x.globalAlpha = d.a; x.beginPath(); x.moveTo(d.x, d.y); x.lineTo(d.x - d.l * .18, d.y + d.l); x.stroke();
     }
     x.globalAlpha = 1;
-    if (S.thunder) {
+    if (S.thunder && LV !== '720') {
       if (!nextFlash) nextFlash = ts + 5000 + Math.random() * 9000;
       if (ts > nextFlash) { flash = 1; nextFlash = ts + 6000 + Math.random() * 12000; }
       if (flash > 0) { x.fillStyle = 'rgba(235,240,255,' + (flash * .22) + ')'; x.fillRect(0, 0, w, h); flash -= s * 3.2; }
@@ -336,20 +440,24 @@
   }
   window.addEventListener('resize', function () { sizeFx(); syncFx(); });
   document.addEventListener('visibilitychange', function () { if (document.hidden) { stopFx(); } else { fetchWx(false).then(function () { apply(false); }); } });
-  window.addEventListener('fm:live', function () { slow = false; stopFx(); syncFx(); });
   window.addEventListener('fm:geo', function () { fetchWx(true).then(function () { apply(true); }); });
-  window.addEventListener('fm:geo-refresh', function () { try { localStorage.removeItem('fm_geo_v3'); } catch (e) {} ensureGeo(true).then(function () { return fetchWx(true); }).then(function () { apply(true); }); });
+  window.addEventListener('fm:look', function () { apply(true); });
+  window.addEventListener('fm:perf', function () { apply(false); });
   window.addEventListener('online', function () { fetchWx(true).then(function () { apply(false); }); });
 
   /* ---------- mulai ---------- */
   function boot() {
-    if (!window.FM_WP) return;
+    if (!window.FM_WP || !resolve()) return;
     apply(true);                                  // langsung tampil dengan jam perangkat (tanpa menunggu jaringan)
-    fetchCfg().then(function () { return fetchWx(false); }).then(function () { apply(true); });
+    fetchCfg().then(function () { apply(true); return fetchWx(false); }).then(function () { apply(true); });
+    setTimeout(measure, 7000);
     setInterval(function () { if (!document.hidden) apply(false); }, 60000);
-    setInterval(function () { fetchCfg(); fetchWx(false).then(function () { apply(false); }); }, 15 * 60000);
+    setInterval(function () { fetchCfg().then(function () { apply(false); }); fetchWx(false).then(function () { apply(false); }); }, 15 * 60000);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   window.FM_LANGIT.state = function () { return S; };
-  window.FM_LANGIT.apply = apply; window.FM_LANGIT.fetchWx = fetchWx;
+  window.FM_LANGIT.apply = apply;
+  window.FM_LANGIT.fetchWx = fetchWx;
+  window.FM_LANGIT.level = function () { return LV; };
+  window.FM_LANGIT.measure = measure;
 })();

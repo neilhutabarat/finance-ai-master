@@ -2,7 +2,7 @@
    Aturan: saat ada internet, halaman dan skrip SELALU diambil terbaru dari server (batas tunggu 5 detik).
    Jika server GitHub lambat/mati atau internet putus, dipakai salinan terakhir yang tersimpan di browser.
    Data toko (Firestore/Auth/API) tidak pernah disentuh di sini. Naikkan VERSI setiap rilis. */
-var VERSI = 'beta-9';
+var VERSI = 'beta-10';
 var CACHE = 'oneilverse-' + VERSI;
 var TUNGGU_MS = 5000;
 var PRE = ['index.html', '404.html', 'kasir.html', 'manager.html', 'dashboard.html', 'partner.html', 'provider.html', 'js/sw-register.js', 'js/dialog.js', 'js/pwa.js', 'js/update-check.js', 'js/auth.js', 'js/analisa.js', 'js/billing.js', 'js/chat.js', 'js/config.js', 'js/core.js', 'js/ctrl.js', 'js/shield.js', 'js/gaji.js', 'js/insights.js', 'js/labarugi.js', 'js/laporan-pdf.js', 'js/logo.js', 'js/mutasi-share.js', 'js/plans.js', 'js/rollout.js', 'js/skin.js', 'js/stok.js', 'js/coa-drag.js', 'js/struk-pdf.js', 'js/store.js', 'js/tenants.js', 'js/theme.js', 'js/tower-cockpit.js', 'js/tower-menu.js', 'js/widgets.js', 'js/templates.js', 'js/tower-health.js', 'js/properti.js', 'js/i18n.js', 'js/stok-admin.js', 'js/usaha-bar.js', 'js/tower-demo.js', 'js/tower-qa.js', 'js/laporan-bulanan.js', 'js/tower-help.js', 'js/tower-store.js', 'js/tower-wall.js', 'js/langit.js', 'img/wp/1.jpg', 'img/wp/2.jpg', 'img/wp/3.jpg', 'img/wp/4.jpg', 'js/bantuan.js', 'js/backup.js', 'js/offline.js', 'js/absensi.js', 'js/pajak.js', 'js/neraca.js', 'js/oneilstore.js', 'js/kas.js', 'js/promo.js', 'js/tower-monitor.js', 'js/monitor.js', 'js/dash-usaha.js', 'js/admins.js', 'js/piutang.js', 'js/tower-lab.js', 'js/usaha.js', 'version.json'];

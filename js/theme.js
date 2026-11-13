@@ -3,11 +3,18 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 9';
+  var BETA = 'Beta 10';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta 10', '14 Nov 2026', [
+      '[Baru] Tampilan kaca cair: kartu tembus pandang bergaya kaca di atas latar, dengan tingkat Statis, 720p, 1080p, dan 1440p',
+      '[Baru] Tingkat tampilan diatur penuh oleh pengelola layanan per peran dan per toko, sehingga tiap toko mendapat kualitas yang cocok dengan perangkatnya',
+      '[Perbaikan] Pengaturan gerakan dan latar dihapus dari Pengaturan agar tampilan seragam; hanya Terang/Gelap dan Bahasa yang tetap bisa diubah',
+      '[Perbaikan] Aplikasi menyesuaikan diri: perangkat yang lemah otomatis turun tingkat supaya kasir tetap lancar',
+      '[Keamanan] Pengaturan tampilan hanya bisa diubah oleh pengelola layanan; aplikasi toko hanya membaca dan tidak mengirim data toko'
+    ]],
     ['Beta 9', '14 Nov 2026', [
       '[Baru] Latar belakang baru bergaya lukisan (4 gambar) menggantikan latar lama. Gambar berganti otomatis tiap minggu',
       '[Baru] Latar hidup: terang-gelap mengikuti matahari terbit dan terbenam di lokasi toko, malam cerah diterangi bulan, dan cuaca nyata (mendung, hujan, petir, kabut) tampil di layar',
@@ -222,6 +229,7 @@
     return (4 + wpShift(cfg) + (wk + 1) * 7) * 86400000 + w.hr * 3600000 - WP_TZ;
   }
   window.FM_THEME_PREF = function () { return pref; };
+  window.FM_ROLE = ROLE;
   window.FM_WP = { files: WP_FILES, pick: wpPick, next: wpNext, cfg: wpCfg, order: wpOrder };
   function updateWp() {
     if (window.FM_LANGIT_ON) return;
@@ -282,15 +290,6 @@
     if (!document.documentElement.hasAttribute('data-fm-dock') || document.documentElement.hasAttribute('data-fm-theme-in-set')) h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (mode === 'light' ? 'on' : '') + '" data-mode="light"><div class="fm-prev" style="background:linear-gradient(135deg,#ffffff,#e2e8f0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (mode === 'dark' ? 'on' : '') + '" data-mode="dark"><div class="fm-prev" style="background:#000"></div>Gelap Pekat</button></div></div>';
-    if (ROLE !== 'lain' && ROLE !== 'login' && ROLE !== 'tower' && ROLE !== 'provider' && !(window.FM_PLANS && !FM_PLANS.has('wallpaper'))) {
-      var lv = pref.live || 'auto', G = window.FM_GEO || null;
-      h += '<div class="fm-sec"><div class="fm-lab">Latar Belakang</div><div class="fm-card" style="font-size:12px;line-height:1.55;color:#c7cbd6">' +
-        'Gambar diganti otomatis oleh Oneilverse. Terang-gelap dan cuaca mengikuti jam serta lokasi toko' + (G && G.name ? ': <b style="color:#fff">' + esc(G.short || G.name) + '</b>' : '') + '.</div>' +
-        '<div class="fm-lab" style="margin-top:10px">Gerakan (hujan, kilat)</div><div class="fm-modes" style="grid-template-columns:repeat(3,1fr)">' +
-        [['auto', 'Otomatis'], ['on', 'Selalu'], ['off', 'Diam']].map(function (m) { return '<button class="fm-mode ' + (lv === m[0] ? 'on' : '') + '" data-live="' + m[0] + '" style="padding:10px 4px">' + m[1] + '</button>'; }).join('') +
-        '</div><p style="font-size:11px;color:#94a3b8;margin:6px 0 0;line-height:1.5">Otomatis: bergerak hanya di layar lebar yang lancar, dan berhenti sendiri di perangkat yang berat.</p>' +
-        '<button class="fm-btn" data-geo style="width:100%;margin-top:8px;padding:10px">Perbarui lokasi cuaca</button></div>';
-    }
     if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
       ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +
       '</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px"><label style="font-size:12px;color:#c7cbd6">Warna bebas</label><input type="color" id="fm-acc-custom" value="' + esc(pick) + '" style="width:44px;height:30px;border:0;background:none;padding:0"><button class="fm-btn" data-accreset style="margin-left:auto">Kembali ke Bawaan</button></div></div></div>';
@@ -316,8 +315,6 @@
     var sh = box.querySelector('[data-shield]'); if (sh) sh.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_SHIELD) FM_SHIELD.openPanel(); };
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
     box.querySelectorAll('[data-mode]').forEach(function (b) { b.onclick = function () { pref.mode = b.getAttribute('data-mode'); savePref(pref); apply(); render(); }; });
-    box.querySelectorAll('[data-live]').forEach(function (b) { b.onclick = function () { pref.live = b.getAttribute('data-live'); savePref(pref); try { window.dispatchEvent(new CustomEvent('fm:live')); } catch (e) {} render(); }; });
-    var gb = box.querySelector('[data-geo]'); if (gb) gb.onclick = function () { gb.textContent = 'Mencari lokasi...'; try { window.dispatchEvent(new CustomEvent('fm:geo-refresh')); } catch (e) {} setTimeout(render, 6000); };
     box.querySelectorAll('[data-lang]').forEach(function (b) { b.onclick = function () { if (window.FM_I18N) FM_I18N.set(b.getAttribute('data-lang')); }; });
     box.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { pref.accent = b.getAttribute('data-acc'); savePref(pref); apply(); render(); }; });
     var ac = box.querySelector('#fm-acc-custom');
