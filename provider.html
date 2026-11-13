@@ -1381,16 +1381,16 @@
         // ===== ROLLOUT BERTARGET (versi default per paket + kunci manual per toko) =====
         // Daftar versi yang tersedia sebagai salinan lengkap di folder /rilis/<versi>/.
         // Tambahkan slug versi baru di sini begitu folder rilisnya dibuat.
-        const FM_ROLLOUT_VERSIONS = ['BETA-4.0', 'BETA-4.1'];
+        const FM_ROLLOUT_VERSIONS = ['Prototype'];
         /* Daftar versi terisi otomatis dari rilis/index.json (dibuat tiap rilis); daftar di atas tetap dipakai sebagai cadangan. */
         try {
             fetch('rilis/index.json?c=' + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
                 if (!j || !Array.isArray(j.versi)) return;
-                j.versi.forEach(function (v) { if (/^BETA-\d+\.\d+$/.test(v) && FM_ROLLOUT_VERSIONS.indexOf(v) < 0) FM_ROLLOUT_VERSIONS.push(v); });
-                FM_ROLLOUT_VERSIONS.sort(function (a, b) { const f = function (s) { return s.slice(5).split('.').map(Number); }, x = f(a), y = f(b); return (x[0] - y[0]) || (x[1] - y[1]); });
+                j.versi.forEach(function (v) { if (/^(Prototype|Beta(-\d+)?)$/.test(v) && FM_ROLLOUT_VERSIONS.indexOf(v) < 0) FM_ROLLOUT_VERSIONS.push(v); });
+                FM_ROLLOUT_VERSIONS.sort(function (a, b) { const f = function (s) { return s === 'Prototype' ? 0 : (parseInt(s.split('-')[1], 10) || 1); }; return f(a) - f(b); });
             }).catch(function () {});
         } catch (e) {}
-        let FM_ROLLOUT_CFG = { basic: 'BETA-4.0', plus: 'BETA-4.0' };
+        let FM_ROLLOUT_CFG = { basic: 'Prototype', plus: 'Prototype' };
         let rolloutPanelFor = null;
 
         function startRolloutListener() {
