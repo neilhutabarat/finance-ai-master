@@ -98,7 +98,8 @@
                     biz: p.biz != null ? String(p.biz).trim() : ((old && old.biz) || ''),
                     units: Array.isArray(p.units) ? p.units.map(function (u) { return { name: String((u && u.name) || '').trim(), per: Math.floor(num(u && u.per)), price: num(u && u.price), barcode: u && u.barcode ? String(u.barcode).trim() : '' }; }).filter(function (u) { return u.name && u.per >= 2; }).slice(0, 4) : ((old && old.units) || []),
                     openStock: p.openStock != null ? Math.max(0, Math.floor(num(p.openStock))) : (old && typeof old.openStock === 'number' ? old.openStock : Math.max(0, Math.floor(num(p.stock)))),
-                    endStock: p.endStock !== undefined ? (p.endStock === null || p.endStock === '' ? null : Math.max(0, Math.floor(num(p.endStock)))) : (old && typeof old.endStock === 'number' ? old.endStock : null)
+                    endStock: p.endStock !== undefined ? (p.endStock === null || p.endStock === '' ? null : Math.max(0, Math.floor(num(p.endStock)))) : (old && typeof old.endStock === 'number' ? old.endStock : null),
+                    inLog: Array.isArray(p.inLog) ? p.inLog.slice(-30) : ((old && Array.isArray(old.inLog)) ? old.inLog : [])
                 };
                 var i = st.products.findIndex(function (q) { return q.code === x.code; });
                 if (i >= 0) st.products[i] = x; else st.products.push(x);
@@ -151,6 +152,18 @@
                 if (!p) return Promise.resolve(false);
                 p.stock = Math.max(0, p.stock + qty); notify();
                 if (hasDb) return db.collection('tp_' + id).doc(prodId(code)).update({ stock: firebase.firestore.FieldValue.increment(qty) }).then(function () { return true; }).catch(function (e) { console.warn('store.js: tambah stok gagal', e); return false; });
+                lsSet(prodKey, st.products); return Promise.resolve(true);
+            },
+            // Stok masuk dari Admin (scan): tambah stok dan catat siapa, kapan, berapa (30 catatan terakhir per jenis)
+            stockIn: function (code, qty, who, meta) {
+                qty = Math.floor(num(qty));
+                if (!(qty > 0)) return Promise.resolve(false);
+                var p = st.products.find(function (q) { return q.code === code; });
+                if (!p) return Promise.resolve(false);
+                var e = { at: Date.now(), by: String(who || ''), qty: qty, src: (meta && meta.src) || 'scan', slot: (meta && meta.slot) || '' };
+                var log = (Array.isArray(p.inLog) ? p.inLog : []).concat([e]).slice(-30);
+                p.stock = Math.max(0, p.stock + qty); p.inLog = log; notify();
+                if (hasDb) return db.collection('tp_' + id).doc(prodId(code)).update({ stock: firebase.firestore.FieldValue.increment(qty), inLog: log }).then(function () { return true; }).catch(function (er) { console.warn('store.js: stok masuk gagal', er); return false; });
                 lsSet(prodKey, st.products); return Promise.resolve(true);
             },
             decrementStock: function (code, qty) {

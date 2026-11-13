@@ -22,13 +22,15 @@
     return STORE.saveProduct(o);
   }
   function gOf(p) { return p.group ? String(p.group) : ''; }
+  function bizView() { try { return (window.FM_BIZ && FM_BIZ.enabled() && FM_BIZ.view) ? FM_BIZ.view() : ''; } catch (e) { return ''; } }
+  function allProds() { return prods(); }
   function groups() {
-    var seen = {}, out = [], none = false;
-    prods().forEach(function (p) { var g = gOf(p); if (!g) { none = true; return; } var k = g.toLowerCase(); if (!seen[k]) { seen[k] = 1; out.push(g); } });
+    var seen = {}, out = [], none = false, bv = bizView();
+    prods().forEach(function (p) { var g = gOf(p); if (!g) { none = true; return; } if (bv && bizOf(g) !== bv) return; var k = g.toLowerCase(); if (!seen[k]) { seen[k] = 1; out.push(g); } });
     var mo = {};
     prods().forEach(function (p) { var g = gOf(p); if (!g) return; var k = g.toLowerCase(), o = (typeof p.order === 'number') ? p.order : 1e9; if (!(k in mo) || o < mo[k]) mo[k] = o; });
     out.sort(function (a, b) { var d = mo[a.toLowerCase()] - mo[b.toLowerCase()]; return d !== 0 ? d : a.localeCompare(b); });
-    if (none) out.push(NONE);
+    if (none && !bv) out.push(NONE);
     return out;
   }
   function gLabel(g) { return g === NONE ? 'Lainnya (tanpa induk)' : g; }
@@ -68,7 +70,7 @@
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-stok';
     ov.innerHTML = '<div class="sk-box"><div class="sk-h"><h3>Stok</h3><button type="button" class="sk-x" data-x aria-label="Tutup">✕</button></div>' +
-      '<div class="sk-tabs"><button type="button" class="sk-chip on" data-tab="masuk">Stok Masuk</button><button type="button" class="sk-chip" data-tab="jenis">Daftar Jenis Stok</button><button type="button" class="sk-chip" data-tab="closing">Sisa Stok &amp; Closing</button></div>' +
+      '<div class="sk-tabs"><button type="button" class="sk-chip on" data-tab="masuk">Stok Masuk</button><button type="button" class="sk-chip" data-tab="jenis">Daftar Jenis Stok</button><button type="button" class="sk-chip" data-tab="closing">Sisa Stok &amp; Closing</button><button type="button" class="sk-chip" data-tab="riwayat">Riwayat Masuk</button></div>' +
       '<div class="sk-body" id="sk-body"></div><div class="sk-msg" id="sk-msg"></div></div>';
     document.body.appendChild(ov);
     ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
@@ -106,7 +108,7 @@
     }).join('');
   }
 
-  function render() { if (tab === 'jenis') renderJenis(); else if (tab === 'closing') renderClosing(); else renderMasuk(); }
+  function render() { if (tab === 'jenis') renderJenis(); else if (tab === 'closing') renderClosing(); else if (tab === 'riwayat') renderRiwayat(); else renderMasuk(); }
 
   /* ---------- tab Stok Masuk ---------- */
   function saveEnd(i) {
@@ -266,7 +268,7 @@
     var g = gOf(p), vr = vLabel(p) + ' (Salinan)', name = uniqName(g ? g + ' - ' + vr : vr), nv = g ? name.slice(g.length + 3) : p.variant;
     var c = newCode(g), o = {};
     for (var k in p) o[k] = p[k];
-    o.code = c; o.name = name; o.variant = nv; o.barcode = ''; if (o.units) o.units = o.units.map(function (u) { return { name: u.name, per: u.per, price: u.price, barcode: '' }; }); o.stock = 0; o.openStock = 0; o.endStock = null;
+    o.code = c; o.name = name; o.variant = nv; o.barcode = ''; if (o.units) o.units = o.units.map(function (u) { return { name: u.name, per: u.per, price: u.price, barcode: '' }; }); o.stock = 0; o.openStock = 0; o.endStock = null; o.inLog = [];
     if (typeof p.order === 'number') o.order = slot(p.order, nextOrd(p.order), 0, 1); else delete o.order;
     Promise.resolve(STORE.saveProduct(o)).then(function () { audit('SALIN_JENIS_STOK', 'Menyalin jenis stok [' + p.code + '] ' + p.name, '-', '[' + c + '] ' + name); msg('Disalin ke bawahnya: ' + name + '. Ubah namanya sekarang.'); renderJenis(); refreshOthers(); editJenis(c); });
   }
@@ -277,7 +279,7 @@
     var nx = isFinite(lastO) ? nextOrd(lastO) : Infinity, n = items.length;
     Promise.all(items.map(function (p, i) {
       var o = {}; for (var k in p) o[k] = p[k];
-      var vr = vLabel(p); o.code = newCode(ng); o.group = ng; o.variant = vr; o.name = ng + ' - ' + vr; o.barcode = ''; if (o.units) o.units = o.units.map(function (u) { return { name: u.name, per: u.per, price: u.price, barcode: '' }; }); o.stock = 0; o.openStock = 0; o.endStock = null;
+      var vr = vLabel(p); o.code = newCode(ng); o.group = ng; o.variant = vr; o.name = ng + ' - ' + vr; o.barcode = ''; if (o.units) o.units = o.units.map(function (u) { return { name: u.name, per: u.per, price: u.price, barcode: '' }; }); o.stock = 0; o.openStock = 0; o.endStock = null; o.inLog = [];
       if (isFinite(lastO)) o.order = slot(lastO, nx, i, n); else delete o.order;
       return STORE.saveProduct(o);
     })).then(function () { audit('SALIN_INDUK_STOK', 'Menyalin induk stok ' + g, '-', ng + ' (' + n + ' jenis)'); msg('Induk disalin di bawahnya: ' + ng + '. Ubah namanya sekarang.'); renderJenis(); refreshOthers(); editInduk(ng); }).catch(function () { msg('Gagal menyalin induk.', true); });
@@ -335,6 +337,21 @@
     });
   }
 
+
+  /* ---------- tab Riwayat Masuk (stok masuk yang dicatat Admin lewat scan) ---------- */
+  function tfmt(ms) { var d = new Date(ms), p = function (n) { return String(n).padStart(2, '0'); }; return p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
+  function renderRiwayat() {
+    var box = document.getElementById('sk-body'), bv = bizView(), ev = [];
+    prods().forEach(function (p) {
+      if (bv && (FM_BIZ.canon(p.biz) || '') !== bv) return;
+      (p.inLog || []).forEach(function (e) { ev.push({ p: p, e: e }); });
+    });
+    ev.sort(function (a, b) { return b.e.at - a.e.at; });
+    box.innerHTML = '<div class="sk-info">Stok masuk yang dicatat Admin lewat scan: siapa, berapa, dan kapan.' + (bv ? ' Menampilkan usaha <b>' + esc(bv) + '</b>.' : '') + ' Tiap barang menyimpan 30 catatan terakhir.</div>' +
+      (ev.length ? ev.slice(0, 200).map(function (x) {
+        return '<div class="sk-row"><div class="nm">' + esc(x.p.name) + ' <span class="cd">oleh ' + esc(x.e.by || '-') + ' · ' + tfmt(x.e.at) + '</span></div><div class="sk-st">+' + fmt(x.e.qty) + ' ' + esc(unit(x.p)) + '</div></div>';
+      }).join('') : '<div class="sk-empty">Belum ada stok masuk dari Admin.</div>');
+  }
 
   /* ---------- tab Closing Mingguan ---------- */
   function txAll() { try { return (typeof txList !== 'undefined' && txList) ? txList : []; } catch (e) { return []; } }
@@ -410,10 +427,11 @@
     }).catch(function () { msg('Closing gagal disimpan. Periksa koneksi lalu coba lagi.', true); });
   }
 
+  window.addEventListener('fm-biz-view', function () { if (ov && ov.style.display === 'flex') render(); });
   window.FM_STOK = {
     open: function (t) {
       build(); msg('');
-      tab = t === 'jenis' ? 'jenis' : t === 'closing' ? 'closing' : 'masuk';
+      tab = t === 'jenis' ? 'jenis' : t === 'closing' ? 'closing' : t === 'riwayat' ? 'riwayat' : 'masuk';
       if (tab === 'jenis' && !canIn()) tab = 'masuk';
       [].forEach.call(ov.querySelectorAll('[data-tab]'), function (x) {
         var k = x.getAttribute('data-tab');

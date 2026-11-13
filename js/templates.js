@@ -126,6 +126,66 @@
     'Perkakas Ringan|pcs|25|Palu:35000;Obeng Set:30000:set;Tang:30000;Gergaji Kecil:28000;Paku 1 kg:25000:kg;Baut Kecil Kotak:15000:box;Lakban Kabel:5000;Cat Semprot:30000;Kuas Cat:8500;Meteran 5 m:15000'
   ];
 
+
+  /* ---- Kafe & Resto (jenis usaha 'warung'). Item = menu yang dijual; modal = perkiraan biaya bahan per porsi ---- */
+  var KAFE = [
+    'Kopi Panas|gelas|55|Espresso:6000;Americano:7000;Kopi Hitam Tubruk:4500;Cappuccino:11000;Cafe Latte:11500;Kopi Susu:9000;Mocha:12500;Kopi Tarik:8500',
+    'Kopi Dingin|gelas|55|Es Kopi Susu:10000;Es Americano:7500;Es Latte:12000;Es Mocha:13000;Es Kopi Gula Aren:11000;Affogato:15000',
+    'Teh|gelas|65|Teh Manis Panas:2000;Es Teh Manis:2500;Teh Tarik:6000;Es Teh Lemon:4500;Teh Tawar:1200;Teh Poci:4000;Thai Tea:7000',
+    'Minuman Non-Kopi|gelas|60|Cokelat Panas:8000;Es Cokelat:9000;Matcha Latte:11000;Susu Murni:6000;Susu Jahe:6000;Red Velvet:10000;Taro Latte:10000',
+    'Jus & Buah|gelas|60|Jus Alpukat:9000;Jus Jeruk:6500;Jus Mangga:8000;Jus Melon:6000;Jus Semangka:5500;Es Jeruk Peras:5000;Jus Campur:8000;Smoothie Buah:11000',
+    'Minuman Segar|gelas|65|Es Lemon Tea:4500;Es Kelapa Muda:8000;Es Campur:9000;Es Cincau:5000;Es Doger:7000;Soda Gembira:8000;Air Mineral Botol:2500:btl;Es Batu Tambahan:500',
+    'Nasi & Lauk|porsi|50|Nasi Putih:3500;Nasi Goreng Spesial:12000;Nasi Goreng Ayam:13000;Nasi Ayam Penyet:15000;Nasi Ayam Goreng:14000;Nasi Rames:11000;Nasi Uduk Komplit:11000;Nasi Soto Ayam:12000;Nasi Telur Dadar:7000',
+    'Mie & Bihun|porsi|50|Mie Goreng:10000;Mie Kuah:10000;Mie Rebus Telur:8500;Bihun Goreng:9500;Kwetiau Goreng:12000;Mie Ayam:10000;Mie Ayam Bakso:13000;Indomie Goreng Telur:7500',
+    'Ayam & Lauk Utama|porsi|50|Ayam Goreng Paha:12000;Ayam Goreng Dada:12500;Ayam Bakar:14000;Ikan Lele Goreng:11000;Ikan Nila Bakar:16000;Telur Balado:6000;Tahu Tempe Goreng:4000;Sate Ayam 10 tusuk:16000',
+    'Sup & Soto|porsi|50|Soto Ayam:11000;Soto Daging:15000;Sop Ayam:11000;Sop Iga:24000;Bakso Kuah:13000;Bakso Urat:15000;Rawon:17000;Sop Buntut:35000',
+    'Snack & Gorengan|porsi|60|Pisang Goreng:5000;Tahu Isi:4000;Tempe Mendoan:4000;Risol:4000;Kentang Goreng:9000;Singkong Goreng:5000;Bakwan:3000;Otak-otak:7000;Roti Bakar Cokelat:9000;Roti Bakar Keju:10000',
+    'Dessert & Kue|porsi|60|Puding:4500;Es Krim Scoop:5000;Brownies:8000;Cheesecake Slice:14000;Donat:4000;Pancake:11000;Waffle:13000;Bolu Slice:6000',
+    'Paket & Tambahan|porsi|50|Paket Hemat Nasi + Ayam + Teh:20000;Paket Mie + Es Teh:13000;Tambah Nasi:3500;Tambah Telur:3500;Tambah Sambal:1000;Tambah Kerupuk:1500;Tambah Nasi Goreng:7000;Kantong Bungkus:500'
+  ];
+
+  /* ---- Laundry. Layanan dihitung per kilo / per potong, ditambah perlengkapan yang dijual ---- */
+  var LAUNDRY = [
+    'Cuci Kiloan|kg|45|Cuci + Setrika Reguler (2-3 hari):4500:kg:7000;Cuci + Setrika Ekspres (1 hari):6500:kg:10000;Cuci + Setrika Kilat (6 jam):9000:kg:14000;Cuci Lipat Saja:3000:kg:5000;Setrika Saja:2500:kg:4500;Cuci Kering Saja:2000:kg:3500',
+    'Cuci Satuan|pcs|50|Kemeja:4000:pcs:8000;Kaos:3000:pcs:6000;Celana Panjang:4000:pcs:8000;Jaket:7000:pcs:14000;Jas:15000:pcs:30000;Gaun:15000:pcs:30000;Batik:5000:pcs:10000;Sweater:6000:pcs:12000;Seragam Sekolah:3000:pcs:6000',
+    'Cuci Perlengkapan Rumah|pcs|50|Sprei Single:6000:pcs:12000;Sprei Double:9000:pcs:18000;Selimut:12000:pcs:25000;Bed Cover:20000:pcs:40000;Bantal:6000:pcs:12000;Guling:5000:pcs:10000;Gorden per m2:5000:m2:10000;Karpet per m2:7000:m2:15000;Handuk:2500:pcs:5000',
+    'Cuci Khusus|pcs|50|Sepatu:15000:pasang:30000;Sepatu Anak:10000:pasang:20000;Tas:20000:pcs:40000;Topi:5000:pcs:10000;Boneka Kecil:8000:pcs:15000;Boneka Besar:18000:pcs:35000;Helm:12000:pcs:25000;Kain Pel:2000:pcs:4000',
+    'Dry Cleaning|pcs|50|Jas Dry Clean:20000:pcs:40000;Kebaya:18000:pcs:35000;Gaun Pesta:25000:pcs:50000;Blazer:12000:pcs:25000;Mantel:18000:pcs:35000;Celana Bahan:8000:pcs:16000',
+    'Layanan Tambahan|pcs|50|Antar Jemput:5000:kali:10000;Pewangi Ekstra:1500:kg:3000;Plastik Packing:500:pcs:1000;Hanger:1000:pcs:2500;Pengemasan Rapi:1000:kg:2500;Hilangkan Noda Khusus:4000:pcs:8000',
+    'Perlengkapan Laundry|pcs|25|Deterjen Bubuk 1 kg:19000:pcs;Deterjen Cair 1 L:23000:pcs;Pelembut 1 L:21000:pcs;Pewangi Laundry 1 L:35000:pcs;Pemutih 1 L:15000:pcs;Plastik Laundry 100 pcs:22000:pak;Hanger Plastik 12 pcs:15000:pak;Kantong Laundry:7000:pcs'
+  ];
+
+  /* ---- Salon & Barbershop. Layanan + produk perawatan ---- */
+  var SALON = [
+    'Potong Rambut|kali|50|Potong Pria Dewasa:8000:kali:25000;Potong Pria Anak:6000:kali:20000;Potong Wanita:10000:kali:35000;Potong Poni:3000:kali:10000;Cukur Kumis dan Jenggot:3000:kali:10000;Cukur Rapi (Barber):9000:kali:30000;Potong + Keramas:11000:kali:35000',
+    'Keramas & Perawatan|kali|50|Keramas + Blow:8000:kali:25000;Creambath:20000:kali:60000;Hair Spa:35000:kali:100000;Hair Mask:15000:kali:45000;Masker Rambut Alami:10000:kali:30000;Totok Wajah dan Kepala:8000:kali:30000;Pijat Kepala 15 menit:3000:kali:15000',
+    'Pewarnaan Rambut|kali|50|Semir Hitam:40000:kali:100000;Semir Warna Pendek:60000:kali:150000;Semir Warna Panjang:90000:kali:230000;Highlight:120000:kali:300000;Ombre:200000:kali:500000;Toner Rambut:40000:kali:100000',
+    'Penataan Rambut|kali|50|Blow Dry Pendek:6000:kali:25000;Blow Dry Panjang:10000:kali:40000;Catok:5000:kali:25000;Keriting Gelombang:30000:kali:100000;Smoothing:100000:kali:300000;Rebonding Pendek:100000:kali:300000;Rebonding Panjang:150000:kali:450000;Sanggul Pesta:50000:kali:150000',
+    'Perawatan Kuku|kali|55|Manicure:12000:kali:35000;Pedicure:15000:kali:45000;Manicure + Pedicure:25000:kali:70000;Nail Art per Jari:3000:jari:10000;Cat Kuku Biasa:5000:kali:20000;Kutek Gel:25000:kali:75000;Lepas Kutek Gel:8000:kali:25000',
+    'Perawatan Wajah & Badan|kali|50|Facial Dasar:25000:kali:75000;Facial Jerawat:35000:kali:100000;Facial Anti Aging:45000:kali:130000;Totok Wajah:12000:kali:40000;Masker Wajah:8000:kali:30000;Waxing Kaki:20000:kali:60000;Waxing Ketiak:8000:kali:30000;Lulur Badan:30000:kali:90000;Pijat Badan 60 menit:35000:kali:100000;Mandi Uap:15000:kali:50000',
+    'Rias & Makeup|kali|50|Makeup Harian:25000:kali:75000;Makeup Pesta:50000:kali:150000;Makeup Wisuda:55000:kali:160000;Makeup Pengantin Akad:150000:kali:450000;Makeup + Hijab Do:70000:kali:200000;Bulu Mata Palsu Pasang:10000:kali:35000;Alis Sulam Sementara:25000:kali:80000',
+    'Produk Rambut|btl|25|Sampo 170 ml:18000;Sampo 340 ml:32000;Kondisioner 170 ml:18000;Serum Rambut 50 ml:22000;Vitamin Rambut:28000;Pomade 80 g:30000;Hair Powder:35000;Hair Spray 150 ml:25000;Gel Rambut 150 ml:15000;Minyak Rambut Natural:20000',
+    'Produk Wajah & Badan|pcs|25|Sabun Wajah:18000;Pelembap Wajah:25000;Tabir Surya:35000;Serum Wajah:45000;Masker Sheet:6000;Body Lotion 200 ml:20000;Scrub Badan:25000;Lulur Tradisional:18000;Minyak Pijat 100 ml:18000;Parfum Mini:22000',
+    'Alat Salon Dijual|pcs|30|Sisir Biasa:3500;Sisir Hairdryer:12000;Sisir Barber:8000;Gunting Rambut:30000;Hair Clip Isi 12:8000:pak;Karet Rambut Isi 10:6000:pak;Jepit Rambut Besar:4000;Catok Mini:75000;Hair Dryer Mini:95000;Handuk Kecil:12000;Jubah Salon:45000'
+  ];
+
+  /* ---- Bengkel (motor dan mobil ringan). Suku cadang, oli, jasa ---- */
+  var BENGKEL = [
+    'Oli Mesin Motor|liter|20|Matic 0,8 L:42000:pcs;Matic 1 L:52000:pcs;Bebek 0,8 L:40000:pcs;Bebek 1 L:50000:pcs;Sport 1 L:70000:pcs;Full Synthetic 1 L:95000:pcs;Mineral 1 L:38000:pcs',
+    'Oli Mesin Mobil|liter|20|Mineral 1 L:42000:pcs;Mineral 4 L:160000:pcs;Semi Sintetis 4 L:240000:pcs;Full Sintetis 4 L:380000:pcs;Diesel 4 L:230000:pcs;Oli Mesin Curah:38000:liter',
+    'Oli Lainnya|pcs|20|Oli Gardan Matic:17000;Oli Transmisi Manual:42000;Oli Transmisi Matik 1 L:65000;Oli Rem DOT 3:25000;Oli Power Steering:38000;Minyak Rem Motor 100 ml:15000;Coolant Radiator 1 L:35000;Air Aki Zuur 1 L:12000;Pembersih Karburator:28000',
+    'Filter|pcs|25|Filter Oli Motor:21000;Filter Oli Mobil:40000;Filter Udara Motor:30000;Filter Udara Mobil:65000;Filter Bensin:45000;Filter Solar:75000;Filter AC Mobil:75000;Saringan Oli Magnet:12000',
+    'Busi & Kelistrikan|pcs|25|Busi Motor Standar:15000;Busi Motor Iridium:70000;Busi Mobil:25000;Koil Motor:75000;CDI Motor:95000;Kiprok:70000;Aki Motor Basah:210000;Aki Motor Kering:275000;Aki Mobil:900000;Lampu Depan LED Motor:75000;Lampu Rem:6500;Lampu Sein:8500;Klakson:30000;Sekring Kotak:12000',
+    'Rem & Kampas|set|25|Kampas Rem Depan Motor:35000;Kampas Rem Belakang Motor:30000;Kampas Rem Cakram Motor:55000;Kampas Rem Depan Mobil:210000;Kampas Rem Belakang Mobil:180000;Cakram Motor:120000;Selang Rem:65000;Master Rem:150000;Kabel Rem Motor:15000;Kampas Kopling Motor:210000',
+    'Ban & Velg|pcs|15|Ban Motor Luar Matic 80/90-14:195000;Ban Motor Luar Bebek 70/90-17:155000;Ban Motor Luar Sport 100/80-17:310000;Ban Dalam Motor:35000;Ban Mobil 185/65-R15:620000;Ban Tubeless Tambal:25000:kali;Pentil Ban:2500;Velg Racing Motor:350000;Balance Ban Mobil:25000:kali;Pasang Ban:15000:kali',
+    'Rantai & Gear|set|25|Rantai Motor Standar:60000;Gear Set Motor:130000;Rantai Gear Set Lengkap:200000;V-Belt Matic:90000;Roller Matic Set:55000;Kampas Ganda Matic:70000;Per CVT:45000;Bearing Roda:25000',
+    'Per & Suspensi|pcs|20|Shockbreaker Depan Motor:150000:pasang;Shockbreaker Belakang Motor:180000:pasang;Per Shock Mobil:350000:pasang;Karet Boot Shock:30000;Bos Arm:35000;Ball Joint:120000;Tie Rod:100000;Karet Stabilizer:45000',
+    'Jasa Servis Motor|kali|60|Ganti Oli:5000:kali:15000;Servis Ringan:25000:kali:60000;Servis Besar:60000:kali:150000;Tune Up:35000:kali:90000;Bersihkan Karburator:25000:kali:60000;Setel Rantai:3000:kali:10000;Servis Rem:10000:kali:30000;Servis CVT:35000:kali:90000;Ganti Aki:5000:kali:20000;Tambal Ban:5000:kali:15000;Cuci Motor:5000:kali:15000',
+    'Jasa Servis Mobil|kali|55|Ganti Oli Mobil:20000:kali:60000;Servis Berkala 10.000 km:150000:kali:350000;Tune Up Mobil:100000:kali:250000;Servis Rem:80000:kali:200000;Spooring Balancing:100000:kali:250000;Servis AC:150000:kali:350000;Kuras Radiator:70000:kali:180000;Ganti Aki:20000:kali:60000;Cuci Mobil:25000:kali:60000;Cuci Mesin:50000:kali:120000',
+    'Aksesoris & Perlengkapan|pcs|30|Helm Standar:150000;Jas Hujan:35000;Sarung Tangan:25000;Spion Motor:25000:pasang;Handgrip:30000:pasang;Footstep:35000:pasang;Cover Motor:55000;Kunci Roda:25000;Dongkrak Botol:230000;Gembok Cakram:75000;Karpet Mobil Set:220000:set;Parfum Mobil:25000;Kabel Jumper:75000',
+    'Pembersih & Perawatan|pcs|30|Semir Ban:25000;Semir Dashboard:30000;Sampo Motor:25000;Sampo Mobil:35000;Wax Poles:55000;Chain Lube Spray:32000;Penetrant Spray:28000;Pembersih Rem Spray:32000;Kain Lap Microfiber:12000;Pembersih Kaca:20000;Aditif Bensin:45000;Pembersih Injektor:65000'
+  ];
+
   function pre(g) { return String(g || 'STK').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 3) || 'STK'; }
   function roundUp(n) { var u = n >= 100000 ? 500 : 100; return Math.ceil(n / u) * u; }
   function build(lines) {
@@ -144,7 +204,11 @@
     return out;
   }
   var PACKS = {
-    minimarket: { label: 'Minimarket Besar', type: 'minimarket', preset: 'minimarket', lines: MINIMARKET }
+    minimarket: { label: 'Minimarket Besar', type: 'minimarket', preset: 'minimarket', lines: MINIMARKET },
+    warung: { label: 'Kafe & Resto (menu umum)', type: 'warung', preset: 'kafe', lines: KAFE },
+    laundry: { label: 'Laundry (layanan umum)', type: 'laundry', preset: 'laundry', lines: LAUNDRY },
+    salon: { label: 'Salon & Barbershop (layanan umum)', type: 'salon', preset: 'salon', lines: SALON },
+    bengkel: { label: 'Bengkel Motor & Mobil (suku cadang dan jasa)', type: 'bengkel', preset: 'bengkel', lines: BENGKEL }
   };
   /* jenis usaha (COA_TEMPLATES) -> paket fitur bawaan (PRESETS di plans.js) */
   var TYPE_PRESET = { umum: 'umum', warung: 'kafe', toko: 'minimarket', minimarket: 'minimarket', jasa: 'jasa', konveksi: 'konveksi', laundry: 'laundry', salon: 'salon', bengkel: 'bengkel' };

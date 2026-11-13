@@ -3,11 +3,25 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 8.3';
+  var BETA = 'BETA 8.6';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 8.6)', '13 Nov 2026', [
+      '[Baru] Katalog awal siap pakai untuk usaha Kafe & Resto, Laundry, Salon & Barbershop, dan Bengkel (harga perkiraan, wajib disesuaikan oleh toko)',
+      '[Perbaikan] Paket fitur Laundry kini menyertakan penjualan produk agar katalog tampil di kasir'
+    ]],
+    ['1.0.0 (BETA 8.5)', '13 Nov 2026', [
+      '[Baru] Banyak Bahasa: tombol ID | EN di pojok kanan bawah untuk mengganti tampilan ke English; teks yang belum diterjemahkan tetap Bahasa Indonesia, data dan catatan transaksi tidak berubah'
+    ]],
+    ['1.0.0 (BETA 8.4)', '13 Nov 2026', [
+      '[Baru] Tombol Stok di Kasir: Admin melihat stok usaha miliknya sendiri',
+      '[Baru] Scan Stok Masuk: Admin scan barcode (alat scan atau kamera), isi jumlah, stok bertambah; barcode satuan ganda ikut dihitung',
+      '[Baru] Riwayat Masuk di Stok & Closing: siapa menambah stok, berapa, dan kapan',
+      '[Perbaikan] Daftar stok Manager dan Owner mengikuti pilihan usaha yang dipilih',
+      '[Keamanan] Barcode yang belum terdaftar ditolak, dan Admin hanya bisa menambah stok barang usahanya sendiri'
+    ]],
     ['1.0.0 (BETA 8.3)', '13 Nov 2026', [
       '[Baru] Toko multi-usaha: tiap Admin punya buku sendiri, transaksi, saldo kas, dan closing terpisah dari Admin lain',
       '[Baru] Manager dan Owner bisa memilih tampilan Semua usaha atau satu usaha, berlaku untuk kartu, Mutasi, Laba Rugi, Arus Kas, dan Laporan Bulanan',
