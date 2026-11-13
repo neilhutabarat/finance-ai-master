@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 13';
+  var BETA = 'Beta 14';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['Beta 14', '14 Nov 2026', [
+      '[Baru] Tema kaca juga dipakai di Control Tower',
+      '[Perbaikan] Teks tombol berwarna kini hitam agar jelas terbaca; ikon dock merah dan huruf dock lebih besar',
+      '[Perbaikan] Teks dan angka kecil di Manager dan Owner dibesarkan; aplikasi lebih ringan (blur kaca dikurangi)',
+      '[Keamanan] Tampilan tetap hanya bisa diatur oleh pengelola layanan; tidak ada data toko yang dikirim'
+    ]],
     ['Beta 13', '14 Nov 2026', [
       '[Baru] Efek tetesan hujan di atas kaca (kartu, tombol, header, dock, dan pop-up); ukuran butiran dan derasnya diatur pengelola layanan',
       '[Baru] Halaman masuk (portal) kini berkaca dan memakai wallpaper sendiri',
@@ -100,7 +106,7 @@
   var path = (location.pathname || '').toLowerCase();
   var ROLE = path.indexOf('kasir') >= 0 ? 'kasir' : path.indexOf('manager') >= 0 ? 'manager' : path.indexOf('dashboard') >= 0 ? 'owner' : path.indexOf('provider') >= 0 ? 'tower' : path.indexOf('partner') >= 0 ? 'partner' : (path.indexOf('index') >= 0 || /\/$/.test(path)) ? 'login' : 'lain';
   var NATIVE = (ROLE === 'kasir' || ROLE === 'login') ? 'light' : 'dark';
-  var DEFAULT_MODE = (ROLE === 'tower') ? NATIVE : 'light';   // tampilan bawaan: terang untuk semua toko; Tower tetap gelap
+  var DEFAULT_MODE = 'light';   // tampilan bawaan: terang untuk semua toko; Tower tetap gelap
   var TOKO = ''; try { TOKO = (new URLSearchParams(location.search).get('toko') || '').toLowerCase().trim(); } catch (e) {}
   var KEY = 'fm_theme2_' + (TOKO || 'master') + '_' + ROLE;
 
@@ -264,7 +270,6 @@
   var curKey = '';
   function updateWp() {
     try {
-      if (ROLE === 'tower') return;
       var cfg = wpCfg(), items = wpItems(cfg), key = items[wpPick(cfg)];
       if (ROLE === 'login') {
         var pt = cfg.portal;
@@ -285,7 +290,7 @@
   function apply() {
     var h = document.documentElement;
     updateWp();
-    var mode = (ROLE === 'tower') ? (pref.mode || DEFAULT_MODE) : 'light';     /* mode gelap dihapus (Beta 12): hanya Original (kaca) dan Base (putih polos) */
+    var mode = 'light';     /* mode gelap dihapus (Beta 12): hanya Original (kaca) dan Base (putih polos) */
     h.setAttribute('data-fm-native', NATIVE);
     ['data-fm-black', 'data-fm-invert', 'data-fm-accent'].forEach(function (a) { h.removeAttribute(a); });
     if (!LITE && ROLE !== 'lain') {

@@ -35,7 +35,7 @@
   /* ---------- kaca ---------- */
   /* tingkat 1..5: kepekatan lapisan kaca (atas, tengah, bawah), kekaburan, kejenuhan latar */
   var LV = { 1: { a: [.9, .78, .86], b: 24, s: 1.1 }, 2: { a: [.7, .52, .64], b: 19, s: 1.25 }, 3: { a: [.5, .22, .4], b: 14, s: 1.45 }, 4: { a: [.3, .09, .22], b: 9, s: 1.6 }, 5: { a: [.16, .03, .1], b: 5, s: 1.7 } };
-  var MIRR = ['.ios-glass', '.white-ice-glass-card:not([style*="0f172a"])', '.fixed.inset-0[id*="modal"]>div'];
+  var MIRR = ['#tw-bar', '#tw-strip', '#tw-tbw', '#tw-bot .bx', '.ios-glass', '.white-ice-glass-card:not([style*="0f172a"])', '.fixed.inset-0[id*="modal"]>div'];
   var AUTH = ['header.oneui-hero', '#fm-dock', '.fm-act', '.fm-fab', '#fm-dlg .fm-dlg-box', '.white-ice-glass-card[style*="0f172a"]'];
   var PLUGOV = '[style*="inset: 0px"][style*="z-index: 21474"][style*="background: rgba(0, 0, 0,"]', PLUG = [PLUGOV + '>div'];
   var COLORS = ['#1d4ed8', '#047857', '#b91c1c', '#7c3aed', '#b45309', '#0e7490', '#be185d', '#4d7c0f'];
@@ -47,7 +47,7 @@
     function shine(T) { return 'linear-gradient(112deg,transparent 16%,rgba(' + T + ',' + T + ',' + T + ',' + (.36 - lv * .04).toFixed(2) + ') 22%,transparent 27%)'; }
     function edge(T, sh) { var t = 'rgba(' + T + ',' + T + ',' + T + ','; return 'inset 0 0 0 1px ' + t + '.3),inset 0 2px 1px ' + t + '.9),inset 0 -2px 2px ' + t + '.3),inset 0 0 20px ' + t + '.2),0 18px 34px -16px ' + sh; }
     function printed(T) { var t = 'rgba(' + T + ',' + T + ',' + T + ','; return 'text-shadow:0 1px 0 ' + t + (.55 + lv * .06).toFixed(2) + '),0 0 7px ' + t + (.18 + lv * .08).toFixed(2) + ')!important;'; }
-    var bf = 'blur(' + p.b + 'px) saturate(' + p.s + ')', bfInv = 'invert(1) hue-rotate(180deg) ' + bf;
+    var bf = 'blur(' + Math.min(p.b, 14) + 'px) saturate(' + Math.min(p.s, 1.25) + ')', bfInv = 'invert(1) hue-rotate(180deg) ' + bf;
     var SH = 'rgba(4,22,48,.5)', SHI = 'rgba(235,225,205,.5)';
     var o = '';
     /* halaman biasa (Kasir) : semuanya kaca terang */
@@ -58,6 +58,9 @@
     /* halaman yang memakai pembalik warna (Manager, Owner): kartu = cermin; elemen yang dibalik lagi = kaca biasa dengan latar dikembalikan */
     o += sel(MIRR.concat(PLUG), P + '[data-fm-invert="1"]') + '{background:' + shine(0) + ',' + grad(0) + '!important;backdrop-filter:' + bf + '!important;-webkit-backdrop-filter:' + bf + '!important;border:1px solid rgba(0,0,0,.55)!important;box-shadow:' + edge(0, SHI) + '!important;' + printed(0) + '}';
     o += sel(AUTH, P + '[data-fm-invert="1"]') + '{filter:invert(1) hue-rotate(180deg);background:' + shine(255) + ',' + grad(255) + '!important;backdrop-filter:' + bfInv + '!important;-webkit-backdrop-filter:' + bfInv + '!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:' + edge(255, SH) + '!important;' + printed(255) + '}';
+    var sm = 'blur(5px)', smI = 'invert(1) hue-rotate(180deg) blur(5px)', SMS = ['.fm-act', '.fm-fab', '#fm-dock'];
+    o += sel(SMS, P + ':not([data-fm-invert])') + '{backdrop-filter:' + sm + '!important;-webkit-backdrop-filter:' + sm + '!important}';
+    o += sel(SMS, P + '[data-fm-invert="1"]') + '{backdrop-filter:' + smI + '!important;-webkit-backdrop-filter:' + smI + '!important}';
     /* selubung latar tipis: gambar tetap terlihat, kartu yang menjaga keterbacaan */
     o += P + ':not([data-fm-invert]) body[class]{background-image:linear-gradient(rgba(255,255,255,.04),rgba(255,255,255,.02)),var(--fm-wp)!important}';
     return o;
@@ -66,11 +69,13 @@
   var STATIC = (function () {
     var o = '';
     COLORS.forEach(function (c, i) { o += '.fm-actions .fm-act:nth-child(8n+' + (i + 1) + '){--fc:' + c + '}'; });
-    o += '.fm-actions .fm-act,.fm-actions .fm-act *{color:var(--fc,#1d4ed8)!important}';
+    o += '.fm-actions .fm-act,.fm-actions .fm-act span{color:#000!important}.fm-actions .fm-act svg{color:var(--fc,#1d4ed8)!important}';
     o += '.fm-actions .fm-act i{background:color-mix(in srgb,var(--fc,#1d4ed8) 14%,transparent)!important}';
     o += 'html[data-fm-page="manager"] .fm-actions,html[data-fm-page="owner"] .fm-actions{display:flex!important;flex-wrap:wrap;gap:8px!important;align-content:flex-start!important;grid-template-columns:none!important;grid-auto-rows:auto!important;max-height:none!important}';
     o += 'html[data-fm-page] .fm-actions .fm-act{flex:0 0 auto!important;grid-column:auto!important;min-height:0!important;height:38px!important;padding:0 15px 0 8px!important;border-radius:999px!important;font-size:12.5px!important;font-weight:800!important;gap:8px!important;flex-direction:row!important;text-align:left!important}';
     o += 'html[data-fm-page] .fm-actions .fm-act i{width:24px!important;height:24px!important;border-radius:50%!important}.fm-actions .fm-act svg{width:14px!important;height:14px!important}';
+    o += 'html[data-fm-page="manager"] [class*="text-[9px]"],html[data-fm-page="owner"] [class*="text-[9px]"],html[data-fm-page="manager"] [class*="text-[10px]"],html[data-fm-page="owner"] [class*="text-[10px]"]{font-size:11.5px!important}html[data-fm-page="manager"] [class*="text-[11px]"],html[data-fm-page="owner"] [class*="text-[11px]"],html[data-fm-page="manager"] .text-xs,html[data-fm-page="owner"] .text-xs{font-size:12.5px!important}';
+    o += 'html[data-fm-page] #fm-dock .fm-dk svg{color:#ef4444!important;stroke:#ef4444!important;width:26px!important;height:26px!important;stroke-width:2!important}html[data-fm-page] #fm-dock .fm-dk,html[data-fm-page] #fm-dock .fm-dk span,html[data-fm-page] #fm-dock .fm-dk b{font-size:12.5px!important;font-weight:700!important}html[data-fm-page] body #fm-dock .fm-dk{width:70px!important;height:62px!important}html[data-fm-page] body #fm-dock .fm-dk .fm-bd,html[data-fm-page] body #fm-dock .fm-dk em{font-size:11px!important}';
     o += '.fm-actions .fm-act span{display:block!important;white-space:nowrap!important;-webkit-line-clamp:unset!important}';
     /* tombol melayang Absen / Stok / Piutang */
     o += '.fm-fab{border-radius:999px!important;font-weight:800!important;font-size:12.5px!important;padding:0 16px!important;height:38px!important;line-height:36px!important;cursor:pointer;background:rgba(255,255,255,.88)!important;border:1px solid rgba(255,255,255,.9)!important;box-shadow:0 6px 16px -6px rgba(15,23,42,.35)!important}';
@@ -84,6 +89,9 @@
     o += '#topbar-store-slogan{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-width:min(440px,34vw)!important;display:block!important;-webkit-line-clamp:unset!important;line-height:1.25!important}';
     o += 'html[data-fm-portal] body{background-image:var(--fm-wp)!important;background-size:cover!important;background-position:center!important;background-attachment:fixed!important;background-repeat:no-repeat!important}';
     o += 'html[data-fm-invert="1"] #fm-rain{filter:invert(1) hue-rotate(180deg)}';
+    /* Tower memakai latar dan kaca yang sama dengan toko */
+    o += 'html[data-fm-page="tower"]::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;background:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,.2)),var(--fm-wp,url("/img/wp/1.jpg")) center bottom/cover no-repeat}html[data-fm-page="tower"] body{background:transparent!important}';
+    o += 'html[data-fm-page="tower"] #tw-root{background:transparent!important}html[data-fm-page="tower"] #tw-bar{margin:10px 16px 8px;border-radius:18px!important;padding:9px 16px}html[data-fm-page="tower"] #tw-strip,html[data-fm-page="tower"] #tw-tbw,html[data-fm-page="tower"] #tw-bot .bx{border-radius:18px!important}html[data-fm-page="tower"] #tw-strip{margin-top:2px}html[data-fm-page="tower"] #tw-tbw{margin-top:8px;padding:4px 10px}html[data-fm-page="tower"] #tw-bot .bx{padding:10px 14px}html[data-fm-page="tower"] #tw-tbw th{background:transparent!important}';
     /* Base: putih polos, tanpa latar gambar */
     o += 'html[data-fm-look="base"]{--fm-wp:none!important}';
     o += 'html[data-fm-look="base"][data-fm-invert="1"]{background:rgb(41,48,60)!important}html[data-fm-look="base"][data-fm-invert="1"] body{background:transparent!important}';
@@ -93,7 +101,7 @@
 
   function setLook() {
     var h = document.documentElement, st = document.getElementById('fm-glass-css');
-    var on = look() === 'original' && (ROLE === 'kasir' || ROLE === 'manager' || ROLE === 'owner' || ROLE === 'login');
+    var on = look() === 'original' && (ROLE === 'kasir' || ROLE === 'manager' || ROLE === 'owner' || ROLE === 'login' || ROLE === 'tower');
     h.setAttribute('data-fm-look', look());
     if (!st) { st = document.createElement('style'); st.id = 'fm-glass-css'; document.head.appendChild(st); }
     var key = (on ? level() : 0) + '|' + (on ? 1 : 0);
