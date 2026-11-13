@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>.fm-bh{opacity:0;animation:fmbh 0s linear 1.6s forwards}html.fm-br .fm-bh{opacity:1;animation:none}@keyframes fmbh{to{opacity:1}}</style>
     <style>
         :root {
             --app-bg: #f1f5f9;
@@ -107,7 +108,7 @@
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="js/dialog.js?v=8.9"></script>
-    <script src="js/theme.js?v=8.9"></script>
+    <script src="js/theme.js?v=9.0"></script>
     <script src="js/logo.js?v=8.9"></script>
     <script src="js/skin.js?v=8.9"></script>
     <script src="js/pwa.js" defer></script>
@@ -119,7 +120,7 @@
     <div class="white-ice-glass-card w-full max-w-md p-7 sm:p-8 space-y-5 text-center relative z-10">
         
         <!-- LOGO ON 3D FACETED CRYSTAL DIAMOND DENGAN KILAP (EASTER EGG 7X TAP UNTUK SUPERADMIN) -->
-        <div class="pt-2 flex justify-center relative z-20">
+        <div class="pt-2 flex justify-center relative z-20 fm-bh">
             <div class="relative w-20 h-20 flex items-center justify-center select-none cursor-pointer group" id="login-logo-trigger" title="Ketuk logo 7x untuk Otorisasi Super Admin">
                 <div class="absolute inset-0 bg-gradient-to-tr from-cyan-400/40 via-blue-500/25 to-indigo-500/35 rounded-3xl blur-lg group-hover:blur-xl transition-all duration-300"></div>
                 <div class="relative w-full h-full rounded-2xl bg-gradient-to-b from-white/95 via-white/80 to-slate-100/90 border border-white backdrop-blur-2xl shadow-[0_12px_28px_rgba(15,23,42,0.12),inset_0_2px_4px_rgba(255,255,255,1)] flex items-center justify-center p-2.5 overflow-hidden">
@@ -181,7 +182,7 @@
         </div>
 
         <!-- Identity -->
-        <div class="space-y-1 relative z-20">
+        <div class="space-y-1 relative z-20 fm-bh">
             <h1 id="login-brand" class="text-2xl font-black text-slate-900 tracking-tight leading-tight">Oneilverse</h1>
             <p id="login-sub" class="text-xs text-slate-500 font-semibold">Financial Hub & Otorisasi Sistem Enterprise</p>
         </div>
@@ -263,7 +264,7 @@
         </div>
 
         <div class="pt-3 text-[10px] text-slate-500 border-t border-slate-200/80 flex items-center justify-between relative z-20 font-semibold">
-            <span class="font-mono" data-fm-ver>v1.0.0 (BETA 8.9)</span>
+            <span class="font-mono" data-fm-ver>v1.0.0 (BETA 9.0)</span>
             <span class="text-emerald-600 font-bold flex items-center">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
                 Perlindungan sistem aktif
@@ -486,6 +487,7 @@
             if (svg) svg.style.display = '';
             if (badge) badge.style.display = 'none';
             setLoginBrand(tn);
+            document.documentElement.classList.add('fm-br');
             const pin = document.getElementById('input-pin');
             const btn = document.getElementById('btn-login-submit');
             if (tn && tn.notFound) { if (pin) pin.disabled = true; if (btn) btn.disabled = true; if (typeof checkFormerStore === 'function' && !window.__formerChecked) { window.__formerChecked = true; checkFormerStore(); } }

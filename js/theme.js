@@ -3,11 +3,14 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 8.9';
+  var BETA = 'BETA 9.0';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 9.0)', '13 Nov 2026', [
+      '[Perbaikan] Halaman masuk tidak lagi menampilkan tampilan lama sesaat sebelum logo dan nama muncul dengan benar saat dimuat ulang'
+    ]],
     ['1.0.0 (BETA 8.9)', '13 Nov 2026', [
       '[Baru] Properti: tagihan sewa bulanan dibuat otomatis dari daftar penyewa aktif, pembayaran (tunai, transfer, QRIS, bisa dicicil) langsung masuk ke Mutasi',
       '[Baru] Tombol Ingatkan WA di tiap tagihan, berisi pesan siap kirim ke penyewa',
