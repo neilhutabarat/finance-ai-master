@@ -72,7 +72,7 @@
       tasks.push(getAll('manager_audit_logs', 3000).then(function (list) {
         var dead = list.filter(function (x) { return x.tenantId && (low(x.tenantId) === 'sistem' || (/^ID\d+$/i.test(String(x.tenantId)) && !alive[low(x.tenantId)])); });
         dead.forEach(function (x) { if (/^ID\d+$/i.test(String(x.tenantId))) markOrphan(x.tenantId); });
-        if (dead.length) out.push({ kind: 'clean', key: 'audit', title: 'Riwayat audit milik toko yang sudah tidak ada', count: dead.length, detail: '', refs: dead.map(function (x) { return x._ref; }) });
+        if (dead.length) out.push({ kind: 'clean', key: 'audit', title: 'Riwayat audit milik toko yang sudah tidak ada', count: dead.length, detail: dead.slice(0, 5).map(function (x) { return (x.tenantId || '?') + ' · ' + (x.action || '?') + ' · ' + (x.date || ''); }).join(' | '), refs: dead.map(function (x) { return x._ref; }) });
       }));
       tasks.push(getAll('provider_tickets').then(function (list) {
         var dead = list.filter(function (x) { return x.tenantId && !alive[low(x.tenantId)]; });

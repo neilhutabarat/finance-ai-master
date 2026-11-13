@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 6.6';
+  var BETA = 'BETA 6.7';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 6.7)', '13 Nov 2026', [
+      '[Perbaikan] Laporan pemeriksaan data kini menampilkan keterangan lebih rinci untuk setiap temuan',
+      '[Keamanan] Penelusuran catatan perubahan lebih jelas, sehingga asal setiap perubahan mudah dipastikan'
+    ]],
     ['1.0.0 (BETA 6.6)', '13 Nov 2026', [
       '[Perbaikan] Pembersihan data lama kini tuntas sampai bersih dan tidak meninggalkan catatan sisa',
       '[Keamanan] Catatan sistem yang tidak terkait toko manapun dihapus bersama sisa data lama'
