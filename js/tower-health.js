@@ -70,8 +70,8 @@
       }));
       /* audit & tiket & pengumuman */
       tasks.push(getAll('manager_audit_logs', 3000).then(function (list) {
-        var dead = list.filter(function (x) { return x.tenantId && !alive[low(x.tenantId)]; });
-        dead.forEach(function (x) { markOrphan(x.tenantId); });
+        var dead = list.filter(function (x) { return x.tenantId && (low(x.tenantId) === 'sistem' || (/^ID\d+$/i.test(String(x.tenantId)) && !alive[low(x.tenantId)])); });
+        dead.forEach(function (x) { if (/^ID\d+$/i.test(String(x.tenantId))) markOrphan(x.tenantId); });
         if (dead.length) out.push({ kind: 'clean', key: 'audit', title: 'Riwayat audit milik toko yang sudah tidak ada', count: dead.length, detail: '', refs: dead.map(function (x) { return x._ref; }) });
       }));
       tasks.push(getAll('provider_tickets').then(function (list) {
@@ -247,7 +247,6 @@
           if (!confirm('Hapus permanen ' + sel.length + ' jenis sampah? Toko yang masih terdaftar tidak disentuh.')) return;
           return runClean(sel, say).then(function (n) {
             note.innerHTML = '<b style="color:#6ee7b7">Selesai. ' + fmtN(n) + ' item dibersihkan.</b>'; out.innerHTML = '';
-            try { ctAudit('SISTEM', 'BERSIHKAN_SERVER', 'Tower membersihkan ' + sel.length + ' jenis sampah server', '-', String(n)); } catch (e) {}
           });
         });
       });
