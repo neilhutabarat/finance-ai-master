@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 6.2';
+  var BETA = 'BETA 6.3';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 6.3)', '13 Nov 2026', [
+      '[Perbaikan] Sesi login kini tersimpan terpisah per jenis akun, sehingga membuka beberapa halaman di browser yang sama tidak lagi menyebabkan login ulang atau gagal menyimpan',
+      '[Keamanan] Sesi akun pengelola dipisahkan dari sesi toko sehingga tidak bisa tertimpa akun lain'
+    ]],
     ['1.0.0 (BETA 6.2)', '13 Nov 2026', [
       '[Perbaikan] Setelah pembaruan, halaman cukup dimuat ulang dan Anda tetap masuk tanpa login ulang, termasuk saat sinyal lambat atau terputus sesaat',
       '[Keamanan] Sesi login tetap diperiksa di latar belakang, dan akses yang dicabut tetap langsung mengeluarkan pengguna dari aplikasi',

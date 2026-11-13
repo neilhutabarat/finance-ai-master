@@ -24,7 +24,7 @@
     var t = g(function () { return getActiveTenant(); }, null), tid = t && t.id ? String(t.id).toUpperCase() : '';
     return { tid: tid, role: ROLE, label: tid + (ROLE === 'staff' ? '-K' : '-O') };
   }
-  function ready() { return typeof db !== 'undefined' && db && g(function () { return firebase.auth().currentUser; }, null); }
+  function ready() { return typeof db !== 'undefined' && db && g(function () { return window.FM_AUTH ? FM_AUTH.curUser() : firebase.auth().currentUser; }, null); }
 
   /* ---------- aturan kirim ---------- */
   var LINK = /(https?:|www\.|\.com|\.net|\.org|\.id\b|\.co\b|bit\.ly|wa\.me)/i;

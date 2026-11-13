@@ -19,8 +19,15 @@
     if (!firebase.apps.length) { var c = fbConf(); if (!c) throw new Error('Konfigurasi Firebase tidak ada'); firebase.initializeApp(c); }
     return firebase.app();
   }
-  function auth() { app(); return firebase.auth(); }
-  function fs() { app(); return firebase.firestore(); }
+  /* Tower memakai aplikasi Firebase bernama 'tower' (sesi login tersimpan terpisah), sehingga login klien di browser yang sama tidak menimpa sesi Tower */
+  var PAGE0 = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  var TOWER_CTX = PAGE0 === 'provider.html';
+  function tapp() {
+    app();
+    try { return firebase.app('tower'); } catch (e) { return firebase.initializeApp(fbConf(), 'tower'); }
+  }
+  function auth() { return TOWER_CTX ? tapp().auth() : (app(), firebase.auth()); }
+  function fs() { return TOWER_CTX ? tapp().firestore() : (app(), firebase.firestore()); }
   function key(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
   function email(t, role, gen) { return key(t) + '.' + role + '.' + gen + DOMAIN; }
   function isSynthetic(em) { return !!em && em.slice(-DOMAIN.length) === DOMAIN; }
@@ -68,8 +75,9 @@
     }, function (e) { return { ok: false, reason: reason(e) }; });
   }
   function loginTower(em, pw) {
-    return auth().signInWithEmailAndPassword(String(em || '').trim(), pw).then(function (cr) {
-      if (isSynthetic(cr.user.email)) return auth().signOut().catch(noop).then(function () { return { ok: false, reason: 'denied' }; });
+    var ta = tapp().auth();
+    return ta.signInWithEmailAndPassword(String(em || '').trim(), pw).then(function (cr) {
+      if (isSynthetic(cr.user.email)) return ta.signOut().catch(noop).then(function () { return { ok: false, reason: 'denied' }; });
       return { ok: true };
     }, function (e) { return { ok: false, reason: reason(e) }; });
   }
@@ -189,7 +197,7 @@
     });
   }
 
-  window.FM_AUTH = { LEGACY: LEGACY, login: login, loginTower: loginTower, provision: provision, provisionMany: provisionMany, changeOwnPin: changeOwnPin, status: status, randomPin: randomPin, errText: function (r) { return ERR[r] || ERR.err; }, isSynthetic: isSynthetic, signOut: doSignOut, auth: auth };
+  window.FM_AUTH = { curUser: function () { try { return auth().currentUser; } catch (e) { return null; } }, towerDb: function () { return tapp().firestore(); }, LEGACY: LEGACY, login: login, loginTower: loginTower, provision: provision, provisionMany: provisionMany, changeOwnPin: changeOwnPin, status: status, randomPin: randomPin, errText: function (r) { return ERR[r] || ERR.err; }, isSynthetic: isSynthetic, signOut: doSignOut, auth: auth };
 
   var page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   var need = ROLES_BY_PAGE[page];

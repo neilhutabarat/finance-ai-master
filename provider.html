@@ -70,11 +70,11 @@
     </script>
     <script src="js/billing.js?v=4.1"></script>
     <script src="js/dialog.js?v=1.13"></script>
-    <script src="js/theme.js?v=6.2"></script>
+    <script src="js/theme.js?v=6.3"></script>
     <script src="js/logo.js?v=5.0"></script>
     <script src="js/skin.js?v=5.8"></script>
     <script src="js/tower-menu.js?v=6.1"></script>
-    <script src="js/chat.js?v=4.1"></script>
+    <script src="js/chat.js?v=4.2"></script>
     <script src="js/tower-cockpit.js?v=4.4"></script>
     <style>#main-modal-container{z-index:70 !important}
     .fm-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
@@ -736,7 +736,7 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/auth.js?v=6.2"></script>
+    <script src="js/auth.js?v=6.3"></script>
     <script src="js/plans.js?v=6.2"></script>
     <script src="js/widgets.js?v=4.1"></script>
     <script>window.NO_AUTO_STORE = true;</script>
@@ -755,7 +755,7 @@
         })();
         if (!PROVIDER_OK) { window.location.replace('index.html'); }
 
-        if (PROVIDER_OK && typeof initFirebase === 'function') initFirebase();
+        if (PROVIDER_OK && typeof initFirebase === 'function') { initFirebase(); try { db = FM_AUTH.towerDb(); } catch (e) {} }
         if (window.lucide) lucide.createIcons();
 
         function formatThousand(num) {
@@ -1356,7 +1356,7 @@
         // Diagnosa izin: tampilkan akun yang sedang masuk supaya penyebab "Missing or insufficient permissions" jelas.
         function fmPermAlert(e) {
             var base = 'Gagal menyimpan: ' + (e && e.message ? e.message : e);
-            var u = null; try { u = firebase.auth().currentUser; } catch (x) {}
+            var u = null; try { u = FM_AUTH.curUser(); } catch (x) {}
             if (!u) return alert(base + '\n\nTidak ada akun Firebase yang sedang masuk. Keluar lalu masuk lagi ke Tower.');
             u.getIdTokenResult().then(function (t) {
                 var prov = t && t.signInProvider;
