@@ -134,11 +134,11 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=beta10"></script>
-    <script src="js/theme.js?v=beta10"></script>
-    <script src="js/langit.js?v=beta10" defer></script>
-    <script src="js/logo.js?v=beta10"></script>
-    <script src="js/skin.js?v=beta10"></script>
+    <script src="js/dialog.js?v=beta11"></script>
+    <script src="js/theme.js?v=beta11"></script>
+    <script src="js/langit.js?v=beta11" defer></script>
+    <script src="js/logo.js?v=beta11"></script>
+    <script src="js/skin.js?v=beta11"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -741,32 +741,32 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=beta10"></script>
-    <script src="js/monitor.js?v=beta10"></script>
-    <script src="js/plans.js?v=beta10"></script>
-    <script src="js/usaha.js?v=beta10"></script>
-    <script src="js/mutasi-share.js?v=beta10"></script>
-    <script src="js/struk-pdf.js?v=beta10"></script>
-    <script src="js/gaji.js?v=beta10"></script>
-    <script src="js/piutang.js?v=beta10"></script>
-    <script src="js/promo.js?v=beta10"></script>
-    <script src="js/bantuan.js?v=beta10"></script>
-    <script src="js/absensi.js?v=beta10"></script>
+    <script src="js/auth.js?v=beta11"></script>
+    <script src="js/monitor.js?v=beta11"></script>
+    <script src="js/plans.js?v=beta11"></script>
+    <script src="js/usaha.js?v=beta11"></script>
+    <script src="js/mutasi-share.js?v=beta11"></script>
+    <script src="js/struk-pdf.js?v=beta11"></script>
+    <script src="js/gaji.js?v=beta11"></script>
+    <script src="js/piutang.js?v=beta11"></script>
+    <script src="js/promo.js?v=beta11"></script>
+    <script src="js/bantuan.js?v=beta11"></script>
+    <script src="js/absensi.js?v=beta11"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return (typeof myTx === 'function') ? myTx() : txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/widgets.js?v=beta10"></script>
-    <script src="js/config.js?v=beta10"></script>
-    <script src="js/offline.js?v=beta10"></script>
-    <script src="js/core.js?v=beta10"></script>
-    <script src="js/billing.js?v=beta10"></script>
-    <script src="js/shield.js?v=beta10"></script>
-    <script src="js/ctrl.js?v=beta10"></script>
-    <script src="js/chat.js?v=beta10"></script>
-    <script src="js/store.js?v=beta10"></script>
-    <script src="js/stok-admin.js?v=beta10"></script>
-    <script src="js/i18n.js?v=beta10"></script>
+    <script src="js/widgets.js?v=beta11"></script>
+    <script src="js/config.js?v=beta11"></script>
+    <script src="js/offline.js?v=beta11"></script>
+    <script src="js/core.js?v=beta11"></script>
+    <script src="js/billing.js?v=beta11"></script>
+    <script src="js/shield.js?v=beta11"></script>
+    <script src="js/ctrl.js?v=beta11"></script>
+    <script src="js/chat.js?v=beta11"></script>
+    <script src="js/store.js?v=beta11"></script>
+    <script src="js/stok-admin.js?v=beta11"></script>
+    <script src="js/i18n.js?v=beta11"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -1431,8 +1431,8 @@
                 const toClose = myTx().filter(t => !t.isClosed);
                 toClose.forEach(t => { t.isClosed = true; });
                 persistData();
-                /* Admin berkode: tutup juga di server agar tidak hidup lagi saat data dimuat ulang dan tidak mengganggu Admin lain */
-                if (user.slot && typeof db !== 'undefined' && db) {
+                /* Semua akun kasir: tutup juga di server agar saldo tidak kembali saat data dimuat ulang */
+                if (typeof db !== 'undefined' && db) {
                     const withDoc = toClose.filter(t => t.docId);
                     for (let i = 0; i < withDoc.length; i += 400) {
                         const b = db.batch();

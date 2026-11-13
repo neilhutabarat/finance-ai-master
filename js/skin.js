@@ -682,6 +682,8 @@
     var sp = document.createElement('div'); sp.className = 'fm-sep'; dock.appendChild(sp);
     tail.forEach(function (it) { dock.appendChild(btn(it)); });
     document.body.appendChild(dock);
+    /* ruang kosong di dasar halaman setinggi dock supaya baris tombol terakhir tidak tertimpa (Manager dan Owner) */
+    if (!document.getElementById('fm-dock-gap') && (document.documentElement.getAttribute('data-fm-page') === 'manager' || document.documentElement.getAttribute('data-fm-page') === 'owner')) { var gap = document.createElement('div'); gap.id = 'fm-dock-gap'; gap.setAttribute('aria-hidden', 'true'); gap.style.cssText = 'height:112px;width:100%;pointer-events:none'; document.body.insertBefore(gap, dock); }
     document.documentElement.setAttribute('data-fm-dock', '1');
   }
   function showMore(list, act) {

@@ -47,7 +47,7 @@
       { t: 'Log Login', ic: 'users', run: "FM_MON.open('login')", d: 'Siapa masuk, kapan, perangkat apa' },
       { t: 'Tiket Bantuan', ic: 'bell', run: "FM_HELPDESK.open()", d: 'Pertanyaan dari klien, balas di sini' },
       { t: 'OneilStore', ic: 'tag', run: "FM_TSTORE.open()", d: 'Permintaan sewa, sewa aktif, beri sewa, dan mode demo toko' },
-      { t: 'Wallpaper', ic: 'spark', run: "FM_TWALL.open()", d: 'Atur gambar latar toko: ganti tiap minggu atau kunci satu gambar, dengan pratinjau siang, malam, dan cuaca' },
+      { t: 'Wallpaper', ic: 'spark', run: "FM_TWALL.open()", d: 'Atur gambar latar toko: ganti tiap minggu atau kunci satu gambar. Berganti di semua toko tanpa muat ulang' },
       { t: 'Uji Mandiri', ic: 'shield', run: "FM_QA.open()", d: 'Cek file, versi, dan kecocokan data toko (baca-saja)' },
       { t: 'Data Demo', ic: 'grid', run: "FM_DEMO.open()", d: 'Isi toko uji dengan transaksi contoh' },
       { t: 'Akun Login', ic: 'key', find: 'Akun Login', d: 'Email dan sandi masuk Tower' },

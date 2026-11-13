@@ -3,17 +3,19 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'Beta 10';
+  var BETA = 'Beta 11';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
-    ['Beta 10', '14 Nov 2026', [
-      '[Baru] Tampilan kaca cair: kartu tembus pandang bergaya kaca di atas latar, dengan tingkat Statis, 720p, 1080p, dan 1440p',
-      '[Baru] Tingkat tampilan diatur penuh oleh pengelola layanan per peran dan per toko, sehingga tiap toko mendapat kualitas yang cocok dengan perangkatnya',
-      '[Perbaikan] Pengaturan gerakan dan latar dihapus dari Pengaturan agar tampilan seragam; hanya Terang/Gelap dan Bahasa yang tetap bisa diubah',
-      '[Perbaikan] Aplikasi menyesuaikan diri: perangkat yang lemah otomatis turun tingkat supaya kasir tetap lancar',
-      '[Keamanan] Pengaturan tampilan hanya bisa diubah oleh pengelola layanan; aplikasi toko hanya membaca dan tidak mengirim data toko'
+    ['Beta 11', '14 Nov 2026', [
+      '[Baru] Tampilan kaca bening yang sama untuk Kasir, Manager, dan Owner; latar tetap terlihat jelas di balik kartu dan tombol',
+      '[Baru] Latar berganti otomatis dalam sekitar 30 detik saat diatur pengelola layanan, tanpa perlu memuat ulang',
+      '[Baru] Alamat toko tampil di bawah nama toko di Manager dan Owner, sama seperti Kasir',
+      '[Perbaikan] Saldo kas laci tidak lagi kembali setelah closing lalu memuat ulang halaman',
+      '[Perbaikan] Dock bawah tidak lagi menimpa baris tombol terakhir di Manager dan Owner',
+      '[Perbaikan] Tampilan disederhanakan (tanpa animasi hujan dan cuaca) agar ringan di semua komputer',
+      '[Keamanan] Latar hanya bisa diubah oleh pengelola layanan; aplikasi toko hanya membaca dan tidak mengirim data toko'
     ]],
     ['Beta 9', '14 Nov 2026', [
       '[Baru] Latar belakang baru bergaya lukisan (4 gambar) menggantikan latar lama. Gambar berganti otomatis tiap minggu',
@@ -203,7 +205,7 @@
     return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.0543) ? '#fff' : '#0b0d12';
   }
   /* Latar belakang: 4 gambar bergaya lukisan. Gambar yang tampil diatur dari Tower (app_meta/wallpaper):
-     otomatis bergilir tiap minggu, atau dikunci satu gambar. Jam, cuaca, dan lokasi diolah js/langit.js. */
+     otomatis bergilir tiap minggu, atau dikunci satu gambar. Kaca dan pembaruan otomatis di js/langit.js. */
   var WP_FILES = ['img/wp/1.jpg', 'img/wp/2.jpg', 'img/wp/3.jpg', 'img/wp/4.jpg'];
   var WP_TZ = 7 * 3600000; /* WIB: pergantian mingguan mengikuti jam Indonesia barat */
   function wpCfg() { try { return JSON.parse(localStorage.getItem('fm_wp_cfg') || 'null') || {}; } catch (e) { return {}; } }
@@ -232,14 +234,9 @@
   window.FM_ROLE = ROLE;
   window.FM_WP = { files: WP_FILES, pick: wpPick, next: wpNext, cfg: wpCfg, order: wpOrder };
   function updateWp() {
-    if (window.FM_LANGIT_ON) return;
-    try {
-      var idx = wpPick(), url = WP_FILES[idx];
-      /* kilasan terakhir yang sudah diolah (jam + cuaca) dipakai dulu supaya tidak ada kedipan terang saat malam */
-      try { var L = JSON.parse(localStorage.getItem('fm_wp_last') || 'null'); if (L && L.idx === idx && Date.now() - L.t < 12 * 3600000 && L.u) url = L.u; } catch (e) {}
-      document.documentElement.style.setProperty('--fm-wp', 'url("' + url + '")');
-    } catch (e) {}
+    try { document.documentElement.style.setProperty('--fm-wp', 'url("' + WP_FILES[wpPick()] + '")'); } catch (e) {}
   }
+  window.FM_WP.update = updateWp;
   function apply() {
     var h = document.documentElement;
     updateWp();

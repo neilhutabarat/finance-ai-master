@@ -321,8 +321,6 @@
         };
         var g = window.FM_GEO;
         if (g && isFinite(g.lat) && isFinite(g.lon)) doc.geo = { src: g.src === 'GPS' ? 'GPS' : 'Jaringan', lat: g.lat, lon: g.lon, name: String(g.name || '').slice(0, 140), acc: g.acc || 0, at: g.t || Date.now() };
-        var pf = window.FM_PERF;
-        if (pf && isFinite(pf.fps)) doc.perf = { fps: pf.fps, cores: pf.cores || 0, mem: pf.mem || 0, w: pf.w || 0, h: pf.h || 0, dpr: pf.dpr || 1, br: String(pf.br || '').slice(0, 12), rec: String(pf.rec || ''), at: pf.t || 0 };
         presenceRef(tenant).set(doc, { merge: true }).catch(function () {});
     }
 
@@ -333,7 +331,6 @@
         beat(tenant);
         setInterval(function () { beat(tenant); }, BEAT_MS);
         window.addEventListener('fm:geo', function () { beat(tenant); });
-        window.addEventListener('fm:perf', function () { beat(tenant); });
         window.addEventListener('pagehide', function () { try { presenceRef(tenant).delete(); } catch (e) {} });
     }
 
@@ -432,7 +429,6 @@
             var d = snap.exists ? snap.data() : null;
             window.TENANT_CTRL = d || {};
             try { localStorage.setItem('fm_rentals_' + tenant.id, JSON.stringify((d && d.rentals) || {})); } catch (eR) {}
-            try { var lk = JSON.stringify({ id: tenant.id, look: (d && d.look) || null }); if (localStorage.getItem('fm_look_cur') !== lk) { localStorage.setItem('fm_look_cur', lk); window.dispatchEvent(new CustomEvent('fm:look')); } } catch (eL) {}
             try { window.dispatchEvent(new CustomEvent('fm:ctrl')); } catch (e) {}
             var billFreeze = !!(d && window.FM_BILL && FM_BILL.freezeNow(d.billing, Date.now()));
             lastCtrl = d; demoPill(demoMs(d)); demoTickStart();
