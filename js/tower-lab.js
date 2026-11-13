@@ -519,6 +519,7 @@
       '<div style="' + sec + '"><div style="' + h3 + '">2. Terapkan ke toko</div>' +
       '<div style="font-size:11.5px;opacity:.7;margin-bottom:4px">Ambil dari (template tersimpan atau toko lain langsung):</div>' +
       '<select id="ap-src" style="' + INP + '"><optgroup label="Template tersimpan">' + (tpls.length ? tpls.map(function (p) { return '<option value="tpl:' + H(p._id) + '">' + H(p.name) + '</option>'; }).join('') : '<option value="" disabled>(belum ada template)</option>') + '</optgroup>' +
+      '<optgroup label="Paket bawaan (siap pakai)">' + Object.keys((window.FM_TPL && FM_TPL.PACKS) || {}).map(function (k) { return '<option value="pak:' + H(k) + '">' + H(FM_TPL.PACKS[k].label) + ' — fitur, COA & katalog</option>'; }).join('') + '</optgroup>' +
       '<optgroup label="Salin langsung dari toko">' + tl.map(function (t) { return '<option value="toko:' + H(t.id) + '">' + H((t.nama || t.id) + ' [' + t.id + ']') + '</option>'; }).join('') + '</optgroup></select>' +
       '<div style="font-size:11.5px;opacity:.7;margin:8px 0 4px">Terapkan ke toko:</div>' +
       '<select id="ap-dst" style="' + INP + '">' + tl.map(function (t) { return opt(t, cur && cur.target && t.id === cur.target); }).join('') + '</select>' +
@@ -557,7 +558,8 @@
     var parts = checked(box, 'ap');
     if (!Object.keys(parts).some(function (k) { return parts[k]; })) return alert('Centang minimal satu bagian.');
     var kind = src.split(':')[0], key = src.slice(kind.length + 1), label, getSnap;
-    if (kind === 'tpl') { var p = tplMap[key]; if (!p) return alert('Template tidak ditemukan.'); label = 'template "' + p.name + '"'; getSnap = Promise.resolve(p.snap); }
+    if (kind === 'pak') { var pk = window.FM_TPL && FM_TPL.snap(key); if (!pk) return alert('Paket tidak ditemukan.'); label = 'paket ' + FM_TPL.PACKS[key].label; getSnap = Promise.resolve(pk); }
+    else if (kind === 'tpl') { var p = tplMap[key]; if (!p) return alert('Template tidak ditemukan.'); label = 'template "' + p.name + '"'; getSnap = Promise.resolve(p.snap); }
     else { var s = T(key); if (!s) return alert('Toko sumber tidak ditemukan.'); if (s.id === dst.id) return alert('Sumber dan tujuan sama.'); label = 'toko ' + (s.nama || s.id); getSnap = snapshot(s, null); }
     var names = PARTS.filter(function (x) { return parts[x[0]]; }).map(function (x) { return x[1]; }).join(', ');
     if (!confirm('Terapkan ' + label + ' ke ' + (dst.nama || dst.id) + ' [' + dst.id + ']?\n\nBagian yang ditimpa: ' + names + '.\nTransaksi dan akun login tidak disentuh.')) return;

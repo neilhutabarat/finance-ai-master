@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 6.7';
+  var BETA = 'BETA 6.8';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 6.8)', '13 Nov 2026', [
+      '[Baru] Stok: tombol Salin pada Jenis dan Induk, hasil salinan langsung muncul tepat di bawah aslinya dengan stok 0',
+      '[Baru] Stok: tombol Ubah untuk mengganti nama jenis, satuan, harga beli, harga jual, dan nama Induk',
+      '[Perbaikan] Urutan Induk stok kini mengikuti susunan toko, tidak lagi diurutkan abjad',
+      '[Keamanan] Setiap salinan dan perubahan nama stok tercatat di Audit'
+    ]],
     ['1.0.0 (BETA 6.7)', '13 Nov 2026', [
       '[Perbaikan] Laporan pemeriksaan data kini menampilkan keterangan lebih rinci untuk setiap temuan',
       '[Keamanan] Penelusuran catatan perubahan lebih jelas, sehingga asal setiap perubahan mudah dipastikan'

@@ -97,31 +97,68 @@
   function activeList(role, tn) { role = role || pageRole(); return FEATURES.filter(function (f) { return f.r[role] && !f.soon && has(f.key, role, tn); }); }
 
   /* ---- tabel centang untuk Tower: prefix 'nt' (toko baru) atau 'ts' (ubah toko) ---- */
+  var CATS = [
+    { id: 'jual', label: 'Penjualan & Stok', keys: ['stok', 'stok_input', 'stok_closing', 'jual_produk', 'banyak_usaha', 'bukti', 'wa_receipt', 'tax'] },
+    { id: 'lap', label: 'Laporan & Keuangan', keys: ['dashboard', 'analisa', 'audit', 'export_csv', 'mutasi_wa', 'gaji', 'gaji_auto', 'billing_card'] },
+    { id: 'awas', label: 'Pengawasan & Tim', keys: ['instruksi'] },
+    { id: 'tamp', label: 'Tampilan & Info', keys: ['clock', 'weather', 'rates', 'chat', 'wallpaper', 'theme'] }
+  ];
+  function isCore(f) { return Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); }
+  function catOf(f) { for (var i = 0; i < CATS.length; i++) if (CATS[i].keys.indexOf(f.key) >= 0) return CATS[i].id; return 'lain'; }
+  var BSM = 'padding:3px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:10.5px;cursor:pointer;margin-left:4px';
+  function cnt(prefix) {
+    var all = document.querySelectorAll('input[id^="' + prefix + '-f-"]'), per = {}, tot = 0;
+    [].forEach.call(all, function (el) {
+      if (el.disabled && el.style.opacity) return;
+      var c = el.getAttribute('data-cat') || 'lain'; per[c] = per[c] || { on: 0, n: 0 };
+      if (el.disabled) return;
+      per[c].n++; if (el.checked) { per[c].on++; tot++; }
+    });
+    [].forEach.call(document.querySelectorAll('[id^="' + prefix + '-cnt-"]'), function (sp) {
+      var c = sp.id.slice((prefix + '-cnt-').length), x = per[c] || { on: 0, n: 0 };
+      sp.textContent = x.on + '/' + x.n;
+    });
+    var t = document.getElementById(prefix + '-cnt-all'); if (t) t.textContent = tot + ' fitur tambahan dipilih';
+  }
+  function setCat(prefix, cat, on) {
+    [].forEach.call(document.querySelectorAll('input[id^="' + prefix + '-f-"][data-cat="' + cat + '"]'), function (el) { if (!el.disabled) el.checked = !!on; });
+    cnt(prefix);
+  }
+  function rowHtml(prefix, f, isNew, editable, tn, cat) {
+    var h = '<tr style="border-top:1px solid rgba(255,255,255,.08);' + (f.soon ? 'opacity:.5' : '') + '"><td style="padding:5px 6px">' + f.label + (f.soon ? ' <i>(segera)</i>' : '') + '</td>';
+    ROLES.forEach(function (r) {
+      var m = f.r[r], cell;
+      if (m === 'c') cell = '<span title="Fitur inti: terkunci, tidak bisa dicabut" style="display:inline-flex;width:18px;height:18px;border-radius:5px;background:#ef4444;color:#fff;font-weight:900;font-size:13px;line-height:18px;align-items:center;justify-content:center">✓</span>';
+      else if (!m) cell = '<input type="checkbox" disabled style="width:16px;height:16px;opacity:.25" title="Belum tersedia di mode ini">';
+      else cell = '<input type="checkbox" id="' + prefix + '-f-' + f.key + '-' + r + '" data-cat="' + cat + '" onchange="FM_PLANS.cnt(\'' + prefix + '\')" ' + (((isNew ? defaultFor(f.key, r, 'basic') : has(f.key, r, tn))) ? 'checked ' : '') + ((f.soon || editable === false) ? 'disabled ' : '') + 'style="width:16px;height:16px;accent-color:#22c55e">';
+      h += '<td style="text-align:center;padding:5px;width:64px">' + cell + '</td>';
+    });
+    return h + '</tr>';
+  }
+  function tableHtml(rows) {
+    var th = 'text-align:center;padding:3px 5px;font-weight:800;white-space:nowrap';
+    return '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:3px 6px;opacity:.6;font-weight:700">Fitur</th>' + ROLES.map(function (r) { return '<th style="' + th + '">' + RLABEL[r] + '</th>'; }).join('') + '</tr></thead><tbody>' + rows + '</tbody></table>';
+  }
   function checklistHtml(prefix, features, editable, tnFull) {
     var tn = tnFull || { features: features || null }, isNew = !features;
-    var th = 'text-align:center;padding:4px 6px;font-weight:800;white-space:nowrap';
+    var box = 'border:1px solid rgba(255,255,255,.1);border-radius:12px;margin-bottom:8px;overflow:hidden';
+    var sm = 'padding:8px 10px;cursor:pointer;font-weight:800;font-size:12.5px;display:flex;align-items:center;gap:8px;list-style:none';
     var h = '<div style="font-weight:800;margin-bottom:2px">Fitur toko</div>' +
-      '<div style="opacity:.65;margin-bottom:6px">Merah = fitur inti (terkunci). Hijau = bebas ditambah atau dicabut per toko; yang tidak dicentang hilang dari tampilan klien.</div>' +
-      '<div style="display:flex;gap:6px;margin-bottom:6px"><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',true)" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:11px">Centang semua tambahan</button>' +
-      '<button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',false)" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:11px">Kosongkan tambahan</button></div>' +
-      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span style="opacity:.65;font-size:11px">Template cepat:</span>' + '<span id="' + prefix + '-presets" style="display:contents">' + presetButtons(prefix) + '</span></div>' +
-      '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:4px 6px">Fitur</th>' +
-      ROLES.map(function (r) { return '<th style="' + th + '">' + RLABEL[r] + '</th>'; }).join('') + '</tr></thead><tbody>';
-    var order = FEATURES.filter(function (f) { return !f.soon && Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); })
-      .concat(FEATURES.filter(function (f) { return !f.soon && !Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); }))
-      .concat(FEATURES.filter(function (f) { return f.soon; }));
-    order.forEach(function (f) {
-      h += '<tr style="border-top:1px solid rgba(255,255,255,.08);' + (f.soon ? 'opacity:.5' : '') + '"><td style="padding:6px">' + f.label + (f.soon ? ' <i>(segera)</i>' : '') + '</td>';
-      ROLES.forEach(function (r) {
-        var m = f.r[r], cell;
-        if (m === 'c') cell = '<span title="Fitur inti: terkunci, tidak bisa dicabut" style="display:inline-flex;width:18px;height:18px;border-radius:5px;background:#ef4444;color:#fff;font-weight:900;font-size:13px;line-height:18px;align-items:center;justify-content:center">✓</span>';
-        else if (!m) cell = '<input type="checkbox" disabled title="Belum tersedia di mode ini" style="width:16px;height:16px;opacity:.25">';
-        else cell = '<input type="checkbox" id="' + prefix + '-f-' + f.key + '-' + r + '" ' + (((isNew ? defaultFor(f.key, r, 'basic') : has(f.key, r, tn))) ? 'checked ' : '') + ((f.soon || editable === false) ? 'disabled ' : '') + 'style="width:16px;height:16px;accent-color:#22c55e">';
-        h += '<td style="text-align:center;padding:6px">' + cell + '</td>';
-      });
-      h += '</tr>';
+      '<div style="opacity:.65;margin-bottom:6px">Merah = fitur inti (terkunci). Hijau = bebas dicentang atau dicabut; yang tidak dicentang hilang dari tampilan klien.</div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span style="opacity:.65;font-size:11px">Template cepat:</span><span id="' + prefix + '-presets" style="display:contents">' + presetButtons(prefix) + '</span></div>' +
+      '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><b id="' + prefix + '-cnt-all" style="font-size:11.5px"></b><span style="flex:1"></span><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',true);FM_PLANS.cnt(\'' + prefix + '\')" style="' + BSM + '">Centang semua</button><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',false);FM_PLANS.cnt(\'' + prefix + '\')" style="' + BSM + '">Kosongkan semua</button></div>';
+    var core = FEATURES.filter(function (f) { return !f.soon && isCore(f); });
+    h += '<details style="' + box + ';border-color:rgba(239,68,68,.45)"><summary style="' + sm + '"><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:#ef4444"></span>Fitur Inti <span style="opacity:.6;font-weight:600">· terkunci · ' + core.length + ' fitur</span></summary><div style="padding:2px 8px 8px">' + tableHtml(core.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, 'inti'); }).join('')) + '</div></details>';
+    var cats = CATS.concat([{ id: 'lain', label: 'Lainnya', keys: [] }]);
+    cats.forEach(function (c) {
+      var fs = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && catOf(f) === c.id; });
+      if (!fs.length) return;
+      h += '<details open style="' + box + '"><summary style="' + sm + '"><span>' + c.label + '</span><span id="' + prefix + '-cnt-' + c.id + '" style="opacity:.7;font-weight:700;font-size:11px"></span><span style="flex:1"></span>' + (editable === false ? '' : '<button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',true)" style="' + BSM + '">Centang</button><button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',false)" style="' + BSM + '">Kosongkan</button>') + '</summary><div style="padding:2px 8px 8px">' + tableHtml(fs.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, c.id); }).join('')) + '</div></details>';
     });
-    return h + '</tbody></table></div>';
+    var soon = FEATURES.filter(function (f) { return f.soon; });
+    if (soon.length) h += '<details style="' + box + ';opacity:.7"><summary style="' + sm + '">Segera hadir <span style="opacity:.6;font-weight:600">· ' + soon.length + ' fitur</span></summary><div style="padding:2px 8px 8px">' + tableHtml(soon.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, 'soon'); }).join('')) + '</div></details>';
+    setTimeout(function () { cnt(prefix); }, 0);
+    return h;
   }
   var PRESETS = {
     basic: { label: 'Paket Basic', keys: [] },
@@ -129,6 +166,13 @@
     warung: { label: 'Warung / Kafe', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'clock'] },
     toko: { label: 'Toko Retail', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
     jasa: { label: 'Jasa / Klinik', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
+    umum: { label: 'Usaha Umum', keys: ['ledger', 'coa', 'dashboard', 'mutasi_wa', 'export_csv', 'clock', 'bukti'] },
+    minimarket: { label: 'Minimarket', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'tax', 'dashboard', 'analisa', 'audit', 'export_csv', 'gaji', 'gaji_auto', 'instruksi', 'clock'] },
+    konveksi: { label: 'Konveksi / Jahit', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'banyak_usaha', 'gaji', 'gaji_auto', 'ledger', 'coa', 'dashboard', 'analisa', 'audit', 'export_csv', 'mutasi_wa', 'bukti', 'instruksi'] },
+    kafe: { label: 'Kafe & Resto', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'dashboard', 'tax', 'gaji', 'clock', 'ledger'] },
+    laundry: { label: 'Laundry', keys: ['stok', 'stok_input:manager', 'ledger', 'gaji', 'wa_receipt', 'mutasi_wa', 'bukti', 'dashboard', 'export_csv'] },
+    salon: { label: 'Salon & Barbershop', keys: ['jual_produk', 'stok', 'stok_input:manager', 'gaji', 'gaji_auto', 'wa_receipt', 'dashboard', 'mutasi_wa', 'ledger'] },
+    bengkel: { label: 'Bengkel', keys: ['stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'gaji', 'wa_receipt', 'ledger', 'coa', 'dashboard', 'bukti', 'mutasi_wa', 'export_csv'] },
     lengkap: { label: 'Lengkap', keys: null }
   };
   /* paket buatan sendiri (disimpan di browser Tower dan, bila ada, di provider_settings/plan_presets) */
@@ -152,6 +196,7 @@
         else el.checked = !pr.keys || pr.keys.indexOf(f.key) >= 0 || pr.keys.indexOf(f.key + ':' + r) >= 0;
       });
     });
+    cnt(prefix);
   }
   function saveAsPreset(prefix) {
     var name = (window.prompt ? window.prompt('Nama paket baru (mis. Basic Konveksi):', '') : '') || '';
@@ -235,5 +280,5 @@
   }
 
   window.FM_PLANS = { FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml,
-    readChecklist: readChecklist, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
+    readChecklist: readChecklist, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();

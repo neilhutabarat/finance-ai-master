@@ -90,7 +90,7 @@
                     code: code, name: String(p.name).trim(), sellPrice: num(p.sellPrice), hpp: num(p.hpp),
                     stock: Math.max(0, Math.floor(num(p.stock))), barcode: p.barcode ? String(p.barcode).trim() : '',
                     minStock: (p.minStock === '' || p.minStock == null) ? 5 : Math.max(0, Math.floor(num(p.minStock))),
-                    order: (old && typeof old.order === 'number') ? old.order : maxOrd + 1,
+                    order: (typeof p.order === 'number') ? p.order : ((old && typeof old.order === 'number') ? old.order : maxOrd + 1),
                     group: p.group != null ? String(p.group).trim() : (old && old.group) || '',
                     variant: p.variant != null ? String(p.variant).trim() : (old && old.variant) || '',
                     unit: p.unit != null ? String(p.unit).trim() : (old && old.unit) || '',

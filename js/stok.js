@@ -16,7 +16,7 @@
   function canSell() { try { return !!(window.FM_PLANS && FM_PLANS.has && (FM_PLANS.has('jual_produk', 'manager') || FM_PLANS.has('jual_produk', 'kasir'))); } catch (e) { return false; } }
   function sellOn(g) { return ofGroup(g).some(function (p) { return !!p.forSale; }); }
   function upd(p, over) {
-    var o = { code: p.code, name: p.name, sellPrice: p.sellPrice, hpp: p.hpp, stock: p.stock, openStock: p.openStock, endStock: (typeof p.endStock === 'number' ? p.endStock : null), barcode: p.barcode, minStock: p.minStock, group: p.group, variant: p.variant, unit: p.unit, forSale: !!p.forSale, biz: p.biz || '' };
+    var o = { code: p.code, order: p.order, name: p.name, sellPrice: p.sellPrice, hpp: p.hpp, stock: p.stock, openStock: p.openStock, endStock: (typeof p.endStock === 'number' ? p.endStock : null), barcode: p.barcode, minStock: p.minStock, group: p.group, variant: p.variant, unit: p.unit, forSale: !!p.forSale, biz: p.biz || '' };
     for (var k in over) o[k] = over[k];
     return STORE.saveProduct(o);
   }
@@ -24,7 +24,9 @@
   function groups() {
     var seen = {}, out = [], none = false;
     prods().forEach(function (p) { var g = gOf(p); if (!g) { none = true; return; } var k = g.toLowerCase(); if (!seen[k]) { seen[k] = 1; out.push(g); } });
-    out.sort(function (a, b) { return a.localeCompare(b); });
+    var mo = {};
+    prods().forEach(function (p) { var g = gOf(p); if (!g) return; var k = g.toLowerCase(), o = (typeof p.order === 'number') ? p.order : 1e9; if (!(k in mo) || o < mo[k]) mo[k] = o; });
+    out.sort(function (a, b) { var d = mo[a.toLowerCase()] - mo[b.toLowerCase()]; return d !== 0 ? d : a.localeCompare(b); });
     if (none) out.push(NONE);
     return out;
   }
@@ -49,6 +51,7 @@
     '#fm-stok .sk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px}' +
     '#fm-stok .sk-go{all:unset;cursor:pointer;display:inline-block;padding:10px 18px;border-radius:12px;background:#2f55d4;color:#fff;font-size:13px;font-weight:800;text-align:center}#fm-stok .sk-go:active{transform:scale(.97)}' +
     '#fm-stok .sk-del{all:unset;cursor:pointer;padding:6px 10px;border-radius:10px;background:rgba(225,29,72,.12);color:#be123c;font-size:12px;font-weight:800}' +
+    '#fm-stok .sk-mini{all:unset;cursor:pointer;padding:4px 9px;margin-left:6px;border-radius:9px;background:rgba(47,85,212,.12);color:#2f55d4;font-size:11px;font-weight:800;text-transform:none}#fm-stok .sk-ed{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.45)}#fm-stok .sk-ed>div{width:min(420px,100%);background:#fff;border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.3)}' +
     '#fm-stok .sk-info{padding:8px 12px;border-radius:12px;background:rgba(47,85,212,.1);font-size:12.5px;font-weight:700;margin-bottom:10px}' +
     '#fm-stok .sk-sw{all:unset;cursor:pointer;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800;text-transform:none;background:rgba(100,116,139,.18);color:#475569}#fm-stok .sk-sw.on{background:rgba(16,185,129,.18);color:#047857}' +
     '#fm-stok .sk-sw+span{margin-left:8px}' +
@@ -92,11 +95,12 @@
       var items = ofGroup(g), tot = items.reduce(function (a, p) { return a + p.stock; }, 0);
       var sw = (withDel && canSell() && g !== NONE) ? '<span><button type="button" class="sk-sw' + (sellOn(g) ? ' on' : '') + '" data-sw="' + esc(g) + '" title="Bila hidup, jenis di induk ini tampil di kasir dan stoknya berkurang otomatis tiap penjualan">Dijual di kasir: ' + (sellOn(g) ? 'HIDUP' : 'MATI') + '</button></span>' : '';
       var bz = (withDel && bizOn() && g !== NONE) ? '<select data-biz="' + esc(g) + '" title="Usaha pemilik induk stok ini" style="padding:3px 8px;border-radius:999px;border:1px solid rgba(148,163,184,.45);background:transparent;color:inherit;font-size:11px;font-weight:700;text-transform:none;margin-left:8px">' + FM_BIZ.options(bizOf(g)) + '</select>' : '';
-      return '<div class="sk-gh"><span>' + esc(gLabel(g)) + '</span>' + (sw ? '<span>' + sw.replace(/^<span>|<\/span>$/g, '') + bz + '</span>' : (bz ? '<span>' + bz + '</span>' : '<span>' + items.length + ' jenis</span>')) + '</div>' + items.map(function (p) {
+      var gb = (withDel && g !== NONE) ? ' <button type="button" class="sk-mini" data-gedit="' + esc(g) + '">Ubah</button><button type="button" class="sk-mini" data-gcopy="' + esc(g) + '">Salin</button>' : '';
+      return '<div class="sk-gh"><span>' + esc(gLabel(g)) + gb + '</span>' + (sw ? '<span>' + sw.replace(/^<span>|<\/span>$/g, '') + bz + '</span>' : (bz ? '<span>' + bz + '</span>' : '<span>' + items.length + ' jenis</span>')) + '</div>' + items.map(function (p) {
         return '<div class="sk-row"><div class="nm">' + esc(vLabel(p)) + ' <span class="cd">' + esc(p.code) + '</span></div><div class="cd" style="white-space:nowrap;text-align:right">' + (p.hpp ? 'Modal Rp ' + fmt(p.hpp) + '/' + esc(unit(p)) : 'modal belum diisi') + (withDel && canSell() ? ' · ' + (p.sellPrice ? 'Jual Rp ' + fmt(p.sellPrice) : '<b style="color:#b45309">harga jual belum diisi</b>') : ' · nilai Rp ' + fmt(p.hpp * p.stock)) + '</div><div class="sk-st' + (low(p) ? ' low' : '') + '">' + p.stock + ' ' + esc(unit(p)) + '</div>' +
           (withDel || !canCl() ? '' : '<div style="width:96px" title="Sisa stok hasil hitung fisik (diisi manager tiap minggu)"><input data-end="' + esc(p.code) + '" type="number" min="0" step="1" inputmode="numeric" placeholder="sisa" value="' + (typeof p.endStock === 'number' ? p.endStock : '') + '" style="padding:6px 8px"></div>') +
           (withDel && canSell() ? '<label title="Jual barang ini di kasir" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:800;white-space:nowrap"><input type="checkbox" data-fs="' + esc(p.code) + '"' + (p.forSale ? ' checked' : '') + ' style="width:auto">Jual</label><div style="width:130px" title="Harga jual per satuan di kasir"><input data-pr="' + esc(p.code) + '" type="text" inputmode="numeric" autocomplete="off" placeholder="harga jual" value="' + (p.sellPrice ? fmt(p.sellPrice) : '') + '" style="padding:6px 8px"></div>' : '') +
-          (withDel ? '<button type="button" class="sk-del" data-del="' + esc(p.code) + '">Hapus</button>' : '') + '</div>';
+          (withDel ? '<button type="button" class="sk-mini" data-edit="' + esc(p.code) + '">Ubah</button><button type="button" class="sk-mini" data-copy="' + esc(p.code) + '">Salin</button><button type="button" class="sk-del" data-del="' + esc(p.code) + '">Hapus</button>' : '') + '</div>';
       }).join('');
     }).join('');
   }
@@ -194,6 +198,74 @@
     });
     box.querySelector('#sj-v').onkeydown = function (e) { if (e.key === 'Enter') saveJenis(); };
     [].forEach.call(box.querySelectorAll('[data-del]'), function (b) { b.onclick = function () { delJenis(b.getAttribute('data-del')); }; });
+    [].forEach.call(box.querySelectorAll('[data-edit]'), function (b) { b.onclick = function () { editJenis(b.getAttribute('data-edit')); }; });
+    [].forEach.call(box.querySelectorAll('[data-copy]'), function (b) { b.onclick = function () { copyJenis(b.getAttribute('data-copy')); }; });
+    [].forEach.call(box.querySelectorAll('[data-gedit]'), function (b) { b.onclick = function () { editInduk(b.getAttribute('data-gedit')); }; });
+    [].forEach.call(box.querySelectorAll('[data-gcopy]'), function (b) { b.onclick = function () { copyInduk(b.getAttribute('data-gcopy')); }; });
+  }
+  /* ---------- Ubah & Salin (jenis / induk) ---------- */
+  function nextOrd(o) { var n = Infinity; prods().forEach(function (p) { if (typeof p.order === 'number' && p.order > o && p.order < n) n = p.order; }); return n; }
+  function slot(a, b, i, n) { return isFinite(b) ? a + (b - a) * (i + 1) / (n + 1) : a + (i + 1); }
+  function uniqName(base) {
+    var all = prods().map(function (p) { return String(p.name).toLowerCase(); }), n = base, k = 2;
+    while (all.indexOf(n.toLowerCase()) >= 0) n = base.replace(/\)$/, '') + (/\(Salinan/.test(base) ? ' ' + k++ + ')' : ' ' + k++);
+    return n;
+  }
+  function popup(title, body, onOk) {
+    var d = document.createElement('div'); d.className = 'sk-ed';
+    d.innerHTML = '<div><h4 style="margin:0 0 12px;font-size:15px;font-weight:800">' + esc(title) + '</h4>' + body + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button type="button" class="sk-del" data-no style="background:rgba(148,163,184,.25);color:#334155">Batal</button><button type="button" class="sk-go" data-ok>Simpan</button></div></div>';
+    ov.querySelector('.sk-box').style.position = 'relative'; ov.querySelector('.sk-box').appendChild(d);
+    d.querySelector('[data-no]').onclick = function () { d.remove(); };
+    d.querySelector('[data-ok]').onclick = function () { if (onOk(d) !== false) d.remove(); };
+    var f = d.querySelector('input'); if (f) { f.focus(); f.select && f.select(); }
+  }
+  function editJenis(code) {
+    var p = prods().filter(function (x) { return x.code === code; })[0]; if (!p) return;
+    popup('Ubah jenis [' + p.code + ']',
+      '<label>Nama jenis</label><input id="ed-v" value="' + esc(vLabel(p)) + '" autocomplete="off"><label style="margin-top:8px">Satuan</label><input id="ed-u" value="' + esc(unit(p)) + '" autocomplete="off"><label style="margin-top:8px">Harga beli per satuan (Rp)</label><input id="ed-h" value="' + (p.hpp ? fmt(p.hpp) : '') + '" inputmode="numeric" autocomplete="off">' + (canSell() ? '<label style="margin-top:8px">Harga jual (Rp)</label><input id="ed-p" value="' + (p.sellPrice ? fmt(p.sellPrice) : '') + '" inputmode="numeric" autocomplete="off">' : ''),
+      function (d) {
+        var vr = d.querySelector('#ed-v').value.trim().replace(/\s+/g, ' '); if (!vr) { msg('Nama jenis wajib diisi.', true); return false; }
+        var g = gOf(p), name = g ? g + ' - ' + vr : vr;
+        if (prods().some(function (x) { return x.code !== p.code && String(x.name).toLowerCase() === name.toLowerCase(); })) { msg('Jenis "' + name + '" sudah ada.', true); return false; }
+        var o = { name: name, variant: g ? vr : p.variant, unit: d.querySelector('#ed-u').value.trim() || 'pcs', hpp: rawNum(d.querySelector('#ed-h').value) };
+        if (canSell()) o.sellPrice = rawNum(d.querySelector('#ed-p').value);
+        Promise.resolve(upd(p, o)).then(function () { audit('UBAH_JENIS_STOK', 'Mengubah jenis stok [' + p.code + ']', p.name, name); msg('Tersimpan: ' + name); renderJenis(); refreshOthers(); });
+      });
+  }
+  function copyJenis(code) {
+    var p = prods().filter(function (x) { return x.code === code; })[0]; if (!p) return;
+    var g = gOf(p), vr = vLabel(p) + ' (Salinan)', name = uniqName(g ? g + ' - ' + vr : vr), nv = g ? name.slice(g.length + 3) : p.variant;
+    var c = newCode(g), o = {};
+    for (var k in p) o[k] = p[k];
+    o.code = c; o.name = name; o.variant = nv; o.stock = 0; o.openStock = 0; o.endStock = null;
+    if (typeof p.order === 'number') o.order = slot(p.order, nextOrd(p.order), 0, 1); else delete o.order;
+    Promise.resolve(STORE.saveProduct(o)).then(function () { audit('SALIN_JENIS_STOK', 'Menyalin jenis stok [' + p.code + '] ' + p.name, '-', '[' + c + '] ' + name); msg('Disalin ke bawahnya: ' + name + '. Ubah namanya sekarang.'); renderJenis(); refreshOthers(); editJenis(c); });
+  }
+  function copyInduk(g) {
+    var items = ofGroup(g); if (!items.length) return;
+    var ng = uniqName0(g + ' (Salinan)'), lastO = -Infinity;
+    items.forEach(function (p) { if (typeof p.order === 'number' && p.order > lastO) lastO = p.order; });
+    var nx = isFinite(lastO) ? nextOrd(lastO) : Infinity, n = items.length;
+    Promise.all(items.map(function (p, i) {
+      var o = {}; for (var k in p) o[k] = p[k];
+      var vr = vLabel(p); o.code = newCode(ng); o.group = ng; o.variant = vr; o.name = ng + ' - ' + vr; o.stock = 0; o.openStock = 0; o.endStock = null;
+      if (isFinite(lastO)) o.order = slot(lastO, nx, i, n); else delete o.order;
+      return STORE.saveProduct(o);
+    })).then(function () { audit('SALIN_INDUK_STOK', 'Menyalin induk stok ' + g, '-', ng + ' (' + n + ' jenis)'); msg('Induk disalin di bawahnya: ' + ng + '. Ubah namanya sekarang.'); renderJenis(); refreshOthers(); editInduk(ng); }).catch(function () { msg('Gagal menyalin induk.', true); });
+  }
+  function uniqName0(base) {
+    var all = groups().map(function (x) { return x.toLowerCase(); }), n = base, k = 2;
+    while (all.indexOf(n.toLowerCase()) >= 0) n = base.replace(/\)$/, ' ' + k++ + ')');
+    return n;
+  }
+  function editInduk(g) {
+    var items = ofGroup(g); if (!items.length) return;
+    popup('Ubah nama induk', '<label>Nama induk</label><input id="ed-g" value="' + esc(g) + '" autocomplete="off">', function (d) {
+      var ng = d.querySelector('#ed-g').value.trim().replace(/\s+/g, ' '); if (!ng) { msg('Nama induk wajib diisi.', true); return false; }
+      if (ng.toLowerCase() !== g.toLowerCase() && groups().some(function (x) { return x.toLowerCase() === ng.toLowerCase(); })) { msg('Induk "' + ng + '" sudah ada.', true); return false; }
+      if (ng === g) return true;
+      Promise.all(items.map(function (p) { return upd(p, { group: ng, name: ng + ' - ' + vLabel(p) }); })).then(function () { audit('UBAH_INDUK_STOK', 'Mengubah nama induk stok', g, ng); msg('Induk diubah: ' + ng); renderJenis(); refreshOthers(); }).catch(function () { msg('Gagal mengubah induk.', true); });
+    });
   }
   function v(id) { var e = document.getElementById(id); return e ? e.value : ''; }
   function saveJenis() {

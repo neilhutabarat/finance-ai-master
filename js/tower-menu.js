@@ -5,33 +5,35 @@
   if (!/provider/.test(location.pathname)) return;
 
   var GROUPS = [
-    { id: 'klien', title: 'Klien', hint: 'Toko mitra', c: '#6fc7c0', items: [
-      { t: 'Klien Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko baru dan buat ID-nya' },
+    { id: 'bangun', title: 'Bangun Toko', hint: 'Ikuti urutan 1 → 9, dari atas ke bawah', c: '#6fc7c0', items: [
+      { t: '1. Klien Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko, pilih jenis usaha' },
+      { t: '2. Profil Toko', ic: 'store', run: "towerPick('profil')", d: 'Nama, slogan, warna, logo' },
+      { t: '3. Fitur Toko', ic: 'grid', run: "towerPick('fitur')", d: 'Centang fitur per peran' },
+      { t: '4. COA Toko', ic: 'list', run: "towerPick('coa')", d: 'Daftar akun toko' },
+      { t: '5. Stok & Katalog', ic: 'box', run: "FM_LAB.open('template')", d: 'Isi katalog awal lewat paket bawaan' },
+      { t: '6. Akun Login', ic: 'key', find: 'Akun Login', d: 'PIN Admin, Manager, Owner toko' },
+      { t: '7. Kuota Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Kasir, Manager, Owner' },
+      { t: '8. Paket & Billing', ic: 'tag', run: "towerPick('paket')", d: 'Basic atau Plus, lalu tagihan' },
+      { t: '9. Versi Toko', ic: 'swap', run: "towerPick('versi')", d: 'Kunci versi aplikasi' }
+    ] },
+    { id: 'serah', title: 'Uji & Serah', hint: 'Lanjutkan 10 → 14 sampai diserahkan', c: '#e0a47a', items: [
+      { t: '10. Rakit & Uji', ic: 'grid', run: "FM_LAB.open('rakit')", d: 'Aktifkan fitur satu per satu, catat hasil uji' },
+      { t: '11. Template', ic: 'box', run: "FM_LAB.open('template')", d: 'Simpan dan salin pengaturan toko' },
+      { t: '12. Reset Statistik', ic: 'trash', run: "FM_LAB.open('reset')", d: 'Kembalikan statistik uji coba ke 0' },
+      { t: '13. Ubah ID', ic: 'key', run: "FM_LAB.open('rename')", d: 'Ganti ID toko yang belum Published' },
+      { t: '14. Published', ic: 'send', run: "FM_LAB.open('publish')", d: 'Tandai toko yang sudah diserahkan' }
+    ] },
+    { id: 'klien', title: 'Kelola Klien', hint: 'Toko yang sudah berjalan', c: '#8fb8e8', items: [
       { t: 'Jaringan Mitra', ic: 'building', find: 'Jaringan Mitra', d: 'Pantau daftar toko (hanya lihat)' },
       { t: 'Permohonan Kasir', ic: 'users', run: "openModal('tickets')", badge: 'stat-pending-tickets', d: 'Setujui atau tolak terminal baru' },
-      { t: 'Toko Berhenti', ic: 'archive', find: 'Toko Berhenti', d: 'Toko yang dibekukan atau berhenti' },
-      { t: 'Kendali Massal', ic: 'users', run: "towerMass()", d: 'Bekukan, pesan, paket fitur: banyak toko' }
-    ] },
-    { id: 'toko', title: 'Toko', hint: 'Pilih toko, lalu langsung ke isinya', c: '#8fb8e8', items: [
-      { t: 'Profil Toko', ic: 'store', run: "towerPick('profil')", d: 'Nama, slogan, warna, logo' },
-      { t: 'Fitur Toko', ic: 'grid', run: "towerPick('fitur')", d: 'Centang fitur per peran' },
-      { t: 'COA Toko', ic: 'list', run: "towerPick('coa')", d: 'Daftar akun toko' },
-      { t: 'Kuota Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Kasir, Manager, Owner' },
-      { t: 'Paket', ic: 'tag', run: "towerPick('paket')", d: 'Basic atau Plus' },
-      { t: 'Billing', ic: 'chart', run: "towerPick('billing')", d: 'Biaya dan pembayaran toko' },
       { t: 'Lokasi & Aktivitas', ic: 'shield', run: "towerPick('lokasi')", d: 'GPS, online, mutasi live' },
-      { t: 'Versi Toko', ic: 'swap', run: "towerPick('versi')", d: 'Kunci versi aplikasi' },
+      { t: 'Billing Toko', ic: 'chart', run: "towerPick('billing')", d: 'Biaya dan pembayaran toko' },
       { t: 'Salin Fitur', ic: 'grid', run: "towerPick('salin')", d: 'Salin fitur dari toko lain' },
       { t: 'Link Toko', ic: 'send', run: "towerPick('link')", d: 'Salin link login' },
       { t: 'Bekukan / Aktifkan', ic: 'moon', run: "towerPick('freeze')", d: 'Bekukan atau aktifkan toko' },
+      { t: 'Kendali Massal', ic: 'users', run: "towerMass()", d: 'Bekukan, pesan, paket fitur: banyak toko' },
+      { t: 'Toko Berhenti', ic: 'archive', find: 'Toko Berhenti', d: 'Toko yang dibekukan atau berhenti' },
       { t: 'Hapus / Pulihkan Klien', ic: 'trash', run: "towerPick('hapus')", d: 'Hapus klien atau pulihkan' }
-    ] },
-    { id: 'serah', title: 'Rakit & Serah', hint: 'Uji coba, template, serah terima', c: '#e0a47a', items: [
-      { t: 'Rakit Akun', ic: 'grid', run: "FM_LAB.open('rakit')", d: 'Aktifkan fitur satu per satu, catat hasil uji' },
-      { t: 'Reset Statistik', ic: 'trash', run: "FM_LAB.open('reset')", d: 'Kembalikan statistik uji coba ke 0' },
-      { t: 'Template', ic: 'box', run: "FM_LAB.open('template')", d: 'Simpan dan salin pengaturan toko' },
-      { t: 'Ubah ID', ic: 'key', run: "FM_LAB.open('rename')", d: 'Ganti ID toko yang belum Published' },
-      { t: 'Published', ic: 'send', run: "FM_LAB.open('publish')", d: 'Tandai toko yang sudah diserahkan' }
     ] },
     { id: 'uang', title: 'Uang', hint: 'Tagihan, pajak, dan pembukuan', c: '#d9b872', items: [
       { t: 'Billing Jaringan', ic: 'chart', find: 'Billing Jaringan', d: 'Tagihan, jatuh tempo, cicilan, uji coba' },
@@ -67,8 +69,8 @@
     '.tw-head b{font-size:13px;font-weight:800;letter-spacing:.01em;color:var(--g)}',
     '.tw-head span{font-size:11px;opacity:.55}',
     '.tw-head:before{content:"";align-self:center;width:4px;height:14px;border-radius:3px;background:var(--g)}',
-    '.tw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:7px}',
-    'html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act{flex-direction:row!important;justify-content:flex-start!important;text-align:left!important;gap:11px!important;min-height:42px;height:auto;font-size:12.5px!important;font-weight:700!important;padding:5px 11px!important;position:relative;border-radius:16px}',
+    '.tw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:7px}',
+    'html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act{flex-direction:row!important;justify-content:flex-start!important;text-align:left!important;gap:11px!important;min-height:36px;height:auto;font-size:12px!important;font-weight:700!important;padding:5px 11px!important;position:relative;border-radius:16px}',
     'html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act i{width:28px!important;height:28px!important;border-radius:12px!important;background:color-mix(in srgb,var(--g) 18%,transparent)!important;color:var(--g)!important}',
     'html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act svg{width:16px!important;height:16px!important}',
     'html[data-fm-page="tower"] #fm-actions.tw-grouped .fm-act span{white-space:normal!important;line-height:1.2}',

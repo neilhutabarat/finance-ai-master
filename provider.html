@@ -70,11 +70,11 @@
     </script>
     <script src="js/billing.js?v=4.1"></script>
     <script src="js/dialog.js?v=1.13"></script>
-    <script src="js/theme.js?v=6.7"></script>
+    <script src="js/theme.js?v=6.8"></script>
     <script src="js/logo.js?v=5.0"></script>
     <script src="js/skin.js?v=5.8"></script>
-    <script src="js/tower-menu.js?v=6.5"></script>
-    <script src="js/tower-lab.js?v=6.4"></script>
+    <script src="js/tower-menu.js?v=6.8"></script>
+    <script src="js/tower-lab.js?v=6.8"></script>
     <script src="js/tower-health.js?v=6.7"></script>
     <script src="js/chat.js?v=4.2"></script>
     <script src="js/tower-cockpit.js?v=4.4"></script>
@@ -607,7 +607,8 @@
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Nama Usaha *</label><input id="nt-nama" type="text" placeholder="Contoh: Kedai Kopi Senja" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Slogan / Keterangan</label><input id="nt-slogan" type="text" placeholder="Contoh: Kopi lokal, harga bersahabat" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Jenis Usaha (menentukan COA awal)</label>
-                                <select id="nt-type" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></select></div>
+                                <select id="nt-type" onchange="ntTypeChanged()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></select>
+                                <label id="nt-catwrap" style="display:none;align-items:center;gap:8px" class="mt-2 text-[11px] text-slate-300"><input type="checkbox" id="nt-cat" checked> Isi katalog awal (kategori & harga perkiraan, stok 0) — harga wajib dicek toko</label></div>
                             <input type="hidden" id="nt-tier" value="basic">
                             <div><label class="font-bold text-slate-300 block mb-1">Kuota Terminal Awal (Kasir / Manager / Owner)</label>
                                 <div class="grid grid-cols-3 gap-2"><input id="nt-kasir" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><input id="nt-mgr" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><input id="nt-own" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div></div>
@@ -739,12 +740,13 @@
 
     <script src="js/tenants.js"></script>
     <script src="js/auth.js?v=6.3"></script>
-    <script src="js/plans.js?v=6.2"></script>
+    <script src="js/plans.js?v=6.8"></script>
+    <script src="js/templates.js?v=6.8"></script>
     <script src="js/widgets.js?v=4.1"></script>
     <script>window.NO_AUTO_STORE = true;</script>
     <script src="js/config.js?v=18.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/store.js?v=6.0"></script>
+    <script src="js/store.js?v=6.8"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -1699,6 +1701,14 @@
             return base + String(n).padStart(2, '0');
         }
 
+        function ntTypeChanged() {
+            const t = document.getElementById('nt-type').value || 'umum';
+            const pk = window.FM_TPL && FM_TPL.TYPE_PRESET[t];
+            if (pk && window.FM_PLANS && document.getElementById('nt-f-stok-manager')) FM_PLANS.applyPreset('nt', pk);
+            const w = document.getElementById('nt-catwrap');
+            if (w) w.style.display = (window.FM_TPL && FM_TPL.hasCatalog(t)) ? 'flex' : 'none';
+        }
+
         function fillBusinessTypes() {
             const sel = document.getElementById('nt-type');
             if (!sel || sel.options.length) return;
@@ -1756,7 +1766,14 @@
             batch.set(db.collection('tenants_registry').doc(key), { id: id, nama: nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
             batch.set(db.collection('tenant_settings').doc(id), { coa: cfg.customCOA, templateKey: document.getElementById('nt-type').value || 'umum', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
             batch.set(db.collection('tenant_ctrl').doc(id), { gajiOwner: !!(cfg.features.gaji && cfg.features.gaji.owner), suspended: false, suspendReason: '', allowedCashiers: kasir, allowedManagers: Math.max(1, parseInt(document.getElementById('nt-mgr').value) || 1), allowedOwners: Math.max(1, parseInt(document.getElementById('nt-own').value) || 1), tier: cfg.tier, billingCycle: cycle, priceMonthlyAtPurchase: plan.monthly, billedAmount: plan.amount, customPrice: plan.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+            const tType = document.getElementById('nt-type').value || 'umum';
+            const wantCat = !!(window.FM_TPL && FM_TPL.hasCatalog(tType) && document.getElementById('nt-cat') && document.getElementById('nt-cat').checked);
             batch.commit().then(function () {
+                if (!wantCat) return;
+                const cat = FM_TPL.catalog(tType); let pr = Promise.resolve();
+                for (let i = 0; i < cat.length; i += 400) (function (part) { pr = pr.then(function () { const b = db.batch(); part.forEach(function (x) { b.set(db.collection('tp_' + id).doc(x.id), x.v); }); return b.commit(); }); })(cat.slice(i, i + 400));
+                return pr.then(function () { try { ctAudit(id, 'KATALOG_AWAL', 'Katalog awal template ' + tType + ' (' + cat.length + ' jenis)', '-', 'TERISI'); } catch (e) {} });
+            }).then(function () {
                 registryMergeLocal(cfg);
                 const link = tenantLink(id);
                 const box = document.getElementById('nt-result');
@@ -3104,6 +3121,7 @@
                 previewNewTenantId();
                 fillBusinessTypes();
                 document.getElementById('nt-features').innerHTML = FM_PLANS.checklistHtml('nt', null, true);
+                try { ntTypeChanged(); } catch (e) {}
                 document.getElementById('modal-title').innerText = "Tambah Klien Baru";
                 document.getElementById('modal-subtitle').innerText = "Toko langsung aktif dan bisa dibuka lewat link khusus";
                 document.getElementById('nt-result').classList.add('hidden');
