@@ -59,7 +59,7 @@
     ov.id = 'fm-whatsnew';
     ov.style.cssText = 'position:fixed;left:14px;bottom:14px;z-index:2147483050;max-width:320px;background:#111;color:#eee;border-radius:18px;padding:14px 16px;font:13px/1.5 system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35)';
     var items = (n[2] || []).slice(0, 5).map(function (t) { return '<li style="margin:3px 0">' + String(t).replace(/^\[(\w+)\]\s*/, '').replace(/[<>&]/g, function (c) { return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]; }) + '</li>'; }).join('');
-    ov.innerHTML = '<b style="display:block;margin-bottom:4px">Yang baru di v' + n[0] + '</b><ul style="margin:0;padding-left:18px;color:#bbb;font-size:12px">' + items + '</ul>' +
+    ov.innerHTML = '<b style="display:block;margin-bottom:4px">Yang baru di ' + (/^\d/.test(n[0]) ? 'v' : '') + n[0] + '</b><ul style="margin:0;padding-left:18px;color:#bbb;font-size:12px">' + items + '</ul>' +
       '<button id="fm-whatsnew-ok" style="all:unset;cursor:pointer;display:block;margin-top:10px;text-align:center;background:#2563eb;color:#fff;border-radius:10px;padding:6px 0;font-weight:700;font-size:12.5px">Mengerti</button>';
     document.body.appendChild(ov);
     function tutup() { try { localStorage.setItem('fm_seen_version', versiBerjalan); } catch (e) {} if (!ov.parentNode) return; ov.style.transition = 'opacity .5s'; ov.style.opacity = '0'; setTimeout(function () { ov.remove(); }, 520); }

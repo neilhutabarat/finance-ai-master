@@ -80,6 +80,7 @@
     <script src="js/tower-monitor.js?v=8.9"></script>
     <script src="js/tower-help.js?v=8.9"></script>
     <script src="js/tower-demo.js?v=8.9"></script>
+    <script src="js/tower-qa.js?v=9.2"></script>
     <script src="js/tower-health.js?v=8.9"></script>
     <script src="js/chat.js?v=8.9"></script>
     <script src="js/tower-cockpit.js?v=8.9"></script>
@@ -3024,7 +3025,7 @@
                     const cls = tagCls[tag.toLowerCase()] || 'bg-white/10 text-slate-200';
                     return '<li class="text-[11px] text-slate-300 leading-relaxed">' + (tag ? '<span class="px-1.5 py-0.5 mr-1.5 rounded-full text-[9px] font-black uppercase ' + cls + '">' + escHtml(tag) + '</span>' : '') + escHtml(t.replace(/^\[\w+\]\s*/, '')) + '</li>';
                 }).join('');
-                card.innerHTML = '<div class="flex items-center justify-between"><span class="font-black text-[11px] text-white font-mono">v' + escHtml(n[0]) + (idx === 0 ? ' · terbaru' : '') + '</span><span class="px-2 py-0.5 rounded text-[9px] font-bold bg-white/10 text-slate-300">' + escHtml(n[1]) + '</span></div><ul class="space-y-1.5 list-none">' + items + '</ul>';
+                card.innerHTML = '<div class="flex items-center justify-between"><span class="font-black text-[11px] text-white font-mono">' + (/^\d/.test(n[0]) ? 'v' : '') + escHtml(n[0]) + (idx === 0 ? ' · terbaru' : '') + '</span><span class="px-2 py-0.5 rounded text-[9px] font-bold bg-white/10 text-slate-300">' + escHtml(n[1]) + '</span></div><ul class="space-y-1.5 list-none">' + items + '</ul>';
                 container.appendChild(card);
             });
         }

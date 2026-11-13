@@ -54,7 +54,7 @@
       el.setAttribute('data-fm-logo-done', '1');
       el.innerHTML = mark(el.getAttribute('data-fm-logo') || 56);
     });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-fm-ver]'), function (el) { if (window.FM_RELEASES) el.textContent = 'v' + FM_RELEASES.version + ' (' + FM_RELEASES.beta + ')'; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-fm-ver]'), function (el) { if (window.FM_RELEASES) el.textContent = /^BETA/.test(FM_RELEASES.beta) ? 'v' + FM_RELEASES.version + ' (' + FM_RELEASES.beta + ')' : FM_RELEASES.beta; });
     favicon();
   }
   window.FM_LOGO = { mark: mark, wordmark: wordmark, plus: plus, apply: apply };
