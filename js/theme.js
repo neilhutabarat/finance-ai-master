@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 7.9';
+  var BETA = 'BETA 8.0';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 8.0)', '13 Nov 2026', [
+      '[Baru] Bantuan di dalam aplikasi: tombol "?" berisi panduan singkat per fitur dengan kolom pencarian, hanya menampilkan fitur yang aktif untuk toko Anda',
+      '[Baru] Tanya Tim: kirim pertanyaan atau laporan masalah langsung dari aplikasi, balasan tim muncul di sana lengkap dengan penanda balasan baru',
+      '[Perbaikan] Riwayat pertanyaan dan statusnya (menunggu, dijawab, selesai) tersimpan dan bisa dilihat kapan saja',
+      '[Keamanan] Pertanyaan hanya terlihat oleh toko Anda dan tim, pengiriman dibatasi agar tidak berulang terus-menerus'
+    ]],
     ['1.0.0 (BETA 7.9)', '13 Nov 2026', [
       '[Baru] Backup & Ekspor Data: Owner dan Manager bisa mengunduh data toko sendiri ke file Excel (.xlsx) dengan lembar Transaksi, Produk & Stok, Daftar Akun, Piutang & Utang, dan Absensi',
       '[Baru] Unduh salinan lengkap (.json) sebagai arsip utuh, dan penanda waktu backup terakhir',

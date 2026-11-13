@@ -59,10 +59,10 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=7.9"></script>
-    <script src="js/theme.js?v=7.9"></script>
-    <script src="js/logo.js?v=7.9"></script>
-    <script src="js/skin.js?v=7.9"></script>
+    <script src="js/dialog.js?v=8.0"></script>
+    <script src="js/theme.js?v=8.0"></script>
+    <script src="js/logo.js?v=8.0"></script>
+    <script src="js/skin.js?v=8.0"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -509,41 +509,42 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=7.9"></script>
-    <script src="js/monitor.js?v=7.9"></script>
-    <script src="js/plans.js?v=7.9"></script>
-    <script src="js/usaha.js?v=7.9"></script>
-    <script src="js/mutasi-share.js?v=7.9"></script>
-    <script src="js/gaji.js?v=7.9"></script>
-    <script src="js/piutang.js?v=7.9"></script>
-    <script src="js/promo.js?v=7.9"></script>
-    <script src="js/kas.js?v=7.9"></script>
-    <script src="js/neraca.js?v=7.9"></script>
-    <script src="js/pajak.js?v=7.9"></script>
-    <script src="js/absensi.js?v=7.9"></script>
-    <script src="js/backup.js?v=7.9"></script>
-    <script src="js/dash-usaha.js?v=7.9"></script>
-    <script src="js/stok.js?v=7.9"></script>
-    <script src="js/coa-drag.js?v=7.9"></script>
+    <script src="js/auth.js?v=8.0"></script>
+    <script src="js/monitor.js?v=8.0"></script>
+    <script src="js/plans.js?v=8.0"></script>
+    <script src="js/usaha.js?v=8.0"></script>
+    <script src="js/mutasi-share.js?v=8.0"></script>
+    <script src="js/gaji.js?v=8.0"></script>
+    <script src="js/piutang.js?v=8.0"></script>
+    <script src="js/promo.js?v=8.0"></script>
+    <script src="js/bantuan.js?v=8.0"></script>
+    <script src="js/kas.js?v=8.0"></script>
+    <script src="js/neraca.js?v=8.0"></script>
+    <script src="js/pajak.js?v=8.0"></script>
+    <script src="js/absensi.js?v=8.0"></script>
+    <script src="js/backup.js?v=8.0"></script>
+    <script src="js/dash-usaha.js?v=8.0"></script>
+    <script src="js/stok.js?v=8.0"></script>
+    <script src="js/coa-drag.js?v=8.0"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return txList; } }); if (window.FM_GAJI) FM_GAJI.mount({ addTx: function (tx) { txList.unshift(tx); persistData(); if (typeof db !== 'undefined' && db) { db.collection(tenantFirestoreCol).add(Object.assign({}, tx, { timestamp: firebase.firestore.FieldValue.serverTimestamp() })).catch(console.error); } renderAllReports(); } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/insights.js?v=7.9"></script>
-    <script src="js/analisa.js?v=7.9"></script>
+    <script src="js/insights.js?v=8.0"></script>
+    <script src="js/analisa.js?v=8.0"></script>
     <script>
         (function(){ function go(){ if (window.FM_ANALISA && document.getElementById('fm-analisa-box')) FM_ANALISA.mount({ el: 'fm-analisa-box', tx: function(){ return txList; } }); }
           if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(go,0); }); else setTimeout(go,0);
           if (window.STORE) STORE.onChange(function(){ if (window.FM_ANALISA) FM_ANALISA.render(); }); })();
     </script>
-    <script src="js/labarugi.js?v=7.9"></script>
-    <script src="js/widgets.js?v=7.9"></script>
-    <script src="js/config.js?v=7.9"></script>
-    <script src="js/offline.js?v=7.9"></script>
+    <script src="js/labarugi.js?v=8.0"></script>
+    <script src="js/widgets.js?v=8.0"></script>
+    <script src="js/config.js?v=8.0"></script>
+    <script src="js/offline.js?v=8.0"></script>
     <script src="js/core.js?v=18.0"></script>
-    <script src="js/billing.js?v=7.9"></script>
-    <script src="js/ctrl.js?v=7.9"></script>
-    <script src="js/store.js?v=7.9"></script>
+    <script src="js/billing.js?v=8.0"></script>
+    <script src="js/ctrl.js?v=8.0"></script>
+    <script src="js/store.js?v=8.0"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
