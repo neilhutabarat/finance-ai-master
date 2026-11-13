@@ -60,8 +60,7 @@
     { key: 'mutasi_wa', label: 'Mutasi: Kirim WhatsApp dan Cetak', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'gaji', label: 'Laporan Gaji', r: { manager: 'o', owner: 'o' } },
     { key: 'gaji_auto', label: 'Gaji otomatis tercatat sebagai pengeluaran', r: { manager: 'o' } },
-    { key: 'paket', label: 'Paket Basic, Plus, dan Pro', soon: true, r: { manager: 'o', owner: 'o' } },
-    { key: 'neraca', label: 'Neraca', soon: true, r: { manager: 'o', owner: 'o' } }
+    { key: 'paket', label: 'Paket Basic, Plus, dan Pro', soon: true, r: { manager: 'o', owner: 'o' } }
   ];
   // nilai untuk toko lama yang belum punya pilihan tersimpan
   var LEGACY = { wa_receipt: 'plus', analisa: { owner: true }, coa: {}, ledger: { kasir: true }, mutasi_wa: {}, gaji: {}, gaji_auto: {}, stok_input: { manager: true }, stok_closing: { manager: true } };
@@ -129,6 +128,10 @@
     { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'clock', 'weather', 'rates', 'billing_card', 'chat'] }
   ];
 
+  /* Penempatan fitur untuk tampilan Tower (hanya label + pengelompokan, tidak mengubah hak akses):
+     INTI = terkunci merah; TAMBAHAN = fitur standar yang diberikan; STORE = layak disewa satuan di OneilStore. */
+  var STORE_KEYS = ['wa_receipt', 'bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi', 'properti'];
+  function isStore(f) { return STORE_KEYS.indexOf(f.key) >= 0; }
   function isCore(f) { return Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); }
   function catOf(f) { for (var i = 0; i < CATS.length; i++) if (CATS[i].keys.indexOf(f.key) >= 0) return CATS[i].id; return 'lain'; }
   var BSM = 'padding:3px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:10.5px;cursor:pointer;margin-left:4px';
@@ -152,6 +155,7 @@
   }
   function tierTag(f) {
     if (f.soon || isCore(f)) return '';
+    if (isStore(f)) return ' <span style="font-size:9px;font-weight:900;padding:1px 6px;border-radius:99px;background:rgba(168,85,247,.2);color:#c084fc;vertical-align:middle">STORE</span>';
     return featTier(f) === 'plus'
       ? ' <span style="font-size:9px;font-weight:900;padding:1px 6px;border-radius:99px;background:rgba(245,158,11,.18);color:#fbbf24;vertical-align:middle">PLUS</span>'
       : ' <span style="font-size:9px;font-weight:900;padding:1px 6px;border-radius:99px;background:rgba(34,197,94,.16);color:#4ade80;vertical-align:middle">BASIC</span>';
@@ -187,11 +191,15 @@
     var core = FEATURES.filter(function (f) { return !f.soon && isCore(f); });
     h += '<details style="' + box + ';border-color:rgba(239,68,68,.45)"><summary style="' + sm + '"><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:#ef4444"></span>Fitur Inti <span style="opacity:.6;font-weight:600">· terkunci · ' + core.length + ' fitur</span></summary><div style="padding:2px 8px 8px">' + tableHtml(core.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, 'inti'); }).join('')) + '</div></details>';
     var cats = CATS.concat([{ id: 'lain', label: 'Lainnya', keys: [] }]);
+    [{ id: 'extra', label: 'Fitur Tambahan', note: 'standar, diberikan ke toko', col: '#22c55e' }, { id: 'store', label: 'Fitur Store', note: 'layak disewa satuan di OneilStore', col: '#a855f7' }].forEach(function (T) {
+    var tcount = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && (isStore(f) === (T.id === 'store')); }).length;
+    h += '<div style="display:flex;align-items:center;gap:8px;margin:12px 2px 6px;font-weight:900;font-size:13px"><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:' + T.col + '"></span>' + T.label + ' <span style="opacity:.6;font-weight:600;font-size:11px">· ' + T.note + ' · ' + tcount + ' fitur</span></div>';
     cats.forEach(function (c) {
-      var fs = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && catOf(f) === c.id; });
+      var fs = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && catOf(f) === c.id && (isStore(f) === (T.id === 'store')); });
       if (!fs.length) return;
       fs.sort(function (a, b) { return (featTier(a) === 'plus' ? 1 : 0) - (featTier(b) === 'plus' ? 1 : 0); }); /* BASIC dulu, PLUS belakangan */
-      h += '<details open style="' + box + '"><summary style="' + sm + '"><span>' + c.label + '</span><span id="' + prefix + '-cnt-' + c.id + '" style="opacity:.7;font-weight:700;font-size:11px"></span><span style="flex:1"></span>' + (editable === false ? '' : '<button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',true)" style="' + BSM + '">Centang</button><button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',false)" style="' + BSM + '">Kosongkan</button>') + '</summary><div style="padding:2px 8px 8px">' + tableHtml(fs.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, c.id); }).join('')) + '</div></details>';
+      h += '<details open style="' + box + '"><summary style="' + sm + '"><span>' + c.label + '</span><span id="' + prefix + '-cnt-' + T.id + '-' + c.id + '" style="opacity:.7;font-weight:700;font-size:11px"></span><span style="flex:1"></span>' + (editable === false ? '' : '<button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + T.id + '-' + c.id + '\',true)" style="' + BSM + '">Centang</button><button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + T.id + '-' + c.id + '\',false)" style="' + BSM + '">Kosongkan</button>') + '</summary><div style="padding:2px 8px 8px">' + tableHtml(fs.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, T.id + '-' + c.id); }).join('')) + '</div></details>';
+    });
     });
     var soon = FEATURES.filter(function (f) { return f.soon; });
     if (soon.length) h += '<details style="' + box + ';opacity:.7"><summary style="' + sm + '">Segera hadir <span style="opacity:.6;font-weight:600">· ' + soon.length + ' fitur</span></summary><div style="padding:2px 8px 8px">' + tableHtml(soon.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, 'soon'); }).join('')) + '</div></details>';
