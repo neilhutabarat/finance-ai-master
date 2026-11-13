@@ -94,9 +94,9 @@
         var ids = Object.keys(orphanIds), jobs = [];
         ids.forEach(function (k) {
           var id = orphanIds[k];
-          ['tx_', 'tp_', 'gaji_', 'pu_'].forEach(function (pre) {
+          ['tx_', 'tp_', 'gaji_', 'pu_', 'ab_'].forEach(function (pre) {
             jobs.push(hasDocs(pre + id).then(function (has) {
-              if (has) out.push({ kind: 'clean', key: 'col:' + pre + id, title: 'Data ' + (pre === 'tx_' ? 'transaksi' : pre === 'tp_' ? 'stok & produk' : pre === 'pu_' ? 'piutang & utang' : 'gaji') + ' toko yang sudah tidak ada', count: 0, detail: id, col: pre + id });
+              if (has) out.push({ kind: 'clean', key: 'col:' + pre + id, title: 'Data ' + (pre === 'tx_' ? 'transaksi' : pre === 'tp_' ? 'stok & produk' : pre === 'pu_' ? 'piutang & utang' : pre === 'ab_' ? 'absensi' : 'gaji') + ' toko yang sudah tidak ada', count: 0, detail: id, col: pre + id });
             }));
           });
         });
@@ -112,7 +112,7 @@
         p = p.then(function () {
           say('Membersihkan: ' + it.title + '…');
           if (it.col) {
-            var id = it.col.replace(/^(tx_|tp_|gaji_|pu_)/, '');
+            var id = it.col.replace(/^(tx_|tp_|gaji_|pu_|ab_)/, '');
             if (alive[low(id)]) return;           /* pengaman: toko muncul lagi di daftar */
             return deleteCollectionChunks(it.col).then(function () { n++; });
           }

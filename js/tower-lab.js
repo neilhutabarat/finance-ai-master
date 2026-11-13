@@ -254,6 +254,7 @@
     var add = function (label, fn) { steps.push([label, fn]); };
     if (o.tx) add('Menghapus transaksi', function () { return deleteCollectionChunks('tx_' + id); });
     if (o.tx) add('Menghapus catatan piutang & utang', function () { return deleteCollectionChunks('pu_' + id); });
+    if (o.tx) add('Menghapus catatan absensi', function () { return deleteCollectionChunks('ab_' + id); });
     if (o.gaji) add('Menghapus catatan gaji', function () { return deleteCollectionChunks('gaji_' + id); });
     if (o.katalog) add('Menghapus daftar produk', function () { return deleteCollectionChunks('tp_' + id); });
     else if (o.stok) add('Mengosongkan jumlah stok', function () { return zeroStock(id); });
@@ -392,6 +393,7 @@
     }).then(function () { S('Menyalin stok dan produk'); return copyCol('tp_' + oid, 'tp_' + nid, oid, nid); })
       .then(function () { return copyCol('gaji_' + oid, 'gaji_' + nid, oid, nid); })
       .then(function () { return copyCol('pu_' + oid, 'pu_' + nid, oid, nid); })
+      .then(function () { return copyCol('ab_' + oid, 'ab_' + nid, oid, nid); })
       .then(function () {
         S('Menyalin pengaturan, logo, kuota, dan billing');
         return Promise.all([copyDoc('tenant_settings', oid, nid), copyDoc('tenant_logos', oid, nid), copyDoc('tenant_ctrl', oid, nid), copyDoc(COL, oid, nid, { published: false })]);
@@ -409,7 +411,7 @@
         return Promise.all([retarget('manager_audit_logs', 'tenantId', oid, nid), retarget('provider_tickets', 'tenantId', oid, nid), retarget('provider_notices', 'targetTenant', oid, nid), delWhere('tenant_presence', 'tenantId', oid)]).then(function () { return acc; });
       }).then(function (acc) {
         S('Menghapus ID lama');
-        var tasks = [deleteCollectionChunks('tx_' + oid), deleteCollectionChunks('tp_' + oid), deleteCollectionChunks('gaji_' + oid), deleteCollectionChunks('pu_' + oid)];
+        var tasks = [deleteCollectionChunks('tx_' + oid), deleteCollectionChunks('tp_' + oid), deleteCollectionChunks('gaji_' + oid), deleteCollectionChunks('pu_' + oid), deleteCollectionChunks('ab_' + oid)];
         var b = d.batch();
         ['tenant_settings', 'tenant_logos', 'tenant_ctrl', COL, 'tenant_access_cfg'].forEach(function (c) { b.delete(d.collection(c).doc(oid)); });
         b.delete(d.collection('tenants_registry').doc(okey));
@@ -427,7 +429,7 @@
         return { nid: nid, pins: acc.pins, made: acc.made, err: acc.err };
       }).catch(function (e) {
         /* gagal sebelum ID lama dihapus: bersihkan salinan di ID baru supaya tidak tertinggal */
-        return Promise.all([deleteCollectionChunks('tx_' + nid), deleteCollectionChunks('tp_' + nid), deleteCollectionChunks('gaji_' + nid), deleteCollectionChunks('pu_' + nid)]).catch(function () {})
+        return Promise.all([deleteCollectionChunks('tx_' + nid), deleteCollectionChunks('tp_' + nid), deleteCollectionChunks('gaji_' + nid), deleteCollectionChunks('pu_' + nid), deleteCollectionChunks('ab_' + nid)]).catch(function () {})
           .then(function () { if (step < 6) { var b = d.batch(); ['tenant_settings', 'tenant_logos', 'tenant_ctrl', COL].forEach(function (c) { b.delete(d.collection(c).doc(nid)); }); b.delete(d.collection('tenants_registry').doc(nkey)); return b.commit().catch(function () {}); } })
           .then(function () { throw e; });
       });

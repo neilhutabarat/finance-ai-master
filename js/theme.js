@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'BETA 7.6';
+  var BETA = 'BETA 7.7';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['1.0.0 (BETA 7.7)', '13 Nov 2026', [
+      '[Baru] Absensi Karyawan (opsional): karyawan memilih nama lalu menekan Masuk atau Pulang di Kasir',
+      '[Baru] Manager mengatur daftar karyawan, jam kerja, dan toleransi terlambat, serta mengoreksi atau mencatat izin, sakit, alpha',
+      '[Baru] Rekap bulanan: hari hadir, terlambat, izin, sakit, alpha, dan total jam kerja',
+      '[Keamanan] Owner hanya melihat, pengaturan dan koreksi hanya bisa dilakukan Manager'
+    ]],
     ['1.0.0 (BETA 7.6)', '13 Nov 2026', [
       '[Baru] Laporan Pajak Bulanan (opsional): perkiraan PPh Final dan PPN per bulan dari omzet toko',
       '[Baru] Tarif bisa diatur, termasuk pembebasan omzet sampai Rp 500 juta per tahun',
