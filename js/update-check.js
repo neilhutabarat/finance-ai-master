@@ -3,7 +3,7 @@
    dan muat ulang otomatis hanya dijalankan saat layar benar-benar tidak disentuh (idle). */
 (function () {
   'use strict';
-  if (/provider|partner/.test(location.pathname)) return; // Tower dan Partner memakai alurnya sendiri
+  if (/partner/.test(location.pathname)) return; // Partner memakai alurnya sendiri
   var CEK_MS = 4 * 60 * 1000, IDLE_MS = 5 * 60 * 1000;
   var versiBerjalan = (window.FM_RELEASES && FM_RELEASES.beta) || '';
   var versiBaru = null, lastTouch = Date.now(), pill = null;
