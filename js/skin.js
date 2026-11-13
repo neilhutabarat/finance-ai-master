@@ -269,6 +269,9 @@
     '.fm-actions .fm-act:hover{transform:translateY(-2px);filter:brightness(1.05)}.fm-actions .fm-act:active{transform:scale(.97)}',
     '.fm-actions .fm-act i{width:34px;height:34px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,' + A + ' 16%,transparent);color:' + A + '}',
     '.fm-actions .fm-act svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}',
+    /* badge/penanda yang sengaja disembunyikan (class "hidden") tidak boleh ikut tampil oleh aturan label di bawah */
+    '.fm-actions .fm-act span.hidden,.fm-actions .fm-act span[hidden]{display:none!important}',
+    'html[data-fm-fit][data-fm-page] #fm-actions .fm-act[data-sz] span.hidden,html[data-fm-fit][data-fm-page] #fm-actions .fm-act span.hidden,html[data-fm-fit][data-fm-page] #fm-actions .fm-act[data-sz] span[hidden]{display:none!important}',
     '.fm-actions .fm-act span{min-width:0;overflow:hidden;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.18;overflow-wrap:anywhere}',
     /* ubin dinamis: bentuk dan ukuran dihitung dari ruang kosong (lihat layoutTiles) */
     '.fm-actions[data-fm-mosaic]{align-content:stretch}',
