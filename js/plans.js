@@ -28,6 +28,7 @@
     { key: 'anggaran', label: 'Anggaran Bulanan: batas pengeluaran per akun dan target pemasukan', r: { manager: 'o', owner: 'o' } },
     { key: 'rekon', label: 'Rekonsiliasi Kas: cocokkan uang tunai di laci dengan catatan', r: { manager: 'o', owner: 'o' } },
     { key: 'neraca', label: 'Neraca: harta, utang, dan modal toko (Paket Plus)', r: { manager: 'o', owner: 'o' } },
+    { key: 'neraca_ai', label: 'Neraca AI (uji coba): jurnal debit-kredit, neraca saldo, kunci periode', r: { manager: 'o', owner: 'o' } },
     { key: 'pajak_bulanan', label: 'Laporan Pajak Bulanan: perkiraan PPh Final dan PPN per bulan', r: { manager: 'o', owner: 'o' } },
     { key: 'absensi', label: 'Absensi Karyawan: catat masuk dan pulang, rekap kehadiran bulanan', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'offline_penuh', label: 'Mode Offline Penuh: transaksi tetap tersimpan saat internet putus dan terkirim otomatis', r: { kasir: 'o', manager: 'o', owner: 'o' } },
@@ -189,7 +190,7 @@
     { id: 'akun', label: 'Toko & Akun', keys: ['admin_usaha', 'banyak_usaha', 'instruksi'] },
     { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
     { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode'] },
-    { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
+    { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
     { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
     { id: 'ops', label: 'Operasional', keys: ['absensi', 'properti', 'offline_penuh'] },
     { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'clock', 'weather', 'rates', 'billing_card', 'chat'] }
@@ -197,7 +198,7 @@
 
   /* Penempatan fitur untuk tampilan Tower (hanya label + pengelompokan, tidak mengubah hak akses):
      INTI = terkunci merah; TAMBAHAN = fitur standar yang diberikan; STORE = layak disewa satuan di OneilStore. */
-  var STORE_KEYS = ['wa_receipt', 'bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi', 'properti'];
+  var STORE_KEYS = ['wa_receipt', 'bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi', 'properti'];
   function isStore(f) { return STORE_KEYS.indexOf(f.key) >= 0; }
   function isCore(f) { return Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); }
   function catOf(f) { for (var i = 0; i < CATS.length; i++) if (CATS[i].keys.indexOf(f.key) >= 0) return CATS[i].id; return 'lain'; }
@@ -395,7 +396,8 @@
     if (!has('absensi', role)) drop('button[onclick*="FM_ABS"]');
     if (!has('properti', role)) drop('button[onclick*="FM_PROP"]');
     if (!has('pajak_bulanan', role)) drop('button[onclick*="FM_PAJAK"]');
-    if (!has('neraca', role)) drop('button[onclick*="FM_NERACA"]');
+    if (!has('neraca', role)) drop('button[onclick*="FM_NERACA."]');
+    if (!has('neraca_ai', role)) drop('button[onclick*="FM_NAI"]');
     if (!has('arus_kas', role) && !has('anggaran', role) && !has('rekon', role)) drop('button[onclick*="FM_KAS"]');
     if (!has('banyak_usaha', role)) drop('button[onclick*="FM_USAHA_SUM"]');
     if (!has('admin_usaha', role)) drop('button[onclick*="FM_ADMINS"]');

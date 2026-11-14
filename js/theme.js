@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.7';
+  var BETA = 'v1.0.8';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.8', '15 Nov 2026', [
+      '[Perbaikan] Menu baru "Neraca AI (uji coba)" di Manager dan Owner: jurnal debit-kredit, neraca saldo, dan kunci periode. Hanya tampil di toko yang fiturnya diaktifkan',
+      '[Keamanan] Periode yang sudah dikunci tidak bisa lagi ditambah atau dihapus jurnalnya'
+    ]],
     ['v1.0.7', '14 Nov 2026', [
       '[Perbaikan] Form Input Transaksi di Kasir menyesuaikan diri otomatis dengan tinggi layar, Keterangan dan Petugas tidak lagi tertutup tombol Simpan',
       '[Perbaikan] Laba Rugi: pilihan "Umum" hanya muncul bila memang ada transaksi tanpa usaha',
