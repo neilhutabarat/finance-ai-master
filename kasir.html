@@ -134,12 +134,12 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=v102"></script>
-    <script src="js/theme.js?v=v102"></script>
-    <script src="js/ledger.js?v=v102"></script>
-    <script src="js/langit.js?v=v102" defer></script>
-    <script src="js/logo.js?v=v102"></script>
-    <script src="js/skin.js?v=v102"></script>
+    <script src="js/dialog.js?v=v103"></script>
+    <script src="js/theme.js?v=v103"></script>
+    <script src="js/ledger.js?v=v103"></script>
+    <script src="js/langit.js?v=v103" defer></script>
+    <script src="js/logo.js?v=v103"></script>
+    <script src="js/skin.js?v=v103"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -346,7 +346,7 @@
                     <div>
                         <label class="text-[11px] font-black text-slate-700 block mb-1">Bukti Struk / Invoice</label>
                         <div class="flex space-x-1.5">
-                            <button onclick="document.getElementById('camera-input').click()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-2 rounded-2xl text-xs flex items-center justify-center space-x-1 transition active:scale-95 shadow-sm">
+                            <button onclick="openPhotoCam()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-2 rounded-2xl text-xs flex items-center justify-center space-x-1 transition active:scale-95 shadow-sm">
                                 <i data-lucide="camera" class="w-3.5 h-3.5"></i>
                                 <span>Kamera</span>
                             </button>
@@ -742,32 +742,32 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=v102"></script>
-    <script src="js/monitor.js?v=v102"></script>
-    <script src="js/plans.js?v=v102"></script>
-    <script src="js/usaha.js?v=v102"></script>
-    <script src="js/mutasi-share.js?v=v102"></script>
-    <script src="js/struk-pdf.js?v=v102"></script>
-    <script src="js/gaji.js?v=v102"></script>
-    <script src="js/piutang.js?v=v102"></script>
-    <script src="js/promo.js?v=v102"></script>
-    <script src="js/bantuan.js?v=v102"></script>
-    <script src="js/absensi.js?v=v102"></script>
+    <script src="js/auth.js?v=v103"></script>
+    <script src="js/monitor.js?v=v103"></script>
+    <script src="js/plans.js?v=v103"></script>
+    <script src="js/usaha.js?v=v103"></script>
+    <script src="js/mutasi-share.js?v=v103"></script>
+    <script src="js/struk-pdf.js?v=v103"></script>
+    <script src="js/gaji.js?v=v103"></script>
+    <script src="js/piutang.js?v=v103"></script>
+    <script src="js/promo.js?v=v103"></script>
+    <script src="js/bantuan.js?v=v103"></script>
+    <script src="js/absensi.js?v=v103"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return (typeof myTx === 'function') ? myTx() : txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/widgets.js?v=v102"></script>
-    <script src="js/config.js?v=v102"></script>
-    <script src="js/offline.js?v=v102"></script>
-    <script src="js/core.js?v=v102"></script>
-    <script src="js/billing.js?v=v102"></script>
-    <script src="js/shield.js?v=v102"></script>
-    <script src="js/ctrl.js?v=v102"></script>
-    <script src="js/chat.js?v=v102"></script>
-    <script src="js/store.js?v=v102"></script>
-    <script src="js/stok-admin.js?v=v102"></script>
-    <script src="js/i18n.js?v=v102"></script>
+    <script src="js/widgets.js?v=v103"></script>
+    <script src="js/config.js?v=v103"></script>
+    <script src="js/offline.js?v=v103"></script>
+    <script src="js/core.js?v=v103"></script>
+    <script src="js/billing.js?v=v103"></script>
+    <script src="js/shield.js?v=v103"></script>
+    <script src="js/ctrl.js?v=v103"></script>
+    <script src="js/chat.js?v=v103"></script>
+    <script src="js/store.js?v=v103"></script>
+    <script src="js/stok-admin.js?v=v103"></script>
+    <script src="js/i18n.js?v=v103"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -1843,6 +1843,36 @@
                 bcStatus(`${hits.length} produk cocok. Pilih di Produk Cepat.`, true); return false;
             }
             bcStatus(`"${code}" tidak ditemukan (barcode maupun nama).`, false); return false;
+        }
+
+        /* Kamera bukti struk: di HP memakai kamera bawaan; di desktop membuka pratinjau kamera sungguhan (bukan pemilih berkas) */
+        function openPhotoCam() {
+            const inp = document.getElementById('camera-input');
+            const mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+            if (mobile || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { inp.click(); return; }
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px';
+            wrap.innerHTML = '<div style="background:rgba(255,255,255,.94);border:1px solid #fff;border-radius:24px;padding:16px;box-shadow:0 24px 60px -20px rgba(15,23,42,.5);max-width:min(560px,96vw);color:#0f172a;font:600 13px sans-serif"><b style="display:block;margin-bottom:10px">Foto Bukti Struk / Invoice</b><video autoplay playsinline muted style="width:100%;border-radius:16px;background:#0f172a;display:block"></video><div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end"><button type="button" data-c style="padding:9px 16px;border-radius:14px;border:1px solid #cbd5e1;background:#fff;font-weight:800;cursor:pointer">Batal</button><button type="button" data-s style="padding:9px 18px;border-radius:14px;border:0;background:#2f4fd8;color:#fff;font-weight:800;cursor:pointer">Ambil Foto</button></div></div>';
+            document.body.appendChild(wrap);
+            const v = wrap.querySelector('video'); let stream;
+            const stop = () => { try { stream && stream.getTracks().forEach(t => t.stop()); } catch (e) {} wrap.remove(); };
+            wrap.querySelector('[data-c]').onclick = stop;
+            wrap.querySelector('[data-s]').onclick = () => {
+                if (!v.videoWidth) return;
+                const cv = document.createElement('canvas'); cv.width = v.videoWidth; cv.height = v.videoHeight;
+                cv.getContext('2d').drawImage(v, 0, 0);
+                cv.toBlob(b => {
+                    if (b) {
+                        const f = new File([b], 'bukti-' + Date.now() + '.jpg', { type: 'image/jpeg' });
+                        try { const dt = new DataTransfer(); dt.items.add(f); inp.files = dt.files; } catch (e) {}
+                        document.getElementById('file-chip').classList.remove('hidden');
+                        document.getElementById('file-name').innerText = f.name;
+                    }
+                    stop();
+                }, 'image/jpeg', 0.85);
+            };
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(st => { stream = st; v.srcObject = st; })
+                .catch(() => { stop(); inp.click(); });
         }
 
         function openCamScan() {
