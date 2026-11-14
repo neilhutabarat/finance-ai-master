@@ -134,11 +134,12 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=rc4"></script>
-    <script src="js/theme.js?v=rc4"></script>
-    <script src="js/langit.js?v=rc4" defer></script>
-    <script src="js/logo.js?v=rc4"></script>
-    <script src="js/skin.js?v=rc4"></script>
+    <script src="js/dialog.js?v=rc5"></script>
+    <script src="js/theme.js?v=rc5"></script>
+    <script src="js/ledger.js?v=rc5"></script>
+    <script src="js/langit.js?v=rc5" defer></script>
+    <script src="js/logo.js?v=rc5"></script>
+    <script src="js/skin.js?v=rc5"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -741,32 +742,32 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=rc4"></script>
-    <script src="js/monitor.js?v=rc4"></script>
-    <script src="js/plans.js?v=rc4"></script>
-    <script src="js/usaha.js?v=rc4"></script>
-    <script src="js/mutasi-share.js?v=rc4"></script>
-    <script src="js/struk-pdf.js?v=rc4"></script>
-    <script src="js/gaji.js?v=rc4"></script>
-    <script src="js/piutang.js?v=rc4"></script>
-    <script src="js/promo.js?v=rc4"></script>
-    <script src="js/bantuan.js?v=rc4"></script>
-    <script src="js/absensi.js?v=rc4"></script>
+    <script src="js/auth.js?v=rc5"></script>
+    <script src="js/monitor.js?v=rc5"></script>
+    <script src="js/plans.js?v=rc5"></script>
+    <script src="js/usaha.js?v=rc5"></script>
+    <script src="js/mutasi-share.js?v=rc5"></script>
+    <script src="js/struk-pdf.js?v=rc5"></script>
+    <script src="js/gaji.js?v=rc5"></script>
+    <script src="js/piutang.js?v=rc5"></script>
+    <script src="js/promo.js?v=rc5"></script>
+    <script src="js/bantuan.js?v=rc5"></script>
+    <script src="js/absensi.js?v=rc5"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return (typeof myTx === 'function') ? myTx() : txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/widgets.js?v=rc4"></script>
-    <script src="js/config.js?v=rc4"></script>
-    <script src="js/offline.js?v=rc4"></script>
-    <script src="js/core.js?v=rc4"></script>
-    <script src="js/billing.js?v=rc4"></script>
-    <script src="js/shield.js?v=rc4"></script>
-    <script src="js/ctrl.js?v=rc4"></script>
-    <script src="js/chat.js?v=rc4"></script>
-    <script src="js/store.js?v=rc4"></script>
-    <script src="js/stok-admin.js?v=rc4"></script>
-    <script src="js/i18n.js?v=rc4"></script>
+    <script src="js/widgets.js?v=rc5"></script>
+    <script src="js/config.js?v=rc5"></script>
+    <script src="js/offline.js?v=rc5"></script>
+    <script src="js/core.js?v=rc5"></script>
+    <script src="js/billing.js?v=rc5"></script>
+    <script src="js/shield.js?v=rc5"></script>
+    <script src="js/ctrl.js?v=rc5"></script>
+    <script src="js/chat.js?v=rc5"></script>
+    <script src="js/store.js?v=rc5"></script>
+    <script src="js/stok-admin.js?v=rc5"></script>
+    <script src="js/i18n.js?v=rc5"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -1588,6 +1589,7 @@
             const container = document.getElementById('kasir-per-account-grid');
             if (!container) return;
             container.innerHTML = "";
+            if (window.FM_LEDGER) { FM_LEDGER.mount(container, STORE.getCOA(), myTx()); return; }
 
             let coaList = STORE.getCOA();
             

@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'RC 4';
+  var BETA = 'RC 5';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['RC 5', '14 Nov 2026', [
+      '[Baru] Buku Besar seperti rekening koran: pilih kode akun (cari nomor kode atau nama) dan rentang tanggal; tampil tanggal, keterangan, masuk, keluar, dan saldo berjalan',
+      '[Perbaikan] Buku Besar menampilkan semua mutasi per akun, dengan saldo awal untuk periode yang dipilih',
+      '[Keamanan] Buku Besar hanya membaca data toko yang sudah ada di halaman; tidak ada data yang dikirim keluar'
+    ]],
     ['RC 4', '14 Nov 2026', [
       '[Baru] Buku Besar: ketuk satu akun untuk melihat rincian transaksinya (tanggal, keterangan, nominal)',
       '[Perbaikan] Kartu Control Tower lebih bening (tingkat kaca bawaan 4, bisa diatur 1-5 di Pengaturan)',
