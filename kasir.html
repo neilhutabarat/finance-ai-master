@@ -134,12 +134,12 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=v104"></script>
-    <script src="js/theme.js?v=v104"></script>
-    <script src="js/ledger.js?v=v104"></script>
-    <script src="js/langit.js?v=v104" defer></script>
-    <script src="js/logo.js?v=v104"></script>
-    <script src="js/skin.js?v=v104"></script>
+    <script src="js/dialog.js?v=v105"></script>
+    <script src="js/theme.js?v=v105"></script>
+    <script src="js/ledger.js?v=v105"></script>
+    <script src="js/langit.js?v=v105" defer></script>
+    <script src="js/logo.js?v=v105"></script>
+    <script src="js/skin.js?v=v105"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -742,32 +742,32 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=v104"></script>
-    <script src="js/monitor.js?v=v104"></script>
-    <script src="js/plans.js?v=v104"></script>
-    <script src="js/usaha.js?v=v104"></script>
-    <script src="js/mutasi-share.js?v=v104"></script>
-    <script src="js/struk-pdf.js?v=v104"></script>
-    <script src="js/gaji.js?v=v104"></script>
-    <script src="js/piutang.js?v=v104"></script>
-    <script src="js/promo.js?v=v104"></script>
-    <script src="js/bantuan.js?v=v104"></script>
-    <script src="js/absensi.js?v=v104"></script>
+    <script src="js/auth.js?v=v105"></script>
+    <script src="js/monitor.js?v=v105"></script>
+    <script src="js/plans.js?v=v105"></script>
+    <script src="js/usaha.js?v=v105"></script>
+    <script src="js/mutasi-share.js?v=v105"></script>
+    <script src="js/struk-pdf.js?v=v105"></script>
+    <script src="js/gaji.js?v=v105"></script>
+    <script src="js/piutang.js?v=v105"></script>
+    <script src="js/promo.js?v=v105"></script>
+    <script src="js/bantuan.js?v=v105"></script>
+    <script src="js/absensi.js?v=v105"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return (typeof myTx === 'function') ? myTx() : txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/widgets.js?v=v104"></script>
-    <script src="js/config.js?v=v104"></script>
-    <script src="js/offline.js?v=v104"></script>
-    <script src="js/core.js?v=v104"></script>
-    <script src="js/billing.js?v=v104"></script>
-    <script src="js/shield.js?v=v104"></script>
-    <script src="js/ctrl.js?v=v104"></script>
-    <script src="js/chat.js?v=v104"></script>
-    <script src="js/store.js?v=v104"></script>
-    <script src="js/stok-admin.js?v=v104"></script>
-    <script src="js/i18n.js?v=v104"></script>
+    <script src="js/widgets.js?v=v105"></script>
+    <script src="js/config.js?v=v105"></script>
+    <script src="js/offline.js?v=v105"></script>
+    <script src="js/core.js?v=v105"></script>
+    <script src="js/billing.js?v=v105"></script>
+    <script src="js/shield.js?v=v105"></script>
+    <script src="js/ctrl.js?v=v105"></script>
+    <script src="js/chat.js?v=v105"></script>
+    <script src="js/store.js?v=v105"></script>
+    <script src="js/stok-admin.js?v=v105"></script>
+    <script src="js/i18n.js?v=v105"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -842,7 +842,7 @@
         function myClosings() { return user.slot ? closingHistory.filter(c => c.slot === user.slot) : closingHistory; }
 
         if (document.getElementById('user-role-display')) {
-            document.getElementById('user-role-display').innerText = `Role: ${user.title}`;
+            document.getElementById('user-role-display').innerText = `Role: ${user.title}${user.biz ? ' · ' + user.biz : ''}`;
         }
         if (document.getElementById('receipt-tenant-id')) {
             document.getElementById('receipt-tenant-id').innerText = `ID Toko: ${activeTenant ? activeTenant.id : 'ID26110901'}`;

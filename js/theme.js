@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.4';
+  var BETA = 'v1.0.5';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.5', '14 Nov 2026', [
+      '[Perbaikan] Toko banyak usaha: Admin utama bisa dinonaktifkan, sehingga yang bisa masuk Kasir hanya Admin per usaha (mis. 3 Admin untuk 3 toko)',
+      '[Perbaikan] Akun Login memberi label jelas "Admin utama (melihat semua usaha)", dan halaman masuk menyembunyikannya bila dinonaktifkan',
+      '[Perbaikan] Header Kasir menampilkan nama Admin dan usahanya, jadi jelas siapa yang sedang masuk',
+      '[Keamanan] Admin utama yang dinonaktifkan ditolak saat login, dan tiap Admin per usaha hanya melihat transaksinya sendiri'
+    ]],
     ['v1.0.4', '14 Nov 2026', [
       '[Perbaikan] Toko banyak usaha: Neraca kini ikut pilihan "Tampilkan usaha", lengkap dengan saldo awal, aset, utang, piutang, dan persediaan per usaha',
       '[Perbaikan] Laporan Pajak dan Analisa Toko juga mengikuti usaha yang dipilih, jadi tiap usaha punya pembukuan sendiri di Manager dan Owner',

@@ -51,6 +51,7 @@
     throttle: 'Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.',
     net: 'Tidak ada koneksi internet. Periksa jaringan lalu coba lagi.',
     denied: 'Akun ini tidak berhak masuk ke toko / peran ini.',
+    mainoff: 'Admin utama dinonaktifkan untuk toko ini. Pilih nama Admin Anda di kolom pilihan Admin.',
     err: 'Login gagal. Coba lagi.'
   };
   function reason(e) {
@@ -65,6 +66,7 @@
   function login(tid, role, pin, slot) {
     return getCfg(tid).then(function (cfg) {
       var em;
+      if (role === 'staff' && !slot && cfg && cfg.mainOff) return { ok: false, reason: 'mainoff' };
       if (role === 'staff' && slot) {
         var a = cfg && cfg.admins && cfg.admins[slot];
         if (!a) return { ok: false, reason: 'denied' };
@@ -114,6 +116,9 @@
     });
   }
   /* ---- Admin tambahan: banyak akun Admin per toko, tiap akun PIN sendiri, boleh terikat ke satu usaha ---- */
+  /* Admin utama (tanpa kode usaha, melihat semua) bisa dinonaktifkan Tower/Owner bila toko memakai Admin per usaha */
+  function mainOff(tid) { return getCfg(tid).then(function (c) { return !!(c && c.mainOff); }); }
+  function setMainOff(tid, on) { return cfgRef(tid).set({ tenant: tid, mainOff: !!on, updatedAt: Date.now() }, { merge: true }); }
   function admins(tid) { return getCfg(tid).then(function (c) { var a = (c && c.admins) || {}; return Object.keys(a).map(function (k) { return { slot: k, name: a[k].name || k, biz: a[k].biz || '', gen: a[k].gen }; }).sort(function (x, y) { return String(x.name).localeCompare(String(y.name)); }); }, function () { return []; }); }
   function provisionAdmin(tid, slot, pin, name, biz) {
     pin = String(pin || '');
@@ -249,7 +254,7 @@
     });
   }
 
-  window.FM_AUTH = { admins: admins, updateAdmin: updateAdmin, provisionAdmin: provisionAdmin, removeAdmin: removeAdmin, curUser: function () { try { return auth().currentUser; } catch (e) { return null; } }, towerDb: function () { return tapp().firestore(); }, LEGACY: LEGACY, login: login, loginTower: loginTower, provision: provision, provisionMany: provisionMany, changeOwnPin: changeOwnPin, status: status, randomPin: randomPin, errText: function (r) { return ERR[r] || ERR.err; }, isSynthetic: isSynthetic, signOut: doSignOut, auth: auth };
+  window.FM_AUTH = { mainOff: mainOff, setMainOff: setMainOff, admins: admins, updateAdmin: updateAdmin, provisionAdmin: provisionAdmin, removeAdmin: removeAdmin, curUser: function () { try { return auth().currentUser; } catch (e) { return null; } }, towerDb: function () { return tapp().firestore(); }, LEGACY: LEGACY, login: login, loginTower: loginTower, provision: provision, provisionMany: provisionMany, changeOwnPin: changeOwnPin, status: status, randomPin: randomPin, errText: function (r) { return ERR[r] || ERR.err; }, isSynthetic: isSynthetic, signOut: doSignOut, auth: auth };
 
   var page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   var need = ROLES_BY_PAGE[page];

@@ -69,24 +69,24 @@
             { label: 'Pesan', icon: 'send', run: "openModal('broadcast_modal')" }
         ];
     </script>
-    <script src="js/billing.js?v=v104"></script>
-    <script src="js/dialog.js?v=v104"></script>
-    <script src="js/theme.js?v=v104"></script>
-    <script src="js/langit.js?v=v104" defer></script>
-    <script src="js/logo.js?v=v104"></script>
-    <script src="js/skin.js?v=v104"></script>
-    <script src="js/tower-menu.js?v=v104"></script>
-    <script src="js/tower-lab.js?v=v104"></script>
-    <script src="js/admins.js?v=v104"></script>
-    <script src="js/tower-monitor.js?v=v104"></script>
-    <script src="js/tower-help.js?v=v104"></script>
-    <script src="js/tower-store.js?v=v104"></script>
-    <script src="js/tower-wall.js?v=v104"></script>
-    <script src="js/tower-demo.js?v=v104"></script>
-    <script src="js/tower-qa.js?v=v104"></script>
-    <script src="js/tower-health.js?v=v104"></script>
-    <script src="js/chat.js?v=v104"></script>
-    <script src="js/tower-cockpit.js?v=v104"></script>
+    <script src="js/billing.js?v=v105"></script>
+    <script src="js/dialog.js?v=v105"></script>
+    <script src="js/theme.js?v=v105"></script>
+    <script src="js/langit.js?v=v105" defer></script>
+    <script src="js/logo.js?v=v105"></script>
+    <script src="js/skin.js?v=v105"></script>
+    <script src="js/tower-menu.js?v=v105"></script>
+    <script src="js/tower-lab.js?v=v105"></script>
+    <script src="js/admins.js?v=v105"></script>
+    <script src="js/tower-monitor.js?v=v105"></script>
+    <script src="js/tower-help.js?v=v105"></script>
+    <script src="js/tower-store.js?v=v105"></script>
+    <script src="js/tower-wall.js?v=v105"></script>
+    <script src="js/tower-demo.js?v=v105"></script>
+    <script src="js/tower-qa.js?v=v105"></script>
+    <script src="js/tower-health.js?v=v105"></script>
+    <script src="js/chat.js?v=v105"></script>
+    <script src="js/tower-cockpit.js?v=v105"></script>
     <style>#main-modal-container{z-index:70 !important}
     .fm-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
     .fm-dot-on{background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:fmBlink 1.4s infinite}
@@ -755,14 +755,14 @@
     </div>
 
     <script src="js/tenants.js"></script>
-    <script src="js/auth.js?v=v104"></script>
-    <script src="js/plans.js?v=v104t2"></script>
-    <script src="js/templates.js?v=v104"></script>
-    <script src="js/widgets.js?v=v104"></script>
+    <script src="js/auth.js?v=v105"></script>
+    <script src="js/plans.js?v=v105"></script>
+    <script src="js/templates.js?v=v105"></script>
+    <script src="js/widgets.js?v=v105"></script>
     <script>window.NO_AUTO_STORE = true;</script>
-    <script src="js/config.js?v=v104"></script>
-    <script src="js/core.js?v=v104"></script>
-    <script src="js/store.js?v=v104"></script>
+    <script src="js/config.js?v=v105"></script>
+    <script src="js/core.js?v=v105"></script>
+    <script src="js/store.js?v=v105"></script>
     <script>
         // Pengaman sementara: halaman ini hanya untuk Superadmin (masuk lewat ketuk logo 7x di halaman login).
         // Catatan: ini pengecekan di browser, belum pengganti login Firebase Authentication.
@@ -3135,6 +3135,7 @@
                 const cfg = alCfg[tn.id] || null, roles = alRolesOf(tn);
                 const cell = function (r) {
                     if (roles.indexOf(r) < 0) return '<td class="py-2.5 px-3 text-center text-slate-600">-</td>';
+                    if (r === 'staff' && cfg && cfg.mainOff) return '<td class="py-2.5 px-3 text-center text-sky-300" title="Admin utama dinonaktifkan; tiap usaha punya Admin sendiri">Nonaktif (per usaha)</td>';
                     return (cfg && cfg.gen && cfg.gen[r]) ? '<td class="py-2.5 px-3 text-center text-emerald-300 font-black">Aktif</td>' : '<td class="py-2.5 px-3 text-center text-amber-300">Belum</td>';
                 };
                 return '<tr class="border-b border-white/5"><td class="py-2.5 px-3"><b class="text-white">' + escHtml(tn.nama) + '</b><br><span class="font-mono text-[10px] text-slate-400">' + escHtml(tn.id) + '</span></td>' +
@@ -3148,7 +3149,7 @@
             alTid = id;
             document.getElementById('al-title').innerText = 'Akun login: ' + tn.nama + ' (' + tn.id + ')';
             document.getElementById('al-fields').innerHTML = alRolesOf(tn).map(function (r) {
-                return '<label class="block"><span class="font-bold text-slate-300 block mb-1">PIN ' + AL_ROLES[r] + '</span><input type="text" inputmode="numeric" maxlength="32" data-alrole="' + r + '" placeholder="kosong = tidak diubah" class="w-full bg-slate-950 border border-white/15 rounded-xl p-2.5 font-mono font-bold text-white"></label>';
+                return '<label class="block"><span class="font-bold text-slate-300 block mb-1">PIN ' + (r === 'staff' && ((tn.usaha && tn.usaha.length) || (tn.features && tn.features.banyak_usaha)) ? 'Admin utama (melihat semua usaha)' : AL_ROLES[r]) + '</span><input type="text" inputmode="numeric" maxlength="32" data-alrole="' + r + '" placeholder="kosong = tidak diubah" class="w-full bg-slate-950 border border-white/15 rounded-xl p-2.5 font-mono font-bold text-white"></label>';
             }).join('');
             document.getElementById('al-fields').insertAdjacentHTML('beforeend', '<button type="button" onclick="FM_ADMINS.open(alTid)" class="px-3 py-2 rounded-lg bg-violet-700 hover:bg-violet-600 text-white font-bold">Admin tambahan per usaha…</button>');
             document.getElementById('al-result').classList.add('hidden');

@@ -3,7 +3,7 @@
    Dipakai Tower (menu Akun Login) dan Owner (dashboard). */
 (function () {
   'use strict';
-  var ov = null, tid = '', rows = [], msg = '', result = '';
+  var ov = null, tid = '', rows = [], msg = '', result = '', mOff = false;
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
   function tn() {
     try { if (typeof TENANTS_CONFIG !== 'undefined' && tid && TENANTS_CONFIG[tid.toLowerCase()]) return TENANTS_CONFIG[tid.toLowerCase()]; return typeof getActiveTenant === 'function' ? getActiveTenant() : null; } catch (e) { return null; }
@@ -28,14 +28,15 @@
     });
     document.body.appendChild(ov);
   }
-  function load() { return FM_AUTH.admins(tid).then(function (l) { rows = l; render(); }); }
+  function load() { return Promise.all([FM_AUTH.admins(tid), FM_AUTH.mainOff ? FM_AUTH.mainOff(tid).catch(function () { return false; }) : false]).then(function (r) { rows = r[0]; mOff = !!r[1]; render(); }); }
   function bizSel(id, cur) { return '<select id="' + id + '" style="' + inp + '"><option value="">Semua usaha</option>' + usahaList().map(function (b) { return '<option value="' + esc(b) + '"' + (b === cur ? ' selected' : '') + '>' + esc(b) + '</option>'; }).join('') + '</select>'; }
   function render() {
     if (!ov || ov.style.display === 'none') return;
     var h = '<div style="width:100%;max-width:720px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
-      '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Admin tambahan</div><div style="font-size:12px;opacity:.65">Tiap Admin punya nama dan PIN sendiri. Admin yang terikat usaha hanya melihat barang dan akun usaha itu di Kasir. Admin utama tetap ada.</div></div><button data-x style="' + btn + '">Tutup</button></div>';
+      '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Admin tambahan</div><div style="font-size:12px;opacity:.65">Tiap Admin punya nama dan PIN sendiri. Admin yang terikat usaha hanya melihat barang, akun, dan transaksi usaha itu di Kasir.</div></div><button data-x style="' + btn + '">Tutup</button></div>';
     if (msg) h += '<p style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(245,158,11,.14);color:#fbbf24;font-size:12px">' + esc(msg) + '</p>';
     if (result) h += '<pre style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.14);color:#86efac;font-size:12.5px;white-space:pre-wrap">' + esc(result) + '</pre>';
+    h += '<div style="margin-top:12px;padding:10px 12px;border-radius:14px;border:1px solid ' + (mOff ? 'rgba(34,197,94,.45)' : 'rgba(245,158,11,.45)') + ';background:' + (mOff ? 'rgba(34,197,94,.08)' : 'rgba(245,158,11,.08)') + ';display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px;font-size:12.5px"><b>Admin utama: ' + (mOff ? 'nonaktif' : 'aktif (melihat semua usaha)') + '</b><br><span style="opacity:.7;font-size:11.5px">' + (mOff ? 'Hanya ' + rows.length + ' Admin per usaha di bawah yang bisa masuk Kasir.' : 'Admin utama tidak terikat usaha dan melihat semua transaksi. Nonaktifkan bila tiap usaha harus punya Admin sendiri.') + '</span></div><button data-a="main" style="' + btn + '">' + (mOff ? 'Aktifkan Admin utama' : 'Nonaktifkan Admin utama') + '</button></div>';
     h += '<div style="margin-top:14px;overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px"><tbody>';
     if (!rows.length) h += '<tr><td style="padding:14px;opacity:.7;text-align:center">Belum ada Admin tambahan.</td></tr>';
     rows.forEach(function (a) {
@@ -74,7 +75,11 @@
         if (ans && list.map(function (x) { return x.toLowerCase(); }).indexOf(ans.toLowerCase()) < 0) { msg = 'Usaha "' + ans + '" tidak ada di daftar usaha toko.'; return render(); }
         ans = list.filter(function (x) { return x.toLowerCase() === ans.toLowerCase(); })[0] || '';
         await FM_AUTH.updateAdmin(tid, cur.slot, cur.name, ans); audit('Usaha Admin ' + cur.name, cur.biz || 'Semua', ans || 'Semua'); result = 'Usaha ' + cur.name + ': ' + (ans || 'Semua usaha') + '. Berlaku saat Admin masuk lagi.'; await load();
+      } else if (a === 'main') {
+        if (!mOff && !rows.length) { msg = 'Buat dulu minimal satu Admin per usaha sebelum menonaktifkan Admin utama.'; return render(); }
+        await FM_AUTH.setMainOff(tid, !mOff); audit('Admin utama', mOff ? 'NONAKTIF' : 'AKTIF', mOff ? 'AKTIF' : 'NONAKTIF'); result = 'Admin utama ' + (mOff ? 'diaktifkan kembali.' : 'dinonaktifkan. Berlaku untuk login berikutnya.'); await load();
       } else if (a === 'del' && cur) {
+        if (mOff && rows.length <= 1) { msg = 'Ini Admin terakhir. Aktifkan Admin utama dulu agar toko tetap bisa masuk Kasir.'; return render(); }
         var ok = window.fmAsk ? await window.fmAsk('Hapus Admin ' + cur.name + '? Akunnya langsung tidak bisa masuk.', { ok: 'Ya, Hapus', bahaya: true }) : window.confirm('Hapus Admin ' + cur.name + '?');
         if (!ok) return; await FM_AUTH.removeAdmin(tid, cur.slot); audit('Menghapus Admin ' + cur.name, 'AKTIF', 'DIHAPUS'); result = 'Admin ' + cur.name + ' dihapus.'; await load();
       }
