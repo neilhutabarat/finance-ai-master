@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'RC 6';
+  var BETA = 'RC 7';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['RC 7', '14 Nov 2026', [
+      '[Baru] Logo UMKM tampil di header Kasir, Manager, dan Owner serta di atas struk; logo dipasang dari Pengaturan toko atau oleh pengelola layanan',
+      '[Perbaikan] Logo yang diunggah tidak lagi hanya jadi ikon aplikasi; bila belum ada logo, tampilan lama tetap dipakai',
+      '[Keamanan] Logo disimpan per toko dan hanya bisa diubah pengelola layanan atau akun toko itu sendiri'
+    ]],
     ['RC 6', '14 Nov 2026', [
       '[Baru] Efek kilau kaca (garis putih melintang) dan tepi melengkung seperti layar lengkung pada kartu, tombol, dan header',
       '[Perbaikan] Buku Besar: kotak cari kode/nama akun menampilkan daftar COA untuk dipilih',
@@ -483,25 +488,25 @@
       logoMsg(data ? 'Logo tersimpan (' + Math.round((data.length - data.indexOf(',') - 1) * 0.75 / 1024) + ' KB).' : 'Logo dihapus.', true);
     }).catch(function (e) { logoMsg('Gagal menyimpan: ' + e.message, false); });
   }
-  function applyLogo() { return;
+  function applyLogo() {
     try {
       var nameEl = document.getElementById('topbar-store-name');
-      if (!nameEl) return;
-      var box = nameEl, svg = null;
-      while (box && box.parentElement && !svg) { box = box.parentElement; svg = box.querySelector('svg'); }
-      if (!svg || !svg.parentElement) return;
-      var holder = svg.parentElement, badge = document.getElementById('ctrl-logo-badge'), img = document.getElementById('fm-logo-img');
+      if (!nameEl || !nameEl.parentElement || !nameEl.parentElement.parentElement) return;
+      var block = nameEl.parentElement.parentElement, row = block.parentElement, img = document.getElementById('fm-logo-img');
+      if (!row) return;
+      var olds = []; for (var k = 0; k < row.children.length; k++) { var c = row.children[k]; if (c === block) break; if (c !== block && c.id !== 'fm-logo-img' && c.querySelector && c.querySelector('svg')) olds.push(c); }
+      var ri = document.getElementById('receipt-logo-img');
       if (logoData) {
-        if (!img) { img = document.createElement('img'); img.id = 'fm-logo-img'; img.alt = 'Logo'; img.style.cssText = 'width:100%;height:100%;min-height:40px;object-fit:contain;border-radius:14px'; holder.appendChild(img); }
-        img.src = logoData; svg.style.display = 'none'; if (badge) badge.style.display = 'none';
-        var ri = document.getElementById('receipt-logo-img'); if (ri) { ri.src = logoData; ri.classList.remove('hidden'); }
+        if (!img) { img = document.createElement('img'); img.id = 'fm-logo-img'; img.alt = 'Logo'; img.style.cssText = 'height:52px;width:52px;flex:0 0 auto;object-fit:contain;border-radius:14px;background:rgba(255,255,255,.85);padding:3px;margin-right:12px'; row.insertBefore(img, block); }
+        img.src = logoData; olds.forEach(function (o) { o.style.display = 'none'; });
+        if (ri) { ri.src = logoData; ri.classList.remove('hidden'); }
       } else {
-        var ri2 = document.getElementById('receipt-logo-img'); if (ri2) ri2.classList.add('hidden');
-        if (img) img.remove();
-        if (badge) badge.style.display = 'flex'; else svg.style.display = '';
+        if (img) img.remove(); olds.forEach(function (o) { o.style.display = ''; });
+        if (ri) ri.classList.add('hidden');
       }
     } catch (e) {}
   }
+  window.FM_STORELOGO = { compress: compress, makeThumb: makeThumb, preview: function (d) { logoData = d || null; applyLogo(); } };
   function startLogo() {
     var tries = 0, t = setInterval(function () {
       tries++;
