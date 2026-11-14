@@ -3,11 +3,21 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'RC 8';
+  var BETA = 'RC 10';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['RC 10', '14 Nov 2026', [
+      '[Baru] Akun demo: kasir, manager, dan owner bisa login bersamaan tanpa batas selama tanda DEMO aktif; saat DEMO dicabut, kuota login berlaku lagi',
+      '[Baru] Pengaturan rasio wallpaper desktop dari Control Tower: pas layar, posisi, perbesar, blur, gelap/terang',
+      '[Perbaikan] Wallpaper mengikuti rasio layar desktop dan ponsel secara terpisah',
+      '[Keamanan] Kunci kuota login otomatis kembali setelah demo berakhir; data toko tidak disentuh'
+    ]],
+    ['RC 9', '14 Nov 2026', [
+      '[Perbaikan] Logo toko yang sudah diunggah kini benar-benar dimuat dan tampil di header dan struk',
+      '[Keamanan] Logo hanya dibaca dari data toko itu sendiri; tidak ada data yang dikirim keluar'
+    ]],
     ['RC 8', '14 Nov 2026', [
       '[Baru] Tingkat kaca 1-8 (8 hampir transparan) untuk toko dan Control Tower',
       '[Baru] Manager dan Owner punya tombol Ponsel/Desktop di dock (di samping OneilStore) untuk memilih tampilan HP atau desktop',
@@ -505,6 +515,8 @@
       if (logoData) {
         if (!img) { img = document.createElement('img'); img.id = 'fm-logo-img'; img.alt = 'Logo'; img.style.cssText = 'height:52px;width:52px;flex:0 0 auto;object-fit:contain;border-radius:14px;background:rgba(255,255,255,.85);padding:3px;margin-right:12px'; row.insertBefore(img, block); }
         img.src = logoData; olds.forEach(function (o) { o.style.display = 'none'; });
+        var inv = 0, e = img.parentElement; while (e && e.nodeType === 1) { if (/invert/.test(getComputedStyle(e).filter || '')) inv++; e = e.parentElement; }
+        img.style.setProperty('filter', inv % 2 ? 'invert(1) hue-rotate(180deg)' : 'none', 'important');
         if (ri) { ri.src = logoData; ri.classList.remove('hidden'); }
       } else {
         if (img) img.remove(); olds.forEach(function (o) { o.style.display = ''; });
@@ -550,6 +562,7 @@
   }
   function init() {
     build();
+    if (ROLE === 'kasir' || ROLE === 'manager' || ROLE === 'owner') startLogo();
     if (ROLE === 'login') {
       var o = window.applyTenantBranding;
       if (typeof o === 'function') window.applyTenantBranding = function (tn) { o(tn); applyLoginLogo(); };

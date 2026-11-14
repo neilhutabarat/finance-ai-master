@@ -22,6 +22,8 @@
     d.glass = c5(c.glass, 3);
     d.rain = { on: !!(c.rain && c.rain.on), size: c5(c.rain && c.rain.size, 3), rate: c5(c.rain && c.rain.rate, 3) };
     var p = c.portal; d.portal = (p === 'none') ? 'none' : ((parseInt(p, 10) >= 1 && parseInt(p, 10) <= n) ? parseInt(p, 10) : 'same');
+    var v = c.view || {}, F = ['cover', 'contain', 'stretch', 'original'], P = ['0% 0%', '50% 0%', '100% 0%', '0% 50%', '50% 50%', '100% 50%', '0% 100%', '50% 100%', '100% 100%'];
+    d.view = { fit: F.indexOf(v.fit) >= 0 ? v.fit : 'cover', pos: P.indexOf(v.pos) >= 0 ? v.pos : '50% 50%', zoom: Math.min(200, Math.max(100, parseInt(v.zoom, 10) || 100)), blur: Math.min(12, Math.max(0, parseInt(v.blur, 10) || 0)), dim: Math.min(50, Math.max(-50, parseInt(v.dim, 10) || 0)), mfit: F.indexOf(v.mfit) >= 0 ? v.mfit : 'cover', mpos: P.indexOf(v.mpos) >= 0 ? v.mpos : '50% 50%' };
     return d;
   }
   function fmtWhen(ms) { try { return new Date(ms).toLocaleString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }).replace(/\./g, ':') + ' WIB'; } catch (e) { return ''; } }
@@ -129,6 +131,16 @@
       '<div style="display:' + (cfg.rain.on ? 'block' : 'none') + '"><div style="font-size:12px;color:#c7cbd6;margin:10px 0 6px">Ukuran butiran</div><div style="display:flex;gap:6px;flex-wrap:wrap">' + [1, 2, 3, 4, 5].map(function (v) { return chip(cfg.rain.size === v, 'data-rsize="' + v + '"', v === 1 ? '1 Halus' : v === 5 ? '5 Besar' : String(v)); }).join('') + '</div>' +
       '<div style="font-size:12px;color:#c7cbd6;margin:10px 0 6px">Deras</div><div style="display:flex;gap:6px;flex-wrap:wrap">' + [1, 2, 3, 4, 5].map(function (v) { return chip(cfg.rain.rate === v, 'data-rrate="' + v + '"', v === 1 ? '1 Gerimis' : v === 5 ? '5 Deras' : String(v)); }).join('') + '</div>' +
       '<div style="font-size:11px;color:#94a3b8;margin-top:8px">Efek ini memakai tenaga komputer. Bila PC toko lemah, matikan per toko di tab "Per toko". Aplikasi juga berhenti sendiri bila terasa berat.</div></div></div>';
+    var V = cfg.view, FT = [['cover', 'Penuh (potong tepi)'], ['contain', 'Utuh (ada pinggiran)'], ['stretch', 'Regang (isi layar)'], ['original', 'Ukuran asli']];
+    var PS = ['0% 0%', '50% 0%', '100% 0%', '0% 50%', '50% 50%', '100% 50%', '0% 100%', '50% 100%', '100% 100%'];
+    function posGrid(key, cur) { return '<div style="display:grid;grid-template-columns:repeat(3,30px);gap:4px;margin-top:6px">' + PS.map(function (x) { return '<button data-vpos="' + key + '|' + x + '" style="height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.25);cursor:pointer;background:' + (cur === x ? '#0a84ff' : 'rgba(255,255,255,.08)') + '"></button>'; }).join('') + '</div>'; }
+    function rng(k, lab, min, max, val, unit) { return '<div style="font-size:12px;color:#c7cbd6;margin:12px 0 4px">' + lab + ': <b>' + val + unit + '</b></div><input type="range" data-vr="' + k + '" min="' + min + '" max="' + max + '" value="' + val + '" style="width:100%">'; }
+    h += '<div style="' + BOX + '"><b style="font-size:13px">Rasio wallpaper desktop (semua toko)</b>' +
+      '<div style="font-size:12px;color:#c7cbd6;margin:10px 0 4px">Cara pas di layar (desktop)</div><select data-vfit="fit" style="' + SEL + '">' + opts(FT, V.fit) + '</select>' +
+      '<div style="font-size:12px;color:#c7cbd6;margin:10px 0 0">Titik fokus gambar (desktop)</div>' + posGrid('pos', V.pos) +
+      rng('zoom', 'Perbesar', 100, 200, V.zoom, '%') + rng('blur', 'Blur wallpaper', 0, 12, V.blur, 'px') + rng('dim', 'Gelap (+) / Terang (-)', -50, 50, V.dim, '%') +
+      '<div style="font-size:12px;color:#c7cbd6;margin:14px 0 4px">Layar sempit / mode ponsel</div><select data-vfit="mfit" style="' + SEL + '">' + opts(FT, V.mfit) + '</select>' + posGrid('mpos', V.mpos) +
+      '<div style="font-size:11px;color:#94a3b8;margin-top:8px">Tekan Simpan di bawah agar berlaku ke semua toko.</div></div>';
     return h;
   }
   function tabToko() {
@@ -179,6 +191,9 @@
     var ro = ov.querySelector('[data-rain-on]'); if (ro) ro.onchange = function () { cfg.rain.on = ro.checked; draw(); };
     ov.querySelectorAll('[data-rsize]').forEach(function (b) { b.onclick = function () { cfg.rain.size = parseInt(b.getAttribute('data-rsize'), 10); draw(); }; });
     ov.querySelectorAll('[data-rrate]').forEach(function (b) { b.onclick = function () { cfg.rain.rate = parseInt(b.getAttribute('data-rrate'), 10); draw(); }; });
+    ov.querySelectorAll('[data-vfit]').forEach(function (e) { e.onchange = function () { cfg.view[e.getAttribute('data-vfit')] = e.value; draw(); }; });
+    ov.querySelectorAll('[data-vpos]').forEach(function (b) { b.onclick = function () { var a = b.getAttribute('data-vpos').split('|'); cfg.view[a[0]] = a[1]; draw(); }; });
+    ov.querySelectorAll('[data-vr]').forEach(function (e) { e.oninput = function () { cfg.view[e.getAttribute('data-vr')] = parseInt(e.value, 10); var l = e.previousElementSibling.querySelector('b'); if (l) l.textContent = e.value + (e.getAttribute('data-vr') === 'zoom' || e.getAttribute('data-vr') === 'dim' ? '%' : 'px'); }; });
     var sv = ov.querySelector('[data-save]'); if (sv) sv.onclick = function () { save(); };
     ov.querySelectorAll('[data-row]').forEach(function (row) {
       var id = row.getAttribute('data-row');

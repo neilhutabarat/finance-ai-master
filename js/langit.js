@@ -17,7 +17,7 @@
       var f = d && d.fields; if (!f || !f.json || !f.json.stringValue) return;
       var j = JSON.parse(f.json.stringValue);
       if (j && typeof j === 'object') {
-        lsSet('fm_wp_cfg', JSON.stringify({ mode: j.mode, fixed: j.fixed, order: j.order, start: j.start, day: j.day, hour: j.hour, items: j.items, portal: j.portal }));
+        lsSet('fm_wp_cfg', JSON.stringify({ mode: j.mode, fixed: j.fixed, order: j.order, start: j.start, day: j.day, hour: j.hour, items: j.items, portal: j.portal, view: j.view }));
         lsSet(KEY_G, String(clampLv(j.glass)));
         lsSet('fm_rain_g', JSON.stringify({ on: !!(j.rain && j.rain.on), size: clamp5(j.rain && j.rain.size), rate: clamp5(j.rain && j.rain.rate) }));
       }
@@ -229,7 +229,22 @@
   function syncRain() { if (rainWanted()) startRain(); else stopRain(); }
   window.addEventListener('resize', sizeRain);
 
-  function refresh() { return fetchCfg().then(function () { setLook(); if (window.FM_WP && FM_WP.update) FM_WP.update(); }); }
+  function applyView() {
+    var v = {}; try { v = (JSON.parse(lsGet('fm_wp_cfg') || '{}') || {}).view || {}; } catch (e) {}
+    var d = document.documentElement, el = document.getElementById('fm-wpv');
+    var m = window.innerWidth <= 600, fit = (m ? v.mfit : v.fit) || 'cover', pos = (m ? v.mpos : v.pos) || '50% 50%', z = parseInt(v.zoom, 10) || 100, bl = parseInt(v.blur, 10) || 0, dm = parseInt(v.dim, 10) || 0;
+    var plain = fit === 'cover' && pos === '50% 50%' && z === 100 && !bl && !dm;
+    if (plain || ROLE === 'login' || d.hasAttribute('data-fm-portal') || d.getAttribute('data-fm-look') === 'base') { if (el) el.remove(); return; }
+    if (!el) { el = document.createElement('div'); el.id = 'fm-wpv'; d.appendChild(el); }
+    var size = fit === 'contain' ? 'contain' : fit === 'stretch' ? '100% 100%' : fit === 'original' ? 'auto' : 'cover';
+    if (z > 100) size = fit === 'stretch' ? z + '% ' + z + '%' : fit === 'original' ? z + '%' : 'auto ' + z + '%';
+    if (z > 100 && (fit === 'cover' || fit === 'contain')) size = 'cover';
+    el.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;background:#0b0f17 var(--fm-wp) ' + pos + '/' + size + ' no-repeat;' + (z > 100 && (fit === 'cover' || fit === 'contain') ? 'transform:scale(' + (z / 100) + ');transform-origin:' + pos + ';' : '') + (function () { var f = (d.getAttribute('data-fm-invert') === '1' ? 'invert(1) hue-rotate(180deg) ' : '') + (bl ? 'blur(' + bl + 'px)' : ''); return f ? 'filter:' + f + ';' : ''; })();
+    var o = document.getElementById('fm-wpv-o'); if (!o) { o = document.createElement('div'); o.id = 'fm-wpv-o'; d.appendChild(o); }
+    o.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;background:' + (dm >= 0 ? 'rgba(0,0,0,' + (dm / 100) + ')' : 'rgba(255,255,255,' + (-dm / 100) + ')') + ';' + (d.getAttribute('data-fm-invert') === '1' ? 'filter:invert(1) hue-rotate(180deg)' : '');
+  }
+  window.addEventListener('resize', function () { applyView(); });
+  function refresh() { return fetchCfg().then(function () { setLook(); applyView(); if (window.FM_WP && FM_WP.update) FM_WP.update(); }); }
   window.FM_LANGIT.apply = setLook;
   window.addEventListener('fm:glass', setLook);
   window.addEventListener('fm:theme', setLook);

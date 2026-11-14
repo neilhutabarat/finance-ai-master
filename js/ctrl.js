@@ -377,6 +377,8 @@
         if (presenceState === 'started') return;
         if (ctrl && ctrl.suspended === true) return;
         var field = QUOTA_FIELD[ROLE];
+        /* toko demo (watermark DEMO aktif): tanpa batas login; saat demo dicabut, kuota berlaku lagi */
+        if (demoMs(ctrl) > 0 && !demoEnded(ctrl)) { presenceState = ''; startPresence(tenant); return; }
         if (field) {
             var allowed = (ctrl && typeof ctrl[field] === 'number' && ctrl[field] > 0) ? ctrl[field] : 1;
             checkQuota(tenant, allowed, function () { startPresence(tenant); }, function (n) {
