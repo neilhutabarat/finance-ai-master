@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.6';
+  var BETA = 'v1.0.7';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.7', '14 Nov 2026', [
+      '[Perbaikan] Form Input Transaksi di Kasir menyesuaikan diri otomatis dengan tinggi layar, Keterangan dan Petugas tidak lagi tertutup tombol Simpan',
+      '[Perbaikan] Laba Rugi: pilihan "Umum" hanya muncul bila memang ada transaksi tanpa usaha',
+      '[Perbaikan] Logo toko berwarna putih atau transparan kini diberi alas gelap agar terlihat di header terang',
+      '[Keamanan] Kolom Keterangan dan Petugas tidak lagi tertutup tombol, sehingga transaksi tidak tersimpan tanpa pencatat tanpa disadari'
+    ]],
     ['v1.0.6', '14 Nov 2026', [
       '[Perbaikan] Popup konfirmasi (mis. Hapus Admin) kini tampil di paling depan, tidak lagi tertutup jendela lain',
       '[Perbaikan] Admin tambahan: nama Admin bisa diubah, dan daftar pilihan usaha terbaca jelas',
@@ -457,6 +463,17 @@
         if (img.getAttribute('data-src-len') !== String(logoData.length)) { img.setAttribute('data-src-len', String(logoData.length)); img.__failed = false; img.src = logoData; }
         img.onerror = function () { /* gambar gagal dimuat: kembali ke logo bawaan supaya header tidak kosong */ try { img.__failed = true; img.style.display = 'none'; olds.forEach(function (o) { o.style.display = ''; }); } catch (e) {} };
         img.style.display = '';
+        /* logo putih / transparan tidak terlihat di header terang: beri alas gelap */
+        img.onload = function () {
+          try {
+            var c = document.createElement('canvas'); c.width = c.height = 24; var x = c.getContext('2d'); x.drawImage(img, 0, 0, 24, 24);
+            var d = x.getImageData(0, 0, 24, 24).data, sum = 0, w = 0, i;
+            for (i = 0; i < d.length; i += 4) { var a = d[i + 3] / 255; if (a < .05) continue; sum += a * (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]); w += a; }
+            var opaque = w / 576, lum = w ? sum / w : 255;
+            img.style.setProperty('background', (opaque < .08 || lum > 205) ? '#0f172a' : 'transparent', 'important');
+          } catch (e) { /* gambar lintas-asal: biarkan apa adanya */ }
+        };
+        if (img.complete && img.naturalWidth) img.onload();
         olds.forEach(function (o) { o.style.display = 'none'; });
         var inv = 0, e = img.parentElement; while (e && e.nodeType === 1) { if (/invert/.test(getComputedStyle(e).filter || '')) inv++; e = e.parentElement; }
         img.style.setProperty('filter', inv % 2 ? 'invert(1) hue-rotate(180deg)' : 'none', 'important');

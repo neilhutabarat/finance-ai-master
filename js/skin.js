@@ -423,6 +423,11 @@
     '@media(max-height:660px){html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child>div:last-child{gap:3px 12px!important}html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child>.border-b{display:none}}',
     '@media(max-height:580px){html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child label,html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child .text-xs{font-size:10px!important;line-height:1.2!important}html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child{padding:4px 10px!important}html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child>div:last-child{gap:2px 10px!important}html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child .glass-input{padding-top:2px!important;padding-bottom:2px!important}}',
     '@media(max-height:620px){html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child{padding:6px 10px!important}html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child>div:last-child{gap:3px 10px!important}html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child .glass-input{padding-top:3px!important;padding-bottom:3px!important;font-size:11.5px!important}html[data-fm-page="kasir"][data-fm-fit] #tx-amount{font-size:14px!important;padding-top:2px!important;padding-bottom:2px!important}html[data-fm-page="kasir"][data-fm-fit] #btn-save-draft{padding-top:5px!important;padding-bottom:5px!important;font-size:12px!important}html[data-fm-page="kasir"][data-fm-fit] main>.grid:nth-child(2)>section:first-child #form-title{font-size:12.5px!important}}',
+    'html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="1"] main>.grid:nth-child(2)>section:first-child{padding:8px 12px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="1"] main>.grid:nth-child(2)>section:first-child>.border-b{padding-bottom:0!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="1"] main>.grid:nth-child(2)>section:first-child>div:last-child{gap:5px 12px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="1"] #tx-amount{font-size:16px!important;padding-top:4px!important;padding-bottom:4px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="1"] #btn-save-draft{padding-top:7px!important;padding-bottom:7px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="1"] main>.grid:nth-child(2)>section:first-child label{margin-bottom:1px!important}',
+    'html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="2"] main>.grid:nth-child(2)>section:first-child>div:last-child{gap:3px 12px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="2"] main>.grid:nth-child(2)>section:first-child>.border-b{display:none}',
+    'html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="4"] main>.grid:nth-child(2)>section:first-child label,html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="4"] main>.grid:nth-child(2)>section:first-child .text-xs{font-size:10px!important;line-height:1.2!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="4"] main>.grid:nth-child(2)>section:first-child{padding:4px 10px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="4"] main>.grid:nth-child(2)>section:first-child>div:last-child{gap:2px 10px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="4"] main>.grid:nth-child(2)>section:first-child .glass-input{padding-top:2px!important;padding-bottom:2px!important}',
+    'html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] main>.grid:nth-child(2)>section:first-child{padding:6px 10px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] main>.grid:nth-child(2)>section:first-child>div:last-child{gap:3px 10px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] main>.grid:nth-child(2)>section:first-child .glass-input{padding-top:3px!important;padding-bottom:3px!important;font-size:11.5px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] #tx-amount{font-size:14px!important;padding-top:2px!important;padding-bottom:2px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] #btn-save-draft{padding-top:5px!important;padding-bottom:5px!important;font-size:12px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] main>.grid:nth-child(2)>section:first-child #form-title{font-size:12.5px!important}',
+    'html[data-fm-page="kasir"][data-fm-kc~="4"] #tx-cat-badge{display:none!important}',
     'html[data-fm-fit] .fm-tg{margin-top:3px;gap:4px}html[data-fm-fit] .fm-tg input{padding:3px 8px;font-size:11px}html[data-fm-fit] .fm-tg button{padding:3px 10px;font-size:11px}',
     'html[data-fm-fit] #fm-insights .fm-ins-main{flex:1 0 auto;min-height:0}',
     'html[data-fm-fit] #fm-insights .fm-ins-main .fm-scroll{flex:1 1 auto;max-height:clamp(60px,13vh,150px)}',
@@ -838,12 +843,38 @@
     scheduleTiles();
   }
 
+  /* form Input Transaksi kasir: mampatkan bertahap sampai tidak ada yang tertutup tombol Simpan */
+  function kasirFit() {
+    if (PAGE !== 'kasir') return;
+    var root = document.documentElement, busy = false, t;
+    function sec() { return document.querySelector('main>.grid:nth-child(2)>section:first-child'); }
+    function run() {
+      if (busy) return; busy = true;
+      try {
+        var s = sec(); if (!s) return;
+        var lv = [], n;
+        root.removeAttribute('data-fm-kc');
+        for (n = 1; n <= 4; n++) {
+          if (s.scrollHeight <= s.clientHeight + 1) break;
+          lv.push(n); root.setAttribute('data-fm-kc', lv.join(' '));
+        }
+      } finally { busy = false; }
+    }
+    function later() { clearTimeout(t); t = setTimeout(run, 80); }
+    window.addEventListener('resize', later);
+    var s0 = sec();
+    if (s0 && window.MutationObserver) new MutationObserver(later).observe(s0, { attributes: true, childList: true, subtree: true, attributeFilter: ['class', 'style', 'hidden'] });
+    [300, 900, 2000].forEach(function (ms) { setTimeout(run, ms); });
+    run();
+  }
+
   function init() {
     try { wrapOpenModal(); } catch (e) { console.warn('skin', e); }
     try { buildActions(); } catch (e) { console.warn('actions', e); }
     try { buildDock(); } catch (e) { console.warn('dock', e); }
     try { buildNarrow(); } catch (e) { console.warn('narrow', e); }
     try { watchTiles(); } catch (e) { console.warn('tiles', e); }
+    try { kasirFit(); } catch (e) { console.warn('kfit', e); }
     /* tampilan sudah tersusun: baru ditampilkan (sebelumnya terlihat tata letak lama sekitar 1 detik) */
     setTimeout(function () { document.documentElement.classList.add('fm-ready'); }, 140);
   }

@@ -114,7 +114,9 @@
     }).join('');
     var bizChips = '', bizSum = '';
     if (bizOn()) {
-      var opts = [['', 'Semua usaha']].concat(FM_BIZ.list().map(function (n) { return [n, n]; })).concat([['__umum', 'Umum']]);
+      var hasUmum = false; try { hasUmum = ((typeof txList !== 'undefined' && txList) ? txList : []).some(function (t) { return !FM_BIZ.ofTx(t); }); } catch (e) {}
+      if (!hasUmum && state.biz === '__umum') state.biz = '';
+      var opts = [['', 'Semua usaha']].concat(FM_BIZ.list().map(function (n) { return [n, n]; })).concat(hasUmum ? [['__umum', 'Umum']] : []);
       bizChips = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">' + opts.map(function (p) {
         var on = state.biz === p[0];
         return '<button type="button" data-b="' + esc(p[0]) + '" style="all:unset;cursor:pointer;padding:7px 13px;border-radius:99px;font-size:12px;font-weight:700;border:1px solid rgba(148,163,184,.4);' + (on ? 'background:#047857;color:#fff;border-color:#047857' : '') + '">' + esc(p[1]) + '</button>';
