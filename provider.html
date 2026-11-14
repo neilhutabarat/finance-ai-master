@@ -756,7 +756,7 @@
 
     <script src="js/tenants.js"></script>
     <script src="js/auth.js?v=v104"></script>
-    <script src="js/plans.js?v=v104"></script>
+    <script src="js/plans.js?v=v104t1"></script>
     <script src="js/templates.js?v=v104"></script>
     <script src="js/widgets.js?v=v104"></script>
     <script>window.NO_AUTO_STORE = true;</script>
@@ -1391,8 +1391,13 @@
         try {
             fetch('rilis/index.json?c=' + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
                 if (!j || !Array.isArray(j.versi)) return;
-                j.versi.forEach(function (v) { if (/^(Prototype|Beta(-\d+)?)$/.test(v) && FM_ROLLOUT_VERSIONS.indexOf(v) < 0) FM_ROLLOUT_VERSIONS.push(v); });
-                FM_ROLLOUT_VERSIONS.sort(function (a, b) { const f = function (s) { return s === 'Prototype' ? 0 : (parseInt(s.split('-')[1], 10) || 1); }; return f(a) - f(b); });
+                j.versi.forEach(function (v) { if (/^(Prototype|BETA-[\d.]+|Beta(-\d+)?|v\d+\.\d+\.\d+)$/.test(v) && FM_ROLLOUT_VERSIONS.indexOf(v) < 0) FM_ROLLOUT_VERSIONS.push(v); });
+                /* versi terbaru yang sedang di akar situs (bukan folder rilis) juga boleh dipilih/dikunci */
+                return fetch('version.json?c=' + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (cur) { if (cur && /^v\d+\.\d+\.\d+$/.test(cur.versi || '') && FM_ROLLOUT_VERSIONS.indexOf(cur.versi) < 0) FM_ROLLOUT_VERSIONS.push(cur.versi); }).catch(function () {}).then(function () {
+                    const key = function (s) { if (s === 'Prototype') return [0, 0, 0, 0]; const m = /^v(\d+)\.(\d+)\.(\d+)$/.exec(s); if (m) return [3, +m[1], +m[2], +m[3]]; const b = /(\d+(?:\.\d+)*)/.exec(s) || [0, '1']; const n = String(b[1]).split('.').map(Number); return [1, n[0] || 0, n[1] || 0, 0]; };
+                    FM_ROLLOUT_VERSIONS.sort(function (x, y) { const a = key(x), b = key(y); for (let i = 0; i < 4; i++) { if (a[i] !== b[i]) return a[i] - b[i]; } return 0; });
+                    try { renderRolloutDefaults(); } catch (e) {}
+                });
             }).catch(function () {});
         } catch (e) {}
         let FM_ROLLOUT_CFG = { basic: 'Prototype', plus: 'Prototype' };
@@ -1561,10 +1566,12 @@
             set('ts-nama', tn.nama); set('ts-slogan', tn.slogan); set('ts-alamat', loc); set('ts-logo', tn.logoText);
             set('ts-warna', /^#[0-9a-f]{6}$/i.test(tn.warna || '') ? tn.warna : '#0f172a');
             window.__tsAksenOld = tn.warnaAksen; window.__tsWarnaOld = tn.warna;
-            document.getElementById('ts-features').innerHTML = FM_PLANS.checklistHtml('ts', tn.features || {}, editable, tn) +
-                '<div style="margin-top:12px"><div style="font-weight:800;font-size:12px;margin-bottom:4px">Nama usaha (untuk fitur Banyak Usaha)</div>' +
+            const usahaHtml =
+                '<div style="margin-top:10px;padding:10px;border-radius:12px;border:1px dashed rgba(34,197,94,.5);background:rgba(34,197,94,.06)"><div style="font-weight:800;font-size:12px;margin-bottom:4px">Nama usaha (untuk fitur Banyak Usaha)</div>' +
                 '<input id="ts-usaha" type="text" placeholder="mis. Jahit, Karung, Kelontong" value="' + escHtml((tn.usaha || []).join(', ')) + '"' + (editable ? '' : ' disabled') + ' style="width:100%;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font-size:12px">' +
                 '<div style="opacity:.6;font-size:11px;margin-top:4px">Pisahkan dengan koma. Hanya dipakai bila fitur Banyak Usaha dicentang. Kosongkan untuk toko satu usaha.</div></div>';
+            { const fh = FM_PLANS.checklistHtml('ts', tn.features || {}, editable, tn); const fe = document.getElementById('ts-features'); fe.innerHTML = fh;
+              const slot = document.getElementById('ts-x-akun'); if (slot) slot.innerHTML = usahaHtml; else fe.insertAdjacentHTML('beforeend', usahaHtml); }
             const sv = document.getElementById('ts-profile-save');
             sv.disabled = !editable; sv.classList.toggle('opacity-40', !editable);
             sv.onclick = function () { saveTenantProfile(tn.id); };

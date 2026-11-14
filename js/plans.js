@@ -186,8 +186,8 @@
 
   /* ---- tabel centang untuk Tower: prefix 'nt' (toko baru) atau 'ts' (ubah toko) ---- */
   var CATS = [
-    { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
     { id: 'akun', label: 'Toko & Akun', keys: ['admin_usaha', 'banyak_usaha', 'instruksi'] },
+    { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
     { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode'] },
     { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
     { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
@@ -216,6 +216,16 @@
     });
     var t = document.getElementById(prefix + '-cnt-all'); if (t) t.textContent = tot + ' fitur tambahan dipilih';
   }
+  function find(prefix, q) {
+    q = String(q || '').toLowerCase().trim();
+    var box = document.getElementById(prefix + '-ts-features') || document, shown = 0;
+    [].forEach.call(document.querySelectorAll('details[data-fmq="' + prefix + '"]'), function (d) {
+      var any = 0;
+      [].forEach.call(d.querySelectorAll('tr[data-q]'), function (tr) { var ok = !q || tr.getAttribute('data-q').indexOf(q) >= 0; tr.style.display = ok ? '' : 'none'; if (ok) any++; });
+      shown += any; d.style.display = (!q || any) ? '' : 'none'; if (q && any) d.open = true;
+    });
+    var n = document.getElementById(prefix + '-qn'); if (n) { n.style.display = q ? '' : 'none'; n.textContent = q ? (shown ? shown + ' fitur cocok' : 'Tidak ada fitur yang cocok. Nama usaha ada di bagian Toko & Akun.') : ''; }
+  }
   function setCat(prefix, cat, on) {
     [].forEach.call(document.querySelectorAll('input[id^="' + prefix + '-f-"][data-cat="' + cat + '"]'), function (el) { if (!el.disabled) el.checked = !!on; });
     cnt(prefix);
@@ -228,7 +238,7 @@
       : ' <span style="font-size:9px;font-weight:900;padding:1px 6px;border-radius:99px;background:rgba(34,197,94,.16);color:#4ade80;vertical-align:middle">BASIC</span>';
   }
   function rowHtml(prefix, f, isNew, editable, tn, cat) {
-    var h = '<tr style="border-top:1px solid rgba(255,255,255,.08);' + (f.soon ? 'opacity:.5' : '') + '"><td style="padding:5px 6px">' + f.label + tierTag(f) + (f.soon ? ' <i>(segera)</i>' : '') + '</td>';
+    var h = '<tr data-q="' + String(f.label || '').toLowerCase().replace(/"/g, '') + '" style="border-top:1px solid rgba(255,255,255,.08);' + (f.soon ? 'opacity:.5' : '') + '"><td style="padding:5px 6px">' + f.label + tierTag(f) + (f.soon ? ' <i>(segera)</i>' : '') + '</td>';
     ROLES.forEach(function (r) {
       var m = f.r[r], cell;
       if (m === 'c') cell = '<span title="Fitur inti: terkunci, tidak bisa dicabut" style="display:inline-flex;width:18px;height:18px;border-radius:5px;background:#ef4444;color:#fff;font-weight:900;font-size:13px;line-height:18px;align-items:center;justify-content:center">✓</span>';
@@ -256,18 +266,16 @@
       '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span style="opacity:.65;font-size:11px">Template cepat:</span><span id="' + prefix + '-presets" style="display:contents">' + presetButtons(prefix) + '</span></div>' +
       '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><b id="' + prefix + '-cnt-all" style="font-size:11.5px"></b><span style="flex:1"></span><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',true);FM_PLANS.cnt(\'' + prefix + '\')" style="' + BSM + '">Centang semua</button><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',false);FM_PLANS.cnt(\'' + prefix + '\')" style="' + BSM + '">Kosongkan semua</button></div>';
     var core = FEATURES.filter(function (f) { return !f.soon && isCore(f); });
-    h += '<details style="' + box + ';border-color:rgba(239,68,68,.45)"><summary style="' + sm + '"><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:#ef4444"></span>Fitur Inti <span style="opacity:.6;font-weight:600">· terkunci · ' + core.length + ' fitur</span></summary><div style="padding:2px 8px 8px">' + tableHtml(core.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, 'inti'); }).join('')) + '</div></details>';
+    /* kotak cari: ketik sebagian nama fitur, baris lain disembunyikan */
+    h += '<div style="margin:2px 0 10px"><input id="' + prefix + '-q" type="search" placeholder="Cari fitur (mis. usaha, neraca, stok)" oninput="FM_PLANS.find(\'' + prefix + '\',this.value)" style="width:100%;box-sizing:border-box;padding:8px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:inherit;font-size:12.5px;outline:none"><div id="' + prefix + '-qn" style="font-size:11px;opacity:.65;margin-top:4px;display:none"></div></div>';
     var cats = CATS.concat([{ id: 'lain', label: 'Lainnya', keys: [] }]);
-    [{ id: 'extra', label: 'Fitur Tambahan', note: 'standar, diberikan ke toko', col: '#22c55e' }, { id: 'store', label: 'Fitur Store', note: 'layak disewa satuan di OneilStore', col: '#a855f7' }].forEach(function (T) {
-    var tcount = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && (isStore(f) === (T.id === 'store')); }).length;
-    h += '<div style="display:flex;align-items:center;gap:8px;margin:12px 2px 6px;font-weight:900;font-size:13px"><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:' + T.col + '"></span>' + T.label + ' <span style="opacity:.6;font-weight:600;font-size:11px">· ' + T.note + ' · ' + tcount + ' fitur</span></div>';
     cats.forEach(function (c) {
-      var fs = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && catOf(f) === c.id && (isStore(f) === (T.id === 'store')); });
+      var fs = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && catOf(f) === c.id; });
       if (!fs.length) return;
       fs.sort(function (a, b) { return (featTier(a) === 'plus' ? 1 : 0) - (featTier(b) === 'plus' ? 1 : 0); }); /* BASIC dulu, PLUS belakangan */
-      h += '<details open style="' + box + '"><summary style="' + sm + '"><span>' + c.label + '</span><span id="' + prefix + '-cnt-' + T.id + '-' + c.id + '" style="opacity:.7;font-weight:700;font-size:11px"></span><span style="flex:1"></span>' + (editable === false ? '' : '<button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + T.id + '-' + c.id + '\',true)" style="' + BSM + '">Centang</button><button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + T.id + '-' + c.id + '\',false)" style="' + BSM + '">Kosongkan</button>') + '</summary><div style="padding:2px 8px 8px">' + tableHtml(fs.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, T.id + '-' + c.id); }).join('')) + '</div></details>';
+      h += '<details open data-fmq="' + prefix + '" style="' + box + '"><summary style="' + sm + '"><span>' + c.label + '</span><span id="' + prefix + '-cnt-' + c.id + '" style="opacity:.7;font-weight:700;font-size:11px"></span><span style="flex:1"></span>' + (editable === false ? '' : '<button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',true)" style="' + BSM + '">Centang</button><button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',false)" style="' + BSM + '">Kosongkan</button>') + '</summary><div style="padding:2px 8px 8px">' + tableHtml(fs.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, c.id); }).join('')) + '<div id="' + prefix + '-x-' + c.id + '"></div></div></details>';
     });
-    });
+    h += '<details data-fmq="' + prefix + '" style="' + box + ';border-color:rgba(239,68,68,.45)"><summary style="' + sm + '"><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:#ef4444"></span>Fitur Inti <span style="opacity:.6;font-weight:600">· terkunci · ' + core.length + ' fitur</span></summary><div style="padding:2px 8px 8px">' + tableHtml(core.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, 'inti'); }).join('')) + '</div></details>';
     var soon = FEATURES.filter(function (f) { return f.soon; });
     if (soon.length) h += '<details style="' + box + ';opacity:.7"><summary style="' + sm + '">Segera hadir <span style="opacity:.6;font-weight:600">· ' + soon.length + ' fitur</span></summary><div style="padding:2px 8px 8px">' + tableHtml(soon.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, 'soon'); }).join('')) + '</div></details>';
     setTimeout(function () { cnt(prefix); }, 0);
@@ -422,6 +430,6 @@
     m.style.display = 'flex';
   }
 
-  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml,
+  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, find: find,
     readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();
