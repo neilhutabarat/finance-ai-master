@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.1';
+  var BETA = 'v1.0.2';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.2', '14 Nov 2026', [
+      '[Perbaikan] Pop-up Cuaca dan Kurs & Emas memakai kaca terang yang sama dengan pop-up lain, tidak lagi hitam',
+      '[Perbaikan] Pop-up Cuaca di desktop tampil dalam 4 kolom sehingga muat tanpa scroll',
+      '[Perbaikan] Pemberitahuan versi baru dan "Yang baru" ikut tampil terang dan mudah dibaca',
+      '[Keamanan] Perubahan hanya pada tampilan; tidak ada data yang dikirim atau diubah'
+    ]],
     ['v1.0.1', '14 Nov 2026', [
       '[Perbaikan] Tulisan pada dock bawah tidak lagi bertumpuk (termasuk saat bahasa English)',
       '[Perbaikan] Tema Original/Base kini sama untuk Admin, Kasir, Manager, dan Owner; bawaan Base putih gading',

@@ -67,6 +67,26 @@
     document.body.appendChild(m);
     return m;
   }
+  /* Pop-up cuaca dan kurs memakai kaca terang yang sama dengan pop-up lain; di desktop kartu disusun 4 kolom agar muat tanpa scroll */
+  (function () {
+    var M = '#w-modal-weather,#w-modal-kurs', P = '#w-modal-weather>div,#w-modal-kurs>div';
+    var c = M.split(',').map(function (x) { return x; });
+    var pn = P.split(',').map(function (x) { return x; });
+    var t = [
+      c.join(',') + '{background:rgba(15,23,42,.28)!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}',
+      pn.join(',') + '{max-width:min(760px,96vw)!important;max-height:96vh!important;padding:16px 20px!important;background:linear-gradient(160deg,rgba(255,255,255,.9),rgba(255,255,255,.78) 55%,rgba(255,255,255,.86))!important;color:#0f172a!important;border:1px solid rgba(255,255,255,.85)!important;box-shadow:0 24px 60px -20px rgba(15,23,42,.45),inset 0 1px 0 rgba(255,255,255,.95)!important;backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2)}',
+      pn.map(function (x) { return x + ' [data-x]'; }).join(',') + '{background:rgba(15,23,42,.08)!important;color:#0f172a!important}',
+      pn.map(function (x) { return x + ' *[style*="color:#94a3b8"]'; }).join(',') + '{color:#475569!important}',
+      pn.map(function (x) { return x + ' *[style*="color:#64748b"]'; }).join(',') + '{color:#475569!important}',
+      pn.map(function (x) { return x + ' *[style*="color:#67e8f9"]'; }).join(',') + '{color:#0369a1!important}',
+      pn.map(function (x) { return x + ' *[style*="color:#fbbf24"]'; }).join(',') + '{color:#b45309!important}',
+      pn.map(function (x) { return x + ' [style*="background:rgba(255,255,255,.06)"]'; }).join(',') + '{background:rgba(255,255,255,.62)!important;border-color:rgba(15,23,42,.1)!important}',
+      pn.map(function (x) { return x + ' [style*="border-top:1px solid rgba(255,255,255,.1)"]'; }).join(',') + '{border-top-color:rgba(15,23,42,.12)!important}',
+      pn.map(function (x) { return x + ' [data-gps]'; }).join(',') + '{background:rgba(15,23,42,.06)!important;border-color:rgba(15,23,42,.2)!important;color:#0f172a!important}',
+      '@media(min-width:700px){' + pn.map(function (x) { return x + ' [style*="grid-template-columns:1fr 1fr"]'; }).join(',') + '{grid-template-columns:repeat(4,1fr)!important}}'
+    ].join('\n');
+    var st = document.createElement('style'); st.id = 'w-modal-css'; st.textContent = t; (document.head || document.documentElement).appendChild(st);
+  })();
   function showModal(m) { m.style.display = 'flex'; }
 
   // ---------- KURS & EMAS ----------

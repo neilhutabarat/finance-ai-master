@@ -23,10 +23,10 @@
     if (pill) return;
     pill = document.createElement('div');
     pill.id = 'fm-update-pill';
-    pill.style.cssText = 'position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:2147483100;background:#111;color:#fff;border-radius:16px;padding:10px 14px;font:13px system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.3);display:flex;align-items:center;gap:10px;max-width:92vw';
+    pill.style.cssText = 'position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:2147483100;background:rgba(255,255,255,.9);color:#0f172a;border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;padding:10px 14px;font:13px system-ui,sans-serif;box-shadow:0 8px 28px -8px rgba(15,23,42,.35);display:flex;align-items:center;gap:10px;max-width:92vw';
     pill.innerHTML = '<span>Versi baru tersedia' + (versiBaru ? ' (' + versiBaru.replace('1.0.0 ', '').replace('BETA ', 'Beta ') + ')' : '') + '. Muat ulang halaman untuk memperbarui.</span>' +
       '<button id="fm-update-go" style="all:unset;cursor:pointer;background:#2563eb;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700;font-size:12.5px">Muat ulang</button>' +
-      '<button id="fm-update-later" style="all:unset;cursor:pointer;color:#e5e7eb;font-size:12.5px;padding:6px 8px">Nanti</button>';
+      '<button id="fm-update-later" style="all:unset;cursor:pointer;color:#334155;font-size:12.5px;padding:6px 8px">Nanti</button>';
     document.body.appendChild(pill);
     document.getElementById('fm-update-go').onclick = muatUlang;
     document.getElementById('fm-update-later').onclick = function () { pill.remove(); pill = null; };
@@ -57,9 +57,9 @@
     var n = FM_RELEASES.last(1)[0]; if (!n) return;
     var ov = document.createElement('div');
     ov.id = 'fm-whatsnew';
-    ov.style.cssText = 'position:fixed;left:14px;bottom:14px;z-index:2147483050;max-width:320px;background:#111;color:#eee;border-radius:18px;padding:14px 16px;font:13px/1.5 system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35)';
+    ov.style.cssText = 'position:fixed;left:14px;bottom:14px;z-index:2147483050;max-width:320px;background:rgba(255,255,255,.9);color:#0f172a;border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:18px;padding:14px 16px;font:13px/1.5 system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35)';
     var items = (n[2] || []).slice(0, 5).map(function (t) { return '<li style="margin:3px 0">' + String(t).replace(/^\[(\w+)\]\s*/, '').replace(/[<>&]/g, function (c) { return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]; }) + '</li>'; }).join('');
-    ov.innerHTML = '<b style="display:block;margin-bottom:4px">Yang baru di ' + (/^\d/.test(n[0]) ? 'v' : '') + n[0] + '</b><ul style="margin:0;padding-left:18px;color:#bbb;font-size:12px">' + items + '</ul>' +
+    ov.innerHTML = '<b style="display:block;margin-bottom:4px">Yang baru di ' + (/^\d/.test(n[0]) ? 'v' : '') + n[0] + '</b><ul style="margin:0;padding-left:18px;color:#475569;font-size:12px">' + items + '</ul>' +
       '<button id="fm-whatsnew-ok" style="all:unset;cursor:pointer;display:block;margin-top:10px;text-align:center;background:#2563eb;color:#fff;border-radius:10px;padding:6px 0;font-weight:700;font-size:12.5px">Mengerti</button>';
     document.body.appendChild(ov);
     function tutup() { try { localStorage.setItem('fm_seen_version', versiBerjalan); } catch (e) {} if (!ov.parentNode) return; ov.style.transition = 'opacity .5s'; ov.style.opacity = '0'; setTimeout(function () { ov.remove(); }, 520); }
