@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'RC 2';
+  var BETA = 'RC 3';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['RC 3', '14 Nov 2026', [
+      '[Baru] Control Tower kini memakai kaca bening seperti aplikasi toko, dengan pilihan tema Original/Base dan tingkat kaca 1-5 di Pengaturan',
+      '[Perbaikan] Tombol dan panel Control Tower tidak lagi hitam; teks gelap agar jelas terbaca',
+      '[Perbaikan] Tombol menu Manager dan Owner rata tengah sejajar dengan dock',
+      '[Keamanan] Tampilan hanya bisa diatur oleh pengelola layanan; tidak ada data toko yang dikirim'
+    ]],
     ['RC 2', '14 Nov 2026', [
       '[Perbaikan] Pop-up di Control Tower tidak lagi terbalik warna; gambar wallpaper dan tombol tampil normal',
       '[Perbaikan] Tombol muat ulang setelah pembaruan kini juga muncul di Control Tower; gambar di pop-up akun toko tidak lagi negatif',
@@ -361,6 +367,7 @@
     h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (look === 'original' ? 'on' : '') + '" data-look="original"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#bfe3ff,#e8f6ff 45%,#9fd6c0)"></div>Original</button>' +
       '<button class="fm-mode ' + (look === 'base' ? 'on' : '') + '" data-look="base"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#eceff4)"></div>Base</button></div></div>';
+    if (ROLE === 'tower') { var _tg = parseInt(localStorage.getItem('fm_glass_tw'), 10) || 3; h += '<div class="fm-sec"><div class="fm-lab">Kaca Control Tower (1 buram, 5 bening)</div><div class="fm-modes">' + [1,2,3,4,5].map(function (n) { return '<button class="fm-mode ' + (_tg === n ? 'on' : '') + '" data-twg="' + n + '">' + n + '</button>'; }).join('') + '</div></div>'; }
     if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
       ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +
       '</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px"><label style="font-size:12px;color:#c7cbd6">Warna bebas</label><input type="color" id="fm-acc-custom" value="' + esc(pick) + '" style="width:44px;height:30px;border:0;background:none;padding:0"><button class="fm-btn" data-accreset style="margin-left:auto">Kembali ke Bawaan</button></div></div></div>';
@@ -385,6 +392,7 @@
     var pb = box.querySelector('[data-plans]'); if (pb) pb.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_PLANS) FM_PLANS.openModal(); };
     var sh = box.querySelector('[data-shield]'); if (sh) sh.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_SHIELD) FM_SHIELD.openPanel(); };
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
+    box.querySelectorAll('[data-twg]').forEach(function (b) { b.onclick = function () { try { localStorage.setItem('fm_glass_tw', b.getAttribute('data-twg')); } catch (e) {} window.dispatchEvent(new Event('fm:glass')); render(); }; });
     box.querySelectorAll('[data-look]').forEach(function (b) { b.onclick = function () { pref.look = b.getAttribute('data-look'); savePref(pref); apply(); render(); }; });
     box.querySelectorAll('[data-lang]').forEach(function (b) { b.onclick = function () { if (window.FM_I18N) FM_I18N.set(b.getAttribute('data-lang')); }; });
     box.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { pref.accent = b.getAttribute('data-acc'); savePref(pref); apply(); render(); }; });
