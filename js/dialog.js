@@ -6,7 +6,7 @@
   var nativeAlert = window.alert;
   var css = document.createElement('style');
   css.textContent =
-    '#fm-dlg{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.38);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;animation:fmDlgIn .16s ease-out}' +
+    '#fm-dlg{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.38);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;animation:fmDlgIn .16s ease-out}' +
     '@keyframes fmDlgIn{from{opacity:0}to{opacity:1}}' +
     '#fm-dlg .fm-dlg-box{width:min(420px,100%);border-radius:22px;background:rgba(255,255,255,.84);border:1px solid rgba(255,255,255,.7);box-shadow:0 24px 60px rgba(15,23,42,.35);padding:22px 22px 18px;color:#0f172a;text-align:center;animation:fmDlgPop .18s cubic-bezier(.2,.9,.25,1.15)}' +
     '@keyframes fmDlgPop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}' +

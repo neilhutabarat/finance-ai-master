@@ -3,11 +3,19 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.5';
+  var BETA = 'v1.0.6';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.6', '14 Nov 2026', [
+      '[Perbaikan] Popup konfirmasi (mis. Hapus Admin) kini tampil di paling depan, tidak lagi tertutup jendela lain',
+      '[Perbaikan] Admin tambahan: nama Admin bisa diubah, dan daftar pilihan usaha terbaca jelas',
+      '[Perbaikan] Form Input Transaksi di Kasir muat utuh di layar pendek, kolom Keterangan dan Petugas tidak tertutup tombol',
+      '[Perbaikan] Logo toko tidak hilang lagi saat header digambar ulang, dan kembali ke logo bawaan bila gambarnya gagal dimuat',
+      '[Perbaikan] Mutasi Kas dan Buku Besar menampilkan label usaha pada tiap transaksi',
+      '[Keamanan] Konfirmasi hapus Admin selalu terlihat, sehingga akun tidak terhapus tanpa disadari'
+    ]],
     ['v1.0.5', '14 Nov 2026', [
       '[Perbaikan] Toko banyak usaha: Admin utama bisa dinonaktifkan, sehingga yang bisa masuk Kasir hanya Admin per usaha (mis. 3 Admin untuk 3 toko)',
       '[Perbaikan] Akun Login memberi label jelas "Admin utama (melihat semua usaha)", dan halaman masuk menyembunyikannya bila dinonaktifkan',
@@ -211,6 +219,23 @@
     return (4 + wpShift(cfg) + (wk + 1) * 7) * 86400000 + w.hr * 3600000 - WP_TZ;
   }
   /* tirai muat: halaman disembunyikan sampai kaca + wallpaper siap, supaya tidak berkedip tampilan/gambar lama */
+  /* Control Tower: pilihan mode Terang (bawaan) atau Gelap, tersimpan per perangkat. Gelap = tampilan terang dibalik warnanya. */
+  function ctMode() { try { return localStorage.getItem('fm_ct_mode') === 'gelap' ? 'gelap' : 'terang'; } catch (e) { return 'terang'; } }
+  function applyCtMode() {
+    if (ROLE !== 'tower') return;
+    var h = document.documentElement, st = document.getElementById('fm-ctdark'), on = ctMode() === 'gelap';
+    if (on) h.setAttribute('data-fm-ctdark', '1'); else h.removeAttribute('data-fm-ctdark');
+    if (on && !st) {
+      var F = 'filter:invert(1) hue-rotate(180deg)';
+      st = document.createElement('style'); st.id = 'fm-ctdark';
+      st.textContent = 'html[data-fm-ctdark="1"]{' + F + ';background:#fbf7ea!important}' +
+        'html[data-fm-ctdark="1"] img,html[data-fm-ctdark="1"] video,html[data-fm-ctdark="1"] canvas,html[data-fm-ctdark="1"] svg image{' + F + '}' +
+        'html[data-fm-ctdark="1"] [style*="z-index: 21474"],html[data-fm-ctdark="1"] #fm-set,html[data-fm-ctdark="1"] #fm-dlg{' + F + '}' +
+        '@media print{html[data-fm-ctdark="1"]{filter:none!important}}';
+      (document.head || h).appendChild(st);
+    } else if (!on && st) st.remove();
+  }
+  applyCtMode();
   (function () {
     try {
       var h = document.documentElement;
@@ -314,6 +339,9 @@
     h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (look === 'original' ? 'on' : '') + '" data-look="original"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#bfe3ff,#e8f6ff 45%,#9fd6c0)"></div>Original</button>' +
       '<button class="fm-mode ' + (look === 'base' ? 'on' : '') + '" data-look="base"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#eceff4)"></div>Base</button></div></div>';
+    if (ROLE === 'tower') h += '<div class="fm-sec"><div class="fm-lab">Mode Control Tower</div><div class="fm-modes">' +
+      '<button class="fm-mode ' + (ctMode() === 'terang' ? 'on' : '') + '" data-ctm="terang"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#f3efe0)"></div>Terang</button>' +
+      '<button class="fm-mode ' + (ctMode() === 'gelap' ? 'on' : '') + '" data-ctm="gelap"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#0b1220,#1e293b)"></div>Gelap</button></div></div>';
     if (ROLE === 'tower') { var _tg = parseInt(localStorage.getItem('fm_glass_tw'), 10) || 4; h += '<div class="fm-sec"><div class="fm-lab">Kaca Control Tower (1 buram, 8 bening)</div><div class="fm-modes">' + [1,2,3,4,5,6,8,7].sort().map(function (n) { return '<button class="fm-mode ' + (_tg === n ? 'on' : '') + '" data-twg="' + n + '">' + n + '</button>'; }).join('') + '</div></div>'; }
     if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
       ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +
@@ -339,6 +367,7 @@
     var pb = box.querySelector('[data-plans]'); if (pb) pb.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_PLANS) FM_PLANS.openModal(); };
     var sh = box.querySelector('[data-shield]'); if (sh) sh.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_SHIELD) FM_SHIELD.openPanel(); };
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
+    box.querySelectorAll('[data-ctm]').forEach(function (b) { b.onclick = function () { try { localStorage.setItem('fm_ct_mode', b.getAttribute('data-ctm')); } catch (e) {} applyCtMode(); render(); }; });
     box.querySelectorAll('[data-twg]').forEach(function (b) { b.onclick = function () { try { localStorage.setItem('fm_glass_tw', b.getAttribute('data-twg')); } catch (e) {} window.dispatchEvent(new Event('fm:glass')); render(); }; });
     box.querySelectorAll('[data-look]').forEach(function (b) { b.onclick = function () { pref.look = b.getAttribute('data-look'); savePref(pref); apply(); render(); }; });
     box.querySelectorAll('[data-lang]').forEach(function (b) { b.onclick = function () { if (window.FM_I18N) FM_I18N.set(b.getAttribute('data-lang')); }; });
@@ -425,7 +454,10 @@
       var ri = document.getElementById('receipt-logo-img');
       if (logoData) {
         if (!img) { img = document.createElement('img'); img.id = 'fm-logo-img'; img.alt = 'Logo'; img.style.cssText = 'height:clamp(56px,8vw,76px);width:clamp(56px,8vw,76px);flex:0 0 auto;object-fit:cover;border-radius:16px;background:transparent;padding:0;margin-right:12px'; row.insertBefore(img, block); }
-        img.src = logoData; olds.forEach(function (o) { o.style.display = 'none'; });
+        if (img.getAttribute('data-src-len') !== String(logoData.length)) { img.setAttribute('data-src-len', String(logoData.length)); img.__failed = false; img.src = logoData; }
+        img.onerror = function () { /* gambar gagal dimuat: kembali ke logo bawaan supaya header tidak kosong */ try { img.__failed = true; img.style.display = 'none'; olds.forEach(function (o) { o.style.display = ''; }); } catch (e) {} };
+        img.style.display = '';
+        olds.forEach(function (o) { o.style.display = 'none'; });
         var inv = 0, e = img.parentElement; while (e && e.nodeType === 1) { if (/invert/.test(getComputedStyle(e).filter || '')) inv++; e = e.parentElement; }
         img.style.setProperty('filter', inv % 2 ? 'invert(1) hue-rotate(180deg)' : 'none', 'important');
         if (ri) { ri.src = logoData; ri.classList.remove('hidden'); }
@@ -445,6 +477,19 @@
           var d = snap.exists ? snap.data() : null;
           logoData = (d && d.logo) || null;
           applyLogo(); setTimeout(applyLogo, 600); setTimeout(applyLogo, 2500);
+          /* header bisa digambar ulang oleh modul lain (nama toko, peran): pasang lagi logo toko bila terhapus */
+          if (!window.__fmLogoObs && window.MutationObserver && document.body) {
+            var tmr = null; window.__fmLogoObs = new MutationObserver(function () {
+              if (!logoData) return; clearTimeout(tmr);
+              tmr = setTimeout(function () {
+                var i = document.getElementById('fm-logo-img'); if (i && i.__failed) return;
+                var bad = !i || !i.isConnected;
+                if (!bad) { var row = i.parentElement; bad = !!row && [].some.call(row.children, function (c) { return c !== i && c.querySelector && c.querySelector('svg') && (c.compareDocumentPosition(i) & 4) && getComputedStyle(c).display !== 'none'; }); }
+                if (bad) applyLogo();
+              }, 250);
+            });
+            window.__fmLogoObs.observe(document.body, { childList: true, subtree: true });
+          }
         }, function () {});
       } else if (tries > 100) clearInterval(t);
     }, 100);

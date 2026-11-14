@@ -35,6 +35,12 @@
     return t.isProduct ? ofProduct(t.accountCode) : ofAccount(t.accountCode);
   }
   function ofDraft(d) { return d && d.isProduct ? ofProduct(d.accountCode) : ofAccount(d && d.accountCode); }
+  /* label usaha kecil di baris transaksi (Mutasi, Buku Besar); kosong bila toko satu usaha */
+  function tag(t) {
+    if (!enabled()) return '';
+    var n = ofTx(t) || 'Umum';
+    return ' <span style="display:inline-block;font-size:10px;font-weight:800;line-height:1.5;padding:0 7px;border-radius:99px;border:1px solid rgba(100,116,139,.55);margin-left:6px;white-space:nowrap">' + esc(n) + '</span>';
+  }
   function options(cur) {
     return '<option value="">Umum</option>' + list().map(function (n) { return '<option value="' + esc(n) + '"' + (n === cur ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('');
   }
@@ -74,6 +80,6 @@
   function setView(v) { try { sessionStorage.setItem(vkey(), v || ''); } catch (e) {} try { window.dispatchEvent(new CustomEvent('fm-biz-view', { detail: v || '' })); } catch (e) {} }
   function vf(l) { var v = view(); if (!v || !Array.isArray(l)) return l; return l.filter(function (t) { return ofTx(t) === v; }); }
 
-  window.FM_BIZ = { view: view, setView: setView, vf: vf, list: list, enabled: enabled, ofAccount: ofAccount, ofProduct: ofProduct, ofGroup: ofGroup, ofTx: ofTx, ofDraft: ofDraft, options: options, canon: canon };
+  window.FM_BIZ = { tag: tag, view: view, setView: setView, vf: vf, list: list, enabled: enabled, ofAccount: ofAccount, ofProduct: ofProduct, ofGroup: ofGroup, ofTx: ofTx, ofDraft: ofDraft, options: options, canon: canon };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

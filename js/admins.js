@@ -29,7 +29,7 @@
     document.body.appendChild(ov);
   }
   function load() { return Promise.all([FM_AUTH.admins(tid), FM_AUTH.mainOff ? FM_AUTH.mainOff(tid).catch(function () { return false; }) : false]).then(function (r) { rows = r[0]; mOff = !!r[1]; render(); }); }
-  function bizSel(id, cur) { return '<select id="' + id + '" style="' + inp + '"><option value="">Semua usaha</option>' + usahaList().map(function (b) { return '<option value="' + esc(b) + '"' + (b === cur ? ' selected' : '') + '>' + esc(b) + '</option>'; }).join('') + '</select>'; }
+  function bizSel(id, cur) { return '<select id="' + id + '" style="' + inp + ';color-scheme:dark"><option value="">Semua usaha</option>' + usahaList().map(function (b) { return '<option value="' + esc(b) + '"' + (b === cur ? ' selected' : '') + '>' + esc(b) + '</option>'; }).join('') + '</select>'; }
   function render() {
     if (!ov || ov.style.display === 'none') return;
     var h = '<div style="width:100%;max-width:720px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
@@ -41,7 +41,7 @@
     if (!rows.length) h += '<tr><td style="padding:14px;opacity:.7;text-align:center">Belum ada Admin tambahan.</td></tr>';
     rows.forEach(function (a) {
       h += '<tr style="border-top:1px solid rgba(255,255,255,.08)"><td style="padding:8px 6px"><b>' + esc(a.name) + '</b><br><span style="opacity:.6;font-size:11px">' + (a.biz ? 'Usaha: ' + esc(a.biz) : 'Semua usaha') + '</span></td>' +
-        '<td style="text-align:right;white-space:nowrap"><button data-a="biz" data-id="' + esc(a.slot) + '" style="' + btn + ';padding:5px 10px">Ubah usaha</button> <button data-a="pin" data-id="' + esc(a.slot) + '" style="' + btn + ';padding:5px 10px">PIN baru</button> <button data-a="del" data-id="' + esc(a.slot) + '" style="' + btn + ';padding:5px 10px;color:#fb7185">Hapus</button></td></tr>';
+        '<td style="text-align:right;white-space:nowrap"><button data-a="nama" data-id="' + esc(a.slot) + '" style="' + btn + ';padding:5px 10px">Ubah nama</button> <button data-a="biz" data-id="' + esc(a.slot) + '" style="' + btn + ';padding:5px 10px">Ubah usaha</button> <button data-a="pin" data-id="' + esc(a.slot) + '" style="' + btn + ';padding:5px 10px">PIN baru</button> <button data-a="del" data-id="' + esc(a.slot) + '" style="' + btn + ';padding:5px 10px;color:#fb7185">Hapus</button></td></tr>';
     });
     h += '</tbody></table></div><div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);font-weight:800;font-size:13px">Tambah Admin</div>' +
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:8px">' +
@@ -69,6 +69,11 @@
         var np = FM_AUTH.randomPin();
         await FM_AUTH.provisionAdmin(tid, cur.slot, np, cur.name, cur.biz);
         result = 'PIN baru untuk ' + cur.name + ': ' + np; audit('PIN baru Admin ' + cur.name, '-', 'PIN BARU'); await load();
+      } else if (a === 'nama' && cur) {
+        var nn = window.prompt('Nama baru untuk Admin "' + cur.name + '"', cur.name); if (nn === null) return; nn = nn.trim();
+        if (!nn) { msg = 'Nama Admin tidak boleh kosong.'; return render(); }
+        if (nn.toLowerCase() !== cur.name.toLowerCase() && rows.some(function (r) { return r.name.toLowerCase() === nn.toLowerCase(); })) { msg = 'Nama Admin sudah dipakai.'; return render(); }
+        await FM_AUTH.updateAdmin(tid, cur.slot, nn, cur.biz); audit('Nama Admin ' + cur.name, cur.name, nn); result = 'Nama Admin diubah menjadi ' + nn + '. Berlaku saat Admin masuk lagi.'; await load();
       } else if (a === 'biz' && cur) {
         var list = usahaList(), ans = window.prompt('Usaha untuk ' + cur.name + '\nKetik salah satu: ' + (list.join(', ') || '(belum ada usaha)') + '\nKosongkan = semua usaha', cur.biz || '');
         if (ans === null) return; ans = ans.trim();

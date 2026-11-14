@@ -49,7 +49,7 @@
         if (from && r.d && r.d < from) return; if (to && r.d && r.d > to) return;
         var a = Number(r.x.amount) || 0; n++;
         if (out_) { tout += a; bal -= a; } else { tin += a; bal += a; }
-        h += '<tr><td>' + esc(r.d ? show(r.d) : '-') + '</td><td>' + esc(r.x.desc || r.x.description || c.name || '') + '</td><td class="n">' + (out_ ? '' : rp(a)) + '</td><td class="n">' + (out_ ? rp(a) : '') + '</td><td class="n">' + rp(bal) + '</td></tr>';
+        h += '<tr><td>' + esc(r.d ? show(r.d) : '-') + '</td><td>' + esc(r.x.desc || r.x.description || c.name || '') + ((window.FM_BIZ && FM_BIZ.tag) ? FM_BIZ.tag(r.x) : '') + '</td><td class="n">' + (out_ ? '' : rp(a)) + '</td><td class="n">' + (out_ ? rp(a) : '') + '</td><td class="n">' + rp(bal) + '</td></tr>';
       });
       if (!n) h += '<tr><td colspan="5" class="sm" style="text-align:center;padding:16px">Belum ada mutasi pada akun dan tanggal ini.</td></tr>';
       out.innerHTML = '<div class="tb"><table><thead><tr><th>Tanggal</th><th>Keterangan</th><th class="n">Masuk</th><th class="n">Keluar</th><th class="n">Saldo</th></tr></thead><tbody>' + h + '</tbody><tfoot><tr><td colspan="2">[' + esc(code) + '] ' + esc(c.name || '') + ' · ' + n + ' transaksi</td><td class="n">' + rp(tin) + '</td><td class="n">' + rp(tout) + '</td><td class="n">' + rp(bal) + '</td></tr></tfoot></table></div>';
