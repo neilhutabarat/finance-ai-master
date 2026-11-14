@@ -1,17 +1,17 @@
 /* tower-wall.js — tampilan toko dari Tower: wallpaper (galeri + unggah), jadwal, kejelasan kaca, hujan di kaca, wallpaper portal.
    Global : app_meta/wallpaper = { json } ; gambar unggahan: app_meta/wpimg_<id> = { d: dataURL, t: thumbnail }
             (dibaca semua toko tanpa login, hanya Tower yang menulis).
-   Per toko: tenant_ctrl/<toko>.glass (1-5) dan .rain ('on'|'off'); kosong = ikut global.
+   Per toko: tenant_ctrl/<toko>.glass (1-8) dan .rain ('on'|'off'); kosong = ikut global.
    Klien hanya membaca; berganti sekitar 30 detik tanpa muat ulang. */
 (function () {
   'use strict';
   if (!/provider/.test(location.pathname)) return;
   var DAYS = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-  var GL = [['1', '1 Buram'], ['2', '2'], ['3', '3 Normal'], ['4', '4'], ['5', '5 Bening']];
+  var GL = [['1', '1 Buram'], ['2', '2'], ['3', '3 Normal'], ['4', '4'], ['5', '5'], ['6', '6'], ['7', '7'], ['8', '8 Bening']];
   var ov = null, cfg = null, sel = 0, msg = '', saving = false, tab = 'gambar', ctrls = {}, rowMsg = {}, q = '', listening = false, thumbs = {}, busy = '';
   function DB() { return (typeof db !== 'undefined' && db) ? db : null; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function c5(v, d) { v = parseInt(v, 10); return v >= 1 && v <= 5 ? v : d; }
+  function c5(v, d) { v = parseInt(v, 10); return v >= 1 && v <= 8 ? v : d; }
   function norm(c) {
     c = c || {}; var d = { mode: c.mode === 'fixed' ? 'fixed' : 'auto' };
     d.items = FM_WP.items(c); var n = d.items.length;

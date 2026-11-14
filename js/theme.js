@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'RC 7';
+  var BETA = 'RC 8';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['RC 8', '14 Nov 2026', [
+      '[Baru] Tingkat kaca 1-8 (8 hampir transparan) untuk toko dan Control Tower',
+      '[Baru] Manager dan Owner punya tombol Ponsel/Desktop di dock (di samping OneilStore) untuk memilih tampilan HP atau desktop',
+      '[Perbaikan] Tulisan lebih tipis dan jelas tanpa bayangan ganda; pop-up memakai satu desain kaca yang lebih pekat agar enak dibaca',
+      '[Keamanan] Pilihan tampilan hanya tersimpan di perangkat ini; tidak ada data toko yang dikirim'
+    ]],
     ['RC 7', '14 Nov 2026', [
       '[Baru] Logo UMKM tampil di header Kasir, Manager, dan Owner serta di atas struk; logo dipasang dari Pengaturan toko atau oleh pengelola layanan',
       '[Perbaikan] Logo yang diunggah tidak lagi hanya jadi ikon aplikasi; bila belum ada logo, tampilan lama tetap dipakai',
@@ -387,7 +393,7 @@
     h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (look === 'original' ? 'on' : '') + '" data-look="original"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#bfe3ff,#e8f6ff 45%,#9fd6c0)"></div>Original</button>' +
       '<button class="fm-mode ' + (look === 'base' ? 'on' : '') + '" data-look="base"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#eceff4)"></div>Base</button></div></div>';
-    if (ROLE === 'tower') { var _tg = parseInt(localStorage.getItem('fm_glass_tw'), 10) || 4; h += '<div class="fm-sec"><div class="fm-lab">Kaca Control Tower (1 buram, 5 bening)</div><div class="fm-modes">' + [1,2,3,4,5].map(function (n) { return '<button class="fm-mode ' + (_tg === n ? 'on' : '') + '" data-twg="' + n + '">' + n + '</button>'; }).join('') + '</div></div>'; }
+    if (ROLE === 'tower') { var _tg = parseInt(localStorage.getItem('fm_glass_tw'), 10) || 4; h += '<div class="fm-sec"><div class="fm-lab">Kaca Control Tower (1 buram, 8 bening)</div><div class="fm-modes">' + [1,2,3,4,5,6,8,7].sort().map(function (n) { return '<button class="fm-mode ' + (_tg === n ? 'on' : '') + '" data-twg="' + n + '">' + n + '</button>'; }).join('') + '</div></div>'; }
     if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
       ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +
       '</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px"><label style="font-size:12px;color:#c7cbd6">Warna bebas</label><input type="color" id="fm-acc-custom" value="' + esc(pick) + '" style="width:44px;height:30px;border:0;background:none;padding:0"><button class="fm-btn" data-accreset style="margin-left:auto">Kembali ke Bawaan</button></div></div></div>';

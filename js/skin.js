@@ -532,7 +532,9 @@
     trophy: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',
     building: '<path d="M4 21V5l8-3 8 3v16M9 21v-4h6v4M8 9h.01M12 9h.01M16 9h.01M8 13h.01M12 13h.01M16 13h.01"/>',
     moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
-    out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>'
+    out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+    phone: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+    desk: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/>'
   };
   function svg(k) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (IC[k] || IC.grid) + '</svg>'; }
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
@@ -665,9 +667,10 @@
     if (findLogout()) tail.push({ label: 'Keluar', icon: 'out', fn: window.FM_LOGOUT, danger: true });
     var maxShown = wide ? 9 : 5;
     var shown = items, extra = [];
-    var pin = storeItem ? 1 : 0;
+    var devItem = (storeItem && window.FM_DEVMODE && FM_DEVMODE.canSwitch()) ? { label: FM_DEVMODE.inFrame ? 'Desktop' : 'Ponsel', icon: FM_DEVMODE.inFrame ? 'desk' : 'phone', fn: function () { FM_DEVMODE.toggle(); } } : null;
+    var pin = (storeItem ? 1 : 0) + (devItem ? 1 : 0);
     if (items.length + pin + tail.length > maxShown) { var keep = maxShown - tail.length - 1 - pin; shown = items.slice(0, keep); extra = items.slice(keep); }
-    if (storeItem) shown = shown.concat([storeItem]);
+    if (storeItem) shown = shown.concat(devItem ? [storeItem, devItem] : [storeItem]);
     function act(it) { return function () { if (it.fn) it.fn(); else it.el.click(); }; }
     function btn(it) {
       var b = document.createElement('button'); b.className = 'fm-dk' + (it.danger ? ' danger' : ''); b.type = 'button';

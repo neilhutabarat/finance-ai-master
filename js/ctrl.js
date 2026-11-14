@@ -431,7 +431,7 @@
             try { localStorage.setItem('fm_rentals_' + tenant.id, JSON.stringify((d && d.rentals) || {})); } catch (eR) {}
             /* kejelasan kaca per toko (1-5), diatur Tower; kosong = ikut pengaturan umum */
             try { var rv = d && (d.rain === 'on' || d.rain === 'off') ? d.rain : null; var rs = JSON.stringify({ id: tenant.id, v: rv }); if (localStorage.getItem('fm_rain_s') !== rs) { localStorage.setItem('fm_rain_s', rs); window.dispatchEvent(new CustomEvent('fm:glass')); } } catch (eRn) {}
-            try { var gv = d ? parseInt(d.glass, 10) : 0; var gs = JSON.stringify({ id: tenant.id, v: (gv >= 1 && gv <= 5) ? gv : null }); if (localStorage.getItem('fm_glass_s') !== gs) { localStorage.setItem('fm_glass_s', gs); window.dispatchEvent(new CustomEvent('fm:glass')); } } catch (eG) {}
+            try { var gv = d ? parseInt(d.glass, 10) : 0; var gs = JSON.stringify({ id: tenant.id, v: (gv >= 1 && gv <= 8) ? gv : null }); if (localStorage.getItem('fm_glass_s') !== gs) { localStorage.setItem('fm_glass_s', gs); window.dispatchEvent(new CustomEvent('fm:glass')); } } catch (eG) {}
             try { window.dispatchEvent(new CustomEvent('fm:ctrl')); } catch (e) {}
             var billFreeze = !!(d && window.FM_BILL && FM_BILL.freezeNow(d.billing, Date.now()));
             lastCtrl = d; demoPill(demoMs(d)); demoTickStart();
