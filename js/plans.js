@@ -165,7 +165,33 @@
   var TRIAL_DAYS = 7;
   function sprod(id) { return SPRODUCTS.filter(function (p) { return p.id === id; })[0]; }
   function spack(id) { return SPACKS.filter(function (p) { return p.id === id; })[0]; }
-  function sitem(id) { return id === SALL.id ? SALL : (sprod(id) || spack(id)); }
+  /* ---- fitur satuan dan bundel (katalog baru) ----
+     Id 'f:<kunci fitur>' = satu fitur; 'b:<id>' = bundel buatan Tower (daftar kunci fitur disimpan di katalog dan di data sewa).
+     Id lama (stok, barcode, pk_*, plus_all) tetap dikenali supaya sewa yang sudah berjalan tidak putus. */
+  var _FL = null;
+  function featList() {
+    if (_FL) return _FL;
+    var rows = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && ALWAYS_ON.indexOf(f.key) < 0; }).map(function (f) {
+      var i = f.label.indexOf(':'), nm = i > 0 ? f.label.slice(0, i).trim() : f.label, d = i > 0 ? f.label.slice(i + 1).trim() : '';
+      return { id: 'f:' + f.key, key: f.key, name: nm, d: d, full: f.label, keys: [f.key], cat: catOf(f) };
+    });
+    var seen = {}; rows.forEach(function (r) { seen[r.name] = (seen[r.name] || 0) + 1; });
+    rows.forEach(function (r) { if (seen[r.name] > 1) { r.name = r.full; r.d = ''; } });
+    var order = {}; CATS.forEach(function (c, i) { order[c.id] = i; });
+    var lab = {}; CATS.forEach(function (c) { lab[c.id] = c.label; });
+    rows.forEach(function (r) { r.grp = lab[r.cat] || 'Lainnya'; r.ord = order[r.cat] != null ? order[r.cat] : 99; });
+    rows = rows.map(function (r, i) { r.i = i; return r; }).sort(function (a, b) { return a.ord - b.ord || a.i - b.i; });
+    _FL = rows; return rows;
+  }
+  function featItem(key) { return featList().filter(function (r) { return r.key === key; })[0]; }
+  function bundleItem(id) { var b = ((CAT && CAT.bundles) || []).filter(function (x) { return x.id === id; })[0]; return b ? { id: b.id, name: b.name || 'Bundel', d: b.desc || '', keys: (b.keys || []).slice(), bundle: true } : undefined; }
+  function sitem(id) {
+    id = String(id);
+    if (id === SALL.id) return SALL;
+    if (id.indexOf('f:') === 0) return featItem(id.slice(2));
+    if (id.indexOf('b:') === 0) return bundleItem(id);
+    return sprod(id) || spack(id);
+  }
 
   /* ===== Katalog OneilStore yang diatur Tower =====
      Disimpan di app_meta/store_catalog = { json } (dibaca klien tanpa login, seperti wallpaper dan rollout).
@@ -187,7 +213,12 @@
       }).catch(function () { if (cb) cb(); });
     } catch (e) { if (cb) cb(); }
   }
-  function catEntry(id) { if (!CAT) return null; if (id === SALL.id) return CAT.all || null; return (CAT.items && CAT.items[id]) || (CAT.packs && CAT.packs[id]) || null; }
+  function catEntry(id) {
+    if (!CAT) return null; id = String(id);
+    if (id.indexOf('f:') === 0) return (CAT.feats && CAT.feats[id.slice(2)]) || null;
+    if (id.indexOf('b:') === 0) return ((CAT.bundles || []).filter(function (b) { return b.id === id; })[0]) || null;
+    return null;
+  }
   /* Katalog bawaan KOSONG: fitur baru dijual setelah Tower mengisinya.
      harga item pada satu periode; null = periode itu tidak dijual. Status gratis: klien memilih sendiri, tanpa biaya. */
   function sfree(id) { var e = catEntry(id); return !!(e && e.sell !== false && e.free === true); }
@@ -222,6 +253,9 @@
     return d.getTime();
   }
   function packKeys(id) {
+    id = String(id);
+    if (id.indexOf('f:') === 0) return featItem(id.slice(2)) ? [id.slice(2)] : [];
+    if (id.indexOf('b:') === 0) { var bi = bundleItem(id); return bi ? bi.keys.filter(function (k) { return !!find(k); }) : []; }
     if (id === SALL.id) return STORE_KEYS.slice();
     var pk = spack(id), pr = sprod(id), out = [];
     if (pk) pk.items.forEach(function (i) { var x = sprod(i); if (x) out = out.concat(x.keys); });
@@ -242,7 +276,7 @@
   var LOADED_SIG = null;
   function rentedKey(key) {
     var R = rentals(), now = Date.now();
-    for (var id in R) { if (!Object.prototype.hasOwnProperty.call(R, id)) continue; if (rentalActive(id, now) && packKeys(id).indexOf(key) >= 0) return true; }
+    for (var id in R) { if (!Object.prototype.hasOwnProperty.call(R, id)) continue; if (rentalActive(id, now)) { var ks = (R[id] && Array.isArray(R[id].keys)) ? R[id].keys : packKeys(id); if (ks.indexOf(key) >= 0) return true; } }
     return false;
   }
   function has(key, role, tn) {
@@ -507,6 +541,6 @@
     m.style.display = 'flex';
   }
 
-  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, periods: PERIODS, permUntil: PERM_UNTIL, price: sprice, sold: ssold, free: sfree, quote: squote, disc: sdisc, untilFor: untilForPeriod, cat: function () { return CAT; }, setCat: storeSetCat, fetchCat: fetchCat, catAt: function () { return CAT_AT; }, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
+  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, periods: PERIODS, permUntil: PERM_UNTIL, price: sprice, sold: ssold, free: sfree, features: featList, bundles: function () { return (CAT && CAT.bundles) || []; }, trialOn: function () { return !(CAT && CAT.trial === false); }, quote: squote, disc: sdisc, untilFor: untilForPeriod, cat: function () { return CAT; }, setCat: storeSetCat, fetchCat: fetchCat, catAt: function () { return CAT_AT; }, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
     readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();

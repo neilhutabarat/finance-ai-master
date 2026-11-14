@@ -13,10 +13,10 @@
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function iso(ms) { var d = new Date(ms); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
   var reqs = [], ctrls = {}, ov = null, started = false, tab = 'minta', pill = null, note = '';
-  var B = 'padding:7px 11px;border-radius:10px;font-weight:800;font-size:11.5px;border:0;cursor:pointer;color:#fff;';
+  var B = 'padding:7px 13px;border-radius:999px;font-weight:800;font-size:12px;border:1px solid rgba(255,255,255,.2);cursor:pointer;color:#fff;';
   var INP = 'width:100%;box-sizing:border-box;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:12.5px;outline:none';
   var PER = { hari: 'Harian', minggu: 'Mingguan', bulan: 'Bulanan', tahun: 'Tahunan', perm: 'Permanen', gratis: 'Gratis', coba: 'Coba' };
-  var draft = null, catNote = '', demoMode = false;
+  var catNote = '', demoMode = false, fresh = false;
 
   function tenantsList() {
     var out = []; try { var T = (typeof TENANTS_CONFIG !== 'undefined') ? TENANTS_CONFIG : {}; Object.keys(T).forEach(function (k) { var t = T[k]; if (t && t.id) out.push({ id: t.id, nama: t.nama || t.id }); }); } catch (e) {}
@@ -50,6 +50,7 @@
     var ex = ((ctrls[tenantId] || {}).rentals || {})[item];
     var entry = { until: ST().untilFor(ex, period), trial: period === 'coba' && !(ex && !ex.trial && Number(ex.until) > Date.now()), since: (ex && ex.since) || Date.now(), period: (ex && ex.perm) ? 'perm' : period };
     if (period === 'perm' || period === 'gratis' || (ex && ex.perm)) { entry.perm = true; entry.trial = false; }
+    if (String(item).indexOf('b:') === 0) entry.keys = ST().keysOf(item);
     var data = { rentals: {} }; data.rentals[item] = entry;
     if (period === 'coba') { data.trialUsed = {}; data.trialUsed[item] = true; }
     return d.collection('tenant_ctrl').doc(tenantId).set(data, { merge: true }).then(function () { return entry; });
@@ -96,6 +97,10 @@
       var ms = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 23, 59, 59).getTime(); if (!isFinite(ms)) return alert('Tanggal tidak valid.');
       var d2 = DB(); if (!d2) return; var u = {}; u['rentals.' + q[1] + '.until'] = ms;
       d2.collection('tenant_ctrl').doc(q[0]).update(u).catch(function (e) { alert('Gagal: ' + (e && e.message || e)); });
+    } else if (a === 'ks_sell' || a === 'ks_free' || a === 'ks_off') { collect(); bulk(a.slice(3) === 'sell' ? 'sell' : a.slice(3) === 'free' ? 'free' : 'off');
+    } else if (a === 'ks_clear') { sel = {}; collect(); fresh = true; render();
+    } else if (a === 'ks_grp') { collect(); ST().features().forEach(function (f) { if (f.grp === id) sel[f.key] = true; }); fresh = true; render();
+    } else if (/^k[bs]_(new|bundle|edit|cancel|rm|add|save|del)$/.test(a)) { collect(); bundleAct(a, id);
     } else if (a === 'kt_save') { saveCat();
     } else if (a === 'kt_reset') { resetCat();
     } else if (a === 'dm_on' || a === 'dm_ext') {
@@ -150,9 +155,10 @@
     return h;
   }
   function viewBeri() {
-    var st = ST(), opts = st.products.map(function (p) { return '<option value="' + H(p.id) + '">' + H(p.name) + ' — ' + rp(p.price) + '</option>'; }).join('') +
-      '<optgroup label="Paket usaha">' + st.packs.map(function (p) { return '<option value="' + H(p.id) + '">' + H(p.name) + ' — ' + rp(p.price) + '</option>'; }).join('') + '</optgroup>' +
-      '<option value="' + H(st.all.id) + '">' + H(st.all.name) + ' — ' + rp(st.all.price) + '</option>';
+    var st = ST(), bl = st.bundles(), gs = {}, opts = '';
+    if (bl.length) opts += '<optgroup label="Bundel">' + bl.map(function (b) { return '<option value="' + H(b.id) + '">' + H(b.name) + '</option>'; }).join('') + '</optgroup>';
+    st.features().forEach(function (f) { (gs[f.grp] = gs[f.grp] || []).push(f); });
+    Object.keys(gs).forEach(function (g) { opts += '<optgroup label="' + H(g) + '">' + gs[g].map(function (f) { return '<option value="' + H(f.id) + '">' + H(f.name) + '</option>'; }).join('') + '</optgroup>'; });
     return '<div style="font-size:12px;opacity:.7;margin-bottom:8px">Untuk penjualan langsung tanpa permintaan dari klien.</div>' +
       '<label style="font-size:11.5px;font-weight:700;opacity:.8">Toko</label><select id="ts-t" style="' + INP + ';margin:4px 0 10px">' + tenantsList().map(function (t) { return '<option value="' + H(t.id) + '">' + H(t.nama) + ' [' + H(t.id) + ']</option>'; }).join('') + '</select>' +
       '<label style="font-size:11.5px;font-weight:700;opacity:.8">Fitur atau paket</label><select id="ts-i" style="' + INP + ';margin:4px 0 10px">' + opts + '</select>' +
@@ -161,68 +167,149 @@
       '<button data-a="give" style="' + B + 'background:#7c3aed;width:100%;padding:10px">Aktifkan sewa</button>';
   }
 
-  /* ---- Katalog: fitur yang dijual dan harga per periode (disimpan di app_meta/store_catalog) ---- */
-  var KINP = 'width:92px;box-sizing:border-box;padding:6px 7px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:12px;outline:none;text-align:right';
-  /* katalog bawaan kosong: item yang belum ada di katalog berstatus Tidak dijual */
-  function catFromState() {
-    var st = ST(), c = st.cat() || {}, out = { v: 1, items: {}, packs: {}, all: null, disc: st.disc() };
-    function ent(e) { return e ? { sell: e.sell !== false, free: e.free === true, p: e.p || {} } : { sell: false, free: false, p: {} }; }
-    st.products.forEach(function (p) { out.items[p.id] = ent(c.items && c.items[p.id]); });
-    st.packs.forEach(function (p) { out.packs[p.id] = ent(c.packs && c.packs[p.id]); });
-    out.all = ent(c.all); return out;
+  /* ---- Katalog (v2): tiap fitur satu baris, bisa dicentang lalu dibundel. Disimpan di app_meta/store_catalog ---- */
+  var KINP = 'width:84px;box-sizing:border-box;padding:6px 7px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:12px;outline:none;text-align:right';
+  var SEL = 'padding:6px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:#15151b;color:#f5f5f7;font-size:12px;outline:none';
+  var GREY = ';background:rgba(255,255,255,.08)', VIO = ';background:#a855f7;border-color:#a855f7', GREEN = ';background:#22c55e;color:#04210f;border-color:#22c55e', RED = ';background:#be123c;border-color:#be123c';
+  var dcat = null, sel = {}, bform = null, kview = 'fitur';
+  function emptyCat() { return { v: 2, feats: {}, bundles: [], disc: { min: 3, pct: 0 }, trial: true }; }
+  function loadDcat() {
+    var c = ST().cat(), o = emptyCat();
+    if (c && c.v === 2) { try { o = JSON.parse(JSON.stringify(c)); } catch (e) {} o.feats = o.feats || {}; o.bundles = o.bundles || []; o.disc = o.disc || { min: 3, pct: 0 }; if (o.trial !== false) o.trial = true; }
+    return o;
   }
-  function collectCat() {
-    if (!ov) return null; var st = ST(), q = ov.querySelectorAll('[data-kid]'); if (!q.length) return null;
-    var out = { v: 1, items: {}, packs: {}, all: null, disc: { min: 3, pct: 0 } };
-    [].forEach.call(q, function (tr) {
-      var id = tr.getAttribute('data-kid'), kind = tr.getAttribute('data-kind'), v0 = tr.querySelector('[data-kstat]').value, e = { sell: v0 !== 'off', free: v0 === 'free', p: {} };
-      st.periods.forEach(function (x) { var el = tr.querySelector('[data-kp="' + x[0] + '"]'), v = el ? Number(String(el.value).replace(/[^0-9]/g, '')) : 0; e.p[x[0]] = v > 0 ? v : null; });
-      if (kind === 'all') out.all = e; else if (kind === 'pack') out.packs[id] = e; else out.items[id] = e;
+  function stat(e) { return (!e || e.sell === false) ? 'off' : (e.free === true ? 'free' : 'sell'); }
+  function setStat(e, s) { e = e || { p: {} }; e.sell = s !== 'off'; e.free = s === 'free'; e.p = e.p || {}; return e; }
+  function readPrices(root, attr) {
+    var p = {}; ST().periods.forEach(function (x) { var el = root.querySelector('[' + attr + '="' + x[0] + '"]'); if (el) { var v = Number(String(el.value).replace(/[^0-9]/g, '')); p[x[0]] = v > 0 ? v : null; } });
+    return p;
+  }
+  /* salin isian layar ke dcat sebelum layar digambar ulang */
+  function collect() {
+    if (!ov || !dcat) return;
+    [].forEach.call(ov.querySelectorAll('[data-kf]'), function (r) {
+      var k = r.getAttribute('data-kf'), e = dcat.feats[k] = dcat.feats[k] || { p: {} }, s = r.querySelector('[data-kstat]').value;
+      setStat(e, s); if (r.querySelector('[data-kp]')) e.p = readPrices(r, 'data-kp');
     });
-    var dm = ov.querySelector('#kt-dmin'), dp = ov.querySelector('#kt-dpct');
-    if (dm && dp) { out.disc.min = Math.max(2, parseInt(dm.value, 10) || 3); out.disc.pct = Math.min(50, Math.max(0, Number(dp.value) || 0)); }
-    return out;
+    var dm = ov.querySelector('#kt-dmin'), dp = ov.querySelector('#kt-dpct'), tr = ov.querySelector('#kt-trial');
+    if (dm && dp) { dcat.disc.min = Math.max(2, parseInt(dm.value, 10) || 3); dcat.disc.pct = Math.min(50, Math.max(0, Number(dp.value) || 0)); }
+    if (tr) dcat.trial = !!tr.checked;
+    var bn = ov.querySelector('#kb-name');
+    if (bn && bform) {
+      bform.name = bn.value; bform.desc = (ov.querySelector('#kb-desc') || {}).value || ''; setStat(bform, (ov.querySelector('#kb-stat') || {}).value || 'off');
+      if (ov.querySelector('[data-kbp]')) bform.p = readPrices(ov, 'data-kbp');
+    }
+  }
+  function nSel() { return Object.keys(sel).filter(function (k) { return sel[k]; }); }
+  function cell(k, v, ph, attr) {
+    return '<label style="display:flex;flex-direction:column;gap:2px;font-size:10.5px;opacity:.9"><span style="opacity:.7">' + k[1] + '</span><input ' + attr + '="' + k[0] + '" inputmode="numeric" value="' + (v ? v : '') + '" placeholder="' + (ph || '-') + '" style="' + KINP + '"></label>';
+  }
+  function priceGrid(e, attr) { return '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 2px 28px">' + ST().periods.map(function (x) { return cell(x, e && e.p ? e.p[x[0]] : null, '-', attr); }).join('') + '</div>'; }
+  function statSel(v, attr) { return '<select ' + attr + ' style="' + SEL + '"><option value="off"' + (v === 'off' ? ' selected' : '') + '>Tidak dijual</option><option value="sell"' + (v === 'sell' ? ' selected' : '') + '>Dijual</option><option value="free"' + (v === 'free' ? ' selected' : '') + '>Gratis</option></select>'; }
+  function viewFitur() {
+    var st = ST(), groups = [], by = {};
+    st.features().forEach(function (f) { if (!by[f.grp]) { by[f.grp] = []; groups.push(f.grp); } by[f.grp].push(f); });
+    var h = '<div style="font-size:12px;opacity:.7;margin-bottom:6px;line-height:1.5">Semua fitur yang bisa dijual tampil satu per satu (fitur inti yang terkunci tidak ada di sini). Atur status tiap fitur, atau centang beberapa lalu <b>Buat bundel</b>. Fitur <b>Gratis</b> bisa diambil klien tanpa bayar.</div>';
+    groups.forEach(function (g) {
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 2px"><div style="font-weight:900;font-size:12.5px;color:#c084fc">' + H(g) + '</div><button data-a="ks_grp" data-id="' + H(g) + '" style="' + B + GREY + ';padding:3px 10px;font-size:11px">Pilih semua</button></div>';
+      by[g].forEach(function (f) {
+        var e = dcat.feats[f.key], s = stat(e);
+        h += '<div data-kf="' + H(f.key) + '" style="padding:9px 2px;border-top:1px solid rgba(255,255,255,.08);' + (s === 'off' ? 'opacity:.75' : '') + '"><div style="display:flex;gap:10px;align-items:center">' +
+          '<input type="checkbox" data-ksel="' + H(f.key) + '"' + (sel[f.key] ? ' checked' : '') + '><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:13px">' + H(f.name) + '</div>' + (f.d ? '<div style="font-size:11.5px;opacity:.65;line-height:1.4">' + H(f.d) + '</div>' : '') + '</div>' + statSel(s, 'data-kstat') + '</div>' +
+          (s === 'sell' ? priceGrid(e, 'data-kp') : '') + '</div>';
+      });
+    });
+    var d = dcat.disc;
+    h += '<div style="margin-top:16px;padding:12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>Diskon beli kombinasi</b><span>mulai</span><input id="kt-dmin" inputmode="numeric" value="' + d.min + '" style="' + KINP + ';width:52px"><span>fitur, potongan</span><input id="kt-dpct" inputmode="numeric" value="' + d.pct + '" style="' + KINP + ';width:52px"><span>% (0 = tanpa diskon)</span></div>' +
+      '<label style="margin-top:10px;display:flex;gap:8px;align-items:center;font-size:12px"><input type="checkbox" id="kt-trial"' + (dcat.trial !== false ? ' checked' : '') + '><span>Izinkan coba gratis ' + ST().trialDays + ' hari (satu kali per fitur)</span></label>';
+    return h;
+  }
+  function bundleSum(keys) {
+    var st = ST(), sum = 0, ok = keys.length > 0;
+    keys.forEach(function (k) { var e = dcat.feats[k], v = e && e.p && Number(e.p.bulan); if (stat(e) === 'sell' && v > 0) sum += v; else ok = false; });
+    return ok ? sum : 0;
+  }
+  function viewBundel() {
+    var st = ST(), feats = st.features(), nm = {}; feats.forEach(function (f) { nm[f.key] = f.name; });
+    if (bform) {
+      var s = stat(bform), sum = bundleSum(bform.keys), pb = bform.p && Number(bform.p.bulan);
+      var chips = bform.keys.map(function (k) { return '<span style="display:inline-flex;gap:6px;align-items:center;padding:4px 6px 4px 10px;border-radius:999px;background:rgba(168,85,247,.2);font-size:12px;margin:0 6px 6px 0">' + H(nm[k] || k) + '<button data-a="kb_rm" data-id="' + H(k) + '" style="border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:50%;width:18px;height:18px;cursor:pointer;font-size:11px;line-height:1">×</button></span>'; }).join('');
+      var rest = feats.filter(function (f) { return bform.keys.indexOf(f.key) < 0; });
+      var h = '<div style="font-weight:900;font-size:15px;margin:6px 0 10px">' + (bform.isNew ? 'Bundel baru' : 'Ubah bundel') + '</div>' +
+        '<label style="font-size:11.5px;font-weight:700;opacity:.8">Nama bundel</label><input id="kb-name" value="' + H(bform.name || '') + '" maxlength="40" placeholder="Contoh: Paket Laporan" style="' + INP + ';margin:4px 0 10px">' +
+        '<label style="font-size:11.5px;font-weight:700;opacity:.8">Keterangan singkat (boleh kosong)</label><input id="kb-desc" value="' + H(bform.desc || '') + '" maxlength="100" style="' + INP + ';margin:4px 0 10px">' +
+        '<div style="font-size:11.5px;font-weight:700;opacity:.8;margin-bottom:6px">Isi bundel (' + bform.keys.length + ' fitur)</div><div>' + (chips || '<span style="opacity:.6;font-size:12px">Belum ada fitur.</span>') + '</div>' +
+        '<div style="display:flex;gap:6px;margin:4px 0 12px"><select id="kb-add" style="' + SEL + ';flex:1;min-width:0"><option value="">Tambah fitur…</option>' + rest.map(function (f) { return '<option value="' + H(f.key) + '">' + H(f.grp + ' · ' + f.name) + '</option>'; }).join('') + '</select><button data-a="kb_add" style="' + B + VIO + '">Tambah</button></div>' +
+        '<div style="display:flex;gap:8px;align-items:center"><label style="font-size:11.5px;font-weight:700;opacity:.8">Status</label>' + statSel(s, 'id="kb-stat"') + '</div>' + (s === 'sell' ? priceGrid(bform, 'data-kbp') : '') +
+        (s === 'sell' && sum ? '<div style="font-size:11.5px;opacity:.75;margin:6px 0 0 0">Jumlah harga bulanan satuan: ' + rp(sum) + (pb ? (sum > pb ? ' · hemat ' + rp(sum - pb) + ' per bulan' : ' · bundel tidak lebih murah dari satuan') : '') + '</div>' : (s === 'sell' ? '<div style="font-size:11.5px;opacity:.6;margin-top:6px">Pembanding hemat tampil bila semua isi bundel berstatus Dijual dengan harga bulanan.</div>' : '')) +
+        (catNote ? '<div style="margin-top:10px;font-size:12px;color:#fbbf24">' + H(catNote) + '</div>' : '') +
+        '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button data-a="kb_save" style="' + B + VIO + ';flex:1;padding:10px">Simpan bundel</button><button data-a="kb_cancel" style="' + B + GREY + ';padding:10px">Batal</button>' + (bform.isNew ? '' : '<button data-a="kb_del" data-id="' + H(bform.id) + '" style="' + B + RED + ';padding:10px">Hapus</button>') + '</div>';
+      return h;
+    }
+    var h2 = '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 6px"><div style="font-size:12px;opacity:.7;line-height:1.5;flex:1">Bundel = beberapa fitur dijual sekaligus. Cara cepat: centang fitur di tab Fitur lalu Buat bundel.</div><button data-a="kb_new" style="' + B + VIO + '">+ Bundel baru</button></div>';
+    if (!dcat.bundles.length) return h2 + '<p style="opacity:.6;text-align:center;padding:20px;font-size:13px">Belum ada bundel.</p>';
+    dcat.bundles.forEach(function (b) {
+      var s = stat(b), col = s === 'sell' ? '#c084fc' : s === 'free' ? '#4ade80' : '#94a3b8';
+      h2 += '<div style="padding:11px 2px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;align-items:center"><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:13px">' + H(b.name) + ' <span style="font-size:11px;color:' + col + '">' + (s === 'sell' ? 'Dijual' : s === 'free' ? 'Gratis' : 'Tidak dijual') + '</span></div><div style="font-size:11.5px;opacity:.65;line-height:1.45">' + b.keys.map(function (k) { return H(nm[k] || k); }).join(', ') + '</div></div><button data-a="kb_edit" data-id="' + H(b.id) + '" style="' + B + GREY + '">Ubah</button></div>';
+    });
+    return h2;
   }
   function viewKatalog() {
-    var st = ST(), c = draft || catFromState(), h = '<div style="font-size:12px;opacity:.7;margin-bottom:8px;line-height:1.5">Katalog awalnya kosong. Pilih status tiap fitur: <b>Tidak dijual</b> (tidak tampil di klien), <b>Dijual</b> (isi harga per periode, <b>kosongkan</b> bila periode itu tidak dijual), atau <b>Gratis</b> (klien memilih sendiri tanpa biaya, kamu setujui lalu aktif permanen). Angka abu-abu di kolom hanya saran harga. Sewa yang sudah berjalan tidak berubah.</div>';
-    function cell(e, k, it) {
-      var v = e && e.p ? e.p[k] : null, ph = '-';
-      if (it && !v) { if (k === 'bulan') ph = it.price; else if (k === 'tahun') ph = it.price * 10; else if (k === 'perm' && it.perm) ph = it.perm; }
-      return '<td style="padding:3px"><input data-kp="' + k + '" inputmode="numeric" value="' + (v ? v : '') + '" placeholder="' + ph + '" style="' + KINP + '"></td>';
+    if (!dcat) dcat = loadDcat();
+    var sub = function (id, t) { return '<button data-ksub="' + id + '" style="' + B + (kview === id ? VIO : GREY) + '">' + t + '</button>'; };
+    var h = '<div style="display:flex;gap:6px;margin:0 0 8px">' + sub('fitur', 'Fitur satuan') + sub('bundel', 'Bundel (' + dcat.bundles.length + ')') + '</div>';
+    h += kview === 'bundel' ? viewBundel() : viewFitur();
+    if (kview === 'fitur' || !bform) {
+      var n = nSel().length;
+      if (kview === 'fitur' && n) h += '<div style="position:sticky;bottom:-18px;margin:14px -18px -18px;padding:10px 18px;background:#0b0b0f;border-top:1px solid rgba(255,255,255,.12);display:flex;gap:6px;flex-wrap:wrap;align-items:center"><b style="font-size:12px">' + n + ' dipilih</b><button data-a="ks_bundle" style="' + B + VIO + '">Buat bundel</button><button data-a="ks_sell" style="' + B + GREY + '">Dijual</button><button data-a="ks_free" style="' + B + GREY + '">Gratis</button><button data-a="ks_off" style="' + B + GREY + '">Tidak dijual</button><button data-a="ks_clear" style="' + B + GREY + '">Batal</button></div>';
+      else h += (catNote ? '<div style="margin-top:10px;font-size:12px;color:#fbbf24">' + H(catNote) + '</div>' : '') +
+        '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button data-a="kt_save" style="' + B + VIO + ';flex:1;padding:10px">Simpan katalog</button><button data-a="kt_reset" style="' + B + GREY + ';padding:10px">Kosongkan katalog</button></div>' +
+          '<div style="font-size:11px;opacity:.6;margin-top:8px;line-height:1.5">Klien membaca katalog saat membuka Store. Perubahan baru berlaku setelah Simpan katalog. Harga diperiksa lagi saat Anda mengaktifkan permintaan.</div>';
     }
-    function trow(id, name, e, kind, it) {
-      var stt = e.sell === false || (!e.sell && !e.free) ? 'off' : (e.free ? 'free' : 'sell');
-      return '<tr data-kid="' + H(id) + '" data-kind="' + kind + '" style="border-top:1px solid rgba(255,255,255,.07);' + (stt === 'off' ? 'opacity:.6' : '') + '"><td style="padding:6px 6px 6px 0;min-width:190px"><div style="font-weight:700;font-size:12px;margin-bottom:3px">' + H(name) + '</div><select data-kstat style="' + INP + ';width:auto;padding:4px 8px;font-size:11.5px"><option value="off"' + (stt === 'off' ? ' selected' : '') + '>Tidak dijual</option><option value="sell"' + (stt === 'sell' ? ' selected' : '') + '>Dijual</option><option value="free"' + (stt === 'free' ? ' selected' : '') + '>Gratis</option></select></td>' + st.periods.map(function (x) { return cell(e, x[0], it); }).join('') + '</tr>';
-    }
-    var head = '<thead><tr style="font-size:10.5px;opacity:.7;text-align:right"><th style="text-align:left;padding:4px 0">Fitur dan status</th>' + st.periods.map(function (x) { return '<th style="padding:4px 6px;font-weight:700">' + x[1] + '</th>'; }).join('') + '</tr></thead>';
-    var groups = [], by = {}; st.products.forEach(function (p) { if (!by[p.grp]) { by[p.grp] = []; groups.push(p.grp); } by[p.grp].push(p); });
-    h += '<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%">' + head + '<tbody>';
-    groups.forEach(function (g) { h += '<tr><td colspan="6" style="padding:10px 0 3px;font-weight:900;font-size:12px;color:#c084fc">' + H(g) + '</td></tr>'; by[g].forEach(function (p) { h += trow(p.id, p.name, (c.items && c.items[p.id]) || {}, 'item', p); }); });
-    h += '<tr><td colspan="6" style="padding:12px 0 3px;font-weight:900;font-size:12px;color:#c084fc">Paket jenis usaha</td></tr>';
-    st.packs.forEach(function (p) { h += trow(p.id, p.name, (c.packs && c.packs[p.id]) || {}, 'pack', null); });
-    h += '<tr><td colspan="6" style="padding:12px 0 3px;font-weight:900;font-size:12px;color:#c084fc">Semua fitur</td></tr>' + trow(st.all.id, st.all.name, c.all || {}, 'all', null);
-    h += '</tbody></table></div>';
-    var d = c.disc || st.disc();
-    h += '<div style="margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);font-size:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>Diskon beli kombinasi</b><span>mulai</span><input id="kt-dmin" inputmode="numeric" value="' + (d.min || 3) + '" style="' + KINP + ';width:52px"><span>fitur, diskon</span><input id="kt-dpct" inputmode="numeric" value="' + (d.pct == null ? 0 : d.pct) + '" style="' + KINP + ';width:52px"><span>% (isi 0 untuk tanpa diskon)</span></div>';
-    h += (catNote ? '<div style="margin-top:10px;font-size:12px;color:#fbbf24">' + H(catNote) + '</div>' : '') +
-      '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button data-a="kt_save" style="' + B + 'background:#7c3aed;flex:1;padding:10px">Simpan katalog</button><button data-a="kt_reset" style="' + B + 'background:#475569;padding:10px">Kosongkan katalog</button></div>' +
-      '<div style="font-size:11px;opacity:.6;margin-top:8px;line-height:1.5">Klien membaca katalog saat membuka Store. Harga diperiksa lagi saat Anda mengaktifkan permintaan, jadi harga yang diubah klien di perangkatnya akan terlihat sebagai peringatan.</div>';
     return h;
+  }
+  function bulk(s) { fresh = true; nSel().forEach(function (k) { dcat.feats[k] = setStat(dcat.feats[k], s); }); sel = {}; catNote = ''; render(); }
+  function bundleAct(a, id) {
+    var st = ST(); fresh = true;
+    if (a === 'kb_new') { bform = { id: 'b:' + Date.now().toString(36), isNew: true, name: '', desc: '', keys: [], sell: false, free: false, p: {} }; kview = 'bundel'; }
+    else if (a === 'ks_bundle') { bform = { id: 'b:' + Date.now().toString(36), isNew: true, name: '', desc: '', keys: st.features().map(function (f) { return f.key; }).filter(function (k) { return sel[k]; }), sell: false, free: false, p: {} }; sel = {}; kview = 'bundel'; }
+    else if (a === 'kb_edit') { var b = dcat.bundles.filter(function (x) { return x.id === id; })[0]; if (!b) return; bform = JSON.parse(JSON.stringify(b)); bform.isNew = false; bform.p = bform.p || {}; }
+    else if (a === 'kb_cancel') { bform = null; }
+    else if (a === 'kb_rm') { bform.keys = bform.keys.filter(function (k) { return k !== id; }); }
+    else if (a === 'kb_add') { var v = (ov.querySelector('#kb-add') || {}).value; if (v && bform.keys.indexOf(v) < 0) bform.keys.push(v); }
+    else if (a === 'kb_save') {
+      var nmv = String(bform.name || '').trim();
+      if (!nmv) { catNote = 'Isi nama bundel.'; return render(); }
+      if (bform.keys.length < 2) { catNote = 'Bundel perlu minimal 2 fitur.'; return render(); }
+      if (stat(bform) === 'sell' && !st.periods.some(function (x) { return bform.p[x[0]]; })) { catNote = 'Status Dijual perlu minimal satu harga.'; return render(); }
+      if (dcat.bundles.some(function (x) { return x.id !== bform.id && String(x.name).trim().toLowerCase() === nmv.toLowerCase(); })) { catNote = 'Nama bundel sudah dipakai.'; return render(); }
+      var rec = { id: bform.id, name: nmv, desc: String(bform.desc || '').trim(), keys: bform.keys.slice(), sell: bform.sell !== false && stat(bform) !== 'off', free: bform.free === true, p: bform.p || {} };
+      var i = -1; dcat.bundles.forEach(function (x, j) { if (x.id === rec.id) i = j; }); if (i >= 0) dcat.bundles[i] = rec; else dcat.bundles.push(rec);
+      bform = null; catNote = 'Bundel disimpan di layar ini. Tekan Simpan katalog di tab Fitur satuan agar klien melihatnya.';
+    }
+    else if (a === 'kb_del') {
+      var use = Object.keys(ctrls).filter(function (t) { var e = (ctrls[t].rentals || {})[id]; return e && Number(e.until) > Date.now(); });
+      if (use.length) { catNote = 'Bundel ini masih disewa aktif oleh: ' + use.map(nameOf).join(', ') + '. Ubah status menjadi Tidak dijual saja, atau tunggu sewa habis.'; return render(); }
+      if (!confirm('Hapus bundel ini dari katalog?')) return;
+      dcat.bundles = dcat.bundles.filter(function (x) { return x.id !== id; }); bform = null; catNote = 'Bundel dihapus di layar ini. Tekan Simpan katalog agar berlaku.';
+    }
+    render();
   }
   function saveCat() {
     var d = DB(); if (!d) { catNote = 'Firestore belum terhubung.'; return render(); }
-    var c = collectCat(); if (!c) return;
-    var bad = Object.keys(c.items).concat(Object.keys(c.packs)).filter(function (k) { var e = c.items[k] || c.packs[k]; return e.sell && !e.free && !ST().periods.some(function (x) { return e.p[x[0]]; }); });
-    if (bad.length && !confirm(bad.length + ' item berstatus Dijual tapi tidak punya harga sama sekali, jadi tidak akan tampil di klien. Tetap simpan?')) return;
-    d.collection('app_meta').doc('store_catalog').set({ json: JSON.stringify(c), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }).then(function () {
-      ST().setCat(c); draft = null; catNote = 'Katalog tersimpan. Klien memakainya saat membuka Store.'; render();
+    collect();
+    var st = ST(), bad = Object.keys(dcat.feats).filter(function (k) { var e = dcat.feats[k]; return stat(e) === 'sell' && !st.periods.some(function (x) { return e.p && e.p[x[0]]; }); })
+      .concat(dcat.bundles.filter(function (b) { return stat(b) === 'sell' && !st.periods.some(function (x) { return b.p && b.p[x[0]]; }); }).map(function (b) { return b.id; }));
+    if (bad.length && !confirm(bad.length + ' item berstatus Dijual tapi belum punya harga, jadi tidak akan tampil di klien. Tetap simpan?')) return;
+    var out = JSON.parse(JSON.stringify(dcat)); out.v = 2;
+    d.collection('app_meta').doc('store_catalog').set({ json: JSON.stringify(out), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }).then(function () {
+      st.setCat(out); catNote = 'Katalog tersimpan. Klien memakainya saat membuka Store.'; render();
     }).catch(function (e) { catNote = 'Gagal menyimpan: ' + (e && e.message || e); render(); });
   }
   function resetCat() {
-    if (!confirm('Kosongkan katalog? Semua fitur menjadi Tidak dijual dan Store klien tampil kosong. Sewa yang sudah berjalan tetap aktif sampai tanggalnya.')) return;
-    var d = DB(); if (!d) return;
-    var empty = { v: 1, items: {}, packs: {}, all: null, disc: { min: 3, pct: 0 } };
-    d.collection('app_meta').doc('store_catalog').set({ json: JSON.stringify(empty), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }).then(function () { ST().setCat(empty); draft = null; catNote = 'Katalog dikosongkan.'; render(); }).catch(function (e) { catNote = 'Gagal: ' + (e && e.message || e); render(); });
+    if (!confirm('Kosongkan katalog? Semua fitur dan bundel menjadi Tidak dijual dan Store klien tampil kosong. Sewa yang sudah berjalan tetap aktif sampai tanggalnya.')) return;
+    var d = DB(); if (!d) return; var empty = emptyCat();
+    d.collection('app_meta').doc('store_catalog').set({ json: JSON.stringify(empty), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }).then(function () { ST().setCat(empty); dcat = emptyCat(); bform = null; sel = {}; fresh = true; catNote = 'Katalog dikosongkan.'; render(); }).catch(function (e) { catNote = 'Gagal: ' + (e && e.message || e); render(); });
   }
   function viewDemo() {
     var now = Date.now(), list = tenantsList(), h = '<div style="font-size:12px;opacity:.7;margin-bottom:8px">Toko demo tampil label <b>DEMO · sisa N hari</b> di aplikasi klien, lalu terkunci otomatis saat habis. Data tidak dihapus.</div>' +
@@ -240,13 +327,16 @@
   function render() {
     if (!ov || ov.style.display === 'none') return;
     if (!ST()) { ov.innerHTML = '<div style="color:#fff;padding:20px">Katalog Store belum dimuat.</div>'; return; }
-    var TB = function (id, t) { return '<button data-tab="' + id + '" style="' + B + (tab === id ? 'background:#7c3aed' : 'background:#334155') + '">' + t + '</button>'; };
-    if (tab === 'katalog') { var cc = collectCat(); if (cc) draft = cc; }
+    var TB = function (id, t) { return '<button data-tab="' + id + '" style="' + B + (tab === id ? VIO : GREY) + '">' + t + '</button>'; };
+    if (tab === 'katalog' && !fresh) collect();
+    fresh = false;
+    var keepTop = ov.firstChild && ov.firstChild.scrollTop || 0;
     var body = demoMode ? viewDemo() : tab === 'aktif' ? viewAktif() : tab === 'beri' ? viewBeri() : tab === 'katalog' ? viewKatalog() : viewMinta();
     var keep = { t: (ov.querySelector('#ts-t') || {}).value, i: (ov.querySelector('#ts-i') || {}).value, p: (ov.querySelector('#ts-p') || {}).value };
     ov.innerHTML = '<div style="width:100%;max-width:860px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px;font-family:-apple-system,Segoe UI,sans-serif">' +
       '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-weight:800;font-size:17px">' + (demoMode ? 'Demo Toko' : 'Store') + '</div><div style="font-size:12px;opacity:.65">' + (demoMode ? 'Atur toko uji dengan batas waktu demo' : nBaru() + ' permintaan menunggu') + '</div></div><button data-x style="' + B + 'background:#334155">Tutup</button></div>' +
       (demoMode ? '' : '<div style="display:flex;gap:6px;margin:12px 0">' + TB('minta', 'Permintaan') + TB('aktif', 'Sewa aktif') + TB('beri', 'Beri sewa') + TB('katalog', 'Katalog') + '</div>') + '<div style="margin-top:' + (demoMode ? '12' : '0') + 'px">' + body + '</div></div>';
+    if (keepTop && ov.firstChild) ov.firstChild.scrollTop = keepTop;
     if (tab === 'beri') { [['#ts-t', keep.t], ['#ts-i', keep.i], ['#ts-p', keep.p]].forEach(function (x) { var el = ov.querySelector(x[0]); if (el && x[1]) el.value = x[1]; }); }
   }
   function ensure() {
@@ -255,14 +345,20 @@
     ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px';
     ov.addEventListener('click', function (e) {
       if (e.target === ov || e.target.hasAttribute('data-x')) { ov.style.display = 'none'; return; }
-      var t = e.target.closest('[data-tab]'); if (t) { if (tab === 'katalog') { var c0 = collectCat(); if (c0) draft = c0; } tab = t.getAttribute('data-tab'); note = ''; catNote = ''; return render(); }
+      var t = e.target.closest('[data-tab]'); if (t) { if (tab === 'katalog') collect(); tab = t.getAttribute('data-tab'); note = ''; catNote = ''; return render(); }
+      var ks = e.target.closest('[data-ksub]'); if (ks) { collect(); kview = ks.getAttribute('data-ksub'); catNote = ''; return render(); }
       var fl = e.target.closest('[data-f]'); if (fl) { filter = fl.getAttribute('data-f'); return render(); }
       var b = e.target.closest('[data-a]'); if (b) act(b.getAttribute('data-a'), b.getAttribute('data-id'));
     });
-    ov.addEventListener('change', function (e) { var sel = e.target; if (sel && sel.hasAttribute && sel.hasAttribute('data-kstat')) { var tr = sel.closest('tr'); if (tr) tr.style.opacity = sel.value === 'off' ? '.6' : ''; } });
+    ov.addEventListener('change', function (e) {
+      var t = e.target; if (!t || !t.hasAttribute) return;
+      if (t.hasAttribute('data-ksel')) { var k = t.getAttribute('data-ksel'); if (t.checked) sel[k] = true; else delete sel[k]; collect(); return render(); }
+      if (t.hasAttribute('data-kstat') || t.id === 'kb-stat') { collect(); render(); }
+    });
+    if (!document.getElementById('fm-tstore-css')) { var cs = document.createElement('style'); cs.id = 'fm-tstore-css'; cs.textContent = '#fm-tstore input[type=checkbox]{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:5px;border:2px solid rgba(255,255,255,.5);background:transparent center/12px no-repeat;cursor:pointer;flex:0 0 auto;margin:0}#fm-tstore input[type=checkbox]:checked{background-color:#a855f7;border-color:#a855f7;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27%3E%3Cpath d=%27M2 6.5l2.5 2.5L10 3.5%27 fill=%27none%27 stroke=%27%23fff%27 stroke-width=%271.8%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E")}'; document.head.appendChild(cs); }
     document.body.appendChild(ov);
   }
-  window.FM_TSTORE = { openDemo: function () { ensure(); start(); demoMode = true; ov.style.display = 'flex'; render(); }, open: function (t) { demoMode = false; ensure(); start(); try { ST().fetchCat(function () { if (tab === 'katalog' && !draft) render(); }); } catch (e) {} if (t) tab = t; ov.style.display = 'flex'; render(); }, count: nBaru };
+  window.FM_TSTORE = { openDemo: function () { ensure(); start(); demoMode = true; ov.style.display = 'flex'; render(); }, open: function (t) { demoMode = false; ensure(); start(); dcat = null; bform = null; sel = {}; kview = 'fitur'; catNote = ''; try { ST().fetchCat(function () { if (!bform && !nSel().length && ov.style.display !== 'none') { dcat = null; if (tab === 'katalog') render(); } }); } catch (e) {} if (t) tab = t; ov.style.display = 'flex'; render(); }, count: nBaru };
   function init() { start(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 2800); }); else setTimeout(init, 2800);
 })();

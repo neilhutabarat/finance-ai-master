@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.15';
+  var BETA = 'v1.0.16';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.16', '15 Nov 2026', [
+      '[Perbaikan] Store kini menampilkan fitur satu per satu per kategori, dan penyedia bisa menyusun bundel fitur sendiri dengan harga khusus',
+      '[Perbaikan] Coba gratis 7 hari bisa dimatikan oleh penyedia, dan tampilan Store disamakan di semua halaman',
+      '[Keamanan] Bundel yang sedang disewa tidak bisa dihapus, dan isi bundel dicatat saat diaktifkan sehingga fitur tidak berubah di tengah masa sewa'
+    ]],
     ['v1.0.15', '15 Nov 2026', [
       '[Perbaikan] OneilStore berganti nama menjadi Store',
       '[Perbaikan] Lima laporan baru yang bisa disewa di Store: Penjelasan Laporan Keuangan, Perubahan Modal, Penyusutan Aset Tetap, Perkiraan Stok Habis, dan Laporan Harian WhatsApp',
