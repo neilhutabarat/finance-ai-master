@@ -28,7 +28,7 @@
   function level() {
     var s = lsGet(KEY_S), v = null;
     try { var o = JSON.parse(s || 'null'); if (o && o.v >= 1 && o.v <= 5) v = o.v; } catch (e) {}
-    if (ROLE === 'tower') { var tv = parseInt(lsGet('fm_glass_tw'), 10); return tv >= 1 && tv <= 5 ? tv : 3; }
+    if (ROLE === 'tower') { var tv = parseInt(lsGet('fm_glass_tw'), 10); return tv >= 1 && tv <= 5 ? tv : 4; }
     return v || clampLv(lsGet(KEY_G));
   }
   function look() { try { var p = window.FM_THEME_PREF && FM_THEME_PREF(); return (p && p.look === 'base') ? 'base' : 'original'; } catch (e) { return 'original'; } }
