@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Oneilverse - Manager Command Hub</title>
     <style id="fm-boot">html:not(.fm-ready) body{visibility:hidden}@keyframes fmboot{to{visibility:visible}}html:not(.fm-ready) body{animation:fmboot 0s linear 3s forwards}</style>
-    <script src="/js/loader.js?v=v109"></script>
+    <script src="/js/loader.js?v=v1010"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -60,12 +60,12 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=v109"></script>
-    <script src="js/theme.js?v=v109"></script>
-    <script src="js/ledger.js?v=v109"></script>
-    <script src="js/langit.js?v=v109" defer></script>
-    <script src="js/logo.js?v=v109"></script>
-    <script src="js/skin.js?v=v109"></script>
+    <script src="js/dialog.js?v=v1010"></script>
+    <script src="js/theme.js?v=v1010"></script>
+    <script src="js/ledger.js?v=v1010"></script>
+    <script src="js/langit.js?v=v1010" defer></script>
+    <script src="js/logo.js?v=v1010"></script>
+    <script src="js/skin.js?v=v1010"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -515,49 +515,49 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=v109"></script>
-    <script src="js/monitor.js?v=v109"></script>
-    <script src="js/plans.js?v=v109"></script>
-    <script src="js/usaha.js?v=v109"></script>
-    <script src="js/usaha-bar.js?v=v109"></script>
-    <script src="js/i18n.js?v=v109"></script>
-    <script src="js/mutasi-share.js?v=v109"></script>
-    <script src="js/gaji.js?v=v109"></script>
-    <script src="js/piutang.js?v=v109"></script>
-    <script src="js/promo.js?v=v109"></script>
-    <script src="js/bantuan.js?v=v109"></script>
-    <script src="js/kas.js?v=v109"></script>
-    <script src="js/neraca.js?v=v109"></script>
-    <script src="js/neraca-ai.js?v=v109"></script>
-    <script src="js/oneilstore.js?v=v109"></script>
-    <script src="js/pajak.js?v=v109"></script>
-    <script src="js/absensi.js?v=v109"></script>
-    <script src="js/properti.js?v=v109"></script>
-    <script src="js/backup.js?v=v109"></script>
-    <script src="js/laporan-bulanan.js?v=v109"></script>
-    <script src="js/dash-usaha.js?v=v109"></script>
-    <script src="js/stok.js?v=v109"></script>
-    <script src="js/coa-drag.js?v=v109"></script>
+    <script src="js/auth.js?v=v1010"></script>
+    <script src="js/monitor.js?v=v1010"></script>
+    <script src="js/plans.js?v=v1010"></script>
+    <script src="js/usaha.js?v=v1010"></script>
+    <script src="js/usaha-bar.js?v=v1010"></script>
+    <script src="js/i18n.js?v=v1010"></script>
+    <script src="js/mutasi-share.js?v=v1010"></script>
+    <script src="js/gaji.js?v=v1010"></script>
+    <script src="js/piutang.js?v=v1010"></script>
+    <script src="js/promo.js?v=v1010"></script>
+    <script src="js/bantuan.js?v=v1010"></script>
+    <script src="js/kas.js?v=v1010"></script>
+    <script src="js/neraca.js?v=v1010"></script>
+    <script src="js/neraca-ai.js?v=v1010"></script>
+    <script src="js/oneilstore.js?v=v1010"></script>
+    <script src="js/pajak.js?v=v1010"></script>
+    <script src="js/absensi.js?v=v1010"></script>
+    <script src="js/properti.js?v=v1010"></script>
+    <script src="js/backup.js?v=v1010"></script>
+    <script src="js/laporan-bulanan.js?v=v1010"></script>
+    <script src="js/dash-usaha.js?v=v1010"></script>
+    <script src="js/stok.js?v=v1010"></script>
+    <script src="js/coa-drag.js?v=v1010"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return (typeof fmV === 'function') ? fmV(txList) : txList; } }); if (window.FM_GAJI) FM_GAJI.mount({ addTx: function (tx) { txList.unshift(tx); persistData(); if (typeof db !== 'undefined' && db) { db.collection(tenantFirestoreCol).add(Object.assign({}, tx, { timestamp: firebase.firestore.FieldValue.serverTimestamp() })).catch(console.error); } renderAllReports(); } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/insights.js?v=v109"></script>
-    <script src="js/analisa.js?v=v109"></script>
+    <script src="js/insights.js?v=v1010"></script>
+    <script src="js/analisa.js?v=v1010"></script>
     <script>
         (function(){ function go(){ if (window.FM_ANALISA && document.getElementById('fm-analisa-box')) FM_ANALISA.mount({ el: 'fm-analisa-box', tx: function(){ return (typeof fmV === 'function') ? fmV(txList) : txList; } }); }
           if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(go,0); }); else setTimeout(go,0);
           if (window.STORE) STORE.onChange(function(){ if (window.FM_ANALISA) FM_ANALISA.render(); }); })();
     </script>
-    <script src="js/labarugi.js?v=v109"></script>
-    <script src="js/widgets.js?v=v109"></script>
-    <script src="js/config.js?v=v109"></script>
-    <script src="js/offline.js?v=v109"></script>
-    <script src="js/core.js?v=v109"></script>
-    <script src="js/billing.js?v=v109"></script>
-    <script src="js/shield.js?v=v109"></script>
-    <script src="js/ctrl.js?v=v109"></script>
-    <script src="js/store.js?v=v109"></script>
+    <script src="js/labarugi.js?v=v1010"></script>
+    <script src="js/widgets.js?v=v1010"></script>
+    <script src="js/config.js?v=v1010"></script>
+    <script src="js/offline.js?v=v1010"></script>
+    <script src="js/core.js?v=v1010"></script>
+    <script src="js/billing.js?v=v1010"></script>
+    <script src="js/shield.js?v=v1010"></script>
+    <script src="js/ctrl.js?v=v1010"></script>
+    <script src="js/store.js?v=v1010"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;

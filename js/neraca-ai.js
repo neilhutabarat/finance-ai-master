@@ -1,4 +1,5 @@
-/* neraca-ai.js — Neraca AI (UJI COBA). Jurnal Debit = Kredit dicatat manual oleh Manager; Owner hanya melihat.
+/* neraca-ai.js — Neraca AI (UJI COBA). Jurnal Debit = Kredit: baris OTOMATIS dibentuk dari transaksi toko (hanya dibaca, tidak mengubah transaksi)
+   ditambah jurnal MANUAL oleh Manager (modal, peralatan, penyusutan, dll.); Owner hanya melihat. Satu buku gabungan untuk seluruh usaha.
    Data disimpan di tenant_settings/<id>.neracaAi = { j: [...], lock: 'YYYY-MM' } (satu buku per toko).
    Terpisah dari transaksi toko dan dari menu Neraca yang lama: tidak membaca maupun mengubah keduanya.
    Saran akun memakai aturan kata kunci (bukan model AI). */
@@ -13,7 +14,7 @@
     ['601', 'Beban Sewa', 'beban', 'D'], ['602', 'Beban Gaji', 'beban', 'D'], ['603', 'Beban Listrik / Air', 'beban', 'D'],
     ['604', 'Beban Penyusutan', 'beban', 'D'], ['605', 'Beban Lain-lain', 'beban', 'D']
   ];
-  var D = { j: [], lock: '' }, started = false, ov = null, per = '', note = '', noteCls = 'ok', draft = { date: '', desc: '', deb: '101', kre: '401', amt: '', adj: '0' };
+  var D = { j: [], lock: '', snap: null }, NL = { start: '', kasAwal: 0, modalAwal: 0, byBiz: {} }, _all = null, showAuto = false, started = false, ov = null, per = '', note = '', noteCls = 'ok', draft = { date: '', desc: '', deb: '101', kre: '401', amt: '', adj: '0' };
   function role() { return window.FM_PLANS ? FM_PLANS.pageRole() : 'manager'; }
   function canEdit() { return role() === 'manager'; }
   function tn() { try { return typeof getActiveTenant === 'function' ? getActiveTenant() : null; } catch (e) { return null; } }
@@ -25,19 +26,25 @@
   function ym(s) { return String(s).slice(0, 7); }
   function acc(c) { for (var i = 0; i < COA.length; i++) if (COA[i][0] === c) return COA[i]; return null; }
   function norm(x) {
-    var o = { j: [], lock: '' }; if (!x || typeof x !== 'object') return o;
+    var o = { j: [], lock: '', snap: null }; if (!x || typeof x !== 'object') return o;
     if (/^\d{4}-\d{2}$/.test(x.lock || '')) o.lock = x.lock;
+    if (o.lock && x.snap && typeof x.snap === 'object') o.snap = { n: Number(x.snap.n) || 0, s: Number(x.snap.s) || 0 };
     (Array.isArray(x.j) ? x.j : []).forEach(function (e) {
       if (e && acc(e.deb) && acc(e.kre) && e.deb !== e.kre && Number(e.amt) > 0 && /^\d{4}-\d{2}-\d{2}$/.test(e.date || ''))
         o.j.push({ id: Number(e.id) || o.j.length + 1, date: e.date, desc: String(e.desc || 'Transaksi').slice(0, 120), deb: e.deb, kre: e.kre, amt: Math.round(Number(e.amt)), adj: !!e.adj });
     });
     return o;
   }
+  function normOld(x) {
+    x = x || {}; var bk = 0; if (x.byBiz && typeof x.byBiz === 'object') Object.keys(x.byBiz).forEach(function (k) { bk += Number((x.byBiz[k] || {}).kasAwal) || 0; });
+    return { start: /^\d{4}-\d{2}-\d{2}$/.test(x.start || '') ? x.start : '', kasAwal: (Number(x.kasAwal) || 0) + bk, modalAwal: (Number(x.modalAwal) || 0) + (x.byBiz ? Object.keys(x.byBiz).reduce(function (a, k) { return a + (Number((x.byBiz[k] || {}).modalAwal) || 0); }, 0) : 0) };
+  }
   function lsKey() { return 'fm_neraca_ai_' + tid(); }
   function start() {
     if (started) return; started = true;
-    if (hasDb()) { try { db.collection('tenant_settings').doc(tid()).onSnapshot(function (s) { D = norm(s.exists ? s.data().neracaAi : null); render(); }, function () {}); } catch (e) {} }
-    else { try { D = norm(JSON.parse(localStorage.getItem(lsKey()) || '{}')); } catch (e) {} }
+    if (hasDb()) { try { db.collection('tenant_settings').doc(tid()).onSnapshot(function (s) { var dd = s.exists ? s.data() : null; D = norm(dd ? dd.neracaAi : null); NL = normOld(dd ? dd.neraca : null); render(); }, function () {}); } catch (e) {} }
+    else { try { D = norm(JSON.parse(localStorage.getItem(lsKey()) || '{}')); } catch (e) {} try { NL = normOld(JSON.parse(localStorage.getItem('fm_neraca_' + tid()) || '{}')); } catch (e) {} }
+    try { if (window.FM_PLANS && FM_PLANS.has('piutang') && window.FM_PIU && FM_PIU.start) FM_PIU.start(); } catch (e) {}
   }
   function persist() {
     if (hasDb()) return db.collection('tenant_settings').doc(tid()).set({ neracaAi: D, updatedAt: Date.now() }, { merge: true }).catch(function (e) { alert('Gagal menyimpan: ' + (e && e.message || e)); });
@@ -45,9 +52,31 @@
   }
 
   /* ---------- hitungan ---------- */
+  /* ---------- jurnal otomatis dari transaksi toko (hanya dibaca) ---------- */
+  function txs() { try { return (typeof txList !== 'undefined' && txList) ? txList : []; } catch (e) { return []; } }
+  function cashAcc(t) { return (t.pay === 'qris' || t.pay === 'transfer') ? '102' : '101'; }
+  function bebanAcc(t) {
+    var s = ((t.accountName || '') + ' ' + (t.desc || '')).toLowerCase();
+    if (/sewa|kontrak|kost/.test(s)) return '601'; if (/gaji|upah|honor|thr|karyawan/.test(s)) return '602';
+    if (/listrik|air|pdam|pln|internet|wifi|pulsa|telepon/.test(s)) return '603'; return '605';
+  }
+  function autoEntries() {
+    var out = [], first = '', list = txs();
+    list.forEach(function (t, i) {
+      var d = t && t.dateISO || ''; if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return; if (NL.start && d < NL.start) return;
+      var a = Math.round(Number(t.amount) || 0); if (!(a > 0)) return;
+      var c = t.category, cs = cashAcc(t), deb, kre;
+      if (c === 'sales') { deb = cs; kre = '401'; } else if (c === 'cogs') { deb = '501'; kre = cs; } else if (c === 'prive') { deb = '302'; kre = cs; } else { deb = bebanAcc(t); kre = cs; }
+      if (!first || d < first) first = d;
+      out.push({ id: 'a_' + (t.id || t.timestamp || i), date: d, desc: String(t.desc || t.accountName || 'Transaksi').slice(0, 120), deb: deb, kre: kre, amt: a, adj: false, auto: true });
+    });
+    if (NL.kasAwal > 0) out.push({ id: 'a_open', date: NL.start || first || iso(), desc: 'Saldo awal (dari menu Neraca)', deb: '101', kre: '301', amt: Math.round(NL.kasAwal), adj: false, auto: true });
+    return out;
+  }
+  function all() { return _all || (_all = autoEntries().concat(D.j)); }
   function bal(until) {
     var b = {}; COA.forEach(function (a) { b[a[0]] = { d: 0, k: 0 }; });
-    D.j.forEach(function (x) { if (until && ym(x.date) > until) return; b[x.deb].d += x.amt; b[x.kre].k += x.amt; });
+    all().forEach(function (x) { if (until && ym(x.date) > until) return; b[x.deb].d += x.amt; b[x.kre].k += x.amt; });
     return b;
   }
   function sal(b, c) { var a = acc(c), v = b[c]; return a[3] === 'D' ? v.d - v.k : v.k - v.d; }
@@ -60,12 +89,20 @@
   function checks(p) {
     var out = [], b = bal(p), f = fig(b);
     if (f.aset !== f.liab + f.ek) out.push(['err', 'Neraca tidak balance, selisih ' + rp(f.aset - f.liab - f.ek) + '. Periksa jurnal terakhir.']);
-    ['101', '102', '103', '104', '201', '202'].forEach(function (c) { var s = sal(b, c); if (s < 0) out.push(['err', acc(c)[1] + ' bernilai minus (' + rp(s) + '). Cek arah debit dan kredit, atau modal belum dicatat.']); });
+    ['101', '102', '103', '104', '201', '202'].forEach(function (c) { var s = sal(b, c); if (s < 0) out.push(['err', acc(c)[1] + ' bernilai minus (' + rp(s) + '). ' + (c === '101' ? 'Isi saldo awal Kas dan tanggal mulai di menu Neraca, atau catat modal lewat jurnal manual.' : 'Cek arah debit dan kredit.')]); });
     if (sal(b, '106') > sal(b, '105')) out.push(['err', 'Akumulasi penyusutan melebihi nilai peralatan.']);
-    if (sal(b, '401') > 0 && sal(b, '104') <= 0) out.push(['warn', 'Ada penjualan tetapi persediaan 0. Stok belum dicatat atau HPP belum diakui.']);
+    var stokOn = false; try { stokOn = !!(window.FM_PLANS && FM_PLANS.has('stok')); } catch (e) {}
+    if (stokOn && sal(b, '401') > 0 && sal(b, '104') <= 0) out.push(['warn', 'Ada penjualan tetapi persediaan 0. Stok belum dicatat atau HPP belum diakui.']);
     if (sal(b, '401') > 0 && sal(b, '501') === 0) out.push(['warn', 'Ada penjualan tetapi HPP belum dicatat, jadi laba terlihat terlalu besar.']);
-    if (sal(b, '105') > 0 && !D.j.some(function (x) { return x.deb === '604' && ym(x.date) === p; })) out.push(['warn', 'Peralatan belum disusutkan di bulan ' + p + '.']);
+    if (sal(b, '105') > 0 && !all().some(function (x) { return x.deb === '604' && ym(x.date) === p; })) out.push(['warn', 'Peralatan belum disusutkan di bulan ' + p + '.']);
     var p0 = sal(bal(prevYM(p)), '103'), p1 = sal(b, '103'); if (p0 > 0 && p1 > p0 * 4) out.push(['warn', 'Piutang naik lebih dari 300% dibanding bulan lalu (' + rp(p0) + ' menjadi ' + rp(p1) + ').']);
+    if (NL.kasAwal && NL.modalAwal && Math.round(NL.kasAwal) !== Math.round(NL.modalAwal)) out.push(['warn', 'Saldo awal di menu Neraca tidak sama: Kas ' + rp(NL.kasAwal) + ', Modal ' + rp(NL.modalAwal) + '. Jurnal hanya memakai Kas awal; selisihnya catat lewat jurnal manual.']);
+    if (!NL.start && txs().length) out.push(['warn', 'Tanggal mulai belum diisi di menu Neraca, jadi semua transaksi lama ikut dihitung.']);
+    if (D.lock && D.snap) { var A = autoEntries().filter(function (x) { return ym(x.date) <= D.lock; }), sm = A.reduce(function (q, x) { return q + x.amt; }, 0); if (A.length !== D.snap.n || sm !== D.snap.s) out.push(['warn', 'Transaksi pada periode yang sudah dikunci (sampai ' + D.lock + ') berubah sejak dikunci: ' + D.snap.n + ' baris menjadi ' + A.length + ' baris, nilai ' + rp(D.snap.s) + ' menjadi ' + rp(sm) + '. Neraca periode itu tidak lagi sama dengan saat dikunci.']); }
+    if (p === iso().slice(0, 7)) {
+      try { if (window.FM_PLANS && FM_PLANS.has('piutang') && window.FM_PIU && FM_PIU.totals) { var tt = FM_PIU.totals(''); if (Math.round(tt.piutang) !== sal(b, '103')) out.push(['warn', 'Piutang di modul Piutang (' + rp(tt.piutang) + ') berbeda dari akun Piutang di jurnal (' + rp(sal(b, '103')) + '). Catat selisihnya lewat jurnal manual.']); if (Math.round(tt.utang) !== sal(b, '201')) out.push(['warn', 'Utang di modul Utang (' + rp(tt.utang) + ') berbeda dari Hutang Usaha di jurnal (' + rp(sal(b, '201')) + '). Catat selisihnya lewat jurnal manual.']); } } catch (e) {}
+      try { if (stokOn && window.STORE && STORE.getProducts) { var sv = 0; STORE.getProducts().forEach(function (q) { sv += Math.max(0, Number(q.stock) || 0) * (Number(q.hpp) || 0); }); if (sv > 0 && Math.round(sv) !== sal(b, '104')) out.push(['warn', 'Nilai stok di modul Stok (' + rp(sv) + ') berbeda dari Persediaan di jurnal (' + rp(sal(b, '104')) + '). Catat lewat jurnal manual bila ingin masuk neraca.']); } } catch (e) {}
+    }
     if (D.lock && p <= D.lock) out.unshift(['ok', 'Periode ' + p + ' sudah dikunci.']);
     else if (!out.some(function (x) { return x[0] === 'err'; })) out.unshift(['ok', 'Neraca balance dan tidak ada kesalahan berat.' + (out.length ? ' Ada ' + out.length + ' catatan untuk dicek.' : '')]);
     return out;
@@ -113,6 +150,7 @@
 
   function render() {
     if (!ov || ov.style.display === 'none') return;
+    _all = null;
     var ed = canEdit(), p = per, b = bal(p), f = fig(b), cs = checks(p), hasErr = cs.some(function (c) { return c[0] === 'err'; }), locked = D.lock && p <= D.lock;
     var h = '<div style="width:100%;max-width:820px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
       '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Neraca AI <span style="font-size:10.5px;padding:2px 8px;border-radius:99px;background:rgba(245,158,11,.18);color:#fbbf24;vertical-align:middle">uji coba</span></div><div style="font-size:12px;opacity:.65">Jurnal Debit = Kredit, satu buku untuk seluruh toko.' + (ed ? '' : ' Tampilan baca saja.') + '</div></div><button data-x style="' + btn + ';align-self:flex-start">Tutup</button></div>';
@@ -129,7 +167,7 @@
         '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button data-a="add" style="' + btn + green + '">Simpan jurnal</button><button data-a="dep" style="' + btn + '">Susutkan peralatan</button></div>';
     }
     h += head('Periode') + '<div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin-top:6px"><div style="flex:1;min-width:170px">' + lab('Neraca sampai akhir bulan', '<input id="na-per" type="month" value="' + esc(p) + '" style="' + inp + '">') + '</div>' +
-      (ed ? '<button data-a="lock" ' + ((hasErr || locked || !D.j.length) ? 'disabled style="opacity:.4;cursor:not-allowed;' : 'style="') + btn.replace(/^/, '') + green.replace(/^/, '') + '">' + (locked ? 'Periode terkunci' : 'Kunci periode ' + esc(p)) + '</button>' : '') + '</div>' +
+      (ed ? '<button data-a="lock" ' + ((hasErr || locked || !all().length) ? 'disabled style="opacity:.4;cursor:not-allowed;' : 'style="') + btn.replace(/^/, '') + green.replace(/^/, '') + '">' + (locked ? 'Periode terkunci' : 'Kunci periode ' + esc(p)) + '</button>' : '') + '</div>' +
       '<div style="font-size:11.5px;opacity:.6;margin-top:6px">' + (D.lock ? 'Terkunci sampai ' + esc(D.lock) + ': jurnal bulan itu tidak bisa ditambah atau dihapus.' : 'Belum ada periode dikunci. Tombol aktif hanya jika tidak ada kesalahan berat.') + '</div>' +
       cs.map(function (c) { return box(c[0], c[1]); }).join('');
     function line(c) { var s = sal(b, c); if (!s) return ''; if (c === '106') s = -s; return tr(esc(acc(c)[1]), rp(s)); }
@@ -141,11 +179,16 @@
     var td = 0, tk = 0, rows = '';
     COA.forEach(function (a) { var v = b[a[0]], n = v.d - v.k; if (!v.d && !v.k) return; var Dd = n > 0 ? n : 0, K = n < 0 ? -n : 0; td += Dd; tk += K; rows += tr(a[0] + ' · ' + esc(a[1]), (Dd ? 'D ' + rp(Dd) : 'K ' + rp(K))); });
     h += head('Neraca Saldo') + (rows || tr('Belum ada jurnal', '')) + tr('Total Debit / Kredit', rp(td) + ' / ' + rp(tk), 1);
-    h += head('Jurnal') + (D.j.slice().sort(function (x, y) { return x.date < y.date ? 1 : x.date > y.date ? -1 : y.id - x.id; }).map(function (x) {
+    var au = all().filter(function (x) { return x.auto; });
+    h += head('Jurnal manual (' + D.j.length + ')') + (D.j.slice().sort(function (x, y) { return x.date < y.date ? 1 : x.date > y.date ? -1 : y.id - x.id; }).map(function (x) {
       var lk = D.lock && ym(x.date) <= D.lock;
       return tr(esc(x.date) + ' · ' + esc(x.desc) + (x.adj ? ' <i style="opacity:.6">(penyesuaian)</i>' : '') + '<div style="font-size:11px;opacity:.6">D ' + esc(acc(x.deb)[1]) + ' / K ' + esc(acc(x.kre)[1]) + '</div>',
         rp(x.amt) + (ed && !lk ? ' <button data-a="del" data-id="' + x.id + '" style="' + btn + ';padding:1px 8px;font-size:10.5px">Hapus</button>' : ''));
-    }).join('') || tr('Belum ada jurnal.', ''));
+    }).join('') || tr('Belum ada jurnal manual.', ''));
+    h += head('Jurnal otomatis dari transaksi (' + au.length + ' baris)') + '<div style="font-size:11.5px;opacity:.65;margin:2px 0 6px">Dibaca dari transaksi toko, semua usaha digabung. Untuk mengubah, ubah transaksinya, bukan di sini. <button data-a="toggleauto" style="' + btn + ';padding:2px 10px;font-size:11px">' + (showAuto ? 'Sembunyikan' : 'Tampilkan') + '</button></div>';
+    if (showAuto) h += au.slice().sort(function (x, y) { return x.date < y.date ? 1 : x.date > y.date ? -1 : 0; }).slice(0, 300).map(function (x) {
+      return tr(esc(x.date) + ' · ' + esc(x.desc) + ' <i style="opacity:.6">(otomatis)</i><div style="font-size:11px;opacity:.6">D ' + esc(acc(x.deb)[1]) + ' / K ' + esc(acc(x.kre)[1]) + '</div>', rp(x.amt));
+    }).join('') + (au.length > 300 ? tr('Menampilkan 300 baris terbaru dari ' + au.length + '.', '') : '');
     ov.innerHTML = h + '</div>';
   }
   function readDraft() {
@@ -167,9 +210,10 @@
       var x = D.j.filter(function (q) { return String(q.id) === String(id); })[0];
       if (!x || (D.lock && ym(x.date) <= D.lock)) return;
       if (await (window.fmAsk ? fmAsk('Hapus jurnal "' + x.desc + '"?') : confirm('Hapus jurnal "' + x.desc + '"?'))) { D.j = D.j.filter(function (q) { return q !== x; }); persist(); render(); }
+    } else if (a === 'toggleauto') { showAuto = !showAuto; render();
     } else if (a === 'lock') {
       if (checks(per).some(function (c) { return c[0] === 'err'; })) return;
-      if (await (window.fmAsk ? fmAsk('Kunci periode sampai ' + per + '? Jurnal bulan itu tidak bisa diubah lagi.') : confirm('Kunci periode sampai ' + per + '?'))) { D.lock = per; note = 'Periode ' + per + ' dikunci.'; persist(); render(); }
+      if (await (window.fmAsk ? fmAsk('Kunci periode sampai ' + per + '? Jurnal bulan itu tidak bisa diubah lagi.') : confirm('Kunci periode sampai ' + per + '?'))) { var A2 = autoEntries().filter(function (x) { return ym(x.date) <= per; }); D.lock = per; D.snap = { n: A2.length, s: A2.reduce(function (q, x) { return q + x.amt; }, 0) }; note = 'Periode ' + per + ' dikunci.'; persist(); render(); }
     }
   }
   function ensure() {
@@ -188,5 +232,5 @@
     });
     document.body.appendChild(ov);
   }
-  window.FM_NAI = { open: function () { ensure(); start(); per = iso().slice(0, 7); draft.date = draft.date || iso(); note = ''; ov.style.display = 'flex'; render(); setTimeout(render, 900); }, _suggest: suggest, _amount: amount, _set: function (x) { D = norm(x); }, _data: function () { return D; } };
+  window.FM_NAI = { open: function () { ensure(); start(); per = iso().slice(0, 7); draft.date = draft.date || iso(); note = ''; ov.style.display = 'flex'; render(); setTimeout(render, 900); }, _suggest: suggest, _amount: amount, _set: function (x, o) { D = norm(x); if (o) NL = normOld(o); _all = null; }, _data: function () { return D; }, _all: function () { return all(); }, _auto: autoEntries };
 })();
