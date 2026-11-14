@@ -216,7 +216,7 @@
     });
     var t = document.getElementById(prefix + '-cnt-all'); if (t) t.textContent = tot + ' fitur tambahan dipilih';
   }
-  function find(prefix, q) {
+  function cariFitur(prefix, q) {
     q = String(q || '').toLowerCase().trim();
     var box = document.getElementById(prefix + '-ts-features') || document, shown = 0;
     [].forEach.call(document.querySelectorAll('details[data-fmq="' + prefix + '"]'), function (d) {
@@ -267,7 +267,7 @@
       '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><b id="' + prefix + '-cnt-all" style="font-size:11.5px"></b><span style="flex:1"></span><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',true);FM_PLANS.cnt(\'' + prefix + '\')" style="' + BSM + '">Centang semua</button><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',false);FM_PLANS.cnt(\'' + prefix + '\')" style="' + BSM + '">Kosongkan semua</button></div>';
     var core = FEATURES.filter(function (f) { return !f.soon && isCore(f); });
     /* kotak cari: ketik sebagian nama fitur, baris lain disembunyikan */
-    h += '<div style="margin:2px 0 10px"><input id="' + prefix + '-q" type="search" placeholder="Cari fitur (mis. usaha, neraca, stok)" oninput="FM_PLANS.find(\'' + prefix + '\',this.value)" style="width:100%;box-sizing:border-box;padding:8px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:inherit;font-size:12.5px;outline:none"><div id="' + prefix + '-qn" style="font-size:11px;opacity:.65;margin-top:4px;display:none"></div></div>';
+    h += '<div style="margin:2px 0 10px"><input id="' + prefix + '-q" type="search" placeholder="Cari fitur (mis. usaha, neraca, stok)" oninput="FM_PLANS.cariFitur(\'' + prefix + '\',this.value)" style="width:100%;box-sizing:border-box;padding:8px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:inherit;font-size:12.5px;outline:none"><div id="' + prefix + '-qn" style="font-size:11px;opacity:.65;margin-top:4px;display:none"></div></div>';
     var cats = CATS.concat([{ id: 'lain', label: 'Lainnya', keys: [] }]);
     cats.forEach(function (c) {
       var fs = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && catOf(f) === c.id; });
@@ -430,6 +430,6 @@
     m.style.display = 'flex';
   }
 
-  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, find: find,
+  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
     readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();
