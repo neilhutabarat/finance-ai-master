@@ -382,6 +382,7 @@
     'html[data-tw-ck] #tw-ken #fm-actions{position:static!important;display:flex!important;flex-direction:column;flex:1 1 0;min-height:0;gap:8px;padding:0!important;margin:0!important;overflow:hidden;background:none!important;border:0!important;box-shadow:none!important}',
     'html[data-tw-ck] #tw-ken .tw-group{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:5px}',
     'html[data-tw-ck] #tw-ken .tw-head{padding:0 6px}html[data-tw-ck] #tw-ken .tw-head:before,html[data-tw-ck] #tw-ken .tw-head span{display:none}html[data-tw-ck] #tw-ken .tw-head b{font-size:13px;font-weight:600;color:#bbb;letter-spacing:0}',
+    'html[data-tw-ck] #tw-ken #fm-actions{justify-content:flex-start!important;padding-top:6px!important}',
     'html[data-tw-ck] #tw-ken #fm-actions{container-type:size}html[data-tw-ck] #tw-ken .tw-group{flex:none!important;min-height:0}',
     'html[data-tw-ck] #tw-ken .tw-grid{flex:none!important;grid-auto-rows:calc((100cqh - var(--tw-fixed,172px)) / var(--tw-rows,8))!important}',
     'html[data-tw-ck][data-fm-page="tower"] #tw-ken #fm-actions.tw-grouped .tw-group .fm-act{display:grid!important;grid-template-columns:34px minmax(0,1fr) auto;grid-template-rows:1fr 1fr;column-gap:12px;row-gap:0;align-items:center;justify-items:start;text-align:left!important;padding:6px 14px!important;overflow:hidden;flex-direction:row!important}',
