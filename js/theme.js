@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'RC 5';
+  var BETA = 'RC 6';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['RC 6', '14 Nov 2026', [
+      '[Baru] Efek kilau kaca (garis putih melintang) dan tepi melengkung seperti layar lengkung pada kartu, tombol, dan header',
+      '[Perbaikan] Buku Besar: kotak cari kode/nama akun menampilkan daftar COA untuk dipilih',
+      '[Keamanan] Tampilan hanya bisa diatur oleh pengelola layanan; tidak ada data toko yang dikirim'
+    ]],
     ['RC 5', '14 Nov 2026', [
       '[Baru] Buku Besar seperti rekening koran: pilih kode akun (cari nomor kode atau nama) dan rentang tanggal; tampil tanggal, keterangan, masuk, keluar, dan saldo berjalan',
       '[Perbaikan] Buku Besar menampilkan semua mutasi per akun, dengan saldo awal untuk periode yang dipilih',

@@ -24,17 +24,20 @@
     var codes = Object.keys(coa).sort(function (a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); });
     Object.keys(by).forEach(function (k) { if (codes.indexOf(k) < 0) codes.push(k); });
     var first = codes.filter(function (c) { return (by[c] || []).length; })[0] || codes[0] || '';
-    container.innerHTML = '<div class="r"><input data-q placeholder="Cari kode / nama akun" style="flex:1;min-width:150px"><select data-acc style="flex:2;min-width:200px"></select></div>' +
+    container.innerHTML = '<div style="position:relative;margin-bottom:8px"><input data-q placeholder="Cari kode / nama akun (COA), lalu pilih" style="width:100%" autocomplete="off"><div data-sug style="display:none;position:absolute;left:0;right:0;top:100%;z-index:5;max-height:30vh;overflow:auto;margin-top:4px;border:1px solid rgba(127,127,127,.45);border-radius:12px;background:rgba(255,255,255,.96);color:#0f172a;box-shadow:0 12px 24px -10px rgba(0,0,0,.4)"></div></div><div class="r" data-cur style="font-weight:800"></div>' +
       '<div class="r"><label class="sm">Dari</label><input type="date" data-from><label class="sm">Sampai</label><input type="date" data-to>' +
       '<button data-q1="today">Hari ini</button><button data-q1="month">Bulan ini</button><button data-q1="all">Semua</button></div>' +
       '<div data-out></div>';
-    var sel = container.querySelector('[data-acc]'), q = container.querySelector('[data-q]'), f = container.querySelector('[data-from]'), t = container.querySelector('[data-to]'), out = container.querySelector('[data-out]');
+    var sel = { value: first }, sug = container.querySelector('[data-sug]'), cur = container.querySelector('[data-cur]'), q = container.querySelector('[data-q]'), f = container.querySelector('[data-from]'), t = container.querySelector('[data-to]'), out = container.querySelector('[data-out]');
+    function label(c) { return '[' + c + '] ' + ((coa[c] && coa[c].name) || c) + ' (' + ((by[c] || []).length) + ' transaksi)'; }
     function fill() {
-      var w = q.value.trim().toLowerCase(), cur = sel.value || first;
+      var w = q.value.trim().toLowerCase();
       var list = codes.filter(function (c) { return !w || (String(c) + ' ' + ((coa[c] && coa[c].name) || '')).toLowerCase().indexOf(w) >= 0; });
-      sel.innerHTML = list.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + ' — ' + esc((coa[c] && coa[c].name) || c) + ' (' + ((by[c] || []).length) + ')</option>'; }).join('') || '<option value="">Tidak ada akun</option>';
-      sel.value = list.indexOf(cur) >= 0 ? cur : (list[0] || '');
+      sug.innerHTML = list.map(function (c) { return '<div data-c="' + esc(c) + '" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid rgba(127,127,127,.2)">' + esc(label(c)) + '</div>'; }).join('') || '<div style="padding:10px 12px;opacity:.7">Akun tidak ditemukan</div>';
+      sug.style.display = 'block';
     }
+    sug.onmousedown = function (e) { var d = e.target.closest('[data-c]'); if (!d) return; e.preventDefault(); sel.value = d.getAttribute('data-c'); q.value = ''; sug.style.display = 'none'; cur.textContent = 'Akun: ' + label(sel.value); draw(); };
+    q.onfocus = fill; q.onblur = function () { setTimeout(function () { sug.style.display = 'none'; }, 150); };
     function draw() {
       var code = sel.value, c = coa[code] || {}, out_ = (c.category === 'cogs' || c.category === 'expense');
       var rows = (by[code] || []).map(function (x) { return { d: dateOf(x), x: x }; }).sort(function (a, b) { return a.d < b.d ? -1 : a.d > b.d ? 1 : String(a.x.id || '').localeCompare(String(b.x.id || '')); });
@@ -51,13 +54,13 @@
       if (!n) h += '<tr><td colspan="5" class="sm" style="text-align:center;padding:16px">Belum ada mutasi pada akun dan tanggal ini.</td></tr>';
       out.innerHTML = '<div class="tb"><table><thead><tr><th>Tanggal</th><th>Keterangan</th><th class="n">Masuk</th><th class="n">Keluar</th><th class="n">Saldo</th></tr></thead><tbody>' + h + '</tbody><tfoot><tr><td colspan="2">[' + esc(code) + '] ' + esc(c.name || '') + ' · ' + n + ' transaksi</td><td class="n">' + rp(tin) + '</td><td class="n">' + rp(tout) + '</td><td class="n">' + rp(bal) + '</td></tr></tfoot></table></div>';
     }
-    q.oninput = function () { fill(); draw(); }; sel.onchange = draw; f.onchange = draw; t.onchange = draw;
+    q.oninput = fill; f.onchange = draw; t.onchange = draw;
     container.querySelectorAll('[data-q1]').forEach(function (b) {
       b.onclick = function () { var k = b.getAttribute('data-q1'), d = new Date();
         if (k === 'today') { f.value = t.value = iso(d); } else if (k === 'month') { f.value = iso(new Date(d.getFullYear(), d.getMonth(), 1)); t.value = iso(d); } else { f.value = t.value = ''; }
         draw(); };
     });
-    fill(); sel.value = first; draw();
+    cur.textContent = 'Akun: ' + label(first); draw();
   }
   window.FM_LEDGER = { mount: mount };
 })();

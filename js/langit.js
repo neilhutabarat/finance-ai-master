@@ -45,8 +45,8 @@
     var P = 'html' + '[data-fm-glass]'.repeat(6), p = LV[lv], a = p.a;
     function sel(list, pre) { return list.map(function (e) { return pre + ' ' + e; }).join(','); }
     function grad(T) { return 'linear-gradient(160deg,rgba(' + T + ',' + T + ',' + T + ',' + a[0] + '),rgba(' + T + ',' + T + ',' + T + ',' + a[1] + ') 55%,rgba(' + T + ',' + T + ',' + T + ',' + a[2] + '))'; }
-    function shine(T) { return 'linear-gradient(112deg,transparent 16%,rgba(' + T + ',' + T + ',' + T + ',' + (.36 - lv * .04).toFixed(2) + ') 22%,transparent 27%)'; }
-    function edge(T, sh) { var t = 'rgba(' + T + ',' + T + ',' + T + ','; return 'inset 0 0 0 1px ' + t + '.3),inset 0 2px 1px ' + t + '.9),inset 0 -2px 2px ' + t + '.3),inset 0 0 20px ' + t + '.2),0 18px 34px -16px ' + sh; }
+    function shine(T) { var t = 'rgba(' + T + ',' + T + ',' + T + ','; return 'linear-gradient(112deg,transparent 14%,' + t + (.62 - lv * .06).toFixed(2) + ') 20%,transparent 26%),linear-gradient(112deg,transparent 30%,' + t + (.34 - lv * .03).toFixed(2) + ') 32%,transparent 34%)'; }
+    function edge(T, sh) { var t = 'rgba(' + T + ',' + T + ',' + T + ','; return 'inset 0 0 0 1px ' + t + '.32),inset 0 3px 2px -1px ' + t + '.95),inset 0 -3px 3px -1px ' + t + '.4),inset 5px 0 7px -4px ' + t + '.85),inset -5px 0 7px -4px ' + t + '.55),inset 0 0 26px ' + t + '.26),0 18px 34px -16px ' + sh; }
     function printed(T) { var t = 'rgba(' + T + ',' + T + ',' + T + ','; return 'text-shadow:0 1px 0 ' + t + (.55 + lv * .06).toFixed(2) + '),0 0 7px ' + t + (.18 + lv * .08).toFixed(2) + ')!important;'; }
     var bf = 'blur(' + Math.min(p.b, 14) + 'px) saturate(' + Math.min(p.s, 1.25) + ')', bfInv = 'invert(1) hue-rotate(180deg) ' + bf;
     var SH = 'rgba(4,22,48,.5)', SHI = 'rgba(235,225,205,.5)';
@@ -62,6 +62,7 @@
     var sm = 'blur(5px)', smI = 'invert(1) hue-rotate(180deg) blur(5px)', SMS = ['.fm-act', '.fm-fab', '#fm-dock'];
     o += sel(SMS, P + ':not([data-fm-invert])') + '{backdrop-filter:' + sm + '!important;-webkit-backdrop-filter:' + sm + '!important}';
     o += sel(SMS, P + '[data-fm-invert="1"]') + '{backdrop-filter:' + smI + '!important;-webkit-backdrop-filter:' + smI + '!important}';
+    o += sel(['.ios-glass', '.white-ice-glass-card', 'header.oneui-hero'], P) + '{border-radius:24px!important}';
     /* selubung latar tipis: gambar tetap terlihat, kartu yang menjaga keterbacaan */
     o += P + ':not([data-fm-invert]) body[class]{background-image:linear-gradient(rgba(255,255,255,.04),rgba(255,255,255,.02)),var(--fm-wp)!important}';
     return o;
