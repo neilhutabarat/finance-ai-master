@@ -160,6 +160,8 @@
     ov.addEventListener('change', function (e) { if (e.target.id === 'na-asof' && e.target.value) { asof = e.target.value; note = ''; render(); } });
     document.body.appendChild(ov);
   }
+  /* muat data Neraca sejak halaman dibuka, agar Grafik, Penjelasan, dan Perubahan Modal tidak membaca data kosong */
+  setTimeout(function () { try { if (hasDb()) start(); } catch (e) {} }, 2200);
   window.FM_NAI = { open: function () { ensure(); start(); asof = iso(); note = ''; ov.style.display = 'flex'; render(); setTimeout(render, 900); },
-    _calc: calc, _set: function (ai, ne) { D = normAi(ai); if (ne) NL = normNeraca(ne); }, _data: function () { return D; }, _text: textOut };
+    _calc: calc, _start: start, _nl: function () { return NL; }, _set: function (ai, ne) { D = normAi(ai); if (ne) NL = normNeraca(ne); }, _data: function () { return D; }, _text: textOut };
 })();

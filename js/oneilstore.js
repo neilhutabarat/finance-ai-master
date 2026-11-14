@@ -177,7 +177,7 @@
     var body = sheet ? viewSheet() : tab === 'paket' ? viewPaket() : tab === 'punyaku' ? viewPunyaku() : viewJelajah();
     var banner = (P().STORE.loadedSig() !== null && P().STORE.sig() !== P().STORE.loadedSig()) ? '<div style="margin:10px 0;padding:9px 11px;border-radius:12px;background:rgba(34,197,94,.14);font-size:12px;display:flex;gap:8px;align-items:center"><span style="flex:1">Ada perubahan sewa. Muat ulang halaman agar fitur baru tampil.</span><button data-a="reload" style="' + BTN + GREEN + '">Muat ulang</button></div>' : '';
     ov.innerHTML = '<div style="width:100%;max-width:560px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px;' + S + '">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-weight:900;font-size:18px">OneilStore</div><div style="font-size:12px;opacity:.6">Sewa fitur sesuai kebutuhan usaha</div></div><button data-x style="' + BTN + '">Tutup</button></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-weight:900;font-size:18px">Store</div><div style="font-size:12px;opacity:.6">Sewa fitur sesuai kebutuhan usaha</div></div><button data-x style="' + BTN + '">Tutup</button></div>' +
       '<div style="display:flex;gap:6px;margin:12px 0 4px;flex-wrap:wrap">' + TB('jelajah', 'Jelajah') + TB('paket', 'Paket') + TB('punyaku', 'Punyaku' + (reqs.some(function (r) { return r.status === 'BARU'; }) ? ' •' : '')) + '</div>' + banner + body + cartBar() + '</div>';
     if (keepTop && ov.firstChild) ov.firstChild.scrollTop = keepTop;
   }

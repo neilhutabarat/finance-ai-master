@@ -37,7 +37,8 @@
       { t: 'COA Toko', ic: 'list', run: "towerPick('coa')", d: 'Daftar akun toko' },
       { t: 'Stok & Katalog', ic: 'box', run: "FM_LAB.open('template')", d: 'Isi katalog awal, simpan & salin template toko' },
       { t: 'Kuota Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Kasir, Manager, Owner' },
-      { t: 'Salin Fitur', ic: 'grid', run: "towerPick('salin')", d: 'Salin fitur dari toko lain' }
+      { t: 'Salin Fitur', ic: 'grid', run: "towerPick('salin')", d: 'Salin fitur dari toko lain' },
+      { t: 'Demo Toko', ic: 'moon', run: "FM_TSTORE.openDemo()", d: 'Jadikan toko demo dengan batas hari, atau jadikan toko asli' }
     ] },
     { id: 'paket', title: 'Paket, Versi & Serah Terima', hint: 'Setelah toko siap', c: '#e0a47a', items: [
       { t: 'Paket & Billing', ic: 'tag', run: "towerPick('paket')", d: 'Basic atau Plus, lalu tagihan' },
@@ -60,8 +61,7 @@
     ] },
     { id: 'sistem', title: 'Pengaturan Sistem', hint: 'Jarang disentuh', c: '#b8bccc', items: [
       { t: 'Akun Login', ic: 'key', find: 'Akun Login', d: 'PIN Admin, Manager, Owner toko' },
-      { t: 'OneilStore', ic: 'tag', run: "FM_TSTORE.open()", d: 'Permintaan sewa, sewa aktif, beri sewa, dan mode demo toko' },
-      { t: 'Katalog OneilStore', ic: 'tag', run: "FM_TSTORE.open('katalog')", d: 'Pilih fitur yang dijual dan atur harga harian, mingguan, bulanan, tahunan, permanen' },
+      { t: 'Store', ic: 'tag', run: "FM_TSTORE.open()", d: 'Permintaan sewa, sewa aktif, beri sewa, dan katalog harga fitur' },
       { t: 'Rollout Versi', ic: 'box', run: "if(window.openRolloutModal)openRolloutModal()", d: 'Versi default Basic dan Plus' }
     ] }
   ];

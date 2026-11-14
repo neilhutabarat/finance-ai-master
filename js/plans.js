@@ -29,6 +29,11 @@
     { key: 'rekon', label: 'Rekonsiliasi Kas: cocokkan uang tunai di laci dengan catatan', r: { manager: 'o', owner: 'o' } },
     { key: 'neraca', label: 'Neraca: harta, utang, dan modal toko (Paket Plus)', r: { manager: 'o', owner: 'o' } },
     { key: 'neraca_ai', label: 'Neraca AI (uji coba): neraca dari transaksi, kunci periode', r: { manager: 'o', owner: 'o' } },
+    { key: 'penjelasan', label: 'Penjelasan Laporan Keuangan: angka laporan dijelaskan dengan kalimat sederhana', r: { manager: 'o', owner: 'o' } },
+    { key: 'perubahan_modal', label: 'Perubahan Modal: modal awal sampai modal akhir', r: { manager: 'o', owner: 'o' } },
+    { key: 'penyusutan', label: 'Penyusutan Aset Tetap: daftar aset dan nilai buku', r: { manager: 'o', owner: 'o' } },
+    { key: 'stok_habis', label: 'Perkiraan Stok Habis: produk yang perlu dibeli lagi', r: { manager: 'o', owner: 'o' } },
+    { key: 'harian_wa', label: 'Laporan Harian WhatsApp: ringkasan satu hari siap kirim', r: { manager: 'o', owner: 'o' } },
     { key: 'grafik', label: 'Grafik Keuangan: penjualan, laba, kas, beban, aset dan liabilitas', r: { manager: 'o', owner: 'o' } },
     { key: 'pajak_bulanan', label: 'Laporan Pajak Bulanan: perkiraan PPh Final dan PPN per bulan', r: { manager: 'o', owner: 'o' } },
     { key: 'absensi', label: 'Absensi Karyawan: catat masuk dan pulang, rekap kehadiran bulanan', r: { kasir: 'o', manager: 'o', owner: 'o' } },
@@ -135,6 +140,11 @@
     { id: 'neraca_ai', name: 'Neraca AI', grp: 'Keuangan', price: 15000, perm: 750000, d: 'Neraca otomatis dari transaksi, bisa dikunci per periode (uji coba)', keys: ['neraca_ai'] },
     { id: 'analisa', name: 'Analisa Keuangan', grp: 'Keuangan', price: 20000, perm: 1000000, d: 'Temuan, saran, margin, dan titik impas dari transaksi toko', keys: ['analisa'] },
     { id: 'grafik', name: 'Grafik Keuangan', grp: 'Keuangan', price: 15000, perm: 750000, d: 'Grafik penjualan, laba, kas, beban, aset dan liabilitas', keys: ['grafik'] },
+    { id: 'penjelasan', name: 'Penjelasan Laporan Keuangan', grp: 'Keuangan', price: 15000, perm: 750000, d: 'Angka laporan dijelaskan dengan kalimat sederhana, bisa disalin', keys: ['penjelasan'] },
+    { id: 'perubahan_modal', name: 'Perubahan Modal', grp: 'Keuangan', price: 10000, perm: 500000, d: 'Modal awal, tambahan, laba, prive, sampai modal akhir', keys: ['perubahan_modal'] },
+    { id: 'penyusutan', name: 'Penyusutan Aset Tetap', grp: 'Keuangan', price: 15000, perm: 750000, d: 'Daftar aset, penyusutan tiap bulan, dan nilai buku', keys: ['penyusutan'] },
+    { id: 'stok_habis', name: 'Perkiraan Stok Habis', grp: 'Stok & Barang', price: 10000, perm: 500000, d: 'Produk yang akan habis dan saran jumlah beli', keys: ['stok_habis'] },
+    { id: 'harian_wa', name: 'Laporan Harian WhatsApp', grp: 'Laporan', price: 10000, perm: 500000, d: 'Ringkasan penjualan dan laba satu hari, siap kirim lewat WhatsApp', keys: ['harian_wa'] },
     { id: 'pajak', name: 'Pajak Bulanan', grp: 'Keuangan', price: 15000, d: 'Perkiraan PPh Final dan PPN tiap bulan', keys: ['pajak_bulanan'] },
     { id: 'lapbul', name: 'Laporan Bulanan', grp: 'Laporan', price: 10000, d: 'Ringkasan tiap bulan untuk Owner, kirim lewat WhatsApp', keys: ['laporan_bulanan'] },
     { id: 'backup', name: 'Backup & Ekspor', grp: 'Laporan', price: 10000, d: 'Unduh data toko ke Excel dan arsip', keys: ['backup'] },
@@ -248,16 +258,16 @@
   var CATS = [
     { id: 'akun', label: 'Toko & Akun', keys: ['admin_usaha', 'banyak_usaha', 'instruksi'] },
     { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
-    { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode'] },
-    { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
-    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'grafik', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
+    { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'stok_habis'] },
+    { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
+    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
     { id: 'ops', label: 'Operasional', keys: ['absensi', 'properti', 'offline_penuh'] },
     { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'clock', 'weather', 'rates', 'billing_card', 'chat'] }
   ];
 
   /* Penempatan fitur untuk tampilan Tower (hanya label + pengelompokan, tidak mengubah hak akses):
      INTI = terkunci merah; TAMBAHAN = fitur standar yang diberikan; STORE = layak disewa satuan di OneilStore. */
-  var STORE_KEYS = ['wa_receipt', 'bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'analisa', 'grafik', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi', 'properti'];
+  var STORE_KEYS = ['wa_receipt', 'bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'analisa', 'grafik', 'penjelasan', 'perubahan_modal', 'penyusutan', 'stok_habis', 'harian_wa', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi', 'properti'];
   function isStore(f) { return STORE_KEYS.indexOf(f.key) >= 0; }
   function isCore(f) { return Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); }
   function catOf(f) { for (var i = 0; i < CATS.length; i++) if (CATS[i].keys.indexOf(f.key) >= 0) return CATS[i].id; return 'lain'; }
@@ -458,6 +468,11 @@
     if (!has('neraca', role)) drop('button[onclick*="FM_NERACA."]');
     if (!has('neraca_ai', role)) drop('button[onclick*="FM_NAI"]');
     if (!has('grafik', role)) drop('button[onclick*="FM_GRAFIK"]');
+    if (!has('penjelasan', role)) drop('button[onclick*="FM_PENJ"]');
+    if (!has('perubahan_modal', role)) drop('button[onclick*="FM_MODAL"]');
+    if (!has('penyusutan', role)) drop('button[onclick*="FM_ASET"]');
+    if (!has('stok_habis', role)) drop('button[onclick*="FM_STOKHABIS"]');
+    if (!has('harian_wa', role)) drop('button[onclick*="FM_HARIAN"]');
     if (!has('arus_kas', role) && !has('anggaran', role) && !has('rekon', role)) drop('button[onclick*="FM_KAS"]');
     if (!has('banyak_usaha', role)) drop('button[onclick*="FM_USAHA_SUM"]');
     if (!has('admin_usaha', role)) drop('button[onclick*="FM_ADMINS"]');

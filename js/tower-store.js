@@ -1,4 +1,4 @@
-/* tower-store.js — OneilStore sisi Tower (hanya halaman Tower).
+/* tower-store.js — Store (dulu OneilStore) sisi Tower (hanya halaman Tower).
    - Permintaan sewa dari klien = provider_tickets bertipe 'store'. Tower mengaktifkan / menolak.
    - Sewa aktif ditulis ke tenant_ctrl/<toko>.rentals = { <idItem>: { until, trial, since, period } } dan tenant_ctrl/<toko>.trialUsed.
    - Sewa hanya menambah fitur; mencabut atau kedaluwarsa tidak menyentuh data toko. */
@@ -16,7 +16,7 @@
   var B = 'padding:7px 11px;border-radius:10px;font-weight:800;font-size:11.5px;border:0;cursor:pointer;color:#fff;';
   var INP = 'width:100%;box-sizing:border-box;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:12.5px;outline:none';
   var PER = { hari: 'Harian', minggu: 'Mingguan', bulan: 'Bulanan', tahun: 'Tahunan', perm: 'Permanen', gratis: 'Gratis', coba: 'Coba' };
-  var draft = null, catNote = '';
+  var draft = null, catNote = '', demoMode = false;
 
   function tenantsList() {
     var out = []; try { var T = (typeof TENANTS_CONFIG !== 'undefined') ? TENANTS_CONFIG : {}; Object.keys(T).forEach(function (k) { var t = T[k]; if (t && t.id) out.push({ id: t.id, nama: t.nama || t.id }); }); } catch (e) {}
@@ -206,7 +206,7 @@
     h += '<div style="margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);font-size:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>Diskon beli kombinasi</b><span>mulai</span><input id="kt-dmin" inputmode="numeric" value="' + (d.min || 3) + '" style="' + KINP + ';width:52px"><span>fitur, diskon</span><input id="kt-dpct" inputmode="numeric" value="' + (d.pct == null ? 0 : d.pct) + '" style="' + KINP + ';width:52px"><span>% (isi 0 untuk tanpa diskon)</span></div>';
     h += (catNote ? '<div style="margin-top:10px;font-size:12px;color:#fbbf24">' + H(catNote) + '</div>' : '') +
       '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button data-a="kt_save" style="' + B + 'background:#7c3aed;flex:1;padding:10px">Simpan katalog</button><button data-a="kt_reset" style="' + B + 'background:#475569;padding:10px">Kosongkan katalog</button></div>' +
-      '<div style="font-size:11px;opacity:.6;margin-top:8px;line-height:1.5">Klien membaca katalog saat membuka OneilStore. Harga diperiksa lagi saat Anda mengaktifkan permintaan, jadi harga yang diubah klien di perangkatnya akan terlihat sebagai peringatan.</div>';
+      '<div style="font-size:11px;opacity:.6;margin-top:8px;line-height:1.5">Klien membaca katalog saat membuka Store. Harga diperiksa lagi saat Anda mengaktifkan permintaan, jadi harga yang diubah klien di perangkatnya akan terlihat sebagai peringatan.</div>';
     return h;
   }
   function saveCat() {
@@ -215,11 +215,11 @@
     var bad = Object.keys(c.items).concat(Object.keys(c.packs)).filter(function (k) { var e = c.items[k] || c.packs[k]; return e.sell && !e.free && !ST().periods.some(function (x) { return e.p[x[0]]; }); });
     if (bad.length && !confirm(bad.length + ' item berstatus Dijual tapi tidak punya harga sama sekali, jadi tidak akan tampil di klien. Tetap simpan?')) return;
     d.collection('app_meta').doc('store_catalog').set({ json: JSON.stringify(c), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }).then(function () {
-      ST().setCat(c); draft = null; catNote = 'Katalog tersimpan. Klien memakainya saat membuka OneilStore.'; render();
+      ST().setCat(c); draft = null; catNote = 'Katalog tersimpan. Klien memakainya saat membuka Store.'; render();
     }).catch(function (e) { catNote = 'Gagal menyimpan: ' + (e && e.message || e); render(); });
   }
   function resetCat() {
-    if (!confirm('Kosongkan katalog? Semua fitur menjadi Tidak dijual dan OneilStore klien tampil kosong. Sewa yang sudah berjalan tetap aktif sampai tanggalnya.')) return;
+    if (!confirm('Kosongkan katalog? Semua fitur menjadi Tidak dijual dan Store klien tampil kosong. Sewa yang sudah berjalan tetap aktif sampai tanggalnya.')) return;
     var d = DB(); if (!d) return;
     var empty = { v: 1, items: {}, packs: {}, all: null, disc: { min: 3, pct: 0 } };
     d.collection('app_meta').doc('store_catalog').set({ json: JSON.stringify(empty), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }).then(function () { ST().setCat(empty); draft = null; catNote = 'Katalog dikosongkan.'; render(); }).catch(function (e) { catNote = 'Gagal: ' + (e && e.message || e); render(); });
@@ -242,11 +242,11 @@
     if (!ST()) { ov.innerHTML = '<div style="color:#fff;padding:20px">Katalog Store belum dimuat.</div>'; return; }
     var TB = function (id, t) { return '<button data-tab="' + id + '" style="' + B + (tab === id ? 'background:#7c3aed' : 'background:#334155') + '">' + t + '</button>'; };
     if (tab === 'katalog') { var cc = collectCat(); if (cc) draft = cc; }
-    var body = tab === 'aktif' ? viewAktif() : tab === 'beri' ? viewBeri() : tab === 'demo' ? viewDemo() : tab === 'katalog' ? viewKatalog() : viewMinta();
+    var body = demoMode ? viewDemo() : tab === 'aktif' ? viewAktif() : tab === 'beri' ? viewBeri() : tab === 'katalog' ? viewKatalog() : viewMinta();
     var keep = { t: (ov.querySelector('#ts-t') || {}).value, i: (ov.querySelector('#ts-i') || {}).value, p: (ov.querySelector('#ts-p') || {}).value };
     ov.innerHTML = '<div style="width:100%;max-width:860px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px;font-family:-apple-system,Segoe UI,sans-serif">' +
-      '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-weight:800;font-size:17px">OneilStore</div><div style="font-size:12px;opacity:.65">' + nBaru() + ' permintaan menunggu</div></div><button data-x style="' + B + 'background:#334155">Tutup</button></div>' +
-      '<div style="display:flex;gap:6px;margin:12px 0">' + TB('minta', 'Permintaan') + TB('aktif', 'Sewa aktif') + TB('beri', 'Beri sewa') + TB('katalog', 'Katalog') + TB('demo', 'Demo') + '</div>' + body + '</div>';
+      '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-weight:800;font-size:17px">' + (demoMode ? 'Demo Toko' : 'Store') + '</div><div style="font-size:12px;opacity:.65">' + (demoMode ? 'Atur toko uji dengan batas waktu demo' : nBaru() + ' permintaan menunggu') + '</div></div><button data-x style="' + B + 'background:#334155">Tutup</button></div>' +
+      (demoMode ? '' : '<div style="display:flex;gap:6px;margin:12px 0">' + TB('minta', 'Permintaan') + TB('aktif', 'Sewa aktif') + TB('beri', 'Beri sewa') + TB('katalog', 'Katalog') + '</div>') + '<div style="margin-top:' + (demoMode ? '12' : '0') + 'px">' + body + '</div></div>';
     if (tab === 'beri') { [['#ts-t', keep.t], ['#ts-i', keep.i], ['#ts-p', keep.p]].forEach(function (x) { var el = ov.querySelector(x[0]); if (el && x[1]) el.value = x[1]; }); }
   }
   function ensure() {
@@ -262,7 +262,7 @@
     ov.addEventListener('change', function (e) { var sel = e.target; if (sel && sel.hasAttribute && sel.hasAttribute('data-kstat')) { var tr = sel.closest('tr'); if (tr) tr.style.opacity = sel.value === 'off' ? '.6' : ''; } });
     document.body.appendChild(ov);
   }
-  window.FM_TSTORE = { open: function (t) { ensure(); start(); try { ST().fetchCat(function () { if (tab === 'katalog' && !draft) render(); }); } catch (e) {} if (t) tab = t; ov.style.display = 'flex'; render(); }, count: nBaru };
+  window.FM_TSTORE = { openDemo: function () { ensure(); start(); demoMode = true; ov.style.display = 'flex'; render(); }, open: function (t) { demoMode = false; ensure(); start(); try { ST().fetchCat(function () { if (tab === 'katalog' && !draft) render(); }); } catch (e) {} if (t) tab = t; ov.style.display = 'flex'; render(); }, count: nBaru };
   function init() { start(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 2800); }); else setTimeout(init, 2800);
 })();

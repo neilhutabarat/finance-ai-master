@@ -3,20 +3,25 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.14';
+  var BETA = 'v1.0.15';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.15', '15 Nov 2026', [
+      '[Perbaikan] OneilStore berganti nama menjadi Store',
+      '[Perbaikan] Lima laporan baru yang bisa disewa di Store: Penjelasan Laporan Keuangan, Perubahan Modal, Penyusutan Aset Tetap, Perkiraan Stok Habis, dan Laporan Harian WhatsApp',
+      '[Keamanan] Laporan hanya membaca data transaksi, dan Perubahan Modal dicocokkan dengan ekuitas di Neraca AI sehingga selisih data terlihat'
+    ]],
     ['v1.0.14', '15 Nov 2026', [
-      '[Perbaikan] OneilStore kini tampil kosong sampai penyedia mengisi katalog, dan fitur bisa berstatus Gratis: pilih sesuai kebutuhan lalu diaktifkan setelah disetujui',
+      '[Perbaikan] Store kini tampil kosong sampai penyedia mengisi katalog, dan fitur bisa berstatus Gratis: pilih sesuai kebutuhan lalu diaktifkan setelah disetujui',
       '[Perbaikan] Fitur gratis dan berbayar dipisah saat memilih beberapa fitur sekaligus',
       '[Keamanan] Status Gratis diperiksa terhadap katalog saat penyedia mengaktifkan permintaan, sehingga permintaan gratis untuk fitur yang berbayar ditandai'
     ]],
     ['v1.0.13', '15 Nov 2026', [
-      '[Perbaikan] OneilStore: fitur bisa disewa harian, mingguan, bulanan, tahunan, atau permanen, dan beberapa fitur bisa dipilih sekaligus dengan diskon kombinasi',
+      '[Perbaikan] Store: fitur bisa disewa harian, mingguan, bulanan, tahunan, atau permanen, dan beberapa fitur bisa dipilih sekaligus dengan diskon kombinasi',
       '[Perbaikan] Fitur baru Grafik Keuangan, dan Analisa Keuangan kini memuat margin kotor, titik impas, serta perbandingan laba bulan lalu',
-      '[Perbaikan] Neraca AI, Analisa Keuangan, dan Grafik kini bisa disewa di OneilStore',
+      '[Perbaikan] Neraca AI, Analisa Keuangan, dan Grafik kini bisa disewa di Store',
       '[Keamanan] Harga sewa diperiksa terhadap katalog sebelum fitur diaktifkan, dan sewa yang sudah berjalan tidak berubah'
     ]],
     ['v1.0.12', '15 Nov 2026', [
