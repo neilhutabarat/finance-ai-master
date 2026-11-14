@@ -3,11 +3,19 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.0';
+  var BETA = 'v1.0.1';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.1', '14 Nov 2026', [
+      '[Perbaikan] Tulisan pada dock bawah tidak lagi bertumpuk (termasuk saat bahasa English)',
+      '[Perbaikan] Tema Original/Base kini sama untuk Admin, Kasir, Manager, dan Owner; bawaan Base putih gading',
+      '[Perbaikan] Layar tidak lagi menampilkan wallpaper sesaat saat memuat atau menyegarkan halaman',
+      '[Perbaikan] Logo toko tampil lebih besar dan memenuhi kotaknya',
+      '[Perbaikan] Riwayat Closing ikut bersih pada reset yang sudah dilakukan sebelumnya',
+      '[Keamanan] Pembersihan riwayat closing hanya untuk toko yang direset; data toko lain tidak tersentuh'
+    ]],
     ['v1.0.0', '14 Nov 2026', [
       '[Baru] Tema bawaan Base putih gading yang bersih dan tetap berkaca; tema Original tetap tersedia di Pengaturan',
       '[Baru] Wallpaper dan tampilan kaca (kejelasan 1-8, hujan, rasio wallpaper) diatur dari pusat; logo toko tampil di header dan struk',
@@ -32,8 +40,11 @@
   var KEY = 'fm_theme2_' + (TOKO || 'master') + '_' + ROLE;
 
   function loadPref() { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } }
-  function savePref(p) { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {} }
+  function savePref(p) { try { localStorage.setItem(KEY, JSON.stringify(p)); localStorage.setItem(LOOK_KEY, p.look === 'original' ? 'original' : 'base'); } catch (e) {} }
   var pref = loadPref();
+  /* tema Original/Base satu untuk seluruh toko (Admin, Kasir, Manager, Owner); bawaan: Base putih gading */
+  var LOOK_KEY = 'fm_look_' + (TOKO || 'master');
+  try { pref.look = localStorage.getItem(LOOK_KEY) === 'original' ? 'original' : 'base'; } catch (e) { pref.look = 'base'; }
 
   var CSS = [
     'html,body,button,input,select,textarea{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",Inter,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif!important}',
@@ -179,6 +190,14 @@
   (function () {
     try {
       var h = document.documentElement;
+      if (['kasir', 'manager', 'owner', 'login', 'tower'].indexOf(ROLE) >= 0) {
+        h.setAttribute('data-fm-look', pref.look === 'original' ? 'original' : 'base');
+        if (pref.look !== 'original') {
+          var B = 'html[data-fm-look="base"][data-fm-look][data-fm-look][data-fm-look]', es = document.createElement('style'); es.id = 'fm-base-early';
+          es.textContent = 'html[data-fm-look="base"]{--fm-wp:none!important}html[data-fm-look="base"]:not([data-fm-invert]){background:#fbf7ea}html[data-fm-look="base"][data-fm-invert="1"]{background:rgb(10,5,0)}' + B + ' body,' + B + ' body[class]{background-image:none!important}' + B + '::before{background:none!important}';
+          (document.head || h).appendChild(es);
+        }
+      }
       if (LITE || ['kasir', 'manager', 'owner', 'login', 'tower'].indexOf(ROLE) < 0 || pref.look !== 'original') return;
       var st = document.createElement('style'); st.id = 'fm-boot-css'; st.textContent = 'html[data-fm-boot] body{opacity:0!important}html body{transition:opacity .25s}';
       (document.head || h).appendChild(st); h.setAttribute('data-fm-boot', '1');
@@ -381,7 +400,7 @@
       var olds = []; for (var k = 0; k < row.children.length; k++) { var c = row.children[k]; if (c === block) break; if (c !== block && c.id !== 'fm-logo-img' && c.querySelector && c.querySelector('svg')) olds.push(c); }
       var ri = document.getElementById('receipt-logo-img');
       if (logoData) {
-        if (!img) { img = document.createElement('img'); img.id = 'fm-logo-img'; img.alt = 'Logo'; img.style.cssText = 'height:52px;width:52px;flex:0 0 auto;object-fit:contain;border-radius:14px;background:rgba(255,255,255,.85);padding:3px;margin-right:12px'; row.insertBefore(img, block); }
+        if (!img) { img = document.createElement('img'); img.id = 'fm-logo-img'; img.alt = 'Logo'; img.style.cssText = 'height:clamp(56px,8vw,76px);width:clamp(56px,8vw,76px);flex:0 0 auto;object-fit:cover;border-radius:16px;background:transparent;padding:0;margin-right:12px'; row.insertBefore(img, block); }
         img.src = logoData; olds.forEach(function (o) { o.style.display = 'none'; });
         var inv = 0, e = img.parentElement; while (e && e.nodeType === 1) { if (/invert/.test(getComputedStyle(e).filter || '')) inv++; e = e.parentElement; }
         img.style.setProperty('filter', inv % 2 ? 'invert(1) hue-rotate(180deg)' : 'none', 'important');

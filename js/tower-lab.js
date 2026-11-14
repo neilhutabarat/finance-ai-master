@@ -20,6 +20,12 @@
   function usable(t) { return t && !t.isMaster && !t.isSinglePage && !t.deletedByTower && isManaged(t); }
   function allTenants() { return listNetworkTenants().filter(usable); }
   function fail(e) { alert('Gagal: ' + (e && e.message ? e.message : e)); }
+  var rsDone = {};
+  /* reset lama: tandai juga di tenant_ctrl agar perangkat toko ikut membersihkan riwayat closing lokal */
+  function backfillReset(id, v) {
+    var at = v && parseInt(v.lastResetAt, 10); var d = DB(); if (!at || !d || rsDone[id] === at) return; rsDone[id] = at;
+    d.collection('tenant_ctrl').doc(id).get().then(function (c) { var cur = c.exists ? parseInt((c.data() || {}).lastResetAt, 10) || 0 : 0; if (cur < at) return d.collection('tenant_ctrl').doc(id).set({ lastResetAt: at }, { merge: true }); }).catch(function () {});
+  }
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
   /* ---------- daftar fitur yang bisa diuji ---------- */
@@ -69,7 +75,7 @@
     var d = DB(), u = window.FM_AUTH && FM_AUTH.curUser();
     if (!d || !u) return;
     listening = true;
-    d.collection(COL).onSnapshot(function (s) { labMap = {}; s.forEach(function (x) { labMap[x.id] = x.data(); }); refresh(); }, function () { listening = false; });
+    d.collection(COL).onSnapshot(function (s) { labMap = {}; s.forEach(function (x) { labMap[x.id] = x.data(); backfillReset(x.id, labMap[x.id]); }); refresh(); }, function () { listening = false; });
     d.collection(TPL).onSnapshot(function (s) { tplMap = {}; s.forEach(function (x) { var v = x.data(); v._id = x.id; tplMap[x.id] = v; }); if (cur && cur.kind === 'template') renderTemplate(); }, function () {});
   }
   setInterval(listen, 2500); setTimeout(listen, 800);
