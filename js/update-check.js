@@ -33,11 +33,11 @@
   }
 
   function muatUlang() {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistration().then(function (reg) {
-        if (reg) reg.update().then(function () { location.reload(); }); else location.reload();
-      }).catch(function () { location.reload(); });
-    } else location.reload();
+    /* segarkan dulu salinan halaman di cache browser, baru muat ulang, agar tidak kembali ke versi lama */
+    var go = function () { location.reload(); };
+    var refresh = function () { return fetch(location.pathname + location.search, { cache: 'reload' }).catch(function () {}); };
+    var sw = ('serviceWorker' in navigator) ? navigator.serviceWorker.getRegistration().then(function (reg) { return reg ? reg.update() : null; }).catch(function () {}) : Promise.resolve();
+    Promise.all([refresh(), sw]).then(go, go);
   }
 
   setInterval(function () {

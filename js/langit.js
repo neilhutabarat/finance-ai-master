@@ -31,7 +31,7 @@
     if (ROLE === 'tower') { var tv = parseInt(lsGet('fm_glass_tw'), 10); return tv >= 1 && tv <= 8 ? tv : 4; }
     return v || clampLv(lsGet(KEY_G));
   }
-  function look() { try { var p = window.FM_THEME_PREF && FM_THEME_PREF(); return (p && p.look === 'base') ? 'base' : 'original'; } catch (e) { return 'original'; } }
+  function look() { try { var p = window.FM_THEME_PREF && FM_THEME_PREF(); return (p && p.look === 'original') ? 'original' : 'base'; } catch (e) { return 'base'; } }
 
   /* ---------- kaca ---------- */
   /* tingkat 1..5: kepekatan lapisan kaca (atas, tengah, bawah), kekaburan, kejenuhan latar */
@@ -111,8 +111,12 @@
     o += 'html[data-fm-page="tower"] #tw-root{background:transparent!important}html[data-fm-page="tower"] #tw-bar{margin:10px 16px 8px;border-radius:18px!important;padding:9px 16px}html[data-fm-page="tower"] #tw-strip,html[data-fm-page="tower"] #tw-tbw,html[data-fm-page="tower"] #tw-bot .bx{border-radius:18px!important}html[data-fm-page="tower"] #tw-strip{margin-top:2px}html[data-fm-page="tower"] #tw-tbw{margin-top:8px;padding:4px 10px}html[data-fm-page="tower"] #tw-bot .bx{padding:10px 14px}html[data-fm-page="tower"] #tw-tbw th{background:transparent!important}';
     /* Base: putih polos, tanpa latar gambar */
     o += 'html[data-fm-look="base"]{--fm-wp:none!important}';
-    o += 'html[data-fm-look="base"][data-fm-invert="1"]{background:rgb(41,48,60)!important}html[data-fm-look="base"][data-fm-invert="1"] body{background:transparent!important}';
-    o += 'html[data-fm-look="base"] .fm-actions .fm-act{background:rgba(255,255,255,.92)!important;border:1px solid rgba(15,23,42,.12)!important;box-shadow:0 4px 10px -6px rgba(15,23,42,.3)!important}';
+    o += 'html[data-fm-look="base"]:not([data-fm-invert]):not([data-fm-black="1"]){background:#fbf7ea!important}';
+    o += 'html[data-fm-look="base"][data-fm-invert="1"]:not([data-fm-black="1"]){background:rgb(10,5,0)!important}';
+    o += 'html[data-fm-look="base"][data-fm-page][data-fm-page][data-fm-page][data-fm-page][data-fm-page][data-fm-page]:not([data-fm-black="1"]) body,html[data-fm-look="base"][data-fm-page][data-fm-page][data-fm-page][data-fm-page][data-fm-page][data-fm-page]:not([data-fm-black="1"]) body[class]{background:transparent!important;background-image:none!important}';
+    o += 'html[data-fm-look="base"][data-fm-page][data-fm-page][data-fm-page][data-fm-page][data-fm-page][data-fm-page]:not([data-fm-black="1"])::before,html[data-fm-look="base"][data-fm-page][data-fm-page][data-fm-page][data-fm-page][data-fm-page][data-fm-page]:not([data-fm-black="1"])::after{background:none!important}';
+
+        o += 'html[data-fm-look="base"] .fm-actions .fm-act{background:rgba(255,255,255,.92)!important;border:1px solid rgba(15,23,42,.12)!important;box-shadow:0 4px 10px -6px rgba(15,23,42,.3)!important}';
     return o;
   })();
 

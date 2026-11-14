@@ -3,160 +3,18 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'RC 12';
+  var BETA = 'v1.0.0';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
-    ['RC 12', '14 Nov 2026', [
-      '[Perbaikan] Mode Ponsel tanpa bingkai HP: tampilan selebar HP polos di tengah layar',
-      '[Keamanan] Pilihan mode hanya tersimpan di perangkat ini; tidak ada data yang dikirim'
-    ]],
-    ['RC 11', '14 Nov 2026', [
-      '[Perbaikan] Login Manager/Owner tidak lagi terlempar ke halaman awal (berkas mode Ponsel ikut terpasang)',
-      '[Perbaikan] Riwayat Closing ikut bersih setelah data toko direset dari pusat',
-      '[Perbaikan] Tulisan di Control Tower dan pop-up lebih gelap/terang sesuai latar sehingga mudah dibaca',
-      '[Keamanan] Riwayat Closing tidak lagi terbawa ke toko lain pada browser yang sama'
-    ]],
-    ['RC 10', '14 Nov 2026', [
-      '[Baru] Akun demo: kasir, manager, dan owner bisa login bersamaan tanpa batas selama tanda DEMO aktif; saat DEMO dicabut, kuota login berlaku lagi',
-      '[Baru] Pengaturan rasio wallpaper desktop dari Control Tower: pas layar, posisi, perbesar, blur, gelap/terang',
-      '[Perbaikan] Wallpaper mengikuti rasio layar desktop dan ponsel secara terpisah',
-      '[Keamanan] Kunci kuota login otomatis kembali setelah demo berakhir; data toko tidak disentuh'
-    ]],
-    ['RC 9', '14 Nov 2026', [
-      '[Perbaikan] Logo toko yang sudah diunggah kini benar-benar dimuat dan tampil di header dan struk',
-      '[Keamanan] Logo hanya dibaca dari data toko itu sendiri; tidak ada data yang dikirim keluar'
-    ]],
-    ['RC 8', '14 Nov 2026', [
-      '[Baru] Tingkat kaca 1-8 (8 hampir transparan) untuk toko dan Control Tower',
-      '[Baru] Manager dan Owner punya tombol Ponsel/Desktop di dock (di samping OneilStore) untuk memilih tampilan HP atau desktop',
-      '[Perbaikan] Tulisan lebih tipis dan jelas tanpa bayangan ganda; pop-up memakai satu desain kaca yang lebih pekat agar enak dibaca',
-      '[Keamanan] Pilihan tampilan hanya tersimpan di perangkat ini; tidak ada data toko yang dikirim'
-    ]],
-    ['RC 7', '14 Nov 2026', [
-      '[Baru] Logo UMKM tampil di header Kasir, Manager, dan Owner serta di atas struk; logo dipasang dari Pengaturan toko atau oleh pengelola layanan',
-      '[Perbaikan] Logo yang diunggah tidak lagi hanya jadi ikon aplikasi; bila belum ada logo, tampilan lama tetap dipakai',
-      '[Keamanan] Logo disimpan per toko dan hanya bisa diubah pengelola layanan atau akun toko itu sendiri'
-    ]],
-    ['RC 6', '14 Nov 2026', [
-      '[Baru] Efek kilau kaca (garis putih melintang) dan tepi melengkung seperti layar lengkung pada kartu, tombol, dan header',
-      '[Perbaikan] Buku Besar: kotak cari kode/nama akun menampilkan daftar COA untuk dipilih',
-      '[Keamanan] Tampilan hanya bisa diatur oleh pengelola layanan; tidak ada data toko yang dikirim'
-    ]],
-    ['RC 5', '14 Nov 2026', [
-      '[Baru] Buku Besar seperti rekening koran: pilih kode akun (cari nomor kode atau nama) dan rentang tanggal; tampil tanggal, keterangan, masuk, keluar, dan saldo berjalan',
-      '[Perbaikan] Buku Besar menampilkan semua mutasi per akun, dengan saldo awal untuk periode yang dipilih',
-      '[Keamanan] Buku Besar hanya membaca data toko yang sudah ada di halaman; tidak ada data yang dikirim keluar'
-    ]],
-    ['RC 4', '14 Nov 2026', [
-      '[Baru] Buku Besar: ketuk satu akun untuk melihat rincian transaksinya (tanggal, keterangan, nominal)',
-      '[Perbaikan] Kartu Control Tower lebih bening (tingkat kaca bawaan 4, bisa diatur 1-5 di Pengaturan)',
-      '[Keamanan] Tampilan hanya bisa diatur oleh pengelola layanan; tidak ada data toko yang dikirim'
-    ]],
-    ['RC 3', '14 Nov 2026', [
-      '[Baru] Control Tower kini memakai kaca bening seperti aplikasi toko, dengan pilihan tema Original/Base dan tingkat kaca 1-5 di Pengaturan',
-      '[Perbaikan] Tombol dan panel Control Tower tidak lagi hitam; teks gelap agar jelas terbaca',
-      '[Perbaikan] Tombol menu Manager dan Owner rata tengah sejajar dengan dock',
-      '[Keamanan] Tampilan hanya bisa diatur oleh pengelola layanan; tidak ada data toko yang dikirim'
-    ]],
-    ['RC 2', '14 Nov 2026', [
-      '[Perbaikan] Pop-up di Control Tower tidak lagi terbalik warna; gambar wallpaper dan tombol tampil normal',
-      '[Perbaikan] Tombol muat ulang setelah pembaruan kini juga muncul di Control Tower; gambar di pop-up akun toko tidak lagi negatif',
-      '[Keamanan] Tampilan hanya bisa diatur oleh pengelola layanan; tidak ada data toko yang dikirim'
-    ]],
-    ['RC 1', '14 Nov 2026', [
-      '[Baru] Versi Release Candidate: tampilan kaca sudah final untuk semua akun, termasuk Control Tower',
-      '[Perbaikan] Warna Control Tower tidak lagi terbalik; tombol dan panel kini bening',
-      '[Perbaikan] Halaman tidak lagi berkedip memuat tampilan atau wallpaper lama; tombol dock hitam dengan huruf lebih jelas',
-      '[Keamanan] Tampilan hanya bisa diatur oleh pengelola layanan; aplikasi toko hanya membaca dan tidak mengirim data toko'
-    ]],
-    ['Beta 14', '14 Nov 2026', [
-      '[Baru] Tema kaca juga dipakai di Control Tower',
-      '[Perbaikan] Teks tombol berwarna kini hitam agar jelas terbaca; ikon dock merah dan huruf dock lebih besar',
-      '[Perbaikan] Teks dan angka kecil di Manager dan Owner dibesarkan; aplikasi lebih ringan (blur kaca dikurangi)',
-      '[Keamanan] Tampilan tetap hanya bisa diatur oleh pengelola layanan; tidak ada data toko yang dikirim'
-    ]],
-    ['Beta 13', '14 Nov 2026', [
-      '[Baru] Efek tetesan hujan di atas kaca (kartu, tombol, header, dock, dan pop-up); ukuran butiran dan derasnya diatur pengelola layanan',
-      '[Baru] Halaman masuk (portal) kini berkaca dan memakai wallpaper sendiri',
-      '[Baru] Galeri wallpaper bisa ditambah dan dihapus oleh pengelola layanan, berganti tanpa perlu memuat ulang',
-      '[Perbaikan] Efek hujan berhenti sendiri bila komputer terasa berat, dan bisa dimatikan per toko',
-      '[Keamanan] Gambar dan efek hanya bisa diubah oleh pengelola layanan; aplikasi toko hanya membaca dan tidak mengirim data toko'
-    ]],
-    ['Beta 12', '14 Nov 2026', [
-      '[Baru] Tema Original (kaca bening) dan Base (putih polos) di Pengaturan; mode gelap dihapus',
-      '[Baru] Kartu, tombol, header, dock, dan pop-up berdesain kaca yang sama di Kasir, Manager, dan Owner; tulisan tampak tercetak di atas kaca dan tetap jelas',
-      '[Baru] Tombol menu Manager dan Owner kini ringkas seukuran Absen, Stok, dan Piutang, berwarna berbeda-beda, sehingga halaman tidak perlu digulir',
-      '[Baru] Tingkat kejelasan kaca (1 buram sampai 5 bening) diatur pengelola layanan, per toko bila perlu',
-      '[Perbaikan] Tampilan Manager dan Owner yang rusak (kartu gelap, tulisan tidak terbaca) sudah diperbaiki dan sama dengan Kasir',
-      '[Perbaikan] Alamat toko tampil penuh dan turun ke baris berikutnya; tombol bantuan (?) dipindah ke atas tombol Piutang',
-      '[Perbaikan] Saldo kas laci tidak lagi kembali setelah closing lalu memuat ulang halaman',
-      '[Keamanan] Tingkat kaca dan latar hanya bisa diubah oleh pengelola layanan; aplikasi toko hanya membaca dan tidak mengirim data toko'
-    ]],
-    ['Beta 9', '14 Nov 2026', [
-      '[Baru] Latar belakang baru bergaya lukisan (4 gambar) menggantikan latar lama. Gambar berganti otomatis tiap minggu',
-      '[Baru] Latar hidup: terang-gelap mengikuti matahari terbit dan terbenam di lokasi toko, malam cerah diterangi bulan, dan cuaca nyata (mendung, hujan, petir, kabut) tampil di layar',
-      '[Baru] Pengaturan Gerakan (Otomatis, Selalu, Diam): hujan bergerak hanya di layar lebar yang lancar, dan berhenti sendiri di perangkat yang berat',
-      '[Perbaikan] Latar lama dihapus sehingga aplikasi lebih ringan dan tampilan seragam di semua toko',
-      '[Keamanan] Lokasi hanya dipakai untuk mengambil cuaca dan jam matahari; tidak ada data toko yang dikirim keluar'
-    ]],
-    ['Beta 8', '13 Nov 2026', [
-      '[Baru] OneilStore kini tampil langsung di dock bawah (Manager dan Owner), tidak perlu lagi membuka menu dulu',
-      '[Perbaikan] Tombol Tema dipindah ke Pengaturan agar dock cukup untuk OneilStore; nama tombol kini lengkap "OneilStore"',
-      '[Keamanan] Tidak ada perubahan akses data; OneilStore tetap hanya dapat dibuka akun Manager dan Owner'
-    ]],
-    ['Beta 7', '13 Nov 2026', [
-      '[Baru] Mode demo: toko uji coba tampil label "DEMO · sisa N hari" di layar, dan terkunci otomatis saat masa demo habis. Data demo tidak dihapus',
-      '[Perbaikan] Layar kunci saat masa demo habis kini berbeda dari layar pembekuan pembayaran, dengan pesan yang lebih jelas',
-      '[Keamanan] Masa demo hanya dapat diatur dan dicabut oleh penyedia aplikasi (Tower); toko hanya membaca'
-    ]],
-    ['Beta 6', '13 Nov 2026', [
-      '[Baru] OneilStore: Manager dan Owner kini bisa menyewa fitur tambahan sesuai kebutuhan usaha, satuan atau lewat paket jenis usaha (laundry, kos, klinik, konveksi, minimarket), lengkap dengan masa coba 7 hari',
-      '[Baru] Tab Punyaku menampilkan fitur yang disewa, sisa harinya, dan status permintaan',
-      '[Perbaikan] Fitur yang sudah aktif di toko tetap gratis. Sewa hanya menambah fitur, dan saat masa sewa habis fitur hanya terkunci, data toko tidak pernah dihapus atau diubah',
-      '[Keamanan] Permintaan sewa dikirim lewat jalur tiket yang sudah dilindungi aturan toko, dan hanya penyedia aplikasi yang dapat mengaktifkan atau mencabut sewa'
-    ]],
-    ['Beta 5', '13 Nov 2026', [
-      '[Perbaikan] Nota yang tanggalnya dikosongkan di Kasir kini otomatis memakai tanggal hari ini (sebelumnya tersimpan sebagai "Invalid Date")',
-      '[Perbaikan] Tanggal koreksi Owner dan bulan berjalan di laporan pajak kini mengikuti waktu setempat (sebelumnya bisa mundur satu hari antara pukul 00.00 dan 07.00)',
-      '[Perbaikan] Tombol Edit dan Hapus akun COA tidak lagi rusak bila kode akun memuat tanda kutip',
-      '[Keamanan] Kode akun, kategori, jam tutup kasir, dan notifikasi Partner kini disaring sebelum ditampilkan di semua akun',
-      '[Keamanan] File CSV hasil ekspor kini aman dari rumus tersembunyi (keterangan yang diawali tanda = + - @ tidak lagi dijalankan Excel)'
-    ]],
-    ['Beta 4', '13 Nov 2026', [
-      '[Perbaikan] Mode gelap di akun Kasir dirapikan menyeluruh: kolom isian, jam, tombol, menu bawah, dan semua jendela kini gelap dan jelas terbaca (sebelumnya sebagian masih terang atau hampir tak terlihat)',
-      '[Perbaikan] Tombol di akun Manager dan Owner kini seragam: lebar dan tinggi sama, baris dibagi rata',
-      '[Keamanan] Catatan keterangan transaksi kini disaring sebelum ditampilkan, menutup celah penyisipan skrip dari akun kasir ke akun manager/owner',
-      '[Baru] Terjemahan Bahasa Inggris dilengkapi lagi pada layar utama dan jendela-jendelanya'
-    ]],
-    ['Beta 3', '13 Nov 2026', [
-      '[Perbaikan] Mode gelap dirombak total: sebelumnya hanya membalik warna layar, kini memakai palet gelap yang dirancang khusus sehingga tulisan jernih dan tidak lagi terlihat rusak',
-      '[Perbaikan] Mode terang dibuat lebih mudah dibaca: kartu sedikit lebih pekat dan garisnya lebih tegas, latar dedaunan tetap terlihat',
-      '[Perbaikan] Nama tombol yang panjang kini turun ke dua baris, tidak lagi terpotong menjadi titik-titik',
-      '[Perbaikan] Tombol Piutang & Utang yang sempat tampil tanpa nama sudah kembali normal',
-      '[Baru] Cakupan Bahasa Inggris diperluas lebih dari tiga kali lipat, termasuk tanggal, nama bulan, dan kalimat berangka'
-    ]],
-    ['Beta 2', '13 Nov 2026', [
-      '[Perbaikan] Tombol Stok, Absen, dan Bantuan dipindah ke bawah agar tidak lagi menutupi formulir kasir',
-      '[Perbaikan] Pemberitahuan "versi baru siap" kini muncul otomatis saat ada pembaruan aplikasi'
-    ]],
-    ['Beta', '13 Nov 2026', [
-      '[Baru] Oneil Shield — pusat keamanan toko: lihat perlindungan datamu langsung di menu Pengaturan',
-      '[Baru] Ganti bahasa Indonesia / English kini rapi di dalam menu Pengaturan',
-      '[Perbaikan] Tombol-tombol di layar Kasir ditata ulang agar tidak lagi saling bertumpuk',
-      '[Keamanan] Oneil Shield menjaga akses dan data toko, dan mengunci aplikasi otomatis bila lama tak tersambung ke server'
-    ]],
-    ['Prototype', '13 Nov 2026', [
-      '[Baru] Kasir untuk toko, kafe, laundry, salon, bengkel, dan jasa, lengkap dengan tunai, QRIS, transfer, struk, dan piutang',
-      '[Baru] Pembukuan otomatis: laba rugi, arus kas, neraca, pajak, dan gaji, langsung dari transaksi kasir',
-      '[Baru] Stok dengan scanner barcode atau kamera, riwayat barang masuk per Admin, dan pemisahan stok per usaha',
-      '[Baru] Beberapa Admin dalam satu toko, masing-masing dengan pembukuan usahanya sendiri',
-      '[Baru] Absensi karyawan, Properti (unit, penyewa, tagihan bulanan dan pengingat WhatsApp), dan Chat Universe',
-      '[Baru] Pilihan bahasa Indonesia dan English, mode terang dan gelap, serta mode offline',
-      '[Baru] Cadangan data ke Excel dan JSON, laporan siap cetak, dan tiket bantuan langsung ke tim Oneilverse',
-      '[Perbaikan] Tampilan login dan halaman setelah masuk tidak lagi berkedip tampilan lama sebelum tampilan yang benar',
-      '[Keamanan] Data tiap toko terpisah penuh, sandi tersimpan terenkripsi, dan kolom PIN tidak lagi ditawari simpan sandi oleh browser'
+    ['v1.0.0', '14 Nov 2026', [
+      '[Baru] Tema bawaan Base putih gading yang bersih dan tetap berkaca; tema Original tetap tersedia di Pengaturan',
+      '[Baru] Wallpaper dan tampilan kaca (kejelasan 1-8, hujan, rasio wallpaper) diatur dari pusat; logo toko tampil di header dan struk',
+      '[Baru] Buku Besar per kode akun seperti rekening koran, dan akun demo tanpa batas login selama tanda DEMO aktif',
+      '[Perbaikan] Riwayat Closing ikut bersih setelah data toko direset, dan tidak lagi terbawa ke toko lain pada browser yang sama',
+      '[Perbaikan] Tombol "Muat ulang" pada pemberitahuan versi baru kini benar-benar memuat versi terbaru',
+      '[Keamanan] Data tiap toko tetap terpisah penuh; pilihan tampilan hanya tersimpan di perangkat ini dan tidak ada data yang dikirim keluar'
     ]]
   ];
   var SHOW_LAST = 10;
@@ -321,7 +179,7 @@
   (function () {
     try {
       var h = document.documentElement;
-      if (LITE || ['kasir', 'manager', 'owner', 'login', 'tower'].indexOf(ROLE) < 0 || pref.look === 'base') return;
+      if (LITE || ['kasir', 'manager', 'owner', 'login', 'tower'].indexOf(ROLE) < 0 || pref.look !== 'original') return;
       var st = document.createElement('style'); st.id = 'fm-boot-css'; st.textContent = 'html[data-fm-boot] body{opacity:0!important}html body{transition:opacity .25s}';
       (document.head || h).appendChild(st); h.setAttribute('data-fm-boot', '1');
       window.FM_BOOT_DONE = function () { h.removeAttribute('data-fm-boot'); };
@@ -409,7 +267,7 @@
     box.style.setProperty('--fm-pick', pick);
     var h = '<div style="display:flex;justify-content:space-between;align-items:center"><h3>Pengaturan</h3><button class="fm-btn" data-close>Tutup</button></div>';
     var THEME_ON = !(window.FM_PLANS && !FM_PLANS.has('theme'));
-    var look = pref.look === 'base' ? 'base' : 'original';
+    var look = pref.look === 'original' ? 'original' : 'base';
     h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (look === 'original' ? 'on' : '') + '" data-look="original"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#bfe3ff,#e8f6ff 45%,#9fd6c0)"></div>Original</button>' +
       '<button class="fm-mode ' + (look === 'base' ? 'on' : '') + '" data-look="base"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#eceff4)"></div>Base</button></div></div>';
@@ -428,7 +286,7 @@
     if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur Toko</button></div>';
     if (window.FM_SHIELD) h += '<div class="fm-sec"><button class="fm-btn" data-shield style="width:100%;padding:13px">🛡️ Oneil Shield — Keamanan</button></div>';
     if (false) h += '<div class="fm-sec"><button class="fm-btn" data-logout style="width:100%;padding:13px;color:#fda4af">Keluar dari Akun</button></div>';
-    h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>v' + APP_VERSION + ' · ' + BETA + '</b></div></div>';
+    h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>' + BETA + '</b></div></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.slice(0, SHOW_LAST).map(function (n, i) {
       return '<details ' + (i === 0 ? 'open' : '') + '><summary>v' + n[0] + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { var m = /^\[(\w+)\]\s*/.exec(t); var tag = m ? m[1] : ''; return '<li>' + (tag ? '<i class="fm-tag fm-tag-' + tag.toLowerCase() + '">' + esc(tag) + '</i>' : '') + esc(t.replace(/^\[\w+\]\s*/, '')) + '</li>'; }).join('') + '</ul></details>';
     }).join('') + '</div>';
@@ -578,6 +436,6 @@
       if (typeof o === 'function') window.applyTenantBranding = function (tn) { o(tn); applyLoginLogo(); };
     }
   }
-  window.FM_THEME = { version: APP_VERSION, toggle: function () { pref.look = (pref.look === 'base') ? 'original' : 'base'; savePref(pref); apply(); return pref.look; }, mode: function () { return pref.mode || DEFAULT_MODE; }, open: function () { document.getElementById('fm-gear').click(); } };
+  window.FM_THEME = { version: APP_VERSION, toggle: function () { pref.look = (pref.look === 'original') ? 'base' : 'original'; savePref(pref); apply(); return pref.look; }, mode: function () { return pref.mode || DEFAULT_MODE; }, open: function () { document.getElementById('fm-gear').click(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
