@@ -12,7 +12,7 @@
   function lsKey() { return 'fm_pajak_' + tid(); }
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
   function rp(n) { return (n < 0 ? '-' : '') + 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.abs(Math.round(n || 0))); }
-  function txs() { try { return typeof txList !== 'undefined' ? txList : []; } catch (e) { return []; } }
+  function txs() { try { var l = typeof txList !== 'undefined' ? txList : []; return (window.FM_BIZ && FM_BIZ.vf) ? FM_BIZ.vf(l) : l; } catch (e) { return []; } }
   var MON = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
   function norm(x) { x = x || {}; return { pphOn: x.pphOn !== false, pphRate: x.pphRate != null ? Number(x.pphRate) : 0.5, free500: !!x.free500, ppnOn: !!x.ppnOn, ppnRate: x.ppnRate != null ? Number(x.ppnRate) : 11, paid: x.paid || {} }; }
 
@@ -61,7 +61,7 @@
     var ed = canEdit(), m = calc(year), nowYm = (function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); })(new Date());
     var tO = 0, tP = 0, tN = 0; m.forEach(function (r) { tO += r.omzet; tP += r.pph; tN += Math.max(0, r.ppn); });
     var h = '<div style="width:100%;max-width:820px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
-      '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Laporan Pajak Bulanan</div><div style="font-size:12px;opacity:.65">Perkiraan pajak dari omzet toko. Konfirmasi ke konsultan atau kantor pajak sebelum menyetor.</div></div><button data-x style="' + btn + '">Tutup</button></div>';
+      '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Laporan Pajak Bulanan' + ((window.FM_BIZ && FM_BIZ.enabled() && FM_BIZ.view()) ? ' - ' + esc(FM_BIZ.view()) : '') + '</div><div style="font-size:12px;opacity:.65">Perkiraan pajak dari omzet toko. Konfirmasi ke konsultan atau kantor pajak sebelum menyetor.</div></div><button data-x style="' + btn + '">Tutup</button></div>';
     if (note) h += '<p style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.14);color:#86efac;font-size:12px">' + esc(note) + '</p>';
     h += '<div style="display:flex;gap:8px;align-items:end;margin:12px 0;flex-wrap:wrap"><div style="width:130px">' + lab('Tahun', '<input id="pj-year" type="number" min="2020" max="2100" value="' + year + '" style="' + inp + '">') + '</div><button data-a="copy" style="' + btn + '">Salin teks</button><button data-a="csv" style="' + btn + '">Unduh CSV</button></div>';
     h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px">' + box('Omzet ' + year, rp(tO)) + box('PPh Final', rp(tP)) + (C.ppnOn ? box('PPN kurang bayar', rp(tN)) : '') + box('Total perkiraan', rp(tP + tN)) + '</div>';
@@ -118,5 +118,6 @@
     ov.addEventListener('change', function (e) { if (e.target.id === 'pj-year' && /^\d{4}$/.test(e.target.value)) { year = e.target.value; note = ''; render(); } });
     document.body.appendChild(ov);
   }
+  window.addEventListener('fm-biz-view', function () { render(); });
   window.FM_PAJAK = { open: function () { ensure(); start(); year = String(new Date().getFullYear()); note = ''; ov.style.display = 'flex'; render(); }, calc: calc, _cfg: function (x) { C = norm(x); } };
 })();

@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.3';
+  var BETA = 'v1.0.4';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.4', '14 Nov 2026', [
+      '[Perbaikan] Toko banyak usaha: Neraca kini ikut pilihan "Tampilkan usaha", lengkap dengan saldo awal, aset, utang, piutang, dan persediaan per usaha',
+      '[Perbaikan] Laporan Pajak dan Analisa Toko juga mengikuti usaha yang dipilih, jadi tiap usaha punya pembukuan sendiri di Manager dan Owner',
+      '[Keamanan] Data tiap usaha dipisah pada tampilan, dan Admin yang terikat satu usaha hanya melihat usahanya sendiri'
+    ]],
     ['v1.0.3', '14 Nov 2026', [
       '[Perbaikan] Kartu dan pop-up di Manager dan Owner kini sama dengan tampilan Kasir (putih bersih, tepi dan bayangan sama)',
       '[Perbaikan] Pop-up Kurs & Emas: angka kurs terlihat jelas dan muat tanpa scroll di desktop',

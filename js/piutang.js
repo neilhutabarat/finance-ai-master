@@ -231,7 +231,7 @@
   }
   function open() { ensure(); start(); form = payF = detail = pform = null; if (tab === 'utang' && !canUtang()) tab = 'piutang'; ov.style.display = 'flex'; render(); }
   window.FM_PIU = { open: open, mount: function () {}, start: start, all: function () { start(); return rows.slice(); },
-    totals: function () { start(); var a = 0, b = 0; entries('piutang').forEach(function (e) { a += sisa(e); }); entries('utang').forEach(function (e) { b += sisa(e); }); return { piutang: a, utang: b, ready: rows.length > 0 || started }; } };
+    totals: function (biz) { start(); var a = 0, b = 0, ok = function (e) { if (!biz) return true; try { return FM_BIZ.canon(e.biz) === biz; } catch (x) { return true; } }; entries('piutang').filter(ok).forEach(function (e) { a += sisa(e); }); entries('utang').filter(ok).forEach(function (e) { b += sisa(e); }); return { piutang: a, utang: b, ready: rows.length > 0 || started }; } };
   function floatBtn() {
     try { if (!(window.FM_PLANS && FM_PLANS.has('piutang'))) return; } catch (e) { return; }
     start();

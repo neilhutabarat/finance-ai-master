@@ -1391,13 +1391,8 @@
         try {
             fetch('rilis/index.json?c=' + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
                 if (!j || !Array.isArray(j.versi)) return;
-                j.versi.forEach(function (v) { if (/^(Prototype|BETA-[\d.]+|Beta(-\d+)?|v\d+\.\d+\.\d+)$/.test(v) && FM_ROLLOUT_VERSIONS.indexOf(v) < 0) FM_ROLLOUT_VERSIONS.push(v); });
-                /* versi terbaru yang sedang di akar situs (bukan folder rilis) juga boleh dipilih/dikunci */
-                return fetch('version.json?c=' + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (cur) { if (cur && /^v\d+\.\d+\.\d+$/.test(cur.versi || '') && FM_ROLLOUT_VERSIONS.indexOf(cur.versi) < 0) FM_ROLLOUT_VERSIONS.push(cur.versi); }).catch(function () {}).then(function () {
-                    const key = function (s) { if (s === 'Prototype') return [0, 0, 0, 0]; const m = /^v(\d+)\.(\d+)\.(\d+)$/.exec(s); if (m) return [3, +m[1], +m[2], +m[3]]; const b = /(\d+(?:\.\d+)*)/.exec(s) || [0, '1']; const n = String(b[1]).split('.').map(Number); return [1, n[0] || 0, n[1] || 0, 0]; };
-                    FM_ROLLOUT_VERSIONS.sort(function (x, y) { const a = key(x), b = key(y); for (let i = 0; i < 4; i++) { if (a[i] !== b[i]) return a[i] - b[i]; } return 0; });
-                    try { renderRolloutDefaults(); } catch (e) {}
-                });
+                j.versi.forEach(function (v) { if (/^(Prototype|Beta(-\d+)?)$/.test(v) && FM_ROLLOUT_VERSIONS.indexOf(v) < 0) FM_ROLLOUT_VERSIONS.push(v); });
+                FM_ROLLOUT_VERSIONS.sort(function (a, b) { const f = function (s) { return s === 'Prototype' ? 0 : (parseInt(s.split('-')[1], 10) || 1); }; return f(a) - f(b); });
             }).catch(function () {});
         } catch (e) {}
         let FM_ROLLOUT_CFG = { basic: 'Prototype', plus: 'Prototype' };
