@@ -15,7 +15,7 @@
   function cek() {
     fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
       if (!j || !j.versi) return;
-      if (versiBerjalan && j.versi !== versiBerjalan && j.versi !== versiBaru) { versiBaru = j.versi; tampilkanPopup(); }
+      if (versiBerjalan && j.versi !== versiBerjalan && j.versi !== versiBaru) { versiBaru = j.versi; if (window.FM_REFRESH && FM_REFRESH.flagNew) FM_REFRESH.flagNew(versiBaru); else tampilkanPopup(); }
     }).catch(function () {});
   }
 

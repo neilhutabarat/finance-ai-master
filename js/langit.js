@@ -95,7 +95,7 @@
     o += 'html[data-fm-invert="1"] .fm-act,html[data-fm-invert="1"] .fm-fab,html[data-fm-invert="1"] #fm-help-fab{filter:invert(1) hue-rotate(180deg)}';
     /* Manager/Owner: isi halaman berhenti di atas dock (tidak tertimpa), bagian tengah mengecil bila layar pendek */
     o += 'html[data-fm-page="manager"] main,html[data-fm-page="owner"] main{padding-bottom:96px!important;box-sizing:border-box!important}';
-    o += 'html[data-fm-fit][data-fm-page="manager"] #fm-insights,html[data-fm-fit][data-fm-page="owner"] #fm-insights{flex:1 1 0!important;min-height:96px!important;overflow:hidden!important}';
+    o += 'html[data-fm-fit][data-fm-page="manager"] #fm-insights,html[data-fm-fit][data-fm-page="owner"] #fm-insights{flex:1 0 auto!important;min-height:96px!important;overflow:visible!important}';
     /* alamat toko ditulis penuh dan boleh turun ke baris berikutnya */
     o += '#topbar-store-slogan{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-width:min(440px,34vw)!important;display:block!important;-webkit-line-clamp:unset!important;line-height:1.25!important}';
     o += 'html[data-fm-portal] body{background-image:var(--fm-wp)!important;background-size:cover!important;background-position:center!important;background-attachment:fixed!important;background-repeat:no-repeat!important}';

@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.10';
+  var BETA = 'v1.0.11';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.11', '15 Nov 2026', [
+      '[Perbaikan] Kartu Ringkasan di Manager dan Owner tidak lagi terpotong di layar pendek, halaman bisa digulir',
+      '[Perbaikan] Animasi Memuat dan Memperbarui kini berupa tiga bola yang melompat',
+      '[Perbaikan] Saat ada versi baru, tombol merah Perbarui Aplikasi berdenyut dan bergoyang, menggantikan popup melayang',
+      '[Keamanan] Pemberitahuan versi baru lebih sulit terlewat, sehingga toko tidak bertahan di versi lama yang belum diperbaiki'
+    ]],
     ['v1.0.10', '15 Nov 2026', [
       '[Perbaikan] Neraca AI (uji coba) kini membentuk jurnal otomatis dari transaksi toko, ditambah jurnal manual untuk modal, peralatan, dan penyusutan',
       '[Perbaikan] Neraca AI menampilkan peringatan bila piutang, utang, atau stok di modul lain berbeda dari jurnal, tanpa angka penyeimbang tersembunyi',
