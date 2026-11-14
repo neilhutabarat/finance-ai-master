@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.11';
+  var BETA = 'v1.0.12';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.12', '15 Nov 2026', [
+      '[Perbaikan] Halaman Manager dan Owner dipadatkan otomatis sesuai tinggi layar sehingga tidak perlu digulir; bar usaha menjadi satu baris',
+      '[Perbaikan] Layar memuat menampilkan nama dan versi Oneilverse',
+      '[Perbaikan] Neraca AI (uji coba) kini hanya menampilkan Neraca berformat baku, disusun otomatis dari data yang diinput admin, tanpa input Debit/Kredit',
+      '[Keamanan] Selisih neraca ditampilkan apa adanya dan tidak ditutup angka penyeimbang, sehingga kesalahan data tidak tersembunyi'
+    ]],
     ['v1.0.11', '15 Nov 2026', [
       '[Perbaikan] Kartu Ringkasan di Manager dan Owner tidak lagi terpotong di layar pendek, halaman bisa digulir',
       '[Perbaikan] Animasi Memuat dan Memperbarui kini berupa tiga bola yang melompat',

@@ -428,6 +428,11 @@
     'html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="4"] main>.grid:nth-child(2)>section:first-child label,html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="4"] main>.grid:nth-child(2)>section:first-child .text-xs{font-size:10px!important;line-height:1.2!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="4"] main>.grid:nth-child(2)>section:first-child{padding:4px 10px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="4"] main>.grid:nth-child(2)>section:first-child>div:last-child{gap:2px 10px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="4"] main>.grid:nth-child(2)>section:first-child .glass-input{padding-top:2px!important;padding-bottom:2px!important}',
     'html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] main>.grid:nth-child(2)>section:first-child{padding:6px 10px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] main>.grid:nth-child(2)>section:first-child>div:last-child{gap:3px 10px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] main>.grid:nth-child(2)>section:first-child .glass-input{padding-top:3px!important;padding-bottom:3px!important;font-size:11.5px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] #tx-amount{font-size:14px!important;padding-top:2px!important;padding-bottom:2px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] #btn-save-draft{padding-top:5px!important;padding-bottom:5px!important;font-size:12px!important}html[data-fm-page="kasir"][data-fm-fit][data-fm-kc~="3"] main>.grid:nth-child(2)>section:first-child #form-title{font-size:12.5px!important}',
     'html[data-fm-page="kasir"][data-fm-kc~="4"] #tx-cat-badge{display:none!important}',
+    'html[data-fm-fit][data-fm-page="manager"] #fm-biz-bar,html[data-fm-fit][data-fm-page="owner"] #fm-biz-bar{display:flex!important;flex-wrap:wrap;align-items:center;gap:4px 18px;padding:7px 12px!important;margin:0 0 8px!important}html[data-fm-fit][data-fm-page="manager"] #fm-biz-bar>div+div,html[data-fm-fit][data-fm-page="owner"] #fm-biz-bar>div+div{margin-top:0!important}',
+    'html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="1"] main>div:first-child>.ios-glass,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="1"] main>div:first-child>.ios-glass{padding:9px 16px!important}html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="1"] main>div:first-child h3,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="1"] main>div:first-child h3{font-size:21px!important;margin:0!important;line-height:1.15!important}html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="1"] .fm-ic,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="1"] .fm-ic{padding:7px 12px!important;gap:1px!important}html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="1"] .fm-ic h4,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="1"] .fm-ic h4{margin:0 0 1px!important;font-size:12px!important}html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="1"] .fm-ic .fm-row,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="1"] .fm-ic .fm-row{font-size:11.5px!important;line-height:1.2!important}html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="1"] .fm-ic .fm-sub,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="1"] .fm-ic .fm-sub{font-size:10.5px!important;line-height:1.2!important;margin:1px 0!important}',
+    'html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="2"] #fm-actions,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="2"] #fm-actions{gap:5px!important}html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="2"] #fm-actions .fm-act,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="2"] #fm-actions .fm-act{padding:4px 11px!important;min-height:0!important;font-size:12px!important;line-height:1.2!important}html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="2"] #fm-actions .fm-act i,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="2"] #fm-actions .fm-act i{width:20px!important;height:20px!important}',
+    'html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="3"] header.oneui-hero,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="3"] header.oneui-hero{padding-top:8px!important;padding-bottom:8px!important}html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="3"] #fm-biz-bar,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="3"] #fm-biz-bar{padding:4px 12px!important;margin-bottom:6px!important}',
+    'html[data-fm-fit][data-fm-page="manager"][data-fm-mc~="4"] #fm-insights .fm-ins-main,html[data-fm-fit][data-fm-page="owner"][data-fm-mc~="4"] #fm-insights .fm-ins-main{display:none!important}',
     'html[data-fm-fit] .fm-tg{margin-top:3px;gap:4px}html[data-fm-fit] .fm-tg input{padding:3px 8px;font-size:11px}html[data-fm-fit] .fm-tg button{padding:3px 10px;font-size:11px}',
     'html[data-fm-fit] #fm-insights .fm-ins-main{flex:1 0 auto;min-height:0}',
     'html[data-fm-fit] #fm-insights .fm-ins-main .fm-scroll{flex:1 1 auto;max-height:clamp(60px,13vh,150px)}',
@@ -868,6 +873,26 @@
     run();
   }
 
+  /* Manager/Owner: padatkan bertahap sampai halaman tidak perlu digulir (diukur dari tinggi sebenarnya) */
+  function mgrFit() {
+    if (PAGE !== 'manager' && PAGE !== 'owner') return;
+    var root = document.documentElement, t, busy = false;
+    function run() {
+      if (busy) return; busy = true;
+      try {
+        var m = document.querySelector('main'); if (!m) return;
+        root.removeAttribute('data-fm-mc'); var lv = [], n;
+        for (n = 1; n <= 4; n++) { if (m.scrollHeight <= m.clientHeight + 1) break; lv.push(n); root.setAttribute('data-fm-mc', lv.join(' ')); }
+      } finally { busy = false; }
+    }
+    function later() { clearTimeout(t); t = setTimeout(run, 120); }
+    window.addEventListener('resize', later);
+    var m0 = document.querySelector('main');
+    if (m0 && window.MutationObserver) new MutationObserver(later).observe(m0, { childList: true, subtree: true });
+    [400, 1200, 2600, 5000].forEach(function (ms) { setTimeout(run, ms); });
+    run();
+  }
+
   function init() {
     try { wrapOpenModal(); } catch (e) { console.warn('skin', e); }
     try { buildActions(); } catch (e) { console.warn('actions', e); }
@@ -875,6 +900,7 @@
     try { buildNarrow(); } catch (e) { console.warn('narrow', e); }
     try { watchTiles(); } catch (e) { console.warn('tiles', e); }
     try { kasirFit(); } catch (e) { console.warn('kfit', e); }
+    try { mgrFit(); } catch (e) { console.warn('mfit', e); }
     /* tampilan sudah tersusun: baru ditampilkan (sebelumnya terlihat tata letak lama sekitar 1 detik) */
     setTimeout(function () { document.documentElement.classList.add('fm-ready'); }, 140);
   }

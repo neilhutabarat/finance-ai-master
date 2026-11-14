@@ -10,9 +10,10 @@
 
   var CSS = '#fm-ld{position:fixed;inset:0;z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f6f3ec;color:#334155;font:700 14px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;opacity:1;transition:opacity .3s ease}' +
     '#fm-ld.fm-ld-out{opacity:0;pointer-events:none}' +
+    'html[data-fm-invert="1"] #fm-ld,html[data-fm-ctdark] #fm-ld{filter:invert(1) hue-rotate(180deg)}html[data-fm-invert="1"] #fm-refresh,html[data-fm-ctdark] #fm-refresh{filter:invert(1) hue-rotate(180deg)}' +
     '#fm-ld .fm-ld-dots{display:flex;gap:10px;align-items:flex-end;height:46px}#fm-ld .fm-ld-dots i{display:block;width:15px;height:15px;border-radius:50%;background:#dc2626;transform-origin:50% 100%;animation:fmhop .72s cubic-bezier(.3,.7,.4,1) infinite}#fm-ld .fm-ld-dots i:nth-child(2){background:#f59e0b;animation-delay:.12s}#fm-ld .fm-ld-dots i:nth-child(3){background:#2563eb;animation-delay:.24s}' +
     '#fm-ld .fm-ld-bar{width:200px;height:6px;border-radius:99px;background:rgba(15,23,42,.1);overflow:hidden;display:none}#fm-ld .fm-ld-bar i{display:block;height:100%;width:0;background:#dc2626;border-radius:99px;transition:width .2s ease}' +
-    '#fm-ld.fm-ld-upd .fm-ld-bar{display:block}#fm-ld .fm-ld-s{font-weight:500;font-size:12px;opacity:.65;min-height:15px}' +
+    '#fm-ld.fm-ld-upd .fm-ld-bar{display:block}#fm-ld .fm-ld-s{font-weight:500;font-size:12px;opacity:.65;min-height:15px}#fm-ld .fm-ld-t{font-size:18px;font-weight:800;letter-spacing:.01em}' +
     '@keyframes fmhop{0%,100%{transform:translateY(0) scale(1.25,.7)}18%{transform:translateY(0) scale(.9,1.15)}55%{transform:translateY(-30px) scale(.92,1.1)}85%{transform:translateY(0) scale(1.05,.95)}}@media(prefers-reduced-motion:reduce){#fm-ld .fm-ld-dots i{animation:none}}' +
     '@keyframes fmrfx{0%{transform:scale(1) rotate(0);box-shadow:0 0 0 0 rgba(220,38,38,.7)}15%{transform:scale(1.12) rotate(-5deg)}30%{transform:scale(1.12) rotate(5deg)}45%{transform:scale(1.08) rotate(-3deg);box-shadow:0 0 0 12px rgba(220,38,38,0)}60%,100%{transform:scale(1) rotate(0);box-shadow:0 0 0 0 rgba(220,38,38,0)}}' +
     'html body #fm-refresh.fm-rf-new{animation:fmrfx 1.5s ease-in-out infinite!important;font-size:12.5px!important;background:#b91c1c!important}@media(prefers-reduced-motion:reduce){html body #fm-refresh.fm-rf-new{animation:none!important;outline:3px solid rgba(220,38,38,.5)}}' +
@@ -20,10 +21,12 @@
     'html body #fm-refresh:hover{background:#b91c1c!important}#fm-refresh:active{transform:scale(.97)}html body #fm-refresh.fm-rf-fix{position:fixed!important;right:8px!important;top:5px!important;bottom:auto!important;margin:0!important;min-height:0!important;height:auto!important;padding:5px 10px!important;font-size:11px!important;z-index:2147483000}';
   var st = document.createElement('style'); st.id = 'fm-ld-css'; st.textContent = CSS; (document.head || root).appendChild(st);
 
+  function verText() { var v = (window.FM_RELEASES && FM_RELEASES.beta) || ''; if (v) { try { localStorage.setItem('fm_ld_ver', v); } catch (e) {} } else { try { v = localStorage.getItem('fm_ld_ver') || ''; } catch (e) {} } return v; }
   function build(text) {
     if (ld && ld.parentNode) { ld.classList.remove('fm-ld-out'); ld.querySelector('.fm-ld-t').textContent = text; return ld; }
     ld = document.createElement('div'); ld.id = 'fm-ld'; ld.setAttribute('role', 'status'); ld.setAttribute('aria-live', 'polite');
     ld.innerHTML = '<div class="fm-ld-dots"><i></i><i></i><i></i></div><div class="fm-ld-t"></div><div class="fm-ld-bar"><i></i></div><div class="fm-ld-s"></div>';
+    ld.querySelector('.fm-ld-s').textContent = verText();
     ld.querySelector('.fm-ld-t').textContent = text; root.appendChild(ld); return ld;
   }
   function show(text) { clearTimeout(hideT); build(text || 'Memuat...'); }
@@ -33,11 +36,12 @@
   }
 
   /* ---- 1. tampil sejak awal, hilang setelah halaman siap ---- */
-  show('Memuat...');
+  show('Oneilverse');
   var t0 = Date.now();
   function finish() { if (done) return; done = true; hide(); }
   function check() {
     if (done) return;
+    if (ld && !window.__fmUpdating) { var s0 = ld.querySelector('.fm-ld-s'), vt = verText(); if (s0 && vt && s0.textContent !== vt) s0.textContent = vt; }
     var ready = root.classList.contains('fm-ready') || (document.readyState === 'complete' && Date.now() - t0 > 1500);
     if (document.readyState === 'complete' && ready) { setTimeout(finish, 120); return; }
     setTimeout(check, 60);
@@ -46,7 +50,7 @@
   setTimeout(finish, 7000); /* pengaman: tidak pernah menahan layar lebih dari 7 detik */
 
   /* ---- 2. pindah halaman ---- */
-  window.addEventListener('beforeunload', function () { if (window.__fmUpdating) return; show('Memuat...'); hideT = setTimeout(hide, 6000); });
+  window.addEventListener('beforeunload', function () { if (window.__fmUpdating) return; show('Oneilverse'); hideT = setTimeout(hide, 6000); });
   window.addEventListener('pageshow', function (e) { if (e.persisted) { done = true; hide(); } });
 
   /* ---- 3. perbarui aplikasi ---- */
@@ -58,7 +62,7 @@
   }
   function run() {
     if (window.__fmUpdating) return; window.__fmUpdating = true; done = true;
-    show('Memperbarui aplikasi...'); var el = ld; el.classList.add('fm-ld-upd');
+    show('Memperbarui Oneilverse...'); var el = ld; el.classList.add('fm-ld-upd');
     var bar = el.querySelector('.fm-ld-bar i'), sub = el.querySelector('.fm-ld-s'), t = el.querySelector('.fm-ld-t'), started = Date.now();
     function step(p, s) { bar.style.width = Math.round(p * 100) + '%'; sub.textContent = s || ''; }
     step(0.03, 'Menghapus cache lama');
