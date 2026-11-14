@@ -61,6 +61,7 @@
     { id: 'sistem', title: 'Pengaturan Sistem', hint: 'Jarang disentuh', c: '#b8bccc', items: [
       { t: 'Akun Login', ic: 'key', find: 'Akun Login', d: 'PIN Admin, Manager, Owner toko' },
       { t: 'OneilStore', ic: 'tag', run: "FM_TSTORE.open()", d: 'Permintaan sewa, sewa aktif, beri sewa, dan mode demo toko' },
+      { t: 'Katalog OneilStore', ic: 'tag', run: "FM_TSTORE.open('katalog')", d: 'Pilih fitur yang dijual dan atur harga harian, mingguan, bulanan, tahunan, permanen' },
       { t: 'Rollout Versi', ic: 'box', run: "if(window.openRolloutModal)openRolloutModal()", d: 'Versi default Basic dan Plus' }
     ] }
   ];

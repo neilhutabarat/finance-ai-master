@@ -29,6 +29,13 @@
     var omzet = sum(cat(mtx, 'sales')), hpp = sum(cat(mtx, 'cogs')), beban = sum(cat(mtx, 'expense')), prive = sum(cat(mtx, 'prive'));
     var laba = omzet - hpp - beban;
     out.stat = { omzet: omzet, laba: laba, margin: omzet > 0 ? Math.round(laba / omzet * 100) : 0 };
+    /* rasio tambahan: margin kotor, beban terhadap pendapatan, titik impas, dan laba bulan lalu */
+    var gm = omzet > 0 ? (omzet - hpp) / omzet : null;
+    out.stat.gross = gm == null ? null : Math.round(gm * 100);
+    out.stat.opex = omzet > 0 ? Math.round(beban / omzet * 100) : null;
+    out.stat.bep = (gm != null && gm > 0 && beban > 0) ? Math.round(beban / gm) : null;
+    var lmtx = tx.filter(function (t) { return (t.dateISO || '').slice(0, 7) === lastMonth; });
+    out.stat.labaLast = lmtx.length ? sum(cat(lmtx, 'sales')) - sum(cat(lmtx, 'cogs')) - sum(cat(lmtx, 'expense')) : null;
     var salesDays = {}; cat(tx, 'sales').forEach(function (t) { salesDays[t.dateISO] = 1; });
     var nDays = Object.keys(salesDays).length;
     if (nDays < 3) { out.enough = false; return out; }
@@ -118,6 +125,14 @@
         [['Pendapatan bulan ini', rp(r.stat.omzet)], ['Laba bersih', rp(r.stat.laba)], ['Margin bersih', r.stat.margin + '%']].map(function (x) {
           return '<div style="padding:10px;border-radius:14px;background:rgba(148,163,184,.12)"><div style="font-size:10.5px;opacity:.7">' + x[0] + '</div><div style="font-weight:800;font-size:14px;margin-top:2px">' + x[1] + '</div></div>';
         }).join('') + '</div>';
+      var st = r.stat, rx = [];
+      rx.push(['Margin kotor', st.gross == null ? '-' : st.gross + '%', 'Penjualan dikurangi modal bahan']);
+      rx.push(['Biaya terhadap pendapatan', st.opex == null ? '-' : st.opex + '%', 'Biaya operasional bulan ini']);
+      rx.push(['Titik impas bulan ini', st.bep == null ? '-' : rp(st.bep), st.bep == null ? 'Belum bisa dihitung' : (st.omzet >= st.bep ? 'Sudah terlampaui' : 'Kurang ' + rp(st.bep - st.omzet))]);
+      rx.push(['Laba bulan lalu', st.labaLast == null ? '-' : rp(st.labaLast), st.labaLast == null ? 'Belum ada data' : (st.laba >= st.labaLast ? 'Bulan ini lebih tinggi ' + rp(st.laba - st.labaLast) : 'Bulan ini lebih rendah ' + rp(st.labaLast - st.laba))]);
+      h += '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 6px">' + rx.map(function (x) {
+        return '<div style="padding:10px;border-radius:14px;background:rgba(148,163,184,.08)"><div style="font-size:10.5px;opacity:.7">' + x[0] + '</div><div style="font-weight:800;font-size:14px;margin-top:2px">' + esc(x[1]) + '</div><div style="font-size:10.5px;opacity:.65;margin-top:1px">' + esc(x[2]) + '</div></div>';
+      }).join('') + '</div>';
       h += r.f.map(function (f) {
         return '<div style="border-left:4px solid ' + col[f.level] + ';padding:8px 12px;margin-top:8px;border-radius:0 12px 12px 0;background:rgba(148,163,184,.08)">' +
           '<div style="font-size:10px;font-weight:800;color:' + col[f.level] + '">' + tag[f.level] + '</div>' +

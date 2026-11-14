@@ -28,7 +28,8 @@
     { key: 'anggaran', label: 'Anggaran Bulanan: batas pengeluaran per akun dan target pemasukan', r: { manager: 'o', owner: 'o' } },
     { key: 'rekon', label: 'Rekonsiliasi Kas: cocokkan uang tunai di laci dengan catatan', r: { manager: 'o', owner: 'o' } },
     { key: 'neraca', label: 'Neraca: harta, utang, dan modal toko (Paket Plus)', r: { manager: 'o', owner: 'o' } },
-    { key: 'neraca_ai', label: 'Neraca AI (uji coba): jurnal debit-kredit, neraca saldo, kunci periode', r: { manager: 'o', owner: 'o' } },
+    { key: 'neraca_ai', label: 'Neraca AI (uji coba): neraca dari transaksi, kunci periode', r: { manager: 'o', owner: 'o' } },
+    { key: 'grafik', label: 'Grafik Keuangan: penjualan, laba, kas, beban, aset dan liabilitas', r: { manager: 'o', owner: 'o' } },
     { key: 'pajak_bulanan', label: 'Laporan Pajak Bulanan: perkiraan PPh Final dan PPN per bulan', r: { manager: 'o', owner: 'o' } },
     { key: 'absensi', label: 'Absensi Karyawan: catat masuk dan pulang, rekap kehadiran bulanan', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'offline_penuh', label: 'Mode Offline Penuh: transaksi tetap tersimpan saat internet putus dan terkirim otomatis', r: { kasir: 'o', manager: 'o', owner: 'o' } },
@@ -131,6 +132,9 @@
     { id: 'piutang', name: 'Piutang & Utang', grp: 'Keuangan', price: 20000, d: 'DP, bayar sebagian, jatuh tempo, daftar pelanggan dan pemasok', keys: ['piutang'] },
     { id: 'neraca', name: 'Neraca', grp: 'Keuangan', price: 10000, d: 'Harta, utang, dan modal toko', keys: ['neraca'] },
     { id: 'kontrol', name: 'Kontrol Keuangan', grp: 'Keuangan', price: 20000, d: 'Arus kas, anggaran bulanan, rekonsiliasi kas', keys: ['arus_kas', 'anggaran', 'rekon'] },
+    { id: 'neraca_ai', name: 'Neraca AI', grp: 'Keuangan', price: 15000, perm: 750000, d: 'Neraca otomatis dari transaksi, bisa dikunci per periode (uji coba)', keys: ['neraca_ai'] },
+    { id: 'analisa', name: 'Analisa Keuangan', grp: 'Keuangan', price: 20000, perm: 1000000, d: 'Temuan, saran, margin, dan titik impas dari transaksi toko', keys: ['analisa'] },
+    { id: 'grafik', name: 'Grafik Keuangan', grp: 'Keuangan', price: 15000, perm: 750000, d: 'Grafik penjualan, laba, kas, beban, aset dan liabilitas', keys: ['grafik'] },
     { id: 'pajak', name: 'Pajak Bulanan', grp: 'Keuangan', price: 15000, d: 'Perkiraan PPh Final dan PPN tiap bulan', keys: ['pajak_bulanan'] },
     { id: 'lapbul', name: 'Laporan Bulanan', grp: 'Laporan', price: 10000, d: 'Ringkasan tiap bulan untuk Owner, kirim lewat WhatsApp', keys: ['laporan_bulanan'] },
     { id: 'backup', name: 'Backup & Ekspor', grp: 'Laporan', price: 10000, d: 'Unduh data toko ke Excel dan arsip', keys: ['backup'] },
@@ -152,6 +156,61 @@
   function sprod(id) { return SPRODUCTS.filter(function (p) { return p.id === id; })[0]; }
   function spack(id) { return SPACKS.filter(function (p) { return p.id === id; })[0]; }
   function sitem(id) { return id === SALL.id ? SALL : (sprod(id) || spack(id)); }
+
+  /* ===== Katalog OneilStore yang diatur Tower =====
+     Disimpan di app_meta/store_catalog = { json } (dibaca klien tanpa login, seperti wallpaper dan rollout).
+     Bentuk: { v:1, items:{id:{sell,p:{hari,minggu,bulan,tahun,perm}}}, packs:{...}, all:{...}, disc:{min,pct} }.
+     Item yang belum ada di katalog memakai harga standar: bulanan = price, tahunan = 10 x bulanan, permanen = perm (jika ada). */
+  var PERIODS = [['hari', 'Harian'], ['minggu', 'Mingguan'], ['bulan', 'Bulanan'], ['tahun', 'Tahunan'], ['perm', 'Permanen']];
+  var PERM_UNTIL = 4102444800000; /* 1 Jan 2100: sewa permanen tidak pernah habis */
+  var CAT_KEY = 'fm_store_cat_v1', CAT = null, CAT_AT = 0;
+  function loadCat() { try { var v = JSON.parse(localStorage.getItem(CAT_KEY) || 'null'); CAT = (v && typeof v === 'object') ? v : null; } catch (e) { CAT = null; } }
+  loadCat();
+  function storeSetCat(c) { CAT = c && typeof c === 'object' ? c : null; try { if (CAT) localStorage.setItem(CAT_KEY, JSON.stringify(CAT)); else localStorage.removeItem(CAT_KEY); } catch (e) {} try { window.dispatchEvent(new CustomEvent('fm:storecat')); } catch (e) {} }
+  function fetchCat(cb) {
+    try {
+      var url = 'https://firestore.googleapis.com/v1/projects/finance-ai-master-byneilverse/databases/(default)/documents/app_meta/store_catalog?key=AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI';
+      fetch(url, { cache: 'no-store' }).then(function (r) { return r.status === 404 ? { __none: 1 } : (r.ok ? r.json() : null); }).then(function (d) {
+        if (d && d.__none) storeSetCat(null);
+        else if (d && d.fields && d.fields.json && d.fields.json.stringValue) { var j = JSON.parse(d.fields.json.stringValue); if (j && typeof j === 'object') storeSetCat(j); }
+        CAT_AT = Date.now(); if (cb) cb();
+      }).catch(function () { if (cb) cb(); });
+    } catch (e) { if (cb) cb(); }
+  }
+  function catEntry(id) { if (!CAT) return null; if (id === SALL.id) return CAT.all || null; return (CAT.items && CAT.items[id]) || (CAT.packs && CAT.packs[id]) || null; }
+  /* harga item pada satu periode; null = periode itu tidak dijual */
+  function sprice(id, per) {
+    var it = sitem(id); if (!it) return null;
+    var e = catEntry(id);
+    if (e && e.p && typeof e.p === 'object') { var v = Number(e.p[per]); return v > 0 ? Math.round(v) : null; }
+    if (per === 'bulan') return it.price;
+    if (per === 'tahun') return it.price * 10;
+    if (per === 'perm') return it.perm || null;
+    return null;
+  }
+  function ssold(id) {
+    var e = catEntry(id); if (e && e.sell === false) return false;
+    return PERIODS.some(function (x) { return sprice(id, x[0]) != null; });
+  }
+  function sdisc() { var d = (CAT && CAT.disc) || {}; var mn = parseInt(d.min, 10), pc = Number(d.pct); return { min: mn >= 2 ? mn : 3, pct: (CAT && CAT.disc) ? (pc >= 0 && pc <= 50 ? pc : 0) : 10 }; }
+  /* harga gabungan beberapa fitur: jumlah harga satuan, dikurangi diskon bila jumlah fitur mencapai batas */
+  function squote(ids, per) {
+    var sub = 0, ok = ids.length > 0;
+    ids.forEach(function (id) { var v = sprice(id, per); if (v == null) ok = false; else sub += v; });
+    var d = sdisc(), pct = (ids.length >= d.min && d.pct > 0) ? d.pct : 0, save = Math.round(sub * pct / 100 / 1000) * 1000;
+    return { ok: ok, sub: sub, pct: pct, save: save, total: sub - save };
+  }
+  function untilForPeriod(existing, period) {
+    if (existing && existing.perm) return PERM_UNTIL;
+    if (period === 'perm') return PERM_UNTIL;
+    var now = Date.now(), base = (existing && Number(existing.until) > now) ? Number(existing.until) : now, d = new Date(base);
+    if (period === 'coba') d.setDate(d.getDate() + TRIAL_DAYS);
+    else if (period === 'hari') d.setDate(d.getDate() + 1);
+    else if (period === 'minggu') d.setDate(d.getDate() + 7);
+    else if (period === 'tahun') d.setFullYear(d.getFullYear() + 1);
+    else d.setMonth(d.getMonth() + 1);
+    return d.getTime();
+  }
   function packKeys(id) {
     if (id === SALL.id) return STORE_KEYS.slice();
     var pk = spack(id), pr = sprod(id), out = [];
@@ -191,14 +250,14 @@
     { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
     { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode'] },
     { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
-    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
+    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'grafik', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
     { id: 'ops', label: 'Operasional', keys: ['absensi', 'properti', 'offline_penuh'] },
     { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'clock', 'weather', 'rates', 'billing_card', 'chat'] }
   ];
 
   /* Penempatan fitur untuk tampilan Tower (hanya label + pengelompokan, tidak mengubah hak akses):
      INTI = terkunci merah; TAMBAHAN = fitur standar yang diberikan; STORE = layak disewa satuan di OneilStore. */
-  var STORE_KEYS = ['wa_receipt', 'bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi', 'properti'];
+  var STORE_KEYS = ['wa_receipt', 'bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'analisa', 'grafik', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi', 'properti'];
   function isStore(f) { return STORE_KEYS.indexOf(f.key) >= 0; }
   function isCore(f) { return Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); }
   function catOf(f) { for (var i = 0; i < CATS.length; i++) if (CATS[i].keys.indexOf(f.key) >= 0) return CATS[i].id; return 'lain'; }
@@ -398,6 +457,7 @@
     if (!has('pajak_bulanan', role)) drop('button[onclick*="FM_PAJAK"]');
     if (!has('neraca', role)) drop('button[onclick*="FM_NERACA."]');
     if (!has('neraca_ai', role)) drop('button[onclick*="FM_NAI"]');
+    if (!has('grafik', role)) drop('button[onclick*="FM_GRAFIK"]');
     if (!has('arus_kas', role) && !has('anggaran', role) && !has('rekon', role)) drop('button[onclick*="FM_KAS"]');
     if (!has('banyak_usaha', role)) drop('button[onclick*="FM_USAHA_SUM"]');
     if (!has('admin_usaha', role)) drop('button[onclick*="FM_ADMINS"]');
@@ -432,6 +492,6 @@
     m.style.display = 'flex';
   }
 
-  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
+  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, periods: PERIODS, permUntil: PERM_UNTIL, price: sprice, sold: ssold, quote: squote, disc: sdisc, untilFor: untilForPeriod, cat: function () { return CAT; }, setCat: storeSetCat, fetchCat: fetchCat, catAt: function () { return CAT_AT; }, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
     readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();

@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.12';
+  var BETA = 'v1.0.13';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.13', '15 Nov 2026', [
+      '[Perbaikan] OneilStore: fitur bisa disewa harian, mingguan, bulanan, tahunan, atau permanen, dan beberapa fitur bisa dipilih sekaligus dengan diskon kombinasi',
+      '[Perbaikan] Fitur baru Grafik Keuangan, dan Analisa Keuangan kini memuat margin kotor, titik impas, serta perbandingan laba bulan lalu',
+      '[Perbaikan] Neraca AI, Analisa Keuangan, dan Grafik kini bisa disewa di OneilStore',
+      '[Keamanan] Harga sewa diperiksa terhadap katalog sebelum fitur diaktifkan, dan sewa yang sudah berjalan tidak berubah'
+    ]],
     ['v1.0.12', '15 Nov 2026', [
       '[Perbaikan] Halaman Manager dan Owner dipadatkan otomatis sesuai tinggi layar sehingga tidak perlu digulir; bar usaha menjadi satu baris',
       '[Perbaikan] Layar memuat menampilkan nama dan versi Oneilverse',
