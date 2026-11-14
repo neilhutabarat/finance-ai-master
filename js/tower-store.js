@@ -15,7 +15,7 @@
   var reqs = [], ctrls = {}, ov = null, started = false, tab = 'minta', pill = null, note = '';
   var B = 'padding:7px 11px;border-radius:10px;font-weight:800;font-size:11.5px;border:0;cursor:pointer;color:#fff;';
   var INP = 'width:100%;box-sizing:border-box;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:12.5px;outline:none';
-  var PER = { hari: 'Harian', minggu: 'Mingguan', bulan: 'Bulanan', tahun: 'Tahunan', perm: 'Permanen', coba: 'Coba' };
+  var PER = { hari: 'Harian', minggu: 'Mingguan', bulan: 'Bulanan', tahun: 'Tahunan', perm: 'Permanen', gratis: 'Gratis', coba: 'Coba' };
   var draft = null, catNote = '';
 
   function tenantsList() {
@@ -49,7 +49,7 @@
     var d = DB(); if (!d) { alert('Firestore belum terhubung.'); return Promise.reject(); }
     var ex = ((ctrls[tenantId] || {}).rentals || {})[item];
     var entry = { until: ST().untilFor(ex, period), trial: period === 'coba' && !(ex && !ex.trial && Number(ex.until) > Date.now()), since: (ex && ex.since) || Date.now(), period: (ex && ex.perm) ? 'perm' : period };
-    if (period === 'perm' || (ex && ex.perm)) { entry.perm = true; entry.trial = false; }
+    if (period === 'perm' || period === 'gratis' || (ex && ex.perm)) { entry.perm = true; entry.trial = false; }
     var data = { rentals: {} }; data.rentals[item] = entry;
     if (period === 'coba') { data.trialUsed = {}; data.trialUsed[item] = true; }
     return d.collection('tenant_ctrl').doc(tenantId).set(data, { merge: true }).then(function () { return entry; });
@@ -70,7 +70,10 @@
       var nm = its.map(function (x) { return x.name; }).join(' + ');
       var msg = 'Aktifkan ' + nm + ' (' + (PER[r.period] || r.period) + ') untuk ' + nameOf(r.tenantId) + '?\n\nPastikan pembayaran ' + rp(r.price) + ' sudah diterima.';
       if (r.period === 'coba') msg = 'Aktifkan masa coba ' + nm + ' untuk ' + nameOf(r.tenantId) + '?';
-      else {
+      else if (r.period === 'gratis') {
+        msg = 'Aktifkan ' + nm + ' GRATIS (permanen) untuk ' + nameOf(r.tenantId) + '?';
+        if (!ST().quote(ids, 'gratis').ok) msg = 'PERINGATAN: item ini sekarang TIDAK berstatus Gratis di katalog.\n\n' + msg;
+      } else {
         var q = ST().quote(ids, r.period);
         if (!q.ok) msg = 'PERINGATAN: periode ' + (PER[r.period] || r.period) + ' tidak ada di katalog untuk item ini.\n\n' + msg;
         else if (Number(r.price) !== q.total) msg = 'PERINGATAN: harga di permintaan (' + rp(r.price) + ') BERBEDA dari katalog sekarang (' + rp(q.total) + ').\nPeriksa dulu sebelum mengaktifkan.\n\n' + msg;
@@ -160,18 +163,19 @@
 
   /* ---- Katalog: fitur yang dijual dan harga per periode (disimpan di app_meta/store_catalog) ---- */
   var KINP = 'width:92px;box-sizing:border-box;padding:6px 7px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:12px;outline:none;text-align:right';
+  /* katalog bawaan kosong: item yang belum ada di katalog berstatus Tidak dijual */
   function catFromState() {
-    var st = ST(), c = st.cat(), out = { v: 1, items: {}, packs: {}, all: null, disc: st.disc() };
-    function ent(id) { var e = { sell: st.sold(id) || (c && ((c.items && c.items[id]) || (c.packs && c.packs[id]) || (id === st.all.id && c.all)) ? true : true), p: {} }; st.periods.forEach(function (x) { e.p[x[0]] = st.price(id, x[0]); }); var ce = c && ((c.items && c.items[id]) || (c.packs && c.packs[id]) || (id === st.all.id && c.all)); e.sell = ce ? ce.sell !== false : true; return e; }
-    st.products.forEach(function (p) { out.items[p.id] = ent(p.id); });
-    st.packs.forEach(function (p) { out.packs[p.id] = ent(p.id); });
-    out.all = ent(st.all.id); return out;
+    var st = ST(), c = st.cat() || {}, out = { v: 1, items: {}, packs: {}, all: null, disc: st.disc() };
+    function ent(e) { return e ? { sell: e.sell !== false, free: e.free === true, p: e.p || {} } : { sell: false, free: false, p: {} }; }
+    st.products.forEach(function (p) { out.items[p.id] = ent(c.items && c.items[p.id]); });
+    st.packs.forEach(function (p) { out.packs[p.id] = ent(c.packs && c.packs[p.id]); });
+    out.all = ent(c.all); return out;
   }
   function collectCat() {
     if (!ov) return null; var st = ST(), q = ov.querySelectorAll('[data-kid]'); if (!q.length) return null;
     var out = { v: 1, items: {}, packs: {}, all: null, disc: { min: 3, pct: 0 } };
     [].forEach.call(q, function (tr) {
-      var id = tr.getAttribute('data-kid'), kind = tr.getAttribute('data-kind'), e = { sell: tr.querySelector('[data-ksell]').checked, p: {} };
+      var id = tr.getAttribute('data-kid'), kind = tr.getAttribute('data-kind'), v0 = tr.querySelector('[data-kstat]').value, e = { sell: v0 !== 'off', free: v0 === 'free', p: {} };
       st.periods.forEach(function (x) { var el = tr.querySelector('[data-kp="' + x[0] + '"]'), v = el ? Number(String(el.value).replace(/[^0-9]/g, '')) : 0; e.p[x[0]] = v > 0 ? v : null; });
       if (kind === 'all') out.all = e; else if (kind === 'pack') out.packs[id] = e; else out.items[id] = e;
     });
@@ -180,39 +184,45 @@
     return out;
   }
   function viewKatalog() {
-    var st = ST(), c = draft || catFromState(), h = '<div style="font-size:12px;opacity:.7;margin-bottom:8px;line-height:1.5">Atur fitur apa yang dijual dan harganya per periode. <b>Kosongkan harga</b> bila periode itu tidak dijual. Centang <b>Jual</b> untuk menampilkan fitur di OneilStore klien. Sewa yang sudah berjalan tidak berubah.</div>';
-    function cell(e, k) { var v = e && e.p ? e.p[k] : null; return '<td style="padding:3px"><input data-kp="' + k + '" inputmode="numeric" value="' + (v ? v : '') + '" placeholder="-" style="' + KINP + '"></td>'; }
-    function trow(id, name, e, kind) {
-      return '<tr data-kid="' + H(id) + '" data-kind="' + kind + '" style="border-top:1px solid rgba(255,255,255,.07)"><td style="padding:6px 6px 6px 0;min-width:150px"><label style="display:flex;gap:6px;align-items:center;font-weight:700;font-size:12px"><input type="checkbox" data-ksell ' + (e.sell !== false ? 'checked ' : '') + 'style="accent-color:#a855f7"> ' + H(name) + '</label></td>' + st.periods.map(function (x) { return cell(e, x[0]); }).join('') + '</tr>';
+    var st = ST(), c = draft || catFromState(), h = '<div style="font-size:12px;opacity:.7;margin-bottom:8px;line-height:1.5">Katalog awalnya kosong. Pilih status tiap fitur: <b>Tidak dijual</b> (tidak tampil di klien), <b>Dijual</b> (isi harga per periode, <b>kosongkan</b> bila periode itu tidak dijual), atau <b>Gratis</b> (klien memilih sendiri tanpa biaya, kamu setujui lalu aktif permanen). Angka abu-abu di kolom hanya saran harga. Sewa yang sudah berjalan tidak berubah.</div>';
+    function cell(e, k, it) {
+      var v = e && e.p ? e.p[k] : null, ph = '-';
+      if (it && !v) { if (k === 'bulan') ph = it.price; else if (k === 'tahun') ph = it.price * 10; else if (k === 'perm' && it.perm) ph = it.perm; }
+      return '<td style="padding:3px"><input data-kp="' + k + '" inputmode="numeric" value="' + (v ? v : '') + '" placeholder="' + ph + '" style="' + KINP + '"></td>';
     }
-    var head = '<thead><tr style="font-size:10.5px;opacity:.7;text-align:right"><th style="text-align:left;padding:4px 0">Jual · Nama</th>' + st.periods.map(function (x) { return '<th style="padding:4px 6px;font-weight:700">' + x[1] + '</th>'; }).join('') + '</tr></thead>';
+    function trow(id, name, e, kind, it) {
+      var stt = e.sell === false || (!e.sell && !e.free) ? 'off' : (e.free ? 'free' : 'sell');
+      return '<tr data-kid="' + H(id) + '" data-kind="' + kind + '" style="border-top:1px solid rgba(255,255,255,.07);' + (stt === 'off' ? 'opacity:.6' : '') + '"><td style="padding:6px 6px 6px 0;min-width:190px"><div style="font-weight:700;font-size:12px;margin-bottom:3px">' + H(name) + '</div><select data-kstat style="' + INP + ';width:auto;padding:4px 8px;font-size:11.5px"><option value="off"' + (stt === 'off' ? ' selected' : '') + '>Tidak dijual</option><option value="sell"' + (stt === 'sell' ? ' selected' : '') + '>Dijual</option><option value="free"' + (stt === 'free' ? ' selected' : '') + '>Gratis</option></select></td>' + st.periods.map(function (x) { return cell(e, x[0], it); }).join('') + '</tr>';
+    }
+    var head = '<thead><tr style="font-size:10.5px;opacity:.7;text-align:right"><th style="text-align:left;padding:4px 0">Fitur dan status</th>' + st.periods.map(function (x) { return '<th style="padding:4px 6px;font-weight:700">' + x[1] + '</th>'; }).join('') + '</tr></thead>';
     var groups = [], by = {}; st.products.forEach(function (p) { if (!by[p.grp]) { by[p.grp] = []; groups.push(p.grp); } by[p.grp].push(p); });
     h += '<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%">' + head + '<tbody>';
-    groups.forEach(function (g) { h += '<tr><td colspan="6" style="padding:10px 0 3px;font-weight:900;font-size:12px;color:#c084fc">' + H(g) + '</td></tr>'; by[g].forEach(function (p) { h += trow(p.id, p.name, (c.items && c.items[p.id]) || {}, 'item'); }); });
+    groups.forEach(function (g) { h += '<tr><td colspan="6" style="padding:10px 0 3px;font-weight:900;font-size:12px;color:#c084fc">' + H(g) + '</td></tr>'; by[g].forEach(function (p) { h += trow(p.id, p.name, (c.items && c.items[p.id]) || {}, 'item', p); }); });
     h += '<tr><td colspan="6" style="padding:12px 0 3px;font-weight:900;font-size:12px;color:#c084fc">Paket jenis usaha</td></tr>';
-    st.packs.forEach(function (p) { h += trow(p.id, p.name, (c.packs && c.packs[p.id]) || {}, 'pack'); });
-    h += '<tr><td colspan="6" style="padding:12px 0 3px;font-weight:900;font-size:12px;color:#c084fc">Semua fitur</td></tr>' + trow(st.all.id, st.all.name, c.all || {}, 'all');
+    st.packs.forEach(function (p) { h += trow(p.id, p.name, (c.packs && c.packs[p.id]) || {}, 'pack', null); });
+    h += '<tr><td colspan="6" style="padding:12px 0 3px;font-weight:900;font-size:12px;color:#c084fc">Semua fitur</td></tr>' + trow(st.all.id, st.all.name, c.all || {}, 'all', null);
     h += '</tbody></table></div>';
     var d = c.disc || st.disc();
-    h += '<div style="margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);font-size:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>Diskon beli kombinasi</b><span>mulai</span><input id="kt-dmin" inputmode="numeric" value="' + (d.min || 3) + '" style="' + KINP + ';width:52px"><span>fitur, diskon</span><input id="kt-dpct" inputmode="numeric" value="' + (d.pct == null ? 10 : d.pct) + '" style="' + KINP + ';width:52px"><span>% (isi 0 untuk tanpa diskon)</span></div>';
+    h += '<div style="margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);font-size:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>Diskon beli kombinasi</b><span>mulai</span><input id="kt-dmin" inputmode="numeric" value="' + (d.min || 3) + '" style="' + KINP + ';width:52px"><span>fitur, diskon</span><input id="kt-dpct" inputmode="numeric" value="' + (d.pct == null ? 0 : d.pct) + '" style="' + KINP + ';width:52px"><span>% (isi 0 untuk tanpa diskon)</span></div>';
     h += (catNote ? '<div style="margin-top:10px;font-size:12px;color:#fbbf24">' + H(catNote) + '</div>' : '') +
-      '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button data-a="kt_save" style="' + B + 'background:#7c3aed;flex:1;padding:10px">Simpan katalog</button><button data-a="kt_reset" style="' + B + 'background:#475569;padding:10px">Kembalikan standar</button></div>' +
+      '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button data-a="kt_save" style="' + B + 'background:#7c3aed;flex:1;padding:10px">Simpan katalog</button><button data-a="kt_reset" style="' + B + 'background:#475569;padding:10px">Kosongkan katalog</button></div>' +
       '<div style="font-size:11px;opacity:.6;margin-top:8px;line-height:1.5">Klien membaca katalog saat membuka OneilStore. Harga diperiksa lagi saat Anda mengaktifkan permintaan, jadi harga yang diubah klien di perangkatnya akan terlihat sebagai peringatan.</div>';
     return h;
   }
   function saveCat() {
     var d = DB(); if (!d) { catNote = 'Firestore belum terhubung.'; return render(); }
     var c = collectCat(); if (!c) return;
-    var bad = Object.keys(c.items).concat(Object.keys(c.packs)).filter(function (k) { var e = c.items[k] || c.packs[k]; return e.sell && !ST().periods.some(function (x) { return e.p[x[0]]; }); });
-    if (bad.length && !confirm(bad.length + ' item dicentang Jual tapi tidak punya harga sama sekali, jadi tidak akan tampil di klien. Tetap simpan?')) return;
+    var bad = Object.keys(c.items).concat(Object.keys(c.packs)).filter(function (k) { var e = c.items[k] || c.packs[k]; return e.sell && !e.free && !ST().periods.some(function (x) { return e.p[x[0]]; }); });
+    if (bad.length && !confirm(bad.length + ' item berstatus Dijual tapi tidak punya harga sama sekali, jadi tidak akan tampil di klien. Tetap simpan?')) return;
     d.collection('app_meta').doc('store_catalog').set({ json: JSON.stringify(c), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }).then(function () {
       ST().setCat(c); draft = null; catNote = 'Katalog tersimpan. Klien memakainya saat membuka OneilStore.'; render();
     }).catch(function (e) { catNote = 'Gagal menyimpan: ' + (e && e.message || e); render(); });
   }
   function resetCat() {
-    if (!confirm('Kembalikan katalog ke harga standar (bulanan sama seperti sebelumnya, tahunan 10 bulan, tanpa harian, mingguan, permanen kecuali Neraca AI, Analisa, dan Grafik)?')) return;
+    if (!confirm('Kosongkan katalog? Semua fitur menjadi Tidak dijual dan OneilStore klien tampil kosong. Sewa yang sudah berjalan tetap aktif sampai tanggalnya.')) return;
     var d = DB(); if (!d) return;
-    d.collection('app_meta').doc('store_catalog').delete().then(function () { ST().setCat(null); draft = null; catNote = 'Katalog dikembalikan ke standar.'; render(); }).catch(function (e) { catNote = 'Gagal: ' + (e && e.message || e); render(); });
+    var empty = { v: 1, items: {}, packs: {}, all: null, disc: { min: 3, pct: 0 } };
+    d.collection('app_meta').doc('store_catalog').set({ json: JSON.stringify(empty), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }).then(function () { ST().setCat(empty); draft = null; catNote = 'Katalog dikosongkan.'; render(); }).catch(function (e) { catNote = 'Gagal: ' + (e && e.message || e); render(); });
   }
   function viewDemo() {
     var now = Date.now(), list = tenantsList(), h = '<div style="font-size:12px;opacity:.7;margin-bottom:8px">Toko demo tampil label <b>DEMO · sisa N hari</b> di aplikasi klien, lalu terkunci otomatis saat habis. Data tidak dihapus.</div>' +
@@ -249,6 +259,7 @@
       var fl = e.target.closest('[data-f]'); if (fl) { filter = fl.getAttribute('data-f'); return render(); }
       var b = e.target.closest('[data-a]'); if (b) act(b.getAttribute('data-a'), b.getAttribute('data-id'));
     });
+    ov.addEventListener('change', function (e) { var sel = e.target; if (sel && sel.hasAttribute && sel.hasAttribute('data-kstat')) { var tr = sel.closest('tr'); if (tr) tr.style.opacity = sel.value === 'off' ? '.6' : ''; } });
     document.body.appendChild(ov);
   }
   window.FM_TSTORE = { open: function (t) { ensure(); start(); try { ST().fetchCat(function () { if (tab === 'katalog' && !draft) render(); }); } catch (e) {} if (t) tab = t; ov.style.display = 'flex'; render(); }, count: nBaru };

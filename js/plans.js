@@ -178,31 +178,31 @@
     } catch (e) { if (cb) cb(); }
   }
   function catEntry(id) { if (!CAT) return null; if (id === SALL.id) return CAT.all || null; return (CAT.items && CAT.items[id]) || (CAT.packs && CAT.packs[id]) || null; }
-  /* harga item pada satu periode; null = periode itu tidak dijual */
+  /* Katalog bawaan KOSONG: fitur baru dijual setelah Tower mengisinya.
+     harga item pada satu periode; null = periode itu tidak dijual. Status gratis: klien memilih sendiri, tanpa biaya. */
+  function sfree(id) { var e = catEntry(id); return !!(e && e.sell !== false && e.free === true); }
   function sprice(id, per) {
-    var it = sitem(id); if (!it) return null;
-    var e = catEntry(id);
-    if (e && e.p && typeof e.p === 'object') { var v = Number(e.p[per]); return v > 0 ? Math.round(v) : null; }
-    if (per === 'bulan') return it.price;
-    if (per === 'tahun') return it.price * 10;
-    if (per === 'perm') return it.perm || null;
+    var e = catEntry(id); if (!e || !sitem(id) || e.sell === false || e.free === true) return null;
+    if (e.p && typeof e.p === 'object') { var v = Number(e.p[per]); return v > 0 ? Math.round(v) : null; }
     return null;
   }
   function ssold(id) {
-    var e = catEntry(id); if (e && e.sell === false) return false;
-    return PERIODS.some(function (x) { return sprice(id, x[0]) != null; });
+    var e = catEntry(id); if (!e || e.sell === false) return false;
+    return e.free === true || PERIODS.some(function (x) { return sprice(id, x[0]) != null; });
   }
-  function sdisc() { var d = (CAT && CAT.disc) || {}; var mn = parseInt(d.min, 10), pc = Number(d.pct); return { min: mn >= 2 ? mn : 3, pct: (CAT && CAT.disc) ? (pc >= 0 && pc <= 50 ? pc : 0) : 10 }; }
-  /* harga gabungan beberapa fitur: jumlah harga satuan, dikurangi diskon bila jumlah fitur mencapai batas */
+  function sdisc() { var d = (CAT && CAT.disc) || {}; var mn = parseInt(d.min, 10), pc = Number(d.pct); return { min: mn >= 2 ? mn : 3, pct: (CAT && CAT.disc) ? (pc >= 0 && pc <= 50 ? pc : 0) : 0 }; }
+  /* harga gabungan beberapa fitur: jumlah harga satuan, dikurangi diskon bila jumlah fitur mencapai batas.
+     Fitur gratis hanya boleh digabung dengan fitur gratis (periode 'gratis'); tidak dicampur dengan yang berbayar. */
   function squote(ids, per) {
+    if (per === 'gratis') { var okf = ids.length > 0 && ids.every(sfree); return { ok: okf, sub: 0, pct: 0, save: 0, total: 0 }; }
     var sub = 0, ok = ids.length > 0;
-    ids.forEach(function (id) { var v = sprice(id, per); if (v == null) ok = false; else sub += v; });
+    ids.forEach(function (id) { var v = sprice(id, per); if (v == null || sfree(id)) ok = false; else sub += v; });
     var d = sdisc(), pct = (ids.length >= d.min && d.pct > 0) ? d.pct : 0, save = Math.round(sub * pct / 100 / 1000) * 1000;
     return { ok: ok, sub: sub, pct: pct, save: save, total: sub - save };
   }
   function untilForPeriod(existing, period) {
     if (existing && existing.perm) return PERM_UNTIL;
-    if (period === 'perm') return PERM_UNTIL;
+    if (period === 'perm' || period === 'gratis') return PERM_UNTIL;
     var now = Date.now(), base = (existing && Number(existing.until) > now) ? Number(existing.until) : now, d = new Date(base);
     if (period === 'coba') d.setDate(d.getDate() + TRIAL_DAYS);
     else if (period === 'hari') d.setDate(d.getDate() + 1);
@@ -492,6 +492,6 @@
     m.style.display = 'flex';
   }
 
-  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, periods: PERIODS, permUntil: PERM_UNTIL, price: sprice, sold: ssold, quote: squote, disc: sdisc, untilFor: untilForPeriod, cat: function () { return CAT; }, setCat: storeSetCat, fetchCat: fetchCat, catAt: function () { return CAT_AT; }, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
+  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, periods: PERIODS, permUntil: PERM_UNTIL, price: sprice, sold: ssold, free: sfree, quote: squote, disc: sdisc, untilFor: untilForPeriod, cat: function () { return CAT; }, setCat: storeSetCat, fetchCat: fetchCat, catAt: function () { return CAT_AT; }, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
     readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
 })();

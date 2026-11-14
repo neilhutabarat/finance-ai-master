@@ -25,8 +25,8 @@
   var BTN = 'padding:7px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font-size:12px;font-weight:800;cursor:pointer';
   var GREEN = ';background:#22c55e;color:#04210f;border-color:#22c55e';
   var VIO = ';background:#a855f7;color:#fff;border-color:#a855f7';
-  var PL = { hari: 'Harian', minggu: 'Mingguan', bulan: 'Bulanan', tahun: 'Tahunan', perm: 'Permanen', coba: 'Coba' };
-  var PSUB = { hari: 'Aktif 1 hari', minggu: 'Aktif 7 hari', bulan: 'Aktif 1 bulan, perpanjang sendiri', tahun: 'Aktif 12 bulan', perm: 'Sekali bayar, tidak ada tanggal habis' };
+  var PL = { hari: 'Harian', minggu: 'Mingguan', bulan: 'Bulanan', tahun: 'Tahunan', perm: 'Permanen', gratis: 'Gratis', coba: 'Coba' };
+  var PSUB = { hari: 'Aktif 1 hari', minggu: 'Aktif 7 hari', bulan: 'Aktif 1 bulan, perpanjang sendiri', tahun: 'Aktif 12 bulan', perm: 'Sekali bayar, tidak ada tanggal habis', gratis: 'Tanpa biaya, aktif tetap setelah disetujui penyedia aplikasi' };
 
   function start() {
     if (started || !hasDb()) return; started = true;
@@ -65,11 +65,12 @@
     if (pending(id)) return '';
     if (st.k === 'owned') return '';
     if (st.k === 'rent' && st.perm) return '';
-    return '<button data-sheet="' + esc(id) + '" style="' + BTN + (st.k === 'off' ? VIO : '') + '">' + (st.k === 'rent' ? 'Perpanjang' : 'Sewa') + '</button>';
+    return '<button data-sheet="' + esc(id) + '" style="' + BTN + (st.k === 'off' ? VIO : '') + '">' + (st.k === 'rent' ? 'Perpanjang' : (P().STORE.free(id) ? 'Ambil gratis' : 'Sewa')) + '</button>';
   }
   /* daftar harga yang dijual: hanya periode yang berharga */
   function priceLine(id) {
     var stt = P().STORE, out = [];
+    if (stt.free(id)) return '<b style="color:#4ade80">Gratis</b><span style="opacity:.6"> · pilih sesuai kebutuhan</span>';
     stt.periods.forEach(function (x) { var v = stt.price(id, x[0]); if (v != null) out.push('<b>' + rp(v) + '</b><span style="opacity:.6"> ' + (x[0] === 'perm' ? 'permanen' : '/ ' + ({ hari: 'hari', minggu: 'minggu', bulan: 'bulan', tahun: 'tahun' })[x[0]]) + '</span>'); });
     return out.join(' <span style="opacity:.35">·</span> ');
   }
@@ -87,8 +88,8 @@
     var st = P().STORE, groups = [], by = {};
     st.products.forEach(function (p) { if (!st.sold(p.id)) return; if (!by[p.grp]) { by[p.grp] = []; groups.push(p.grp); } by[p.grp].push(p); });
     var d = st.disc();
-    var h = '<div style="font-size:12px;opacity:.7;margin-bottom:6px">Sewa hanya fitur yang dibutuhkan. Centang beberapa fitur untuk disewa sekaligus' + (d.pct > 0 ? ' (diskon ' + d.pct + '% bila memilih ' + d.min + ' fitur atau lebih)' : '') + '. Fitur yang sudah aktif di toko ini tetap gratis.</div>';
-    if (!groups.length) h += '<div style="opacity:.6;font-size:12px;padding:14px 2px">Belum ada fitur yang dijual saat ini.</div>';
+    var h = '<div style="font-size:12px;opacity:.7;margin-bottom:6px">Pilih hanya fitur yang dibutuhkan. Centang beberapa fitur untuk diambil sekaligus (fitur gratis dan berbayar dipisah)' + (d.pct > 0 ? ' (diskon ' + d.pct + '% bila memilih ' + d.min + ' fitur atau lebih)' : '') + '. Fitur yang sudah aktif di toko ini tetap gratis.</div>';
+    if (!groups.length) h += '<div style="opacity:.6;font-size:12px;padding:14px 2px">Belum ada fitur yang tersedia saat ini.</div>';
     groups.forEach(function (g) {
       h += '<div style="font-weight:900;font-size:12.5px;margin:12px 0 2px;color:#c084fc">' + esc(g) + '</div>';
       by[g].forEach(function (p) { h += row(p.name, p.d, p.id, state(prodItem(p))); });
@@ -97,10 +98,11 @@
   }
   function cartBar() {
     var ids = selIds(); if (!ids.length || sheet || tab !== 'jelajah') return '';
-    var st = P().STORE, per = ['bulan', 'tahun', 'hari', 'minggu', 'perm'].filter(function (x) { return st.quote(ids, x).ok; })[0], q = per ? st.quote(ids, per) : null;
+    var st = P().STORE, nf = ids.filter(st.free).length, mixed = nf > 0 && nf < ids.length, allFree = nf === ids.length;
+    var per = allFree ? 'gratis' : ['bulan', 'tahun', 'hari', 'minggu', 'perm'].filter(function (x) { return st.quote(ids, x).ok; })[0], q = (per && !mixed) ? st.quote(ids, per) : null;
     return '<div style="position:sticky;bottom:-18px;margin:12px -18px -18px;padding:12px 18px;background:#14141c;border-top:1px solid rgba(168,85,247,.5);border-radius:0 0 24px 24px;display:flex;gap:10px;align-items:center"><div style="flex:1;font-size:12px"><b>' + ids.length + ' fitur dipilih</b>' +
-      (q ? '<div style="opacity:.7;font-size:11px">mulai ' + rp(q.total) + ' (' + PL[per].toLowerCase() + ')' + (q.pct ? ', sudah diskon ' + q.pct + '%' : '') + '</div>' : '<div style="opacity:.7;font-size:11px">Tidak ada periode yang sama untuk semua pilihan. Kurangi pilihan.</div>') +
-      '</div><button data-a="clear" style="' + BTN + '">Batal</button><button data-a="cart" ' + (q ? '' : 'disabled ') + 'style="' + BTN + VIO + '">Sewa terpilih</button></div>';
+      (q ? (allFree ? '<div style="opacity:.7;font-size:11px">Gratis</div>' : '<div style="opacity:.7;font-size:11px">mulai ' + rp(q.total) + ' (' + PL[per].toLowerCase() + ')' + (q.pct ? ', sudah diskon ' + q.pct + '%' : '') + '</div>') : '<div style="opacity:.7;font-size:11px">' + (mixed ? 'Fitur gratis dan berbayar tidak bisa digabung. Pilih salah satu jenis.' : 'Tidak ada periode yang sama untuk semua pilihan. Kurangi pilihan.') + '</div>') +
+      '</div><button data-a="clear" style="' + BTN + '">Batal</button><button data-a="cart" ' + (q ? '' : 'disabled ') + 'style="' + BTN + VIO + '">' + (allFree ? 'Ambil gratis' : 'Sewa terpilih') + '</button></div>';
   }
   function viewPaket() {
     var st = P().STORE, h = '<div style="font-size:12px;opacity:.7;margin-bottom:6px">Paket jenis usaha: beberapa fitur sekaligus dengan harga lebih hemat.</div>', n = 0;
@@ -111,13 +113,13 @@
       var s = state({ id: pk.id });
       h += '<div style="padding:11px 2px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;align-items:center"><div style="flex:1;min-width:0">' +
         '<div style="font-weight:800;font-size:13px">' + esc(pk.name) + '</div><div style="font-size:11.5px;opacity:.65;margin-top:2px;line-height:1.45">' + esc(names) + '</div>' +
-        '<div style="font-size:11.5px;margin-top:3px;line-height:1.6">' + priceLine(pk.id) + (pb && sum > pb ? '<span style="opacity:.6"> · hemat ' + rp(sum - pb) + ' dari harga satuan (bulanan)</span>' : '') + ' ' + badge(s, pk.id) + '</div></div>' + actBtn(pk.id, s) + '</div>';
+        '<div style="font-size:11.5px;margin-top:3px;line-height:1.6">' + priceLine(pk.id) + (pb && sum > pb && !st.free(pk.id) ? '<span style="opacity:.6"> · hemat ' + rp(sum - pb) + ' dari harga satuan (bulanan)</span>' : '') + ' ' + badge(s, pk.id) + '</div></div>' + actBtn(pk.id, s) + '</div>';
     });
     var a = st.all, sa = state({ id: a.id });
     if (st.sold(a.id)) h += '<div style="padding:11px 2px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;align-items:center"><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:13px">' + esc(a.name) + '</div>' +
       '<div style="font-size:11.5px;opacity:.65;margin-top:2px">Semua fitur Store aktif. Harga tetap, tidak perlu memilih satu per satu.</div>' +
       '<div style="font-size:11.5px;margin-top:3px;line-height:1.6">' + priceLine(a.id) + ' ' + badge(sa, a.id) + '</div></div>' + actBtn(a.id, sa) + '</div>';
-    else if (!n) h += '<div style="opacity:.6;font-size:12px;padding:14px 2px">Belum ada paket yang dijual saat ini.</div>';
+    else if (!n) h += '<div style="opacity:.6;font-size:12px;padding:14px 2px">Belum ada paket yang tersedia saat ini.</div>';
     return h;
   }
   function viewPunyaku() {
@@ -147,10 +149,10 @@
   function viewSheet() {
     var st = P().STORE, ids = sheetIds(), its = ids.map(function (i) { return st.item(i); });
     if (its.some(function (x) { return !x; })) { sheet = null; return ''; }
-    var multi = ids.length > 1, avail = st.periods.filter(function (x) { return st.quote(ids, x[0]).ok; }).map(function (x) { return x[0]; });
-    var per = sheet.period && (avail.indexOf(sheet.period) >= 0 || (sheet.period === 'coba' && !multi)) ? sheet.period : (avail.indexOf('bulan') >= 0 ? 'bulan' : avail[0]);
+    var multi = ids.length > 1, avail = ['gratis'].concat(st.periods.map(function (x) { return x[0]; })).filter(function (x) { return st.quote(ids, x).ok; });
+    var per = sheet.period && (avail.indexOf(sheet.period) >= 0 || (sheet.period === 'coba' && !multi)) ? sheet.period : (avail.indexOf('gratis') >= 0 ? 'gratis' : avail.indexOf('bulan') >= 0 ? 'bulan' : avail[0]);
     sheet.period = per;
-    var canTrial = !multi && trialOk(ids[0]);
+    var canTrial = !multi && !st.free(ids[0]) && trialOk(ids[0]);
     function opt(v, title, sub, price) {
       return '<label style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid ' + (per === v ? '#a855f7' : 'rgba(255,255,255,.15)') + ';background:' + (per === v ? 'rgba(168,85,247,.14)' : 'transparent') + ';margin-top:8px;cursor:pointer">' +
         '<input type="radio" name="os-per" value="' + v + '" ' + (per === v ? 'checked' : '') + ' style="accent-color:#a855f7"><span style="flex:1"><b style="font-size:13px">' + title + '</b><span style="display:block;font-size:11px;opacity:.65">' + sub + '</span></span><b style="font-size:13px">' + price + '</b></label>';
@@ -158,11 +160,11 @@
     var opts = avail.map(function (v) {
       var q = st.quote(ids, v), sub = PSUB[v];
       if (q.pct) sub += ' · diskon ' + q.pct + '% (hemat ' + rp(q.save) + ')';
-      return opt(v, PL[v], sub, rp(q.total));
+      return opt(v, PL[v], sub, v === 'gratis' ? 'Gratis' : rp(q.total));
     }).join('');
-    if (!avail.length && !canTrial) opts = '<div style="margin-top:10px;font-size:12px;color:#fbbf24">Fitur ini sedang tidak dijual untuk disewa.</div>';
+    if (!avail.length && !canTrial) opts = '<div style="margin-top:10px;font-size:12px;color:#fbbf24">Fitur ini sedang tidak tersedia.</div>';
     return '<div style="padding:4px 2px"><div style="font-weight:900;font-size:15px">' + esc(its.map(function (x) { return x.name; }).join(' + ')) + '</div>' +
-      '<div style="font-size:12px;opacity:.7;margin-top:2px">Pilih lama sewa. Fitur diaktifkan setelah pembayaran dikonfirmasi oleh penyedia aplikasi.</div>' + opts +
+      '<div style="font-size:12px;opacity:.7;margin-top:2px">' + (per === 'gratis' ? 'Fitur diaktifkan setelah permintaan disetujui oleh penyedia aplikasi.' : 'Pilih lama sewa. Fitur diaktifkan setelah pembayaran dikonfirmasi oleh penyedia aplikasi.') + '</div>' + opts +
       (canTrial ? opt('coba', 'Coba ' + st.trialDays + ' hari', 'Gratis, sekali untuk tiap fitur', 'Gratis') : '') +
       (note ? '<div style="margin-top:10px;font-size:12px;color:#fbbf24">' + esc(note) + '</div>' : '') +
       '<div style="display:flex;gap:8px;margin-top:14px"><button data-a="back" style="' + BTN + '">Kembali</button><button data-a="send" ' + ((sending || (!avail.length && !canTrial)) ? 'disabled ' : '') + 'style="' + BTN + VIO + ';flex:1">' + (sending ? 'Mengirim…' : 'Kirim permintaan') + '</button></div></div>';
