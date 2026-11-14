@@ -268,7 +268,8 @@
       try { localStorage.removeItem('fm_v11_tx_' + id); } catch (e) {}
       try { if (typeof tenantTxMap !== 'undefined' && o.tx) tenantTxMap[id] = []; } catch (e) {}
       var what = Object.keys(o).filter(function (k) { return o[k]; }).join(', ');
-      return d.collection(COL).doc(id).set({ lastResetAt: Date.now(), lastResetWhat: what }, { merge: true }).then(function () {
+      var tsr = Date.now(); try { d.collection('tenant_ctrl').doc(id).set({ lastResetAt: tsr }, { merge: true }); } catch (e) {}
+      return d.collection(COL).doc(id).set({ lastResetAt: tsr, lastResetWhat: what }, { merge: true }).then(function () {
         ctAudit(id, 'RESET_STATISTIK', 'Tower mereset statistik uji coba: ' + what, '-', 'reset');
         try { refreshProviderViews(); } catch (e) {}
       });

@@ -430,6 +430,17 @@
             if (!snap.metadata.fromCache && window.FM_SHIELD) FM_SHIELD.touch(); // kontak server nyata: segarkan Kunci Total
             var d = snap.exists ? snap.data() : null;
             window.TENANT_CTRL = d || {};
+            /* Tower mereset data toko: bersihkan riwayat closing & cache transaksi di perangkat ini (hanya sekali per reset) */
+            try {
+                var lr = d ? parseInt(d.lastResetAt, 10) || 0 : 0, sk = 'fm_reset_seen_' + tenant.id, seen = parseInt(localStorage.getItem(sk), 10) || 0;
+                var ct = localStorage.getItem('fm_closing_tenant'), foreign = !!ct && ct !== String(tenant.id);
+                if ((lr && lr > seen) || foreign) {
+                    var had = (localStorage.getItem('fm_closing_history') || '[]') !== '[]';
+                    localStorage.removeItem('fm_closing_history'); localStorage.removeItem('fm_closing_tenant'); localStorage.removeItem('fm_v11_tx_' + tenant.id);
+                    if (lr) localStorage.setItem(sk, String(lr));
+                    if (had) { location.reload(); return; }
+                }
+            } catch (eRs) {}
             try { localStorage.setItem('fm_rentals_' + tenant.id, JSON.stringify((d && d.rentals) || {})); } catch (eR) {}
             /* kejelasan kaca per toko (1-5), diatur Tower; kosong = ikut pengaturan umum */
             try { var rv = d && (d.rain === 'on' || d.rain === 'off') ? d.rain : null; var rs = JSON.stringify({ id: tenant.id, v: rv }); if (localStorage.getItem('fm_rain_s') !== rs) { localStorage.setItem('fm_rain_s', rs); window.dispatchEvent(new CustomEvent('fm:glass')); } } catch (eRn) {}

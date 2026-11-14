@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'RC 10';
+  var BETA = 'RC 11';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['RC 11', '14 Nov 2026', [
+      '[Perbaikan] Login Manager/Owner tidak lagi terlempar ke halaman awal (berkas mode Ponsel ikut terpasang)',
+      '[Perbaikan] Riwayat Closing ikut bersih setelah data toko direset dari pusat',
+      '[Perbaikan] Tulisan di Control Tower dan pop-up lebih gelap/terang sesuai latar sehingga mudah dibaca',
+      '[Keamanan] Riwayat Closing tidak lagi terbawa ke toko lain pada browser yang sama'
+    ]],
     ['RC 10', '14 Nov 2026', [
       '[Baru] Akun demo: kasir, manager, dan owner bisa login bersamaan tanpa batas selama tanda DEMO aktif; saat DEMO dicabut, kuota login berlaku lagi',
       '[Baru] Pengaturan rasio wallpaper desktop dari Control Tower: pas layar, posisi, perbesar, blur, gelap/terang',
