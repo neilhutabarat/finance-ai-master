@@ -20,9 +20,12 @@
     container.className = 'fml';
     if (!document.getElementById('fml-css')) { var st = document.createElement('style'); st.id = 'fml-css'; st.textContent = CSS; document.head.appendChild(st); }
     var coa = {}; (coaList || []).forEach(function (c) { coa[c.code] = c; });
+    coa.TUNAI = { code: 'TUNAI', name: 'Kas / Tunai', category: 'kas' }; /* akun bawaan, bukan dari COA, agar penjualan/HPP/operasional/prive yang dibayar tunai bisa dilihat terpisah seperti akun Bank */
     var by = {}; (txs || []).forEach(function (t) { (by[t.accountCode] = by[t.accountCode] || []).push(t); });
     var byBank = {}; (txs || []).forEach(function (t) { if (t.bankCode) (byBank[t.bankCode] = byBank[t.bankCode] || []).push(t); });
-    function listFor(code) { return (coa[code] && coa[code].category === 'bank') ? (byBank[code] || []) : (by[code] || []); }
+    var byCash = []; (txs || []).forEach(function (t) { if (t.pay === 'tunai' && ['sales', 'cogs', 'expense', 'prive'].indexOf(t.category) >= 0) byCash.push(t); });
+    function isFlow(code) { var cc = coa[code]; return !!cc && (cc.category === 'bank' || cc.category === 'kas'); }
+    function listFor(code) { var cc = coa[code]; if (!cc) return by[code] || []; if (cc.category === 'bank') return byBank[code] || []; if (cc.category === 'kas') return byCash; return by[code] || []; }
     var codes = Object.keys(coa).sort(function (a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); });
     Object.keys(by).forEach(function (k) { if (codes.indexOf(k) < 0) codes.push(k); });
     var first = codes.filter(function (c) { return listFor(c).length; })[0] || codes[0] || '';
@@ -41,7 +44,7 @@
     sug.onmousedown = function (e) { var d = e.target.closest('[data-c]'); if (!d) return; e.preventDefault(); sel.value = d.getAttribute('data-c'); q.value = ''; sug.style.display = 'none'; cur.textContent = 'Akun: ' + label(sel.value); draw(); };
     q.onfocus = fill; q.onblur = function () { setTimeout(function () { sug.style.display = 'none'; }, 150); };
     function draw() {
-      var code = sel.value, c = coa[code] || {}, isBank = c.category === 'bank', out_ = (c.category === 'cogs' || c.category === 'expense');
+      var code = sel.value, c = coa[code] || {}, isBank = isFlow(code), out_ = (c.category === 'cogs' || c.category === 'expense');
       function dirOut(x) { return isBank ? (x.category !== 'sales') : out_; }
       var rows = listFor(code).map(function (x) { return { d: dateOf(x), x: x }; }).sort(function (a, b) { return a.d < b.d ? -1 : a.d > b.d ? 1 : String(a.x.id || '').localeCompare(String(b.x.id || '')); });
       var from = f.value, to = t.value, bal = 0, tin = 0, tout = 0, h = '';

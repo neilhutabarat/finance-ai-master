@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.18';
+  var BETA = 'v1.0.19';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.19', '15 Nov 2026', [
+      '[Perbaikan] Buku Besar kini punya akun bawaan Kas/Tunai, memisahkan mutasi penjualan, HPP, operasional, dan prive yang dibayar tunai dari yang dibayar lewat bank',
+      '[Keamanan] Pemisahan Kas/Tunai dan Bank di Buku Besar hanya membaca data yang sudah tercatat, tidak mengubah angka transaksi mana pun'
+    ]],
     ['v1.0.18', '15 Nov 2026', [
       '[Perbaikan] Kelola Akun (COA) kini punya kategori Aset, Hutang, dan Modal, terpisah dari akun Income/Outcome/Prive yang masuk Laba Rugi',
       '[Keamanan] Akun Aset/Hutang/Modal tidak ikut muncul di pilihan akun transaksi kasir, sehingga tidak bisa salah tercatat sebagai pemasukan atau pengeluaran'
