@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.16';
+  var BETA = 'v1.0.17';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.17', '15 Nov 2026', [
+      '[Perbaikan] Metode Bayar/Terima di kasir kini Tunai atau Bank, dan pembayaran Bank bisa dihubungkan ke akun bank yang didaftarkan di COA (kategori Bank/Rekening)',
+      '[Perbaikan] Buku Besar menampilkan mutasi tiap akun bank secara terpisah seperti rekening koran, selain akun pemasukan/pengeluaran biasa',
+      '[Keamanan] Transaksi tetap tercatat walau akun bank belum didaftarkan, dengan peringatan agar Admin segera melengkapi COA'
+    ]],
     ['v1.0.16', '15 Nov 2026', [
       '[Perbaikan] Store kini menampilkan fitur satu per satu per kategori, dan penyedia bisa menyusun bundel fitur sendiri dengan harga khusus',
       '[Perbaikan] Coba gratis 7 hari bisa dimatikan oleh penyedia, dan tampilan Store disamakan di semua halaman',
