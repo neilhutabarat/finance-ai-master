@@ -72,6 +72,25 @@
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
+    <style id="fm-on2-skin">
+        /* Oneilverse 2 (pratinjau): menimpa variabel tema skin.js. :not(#_) menaikkan prioritas di atas semua aturan skin lama. */
+        html:not(#_)[data-fm-page="manager"], html:not(#_)[data-fm-page="owner"] {
+            --s-surf: rgba(29,25,18,.92) !important; --s-line: rgba(227,166,56,.28) !important; --s-hi: rgba(227,166,56,.12) !important;
+            --s-shadow: rgba(0,0,0,.7) !important; --s-gloss: rgba(227,166,56,.06) !important; --s-bg: #0E0D0A !important;
+            --s-tint: rgba(227,166,56,.08) !important; --s-b2: rgba(29,25,18,.7) !important; --s-b2l: rgba(227,166,56,.3) !important; --s-b2t: #F5F0E4 !important;
+        }
+        html:not(#_)[data-fm-native] body {
+            background-image: radial-gradient(60% 45% at 8% 0%, rgba(227,166,56,.24), transparent 70%), radial-gradient(50% 40% at 100% 100%, rgba(82,161,136,.15), transparent 70%) !important;
+        }
+        html:not(#_)[data-fm-native] header.oneui-hero {
+            background: linear-gradient(180deg, rgba(227,166,56,.20) 0, rgba(227,166,56,.05) 45%, rgba(0,0,0,0) 62%), linear-gradient(135deg, #2e210d, #0E0D0A 72%) !important;
+            border: 1px solid rgba(227,166,56,.35) !important; border-top-color: rgba(227,166,56,.65) !important;
+            box-shadow: inset 0 1px 0 rgba(227,166,56,.4), 0 16px 30px -12px rgba(0,0,0,.65) !important;
+        }
+        html:not(#_)[data-fm-page="manager"] .ios-glass { border-top-color: rgba(227,166,56,.5) !important; }
+        html:not(#_)[data-fm-page="manager"], html:not(#_)[data-fm-page="owner"] { background: #0E0D0A !important; }
+        html:not(#_)[data-fm-page="manager"] body, html:not(#_)[data-fm-page="owner"] body { background-color: #0E0D0A !important; }
+    </style>
 </head>
 <body class="text-white min-h-screen flex flex-col antialiased selection:bg-amber-600 selection:text-white pb-6">
 
