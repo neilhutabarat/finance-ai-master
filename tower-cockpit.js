@@ -12,11 +12,12 @@
   function clock(ms, off) { var d = new Date(ms + off * 3600000); return pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()); }
   function rp(n) { return g(function () { return formatThousand(n); }, 'Rp ' + Math.round(n || 0)); }
   function isDemoId(id) { return /^ID0{4,}/i.test(String(id || '')); }
-  function tenants() { return g(function () { return billTenants(); }, []).filter(function (t) { return !isDemoId(t.id) && !t.isMaster; }); }
+  function tenants() { return g(function () { return billTenants(); }, []).filter(function (t) { return !isDemoId(t.id); }); }
   function ctrl(id) { return g(function () { return getCtrl(id); }, {}); }
   function txs(id) { return g(function () { return getTenantTxList(id); }, []); }
   function online(id) { return g(function () { return onlineSessions(id); }, []); }
   function suspended(id) { return g(function () { return isTenantSuspended(id); }, false); }
+  function src(id) { return g(function () { return tenantSource[id]; }, 'firestore'); }
   function today() { return new Date().toISOString().slice(0, 10); }
   function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
 
@@ -186,6 +187,21 @@
   /* ============ tabel toko (satu baris memuat semua data) ============ */
   var agg = {}, aggAt = 0, SPARK = '▁▂▃▄▅▆▇█';
   function nf(n) { return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(Math.round(n || 0)); }
+  function diag(id) {
+    var list = txs(id), cat = {}, noDate = 0, bulan = ymd(new Date()).slice(0, 7), bulanThis = 0;
+    list.forEach(function (t) {
+      var c = t.category || '(kosong)'; cat[c] = cat[c] || { n: 0, amt: 0 };
+      cat[c].n++; cat[c].amt += (t.amount || 0);
+      if (!t.dateISO) noDate++;
+      if ((t.dateISO || '').slice(0, 7) === bulan) bulanThis++;
+    });
+    var lines = ['Diagnostik: ' + id, 'Sumber data: ' + src(id) + (src(id) !== 'firestore' ? ' (bukan server — cek koneksi/izin akses)' : ''),
+      'Total transaksi tersimpan: ' + list.length, 'Transaksi bulan ini: ' + bulanThis,
+      'Transaksi tanpa tanggal (dateISO kosong, tidak ikut terhitung di Monitor): ' + noDate, ''];
+    Object.keys(cat).sort().forEach(function (c) { lines.push(c + ': ' + cat[c].n + ' trx, total Rp ' + nf(cat[c].amt)); });
+    if (!list.length) lines.push('(tidak ada data transaksi yang terbaca untuk toko ini)');
+    return lines.join('\n');
+  }
   function compute() {
     var first = ymd(new Date()).slice(0, 8) + '01', d0 = ymd(new Date()), days = [], i;
     for (i = 6; i >= 0; i--) days.push(ymd(new Date(Date.now() - i * 86400000)));
@@ -193,12 +209,12 @@
     tenants().forEach(function (tn) {
       var a = { inc: 0, out: 0, tax: 0, trx: 0, today: 0, yest: 0, sp: [0, 0, 0, 0, 0, 0, 0] };
       txs(tn.id).forEach(function (t) {
-        var d = t.dateISO || '', sales = t.category === 'sales', amt = t.amount || 0;
+        var d = t.dateISO || (t.timestamp ? ymd(new Date(t.timestamp)) : '') || '', sales = t.category === 'sales', amt = t.amount || 0, inMonth = !d || d >= first;
         if (d === d0) a.trx++;
         if (sales) {
-          if (d >= first) a.inc += amt;
+          if (inMonth) a.inc += amt;
           var k = days.indexOf(d); if (k >= 0) a.sp[k] += amt;
-        } else if (d >= first) { a.out += amt; a.tax += t.tax12 || Math.round(amt * 0.12); }
+        } else if (inMonth) { a.out += amt; a.tax += t.tax12 || Math.round(amt * 0.12); }
       });
       a.today = a.sp[6]; a.yest = a.sp[5];
       out[tn.id] = a;
@@ -279,7 +295,8 @@
     });
     var html = rows.map(function (r) {
       var tn = r.tn, a = r.a, on = r.on, sus = r.sus, bc = r.bc, dc = r.dc;
-      return '<tr><td class="' + r.lamp + '">●</td><td class="w" title="' + esc(tn.id) + '">' + esc(tn.id) + '</td><td class="w wrap" title="' + esc(tn.nama) + '">' + esc(tn.nama) + (sus ? ' <span class="r">(beku)</span>' : '') + '</td><td class="wrap" title="' + esc(r.kota) + '">' + esc(r.kota) + '</td>' +
+      var srcBadge = src(tn.id) !== 'firestore' ? ' <span class="y" title="Data toko ini dibaca dari penyimpanan lokal, bukan server — transaksi baru kemungkinan tidak ikut terhitung. Klik nama toko untuk rincian.">⚠LOKAL</span>' : '';
+      return '<tr><td class="' + r.lamp + '">●</td><td class="w" title="' + esc(tn.id) + '">' + esc(tn.id) + '</td><td class="w wrap" data-diag="' + esc(tn.id) + '" style="cursor:pointer" title="' + esc(tn.nama) + ' — klik untuk rincian data">' + esc(tn.nama) + (sus ? ' <span class="r">(beku)</span>' : '') + srcBadge + '</td><td class="wrap" title="' + esc(r.kota) + '">' + esc(r.kota) + '</td>' +
         '<td class="n">' + a.trx + '</td><td class="n">' + nf(a.inc) + '</td><td class="n">' + nf(a.out) + '</td><td class="n ' + (r.lab < 0 ? 'r' : 'g') + '">' + nf(r.lab) + '</td><td class="n">' + nf(a.tax) + '</td>' +
         '<td class="' + (r.vsC === 'r' ? 'y' : r.vsC === 'g' ? 'g' : 'm') + '">' + spark(a.sp) + '</td><td class="n ' + r.vsC + '">' + r.vsT + '</td><td class="n ' + (on ? 'g' : 'm') + '">' + on + '</td>' +
         '<td class="n ' + bc.c + '"><span data-live="' + esc(tn.id) + '">' + bc.v + '</span></td><td class="' + dc.c + '"><span' + (dc.live ? ' data-due="' + esc(tn.id) + '"' : '') + '>' + dc.v + '</span></td><td class="' + (on ? 'g' : 'm') + '">' + esc(r.last) + '</td></tr>';
@@ -378,7 +395,10 @@
       else if (b.id === 'tw-out') { SND.click(); if (window.FM_LOGOUT) FM_LOGOUT(); }
     });
     $('tw-ken').addEventListener('click', function (e) { if (e.target.closest('.fm-act') && !e.target.closest('.tw-soon')) SND.click(); });
-    $('tw-tbw').addEventListener('click', function (e) { var th = e.target.closest('th[data-sk]'); if (th) { SND.click(); setSort(th.getAttribute('data-sk')); } });
+    $('tw-tbw').addEventListener('click', function (e) {
+      var th = e.target.closest('th[data-sk]'); if (th) { SND.click(); setSort(th.getAttribute('data-sk')); return; }
+      var dg = e.target.closest('[data-diag]'); if (dg) { SND.click(); alert(diag(dg.getAttribute('data-diag'))); }
+    });
     ['mousemove', 'mousedown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) { document.addEventListener(ev, function () { lastTouch = Date.now(); }, { passive: true }); });
     document.addEventListener('keydown', function (e) {
       var tag = (document.activeElement && document.activeElement.tagName) || '';
