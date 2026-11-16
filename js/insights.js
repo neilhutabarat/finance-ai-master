@@ -78,6 +78,7 @@
     var hrs = {}; sToday.forEach(function (t) { var h = txHour(t); if (h != null) hrs[h] = (hrs[h] || 0) + 1; });
     var peak = Object.keys(hrs).map(function (k) { return [k, hrs[k]]; }).sort(function (a, b) { return b[1] - a[1]; })[0];
     var gross = sToday.reduce(function (x, t) { return x + profitOf(t); }, 0);
+    var grossMonth = sMonth.reduce(function (x, t) { return x + profitOf(t); }, 0);
     var low = prods.filter(function (p) { return p.stock <= (typeof p.minStock === 'number' ? p.minStock : 5); }).sort(function (a, b) { return a.stock - b.stock; });
     var pay = { tunai: 0, qris: 0, transfer: 0, petty: 0 }; sToday.forEach(function (t) { var k = t.pay || 'tunai'; pay[k] = (pay[k] || 0) + t.amount; });
 
@@ -85,6 +86,31 @@
     var line = function (l, r) { return '<div class="fm-row"><span>' + l + '</span><b>' + r + '</b></div>'; };
     var bar = function (v, t) { var pct = t > 0 ? Math.min(100, Math.round(v / t * 100)) : 0; return '<div class="fm-bar"><i style="width:' + pct + '%"></i></div>' + (t > 0 ? '<div class="fm-sub">' + pct + '% dari target ' + rp(t) + '</div>' : '') ; };
 
+    var aiCardHtml = '', aiQ = [], aiA = [];
+    if (P.has('ai_asisten')) {
+      if (!document.getElementById('fm-ai-font')) {
+        var lk = document.createElement('link'); lk.id = 'fm-ai-font'; lk.rel = 'stylesheet';
+        lk.href = 'https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600&display=swap';
+        document.head.appendChild(lk);
+      }
+      aiQ = ['Untung bulan ini berapa?', 'Stok apa yang mau habis?', 'Bagaimana kas hari ini?'];
+      aiA = [
+        'Bulan ini untung kotor sekitar ' + rp(grossMonth) + ' dari omzet ' + rp(omMonth) + '.',
+        low.length ? ('Ada ' + low.length + ' produk di bawah batas aman: ' + low.slice(0, 3).map(function (p) { return esc(p.name) + ' (' + p.stock + ')'; }).join(', ') + (low.length > 3 ? ', dan lainnya' : '') + '.') : 'Semua stok aman, tidak ada yang mendekati batas minimum.',
+        'Hari ini sudah ada ' + sToday.length + ' transaksi dengan omzet ' + rp(omToday) + '.'
+      ];
+      aiCardHtml = '<div id="fm-ai-card" style="font-family:\'Plus Jakarta Sans\',sans-serif;background:#1D1912;border-radius:20px;padding:20px 18px;margin-bottom:14px;color:#F5F0E4">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">' +
+        '<span style="width:7px;height:7px;border-radius:50%;background:#E3A638;display:inline-block"></span>' +
+        '<span style="font-size:12px;font-weight:700;color:#E3A638">Asisten AI &middot; pratinjau Oneilverse 2</span>' +
+        '</div>' +
+        '<div style="font-family:\'Fraunces\',serif;font-size:18px;line-height:1.5;font-weight:500;margin-bottom:14px">Omzet hari ini ' + rp(omToday) + (low.length ? (', dan ' + low.length + ' produk stoknya menipis.') : ', dan stok semua aman.') + '</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
+        aiQ.map(function (q, i) { return '<button type="button" data-ai-q="' + i + '" style="all:unset;cursor:pointer;background:#262017;color:#D9D2C2;font-size:12px;padding:8px 12px;border-radius:100px">' + esc(q) + '</button>'; }).join('') +
+        '</div>' +
+        '<div id="fm-ai-chat" style="display:flex;flex-direction:column;gap:8px;margin-top:10px"></div>' +
+        '</div>';
+    }
     var h = '';
     {
       h += '<div class="fm-ins-grid">';
@@ -110,8 +136,24 @@
         '</tbody></table></div>' : '';
       h += '<div class="ios-glass fm-ic fm-ins-main" data-fm-i="Laba &amp; Margin per Produk"><h4>Laba & Margin per Produk</h4>' + ((secP || secN) ? secP + secN : '<div class="fm-sub">Belum ada penjualan.</div>') + '</div>';
     }
-    box.innerHTML = h;
+    box.innerHTML = aiCardHtml + h;
     var ob = box.querySelector('[data-open-tg]'); if (ob) { ob.onclick = openTargets; var cd = ob.closest('.fm-ic'); if (cd) { cd.style.cursor = 'pointer'; cd.onclick = function (e) { if (e.target.closest('button')) return; openTargets(); }; } }
+    var chatBox = box.querySelector('#fm-ai-chat');
+    if (chatBox) {
+      [].forEach.call(box.querySelectorAll('[data-ai-q]'), function (btn) {
+        btn.onclick = function () {
+          var i = +btn.getAttribute('data-ai-q');
+          var row1 = document.createElement('div');
+          row1.style.cssText = 'align-self:flex-end;max-width:82%;background:#2A2117;color:#F5E9D0;padding:9px 12px;border-radius:14px;font-size:12.5px;line-height:1.4';
+          row1.textContent = aiQ[i];
+          var row2 = document.createElement('div');
+          row2.style.cssText = 'align-self:flex-start;max-width:82%;background:#16140F;color:#D9D2C2;padding:9px 12px;border-radius:14px;font-size:12.5px;line-height:1.4';
+          row2.textContent = aiA[i];
+          chatBox.appendChild(row1); chatBox.appendChild(row2);
+          btn.disabled = true; btn.style.opacity = '.4';
+        };
+      });
+    }
   }
 
   window.FM_INSIGHTS = {

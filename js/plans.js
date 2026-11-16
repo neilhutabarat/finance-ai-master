@@ -54,6 +54,7 @@
     { key: 'tax', label: 'Pajak PPN 12%', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'dashboard', label: 'Kartu: Ringkasan Hari Ini, Metode Bayar, Target Omzet, Stok Menipis, Laba & Margin per Produk', r: { manager: 'o', owner: 'o' } },
     { key: 'analisa', label: 'Analisa Keuangan', r: { manager: 'o', owner: 'o' } },
+    { key: 'ai_asisten', label: 'Asisten AI Pembukuan (pratinjau Oneilverse 2) — kartu ringkasan & tanya-jawab AI di Ringkasan Hari Ini', r: { manager: 'o', owner: 'o' } },
     { key: 'instruksi', label: 'Instruksi & Pengawasan Admin', r: { manager: 'o' } },
     { key: 'audit', label: 'Audit (riwayat perubahan)', r: { owner: 'o' } },
     { key: 'export_csv', label: 'Unduh PDF dan CSV laporan', r: { owner: 'o' } },
@@ -294,7 +295,7 @@
     { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
     { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'stok_habis'] },
     { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
-    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
+    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'ai_asisten', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
     { id: 'ops', label: 'Operasional', keys: ['absensi', 'properti', 'offline_penuh'] },
     { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'clock', 'weather', 'rates', 'billing_card', 'chat'] }
   ];
