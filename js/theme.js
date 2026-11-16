@@ -3,12 +3,12 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.26';
+  var BETA = 'v1.0.25-proto1';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
-    ['v1.0.26', '17 Nov 2026', [
+    ['v1.0.25-proto1', '17 Nov 2026', [
       '[Perbaikan] Pratinjau internal: kartu "Asisten AI Pembukuan" di Ringkasan Hari Ini (Owner/Manager) — fitur ini belum aktif untuk toko manapun kecuali diaktifkan khusus oleh Tower'
     ]],
     ['v1.0.25', '16 Nov 2026', [
