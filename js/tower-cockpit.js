@@ -161,6 +161,23 @@
     });
   }
   function dayIncome(id, iso) { var s = 0; txs(id).forEach(function (t) { if (t.category === 'sales' && (t.dateISO || '') === iso) s += t.amount || 0; }); return s; }
+
+  /* ============ Oneil Shield: kejadian keamanan (kunci PIN/blokir/perangkat baru) tampil di LOG TRANSAKSI ============ */
+  var secAudit = { seen: {}, seeded: false };
+  function pollSecurity() {
+    var d = g(function () { return db; }, null); if (!d) return;
+    d.collection('manager_audit_logs').where('action', 'in', ['KEAMANAN_PIN_TERKUNCI', 'KEAMANAN_PIN_DIBLOKIR', 'KEAMANAN_PERANGKAT_BARU']).limit(40).get().then(function (snap) {
+      var docs = []; snap.forEach(function (doc) { docs.push({ id: doc.id, d: doc.data() || {} }); });
+      docs.sort(function (a, b) { return (a.d.timestamp || 0) - (b.d.timestamp || 0); });
+      if (!secAudit.seeded) { docs.forEach(function (o) { secAudit.seen[o.id] = 1; }); secAudit.seeded = true; return; }
+      docs.forEach(function (o) {
+        if (secAudit.seen[o.id]) return; secAudit.seen[o.id] = 1;
+        var bad = o.d.action === 'KEAMANAN_PIN_DIBLOKIR';
+        addLog(bad ? 'alarm' : 'sys', '🛡️ SHIELD · ' + (o.d.tenantId || '-') + ' · ' + (o.d.detail || o.d.action), false, bad ? 'alarm' : 'notif');
+        if (bad) speak('Peringatan keamanan dari Oneil Shield');
+      });
+    }).catch(function () {});
+  }
   function briefing(all) {
     var d0 = ymd(new Date()), sales = 0, n = 0;
     all.forEach(function (o) { if (o.t.category === 'sales' && (o.t.dateISO || '') === d0) { sales += o.t.amount || 0; n++; } });
@@ -478,6 +495,7 @@
       setInterval(function () { if (document.hidden) return; try { if (mode === 'mon') { renderTable(); renderStrip(); renderAttn(); } updateBar(); } catch (e) { try { console.warn('tower tick', e); } catch (e2) {} } }, 4000),
       setInterval(function () { if (!document.hidden && mode === 'mon') renderJam(); }, 60000),
       setInterval(function () { if (!document.hidden) scanEvents(); }, 2000),
+      setInterval(function () { if (!document.hidden) pollSecurity(); }, 5000),
       setInterval(function () { if (!document.hidden && seeded) trend(); }, 180000),
       /* sapuan radar: berbunyi di layar MONITOR selama masih ada toko online (ikut kedipan lampu hijau) */
       setInterval(function () { try { if (document.hidden || mode !== 'mon' || !S.on || S.eco) return; if (tenants().some(function (t) { return online(t.id).length; })) SND.radar(); } catch (e) {} }, 2600)
