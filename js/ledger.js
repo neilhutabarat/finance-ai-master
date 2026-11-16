@@ -24,8 +24,8 @@
     var by = {}; (txs || []).forEach(function (t) { (by[t.accountCode] = by[t.accountCode] || []).push(t); });
     var byBank = {}; (txs || []).forEach(function (t) { if (t.bankCode) (byBank[t.bankCode] = byBank[t.bankCode] || []).push(t); });
     var byCash = []; (txs || []).forEach(function (t) { if (t.pay === 'tunai' && ['sales', 'cogs', 'expense', 'prive'].indexOf(t.category) >= 0) byCash.push(t); });
-    function isFlow(code) { var cc = coa[code]; return !!cc && (cc.category === 'bank' || cc.category === 'kas'); }
-    function listFor(code) { var cc = coa[code]; if (!cc) return by[code] || []; if (cc.category === 'bank') return byBank[code] || []; if (cc.category === 'kas') return byCash; return by[code] || []; }
+    function isFlow(code) { var cc = coa[code]; return !!cc && (cc.category === 'bank' || cc.category === 'petty' || cc.category === 'kas'); }
+    function listFor(code) { var cc = coa[code]; if (!cc) return by[code] || []; if (cc.category === 'bank' || cc.category === 'petty') return byBank[code] || []; if (cc.category === 'kas') return byCash; return by[code] || []; }
     var codes = Object.keys(coa).sort(function (a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); });
     Object.keys(by).forEach(function (k) { if (codes.indexOf(k) < 0) codes.push(k); });
     var first = codes.filter(function (c) { return listFor(c).length; })[0] || codes[0] || '';

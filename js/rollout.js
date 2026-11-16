@@ -79,7 +79,7 @@
 
   // Jaga-jaga: kalau dokumen app_meta/rollout belum diisi bentuk generations (belum sempat disimpan Tower)
   // atau Firestore tak terjangkau, Generasi 1 tetap aman terkunci ke titik ini, TIDAK ikut kode akar.
-  var FALLBACK_GEN1_PIN = 'v1.0.24';
+  var FALLBACK_GEN1_PIN = 'v1.0.25';
 
   function decide(cfg) {
     try {

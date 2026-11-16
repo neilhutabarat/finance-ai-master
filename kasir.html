@@ -6,7 +6,7 @@
     <title>Oneilverse - Terminal Kasir</title>
     <style id="fm-boot">html:not(.fm-ready) body{visibility:hidden}@keyframes fmboot{to{visibility:visible}}html:not(.fm-ready) body{animation:fmboot 0s linear 3s forwards}</style>
     
-    <script src="/js/loader.js?v=v1024"></script>
+    <script src="/js/loader.js?v=v1025"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -135,12 +135,12 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=v1024"></script>
-    <script src="js/theme.js?v=v1024"></script>
-    <script src="js/ledger.js?v=v1024"></script>
-    <script src="js/langit.js?v=v1024" defer></script>
-    <script src="js/logo.js?v=v1024"></script>
-    <script src="js/skin.js?v=v1024"></script>
+    <script src="js/dialog.js?v=v1025"></script>
+    <script src="js/theme.js?v=v1025"></script>
+    <script src="js/ledger.js?v=v1025"></script>
+    <script src="js/langit.js?v=v1025" defer></script>
+    <script src="js/logo.js?v=v1025"></script>
+    <script src="js/skin.js?v=v1025"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -462,6 +462,7 @@
                             <select id="pay-sub" onchange="onPayMethodChange()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold bg-white text-slate-800">
                                 <option value="qris">QRIS</option>
                                 <option value="transfer">Transfer</option>
+                                <option value="petty">Petty Cash</option>
                             </select>
                             <select id="pay-bank-acc" class="hidden w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold bg-white text-slate-800"></select>
                             <p id="pay-bank-warn" class="hidden text-[10px] leading-snug text-amber-600 font-bold">Belum ada akun bank di COA. Transaksi tetap tercatat, tapi belum terhubung ke bank manapun — tambahkan akun bank di Kelola Akun (COA).</p>
@@ -756,32 +757,32 @@
 
     <script src="js/tenants.js"></script>
     <script src="/js/rollout.js"></script>
-    <script src="js/auth.js?v=v1024"></script>
-    <script src="js/monitor.js?v=v1024"></script>
-    <script src="js/plans.js?v=v1024"></script>
-    <script src="js/usaha.js?v=v1024"></script>
-    <script src="js/mutasi-share.js?v=v1024"></script>
-    <script src="js/struk-pdf.js?v=v1024"></script>
-    <script src="js/gaji.js?v=v1024"></script>
-    <script src="js/piutang.js?v=v1024"></script>
-    <script src="js/promo.js?v=v1024"></script>
-    <script src="js/bantuan.js?v=v1024"></script>
-    <script src="js/absensi.js?v=v1024"></script>
+    <script src="js/auth.js?v=v1025"></script>
+    <script src="js/monitor.js?v=v1025"></script>
+    <script src="js/plans.js?v=v1025"></script>
+    <script src="js/usaha.js?v=v1025"></script>
+    <script src="js/mutasi-share.js?v=v1025"></script>
+    <script src="js/struk-pdf.js?v=v1025"></script>
+    <script src="js/gaji.js?v=v1025"></script>
+    <script src="js/piutang.js?v=v1025"></script>
+    <script src="js/promo.js?v=v1025"></script>
+    <script src="js/bantuan.js?v=v1025"></script>
+    <script src="js/absensi.js?v=v1025"></script>
     <script>
         (function () { function go() { if (window.FM_MUTASI) FM_MUTASI.mount({ tx: function () { return (typeof myTx === 'function') ? myTx() : txList; } }); }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); }); else setTimeout(go, 0); })();
     </script>
-    <script src="js/widgets.js?v=v1024"></script>
-    <script src="js/config.js?v=v1024"></script>
-    <script src="js/offline.js?v=v1024"></script>
-    <script src="js/core.js?v=v1024"></script>
-    <script src="js/billing.js?v=v1024"></script>
-    <script src="js/shield.js?v=v1024"></script>
-    <script src="js/ctrl.js?v=v1024"></script>
-    <script src="js/chat.js?v=v1024"></script>
-    <script src="js/store.js?v=v1024"></script>
-    <script src="js/stok-admin.js?v=v1024"></script>
-    <script src="js/i18n.js?v=v1024"></script>
+    <script src="js/widgets.js?v=v1025"></script>
+    <script src="js/config.js?v=v1025"></script>
+    <script src="js/offline.js?v=v1025"></script>
+    <script src="js/core.js?v=v1025"></script>
+    <script src="js/billing.js?v=v1025"></script>
+    <script src="js/shield.js?v=v1025"></script>
+    <script src="js/ctrl.js?v=v1025"></script>
+    <script src="js/chat.js?v=v1025"></script>
+    <script src="js/store.js?v=v1025"></script>
+    <script src="js/stok-admin.js?v=v1025"></script>
+    <script src="js/i18n.js?v=v1025"></script>
     <script>
         function formatThousandSeparator(num) {
             const n = Number(num) || 0;
@@ -1277,17 +1278,25 @@
         function fillBankAccOptions() {
             const sel = document.getElementById('pay-bank-acc'), warn = document.getElementById('pay-bank-warn');
             if (!sel) return;
-            const banks = ((typeof STORE !== 'undefined' && STORE.getCOA) ? STORE.getCOA() : []).filter(c => c.category === 'bank');
-            if (!banks.length) {
+            const sub = (document.getElementById('pay-sub') || {}).value;
+            const isPetty = sub === 'petty';
+            const wantCat = isPetty ? 'petty' : 'bank';
+            const accs = ((typeof STORE !== 'undefined' && STORE.getCOA) ? STORE.getCOA() : []).filter(c => c.category === wantCat);
+            if (!accs.length) {
                 sel.classList.add('hidden'); sel.innerHTML = '';
-                if (warn) warn.classList.remove('hidden');
+                if (warn) {
+                    warn.classList.remove('hidden');
+                    warn.textContent = isPetty
+                        ? 'Belum ada akun Kas Kecil/Petty Cash di COA. Transaksi tetap tercatat, tapi belum terhubung ke akun manapun — tambahkan akun Kas Kecil/Petty Cash di Kelola Akun (COA).'
+                        : 'Belum ada akun bank di COA. Transaksi tetap tercatat, tapi belum terhubung ke bank manapun — tambahkan akun bank di Kelola Akun (COA).';
+                }
                 return;
             }
             const cur = sel.value;
-            sel.innerHTML = banks.map(b => `<option value="${fmEsc(b.code)}">[${fmEsc(b.code)}] ${fmEsc(b.name)}</option>`).join('');
+            sel.innerHTML = accs.map(b => `<option value="${fmEsc(b.code)}">[${fmEsc(b.code)}] ${fmEsc(b.name)}</option>`).join('');
             sel.classList.remove('hidden');
             if (warn) warn.classList.add('hidden');
-            if (banks.some(b => b.code === cur)) sel.value = cur;
+            if (accs.some(b => b.code === cur)) sel.value = cur;
         }
         function onPayMethodChange() {
             const v = (document.getElementById('pay-method') || {}).value;
@@ -1421,7 +1430,7 @@
             const mixed = draftList.some(d => d.category !== 'sales');
             const lblEl = document.getElementById('receipt-total-label'); if (lblEl) lblEl.innerText = mixed ? 'TOTAL BERSIH:' : 'TOTAL BAYAR:';
 
-            const PAYLBL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer' };
+            const PAYLBL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer', petty: 'Petty Cash' };
             const payShown = PAYLBL[payNow] || payNow;
             const payFull = payShown + (bankAccNow ? ' (' + bankAccNow.name + ')' : '');
             document.getElementById('receipt-pay').innerText = payFull;

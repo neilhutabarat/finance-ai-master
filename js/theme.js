@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.24';
+  var BETA = 'v1.0.25';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.25', '16 Nov 2026', [
+      '[Perbaikan] Metode Bayar / Terima kini punya pilihan baru "Petty Cash" (di bawah Bank, sejajar QRIS & Transfer), terhubung ke akun Kas Kecil/Petty Cash yang ditambahkan di Kelola Akun (COA)',
+      '[Perbaikan] Owner/Manager sekarang bisa menambah akun COA berkategori "Kas Kecil / Petty Cash" di menu Kelola Akun',
+      '[Keamanan] Transaksi Petty Cash dihitung sebagai bagian dari Kas di Neraca AI dan Laporan Harian, namun TIDAK ikut dicocokkan ke uang laci fisik (baris Tunai), karena dananya memang dana terpisah'
+    ]],
     ['v1.0.24', '16 Nov 2026', [
       '[Perbaikan] Daftar Mutasi Kas (kasir & manager) sekarang bisa diurutkan terbaru-dulu atau terlama-dulu lewat tombol di pojok kanan atas, defaultnya terbaru di atas',
       '[Perbaikan] Pilihan Metode Bayar / Terima dipindahkan ke area input barang (sebelumnya di bawah dekat tombol cetak struk), supaya kelihatan saat menginput barang',

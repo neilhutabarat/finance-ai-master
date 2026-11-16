@@ -79,7 +79,7 @@
     var peak = Object.keys(hrs).map(function (k) { return [k, hrs[k]]; }).sort(function (a, b) { return b[1] - a[1]; })[0];
     var gross = sToday.reduce(function (x, t) { return x + profitOf(t); }, 0);
     var low = prods.filter(function (p) { return p.stock <= (typeof p.minStock === 'number' ? p.minStock : 5); }).sort(function (a, b) { return a.stock - b.stock; });
-    var pay = { tunai: 0, qris: 0, transfer: 0 }; sToday.forEach(function (t) { var k = t.pay || 'tunai'; pay[k] = (pay[k] || 0) + t.amount; });
+    var pay = { tunai: 0, qris: 0, transfer: 0, petty: 0 }; sToday.forEach(function (t) { var k = t.pay || 'tunai'; pay[k] = (pay[k] || 0) + t.amount; });
 
     var card = function (title, inner) { return '<div class="ios-glass fm-ic" data-fm-i="' + title + '"><h4>' + title + '</h4>' + inner + '</div>'; };
     var line = function (l, r) { return '<div class="fm-row"><span>' + l + '</span><b>' + r + '</b></div>'; };
@@ -89,7 +89,7 @@
     {
       h += '<div class="fm-ins-grid">';
       h += card('Ringkasan Hari Ini', line('Omzet', rp(omToday)) + line('Laba kotor', rp(gross)) + line('Jumlah nota', sToday.length) + line('Terlaris', top ? esc(top[0]) + ' (' + top[1] + ')' : '-') + line('Jam ramai', peak ? peak[0] + ':00' : '-'));
-      h += card('Metode Bayar Hari Ini', line('Tunai', rp(pay.tunai)) + line('QRIS', rp(pay.qris)) + line('Transfer', rp(pay.transfer)) + '<div class="fm-sub">Cocokkan uang laci dengan baris Tunai.</div>');
+      h += card('Metode Bayar Hari Ini', line('Tunai', rp(pay.tunai)) + line('QRIS', rp(pay.qris)) + line('Transfer', rp(pay.transfer)) + (pay.petty ? line('Petty Cash', rp(pay.petty)) : '') + '<div class="fm-sub">Cocokkan uang laci dengan baris Tunai. Petty Cash dananya terpisah, tidak ikut baris Tunai.</div>');
       var tgt = '<div class="fm-sub" style="margin:0">Hari ini <b>' + rp(omToday) + '</b></div>' + bar(omToday, targets.day || 0) + '<div class="fm-sub" style="margin:6px 0 0">Bulan ini <b>' + rp(omMonth) + '</b></div>' + bar(omMonth, targets.month || 0);
       if (!targets.day && !targets.month) tgt += '<div class="fm-sub">' + (cfg.editTargets ? 'Isi target di bawah untuk melihat progres.' : 'Target belum diisi oleh owner.') + '</div>';
       if (cfg.editTargets) tgt += '<div class="fm-tg"><button type="button" data-open-tg style="grid-column:1/-1">Atur target</button></div>';
