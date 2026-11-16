@@ -90,6 +90,64 @@
         html:not(#_)[data-fm-page="manager"] .ios-glass { border-top-color: rgba(227,166,56,.5) !important; }
         html:not(#_)[data-fm-page="manager"], html:not(#_)[data-fm-page="owner"] { background: #0E0D0A !important; }
         html:not(#_)[data-fm-page="manager"] body, html:not(#_)[data-fm-page="owner"] body { background-color: #0E0D0A !important; }
+
+        /* ---- kartu: garis emas di tepi atas ---- */
+        html:not(#_)[data-fm-page="manager"] main .ios-glass { position: relative; overflow: hidden; }
+        html:not(#_)[data-fm-page="manager"] main .ios-glass::before { content: ""; position: absolute; left: 16px; right: 16px; top: 0; height: 2px; border-radius: 0 0 4px 4px; background: linear-gradient(90deg, #E3A638, rgba(227,166,56,0)); pointer-events: none; }
+
+        /* ---- tombol aksi: gelap, satu warna emas, chip ikon bergaris ---- */
+        html:not(#_)[data-fm-page] #fm-actions .fm-act {
+            background: linear-gradient(180deg, rgba(227,166,56,.10), rgba(29,25,18,.92)) !important;
+            border: 1px solid rgba(227,166,56,.3) !important; border-radius: 14px !important;
+            box-shadow: 0 8px 18px -12px #000 !important; color: #F5F0E4 !important;
+            transition: transform .25s cubic-bezier(.2,.9,.3,1.3), border-color .2s, box-shadow .2s !important;
+        }
+        html:not(#_)[data-fm-page] #fm-actions .fm-act:hover { transform: translateY(-2px) !important; border-color: rgba(227,166,56,.7) !important; box-shadow: 0 10px 24px -10px rgba(227,166,56,.45) !important; }
+        html:not(#_)[data-fm-page] #fm-actions .fm-act span { color: #F5F0E4 !important; font-weight: 600 !important; }
+        html:not(#_)[data-fm-page] #fm-actions .fm-act i { background: rgba(227,166,56,.12) !important; border: 1px solid rgba(227,166,56,.4) !important; border-radius: 9px !important; }
+        html:not(#_)[data-fm-page] #fm-actions .fm-act svg { color: #E3A638 !important; stroke: #E3A638 !important; }
+        html:not(#_)[data-fm-page] #fm-actions .fm-act:first-child { background: linear-gradient(135deg, #E3A638, #c4841c) !important; border-color: #f0c066 !important; }
+        html:not(#_)[data-fm-page] #fm-actions .fm-act:first-child span { color: #1a1206 !important; font-weight: 700 !important; }
+        html:not(#_)[data-fm-page] #fm-actions .fm-act:first-child i { background: rgba(26,18,6,.15) !important; border-color: rgba(26,18,6,.35) !important; }
+        html:not(#_)[data-fm-page] #fm-actions .fm-act:first-child svg { color: #1a1206 !important; stroke: #1a1206 !important; }
+
+        /* ---- pulau dinamis (layar lebar); HP tetap memakai dock bawah lama ---- */
+        @media (min-width: 701px) {
+            html:not(#_) #fm-dock { display: none !important; }
+            html:not(#_)[data-fm-page="manager"] body { padding-left: 96px !important; }
+        }
+        @media (max-width: 700px) { #fm-zone { display: none !important; } }
+        html[data-fm-modal] #fm-zone { opacity: 0; pointer-events: none; transition: opacity .15s; }
+        #fm-zone { position: fixed; left: 14px; top: 50%; transform: translateY(-50%); width: 214px; height: 560px; z-index: 45; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        #fm-island { position: absolute; left: 0; top: 50%; width: 58px; height: 172px; margin-top: -86px; border-radius: 30px; overflow: hidden; cursor: pointer; outline: none;
+            background: linear-gradient(180deg, rgba(227,166,56,.10), rgba(26,22,14,.88)); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(227,166,56,.4); box-shadow: 0 18px 40px -12px #000, inset 0 1px 0 rgba(227,166,56,.35);
+            transition: height .6s cubic-bezier(.34,1.32,.5,1), margin-top .6s cubic-bezier(.34,1.32,.5,1), width .5s cubic-bezier(.34,1.32,.5,1); }
+        #fm-zone.open #fm-island { height: 486px; margin-top: -243px; width: 204px; }
+        #fm-island .mini { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transition: opacity .2s; }
+        #fm-zone.open #fm-island .mini { opacity: 0; pointer-events: none; }
+        #fm-island .lg { width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(135deg, #E3A638, #c4841c); color: #1a1206; display: grid; place-items: center; font: 800 17px Fraunces, Georgia, serif; box-shadow: 0 0 16px rgba(227,166,56,.45); flex: none; }
+        #fm-island .wd { writing-mode: vertical-rl; transform: rotate(180deg); font: 600 13px Fraunces, Georgia, serif; letter-spacing: .14em; color: #E3A638; }
+        #fm-island .mn { position: absolute; inset: 0; padding: 14px 10px; display: flex; flex-direction: column; gap: 3px; opacity: 0; pointer-events: none; transition: opacity .15s; }
+        #fm-zone.open #fm-island .mn { opacity: 1; pointer-events: auto; transition: opacity .2s .25s; }
+        #fm-island .tp { display: flex; align-items: center; gap: 10px; padding: 2px 6px 12px; border-bottom: 1px solid rgba(227,166,56,.22); margin-bottom: 6px; font: 600 15px Fraunces, Georgia, serif; color: #F5F0E4; }
+        #fm-island .tp .lg { width: 30px; height: 30px; font-size: 15px; }
+        #fm-island .it { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 11px; padding: 9px 10px; border-radius: 13px; font-size: 13px; font-weight: 600; color: #cfc4aa; cursor: pointer; opacity: 0; transform: translateX(-12px); }
+        #fm-zone.open #fm-island .it { opacity: 1; transform: none; transition: opacity .3s, transform .4s cubic-bezier(.2,.9,.3,1.2), background .2s, color .2s; transition-delay: calc(.22s + var(--i) * 45ms), calc(.22s + var(--i) * 45ms), 0s, 0s; }
+        #fm-island .it:hover, #fm-island .it:focus-visible { background: rgba(227,166,56,.14); color: #fff; }
+        #fm-island .it.ai { background: linear-gradient(135deg, rgba(227,166,56,.22), rgba(82,161,136,.14)); color: #F5F0E4; border: 1px solid rgba(227,166,56,.4); margin-bottom: 6px; }
+        #fm-island .it.dg { color: #e58c85; }
+        #fm-island .it svg, .fm-sat svg { width: 18px; height: 18px; stroke: #E3A638; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+        #fm-island .it.dg svg { stroke: #e58c85; }
+        #fm-island .sp { flex: 1; }
+        .fm-sat { all: unset; box-sizing: border-box; position: absolute; left: 8px; width: 42px; height: 42px; margin-top: -21px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+            background: rgba(30,26,18,.92); border: 1px solid rgba(227,166,56,.4); box-shadow: 0 8px 18px -8px #000;
+            transition: transform .5s cubic-bezier(.34,1.56,.5,1) var(--back), opacity .3s var(--back), filter .3s var(--back); }
+        .fm-sat.ai { background: linear-gradient(135deg, #E3A638, #c4841c); } .fm-sat.ai svg { stroke: #1a1206; }
+        #fm-zone.open .fm-sat { opacity: 0; filter: blur(6px); transform: translate(var(--dx), var(--dy)) scale(.15) rotate(var(--r)); pointer-events: none;
+            transition: transform .38s cubic-bezier(.5,0,.9,.4) var(--hit), opacity .3s var(--hit), filter .3s var(--hit); }
+        .fm-pt { position: fixed; width: 5px; height: 5px; border-radius: 50%; background: #E3A638; box-shadow: 0 0 8px #E3A638; pointer-events: none; z-index: 60; }
+        @media (prefers-reduced-motion: reduce) { #fm-zone * { transition-duration: .01s !important; transition-delay: 0s !important; } }
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col antialiased selection:bg-amber-600 selection:text-white pb-6">
@@ -1306,6 +1364,82 @@ window.logout = async function () {
     </script>
 <script>
     (function () { var b = document.getElementById('mp-barcode'); if (b) b.addEventListener('keydown', function (e) { if (e.key === 'Enter') e.preventDefault(); }); })();
+</script>
+<script id="fm-on2-island">
+(function(){
+  if (!/manager|owner/.test(location.pathname) && !document.querySelector('#fm-dock')) { /* tetap lanjut: dock dicari di bawah */ }
+  var tries = 0;
+  function init(){
+    var dock = document.getElementById('fm-dock');
+    if (!dock || !dock.querySelector('.fm-dk')) { if (++tries < 60) return setTimeout(init, 250); return; }
+    if (document.getElementById('fm-zone')) return;
+    var zone = document.createElement('div'); zone.id = 'fm-zone';
+    var isl = document.createElement('div'); isl.id = 'fm-island'; isl.tabIndex = 0; isl.setAttribute('role','navigation'); isl.setAttribute('aria-label','Menu Oneilverse');
+    isl.innerHTML = '<div class="mini"><div class="lg">O</div><div class="wd">Oneilverse</div></div><div class="mn"><div class="tp"><div class="lg">O</div>Oneilverse</div></div>';
+    var mn = isl.querySelector('.mn'), n = 0;
+    function item(label, svg, cls, fn){
+      var b = document.createElement('button'); b.type='button'; b.className = 'it ' + (cls||''); b.style.setProperty('--i', n++);
+      b.innerHTML = svg + '<span>' + label + '</span>'; b.addEventListener('click', function(e){ e.stopPropagation(); fn(); close(); });
+      mn.appendChild(b); return b;
+    }
+    var aiSvg = '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>';
+    function goAI(){ var c = document.getElementById('fm-ai-card'); if (c) c.scrollIntoView({behavior:'smooth', block:'center'}); }
+    var aiIt = item('Tanya Akuntan AI', aiSvg, 'ai', goAI);
+    var kids = Array.prototype.slice.call(dock.children), sepDone = false;
+    kids.forEach(function(k){
+      if (k.classList.contains('fm-sep')) { if (!sepDone) { var sp = document.createElement('div'); sp.className='sp'; mn.appendChild(sp); sepDone = true; } return; }
+      if (!k.classList.contains('fm-dk')) return;
+      var sp2 = k.querySelector('span'), sv = k.querySelector('svg');
+      if (!sp2 || !sv) return;
+      var dg = /danger|keluar/i.test(k.className + ' ' + sp2.textContent);
+      item(sp2.textContent.trim(), sv.outerHTML, dg ? 'dg' : '', function(){ k.click(); });
+    });
+    zone.appendChild(isl);
+    // satelit
+    var sats = [];
+    function actByLabel(re){ var a = document.querySelectorAll('#fm-actions .fm-act'); for (var i=0;i<a.length;i++) if (re.test(a[i].textContent)) return a[i]; return null; }
+    function addSat(top, ico, title, cls, fn, hit, dx, dy, r){
+      var s = document.createElement('button'); s.type='button'; s.className='fm-sat ' + (cls||''); s.title = title; s.setAttribute('aria-label', title);
+      s.style.top = 'calc(50% ' + top + 'px)'; s.innerHTML = ico;
+      s.style.setProperty('--hit', hit + 'ms'); s.style.setProperty('--back', (hit*0.6) + 'ms');
+      s.style.setProperty('--dx', dx + 'px'); s.style.setProperty('--dy', dy + 'px'); s.style.setProperty('--r', r + 'deg');
+      s.addEventListener('click', function(e){ e.stopPropagation(); fn(); });
+      zone.appendChild(s); sats.push(s); return s;
+    }
+    var aiSat = addSat('- 130', aiSvg, 'Tanya Akuntan AI', 'ai', goAI, 90, 30, 40, 200);
+    var kasirA = actByLabel(/Buka Kasir/i), lapA = actByLabel(/Laporan Harian|Neraca/i);
+    function clone(a){ var sv = a.querySelector('svg'); return sv ? sv.outerHTML : ''; }
+    var s2 = kasirA ? addSat('+ 130', clone(kasirA), 'Buka Kasir Baru', '', function(){ kasirA.click(); }, 120, 30, -40, -180) : null;
+    var s3 = lapA ? addSat('- 196', clone(lapA), lapA.textContent.trim(), '', function(){ lapA.click(); }, 230, 40, 70, 160) : null;
+    document.body.appendChild(zone);
+
+    function burst(s){
+      var r = s.getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
+      for (var i=0;i<9;i++){
+        var p = document.createElement('i'); p.className='fm-pt'; p.style.left = cx+'px'; p.style.top = cy+'px'; document.body.appendChild(p);
+        var a = Math.random()*Math.PI*2, d = 26 + Math.random()*46;
+        var an = p.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+Math.cos(a)*d+'px,'+Math.sin(a)*d+'px) scale(0)',opacity:0}], {duration: 520 + Math.random()*260, easing:'cubic-bezier(.2,.8,.3,1)'});
+        an.onfinish = (function(el){ return function(){ el.remove(); }; })(p);
+      }
+    }
+    var ot, ct;
+    function open(){
+      clearTimeout(ct); if (zone.classList.contains('open')) return;
+      var has = !!document.getElementById('fm-ai-card');
+      aiIt.style.display = has ? '' : 'none'; aiSat.style.display = has ? '' : 'none';
+      zone.classList.add('open');
+      sats.forEach(function(s){ if (s.style.display === 'none') return; var d = parseFloat(s.style.getPropertyValue('--hit')); setTimeout(function(){ if (zone.classList.contains('open')) burst(s); }, d + 60); });
+    }
+    function close(){ clearTimeout(ot); zone.classList.remove('open'); }
+    zone.addEventListener('mouseenter', function(){ clearTimeout(ct); ot = setTimeout(open, 90); });
+    zone.addEventListener('mouseleave', function(){ clearTimeout(ot); ct = setTimeout(close, 260); });
+    isl.addEventListener('focus', open);
+    zone.addEventListener('focusout', function(e){ if (!zone.contains(e.relatedTarget)) ct = setTimeout(close, 200); });
+    isl.addEventListener('click', function(){ zone.classList.contains('open') ? 0 : open(); });
+    document.addEventListener('click', function(e){ if (!zone.contains(e.target)) close(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
 </script>
 </body>
 </html>
