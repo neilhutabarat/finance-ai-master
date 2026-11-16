@@ -76,6 +76,21 @@
         el.style.background = (over || left < 86400000) ? '#be123c' : '#f59e0b';
         el.style.color = '#fff';
     }
+    // ===== Watermark besar "DEMO VERSION" di layar, tampil terus selama masa demo aktif (beda dari pill kecil di atas) =====
+    function demoWatermark(show) {
+        var wrap = document.getElementById('fm-demo-watermark');
+        if (!show) { if (wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap); return; }
+        if (wrap) return; // sudah tampil, tidak perlu dibangun ulang
+        wrap = document.createElement('div');
+        wrap.id = 'fm-demo-watermark';
+        wrap.style.cssText = 'position:fixed;inset:0;z-index:2147481000;pointer-events:none;overflow:hidden;display:flex;align-items:center;justify-content:center';
+        var line = '';
+        for (var i = 0; i < 6; i++) line += 'DEMO VERSION&nbsp;&nbsp;&nbsp;';
+        var rows = '';
+        for (var j = 0; j < 7; j++) rows += '<div style="white-space:nowrap">' + line + '</div>';
+        wrap.innerHTML = '<div style="transform:rotate(-24deg) scale(1.3);font:900 42px/2.7 system-ui,sans-serif;letter-spacing:.05em;color:rgba(100,116,139,.17);text-align:center;user-select:none">' + rows + '</div>';
+        document.body.appendChild(wrap);
+    }
     var lastCtrl = null, demoTick = null;
     function demoEnded(d) { var dm = demoMs(d); return !!dm && Date.now() > dm; }
     function demoTickStart() {
@@ -83,6 +98,7 @@
         demoTick = setInterval(function () {
             if (!lastCtrl || !demoMs(lastCtrl)) return;
             demoPill(demoMs(lastCtrl));
+            demoWatermark(!demoEnded(lastCtrl));
             if (demoEnded(lastCtrl) && !(lastCtrl.suspended === true)) showDemoEnd();
         }, 60000);
     }
@@ -447,7 +463,7 @@
             try { var gv = d ? parseInt(d.glass, 10) : 0; var gs = JSON.stringify({ id: tenant.id, v: (gv >= 1 && gv <= 8) ? gv : null }); if (localStorage.getItem('fm_glass_s') !== gs) { localStorage.setItem('fm_glass_s', gs); window.dispatchEvent(new CustomEvent('fm:glass')); } } catch (eG) {}
             try { window.dispatchEvent(new CustomEvent('fm:ctrl')); } catch (e) {}
             var billFreeze = !!(d && window.FM_BILL && FM_BILL.freezeNow(d.billing, Date.now()));
-            lastCtrl = d; demoPill(demoMs(d)); demoTickStart();
+            lastCtrl = d; demoPill(demoMs(d)); demoWatermark(!!demoMs(d) && !demoEnded(d)); demoTickStart();
             if (d && d.suspended === true) showOverlay(d.suspendReason || '');
             else if (billFreeze) showOverlay('Pembayaran layanan belum diterima dan sudah melewati masa tenggang.');
             else if (demoEnded(d)) showDemoEnd();

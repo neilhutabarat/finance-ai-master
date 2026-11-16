@@ -17,7 +17,7 @@
   function T(id) { return (typeof TENANTS_CONFIG !== 'undefined') ? TENANTS_CONFIG[String(id).toLowerCase()] : null; }
   function lab(id) { return labMap[id] || {}; }
   function isPub(id) { return !!lab(id).published; }
-  function usable(t) { return t && !t.isMaster && !t.isSinglePage && !t.deletedByTower && isManaged(t); }
+  function usable(t) { return t && !t.isSinglePage && !t.deletedByTower && isManaged(t); }
   function allTenants() { return listNetworkTenants().filter(usable); }
   function fail(e) { alert('Gagal: ' + (e && e.message ? e.message : e)); }
   var rsDone = {};
@@ -89,7 +89,15 @@
       var k = q.value.trim().toLowerCase(); L.innerHTML = '';
       var list = allTenants().filter(function (t) { return (!filter || filter(t)) && (!k || (t.id + ' ' + (t.nama || '')).toLowerCase().indexOf(k) >= 0); });
       if (!list.length) { L.innerHTML = '<div style="padding:18px;text-align:center;opacity:.6;font-size:13px">Tidak ada toko yang cocok</div>'; return; }
+      var demoShown = false;
       list.forEach(function (t) {
+        if (isDemoTenantId(t.id) && !demoShown) {
+          demoShown = true;
+          var div = document.createElement('div');
+          div.style.cssText = 'margin:10px 0 6px;padding:0 2px;font-size:11px;font-weight:800;letter-spacing:.04em;opacity:.55';
+          div.textContent = '— DEMO —';
+          L.appendChild(div);
+        }
         var b = document.createElement('button');
         b.style.cssText = 'display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:11px 12px;margin-bottom:6px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff';
         b.innerHTML = '<span><span style="font-weight:800;font-size:13px">' + H(t.nama || t.id) + '</span><span style="display:block;opacity:.6;font-size:11px;font-family:monospace">' + H(t.id) + '</span></span>' + badge(t.id);

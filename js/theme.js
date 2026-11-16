@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.22';
+  var BETA = 'v1.0.23';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.23', '16 Nov 2026', [
+      '[Perbaikan] Toko yang sedang masa DEMO kini menampilkan watermark besar "DEMO VERSION" di layar selama masa demo aktif, selain label kecil yang sudah ada, supaya lebih jelas membedakan toko uji coba dari toko sungguhan',
+      '[Keamanan] Watermark hanya tampilan, tidak mengubah data atau proses apa pun, dan otomatis hilang begitu toko bukan lagi status demo'
+    ]],
     ['v1.0.22', '16 Nov 2026', [
       '[Keamanan] Kunci PIN salah (3x = 5 menit, 5x = 10 menit, 10x = diblokir) sekarang dicek di server (Oneil Shield v2.0), bukan cuma di penyimpanan browser, jadi tidak bisa dilewati dengan hapus data browser atau pindah perangkat',
       '[Keamanan] Setiap login berhasil kini tercatat (waktu & perangkat), dan login dari perangkat baru ditandai serta dilaporkan ke Tower',

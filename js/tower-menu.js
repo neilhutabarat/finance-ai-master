@@ -47,7 +47,7 @@
     ] },
     { id: 'versi', title: 'Kendali Versi', hint: 'Kunci dan rollout versi aplikasi', c: '#c9a8e0', items: [
       { key: 'versi_toko', t: 'Versi Toko', ic: 'swap', run: "towerPick('versi')", d: 'Kunci versi aplikasi' },
-      { key: 'rollout_versi', t: 'Rollout Versi', ic: 'box', run: "if(window.openRolloutModal)openRolloutModal()", d: 'Versi default Basic dan Plus' }
+      { key: 'rollout_versi', t: 'Rollout Versi', ic: 'box', run: "if(window.openRolloutModal)openRolloutModal()", d: 'Versi default Basic & Plus, aplikasi + Oneil Shield' }
     ] },
     { id: 'serah', title: 'Persiapan & Serah Terima', hint: 'Menuju toko siap diserahkan', c: '#f0a8c0', items: [
       { key: 'rakit_uji', t: 'Rakit & Uji', ic: 'grid', run: "FM_LAB.open('rakit')", d: 'Aktifkan fitur satu per satu, catat hasil uji' },
