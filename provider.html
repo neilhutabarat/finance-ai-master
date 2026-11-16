@@ -986,10 +986,51 @@
         window.towerDue = towerDue;
 
         /* Pemilih toko untuk tile Kendali: popup daftar toko -> aksi langsung */
+
+        /* Susunan Pulau Oneilverse 2: Tower mengatur urutan dan tampil/tidaknya isi pulau kiri-kanan layar manager/owner */
+        function towerPulau(t) {
+            const G = (window.FM_PLANS && FM_PLANS.ISLES) || null; if (!G) { alert('Daftar pulau belum termuat. Muat ulang Tower.'); return; }
+            const feats = t.features || {}, saved = (feats._pulau && typeof feats._pulau === 'object') ? feats._pulau : {};
+            const SEC = [['kiri', 'Pulau KIRI · menu (atas ke bawah)'], ['satkiri', 'Pulau KIRI · satelit (atas ke bawah, maks 6)'], ['kanan', 'Pulau KANAN · aksi cepat (atas ke bawah)'], ['satkanan', 'Pulau KANAN · satelit (atas ke bawah, maks 6)']];
+            const st = {}, on = {}, lab = {};
+            SEC.forEach(function (s) {
+                const all = G[s[0]].map(function (p) { return p[0]; }); G[s[0]].forEach(function (p) { lab[p[0]] = p[1]; });
+                const ord = (saved[s[0]] || []).filter(function (k) { return all.indexOf(k) >= 0; });
+                all.forEach(function (k) { if (ord.indexOf(k) < 0) ord.push(k); });
+                st[s[0]] = ord;
+                all.forEach(function (k) { try { on[k] = FM_PLANS.has(k, 'manager', t); } catch (e) { on[k] = true; } });
+            });
+            const ov = towerOverlay('tw-pulau', 'Susunan Pulau ON2', (t.nama || t.id) + ' [' + t.id + '] · nomor kecil = urutan dari atas', '<div id="tp-body" style="overflow:auto;padding:0 18px 8px;flex:1"></div><div style="padding:12px 18px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid rgba(255,255,255,.1)"><button data-tp-reset style="' + TW_BTN + 'background:rgba(255,255,255,.1)">Urutan Bawaan</button><button data-tp-save style="' + TW_BTN + 'background:#16a34a">Simpan</button></div>');
+            const body = ov.el.querySelector('#tp-body');
+            function draw() {
+                body.innerHTML = SEC.map(function (s) {
+                    return '<div style="margin:10px 0 4px;font-weight:800;font-size:12.5px;color:#fbbf24">' + s[1] + '</div>' + st[s[0]].map(function (k, i) {
+                        return '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-top:1px solid rgba(255,255,255,.07);' + (on[k] ? '' : 'opacity:.45') + '"><span style="width:22px;opacity:.6;font-size:11px">' + (i + 1) + '</span><input type="checkbox" data-tk="' + k + '" ' + (on[k] ? 'checked' : '') + '><span style="flex:1;font-size:12.5px">' + lab[k] + '</span><button data-up="' + s[0] + '|' + i + '" style="padding:2px 9px;border-radius:8px;background:rgba(255,255,255,.1)">▲</button><button data-dn="' + s[0] + '|' + i + '" style="padding:2px 9px;border-radius:8px;background:rgba(255,255,255,.1)">▼</button></div>';
+                    }).join('');
+                }).join('');
+            }
+            draw();
+            body.onclick = function (e) {
+                const b = e.target.closest('button'); if (!b) return;
+                const u = b.getAttribute('data-up'), d = b.getAttribute('data-dn'), v = (u || d || '').split('|'); if (v.length < 2) return;
+                const arr = st[v[0]], i = +v[1], j = u ? i - 1 : i + 1; if (j < 0 || j >= arr.length) return;
+                const x = arr[i]; arr[i] = arr[j]; arr[j] = x; draw();
+            };
+            body.onchange = function (e) { const k = e.target.getAttribute && e.target.getAttribute('data-tk'); if (k) { on[k] = e.target.checked; draw(); } };
+            ov.el.querySelector('[data-tp-reset]').onclick = function () { SEC.forEach(function (s) { st[s[0]] = G[s[0]].map(function (p) { return p[0]; }); }); draw(); };
+            ov.el.querySelector('[data-tp-save]').onclick = function () {
+                const nf = Object.assign({}, t.features || {});
+                Object.keys(on).forEach(function (k) { nf[k] = !!on[k]; });
+                nf._pulau = { kiri: st.kiri, satkiri: st.satkiri, kanan: st.kanan, satkanan: st.satkanan };
+                towerSaveFeatures(t, nf).then(function () { try { ctAudit(t.id, 'UBAH_SUSUNAN_PULAU', 'Provider mengatur susunan pulau ON2', '-', '-'); } catch (e) {} t.features = nf; ov.close(); alert('Susunan pulau tersimpan. Muat ulang halaman toko untuk melihatnya.'); }).catch(function (e) { alert('Gagal menyimpan: ' + (e && e.message || e)); });
+            };
+        }
+
         function towerPick(kind, extra) {
             var T = {
                 profil: ['Profil Toko', 'Pilih toko: nama, slogan, warna, logo'],
                 fitur: ['Fitur Toko', 'Pilih toko: centang fitur per peran'],
+                susun: ['Susunan Pulau ON2', 'Pilih toko: atur urutan dan tampil pulau kiri/kanan'],
                 pulau: ['Pulau & Kartu ON2', 'Pilih toko: atur pulau kiri/kanan, kartu, denyut, dan tutup hari'],
                 coa: ['COA Toko', 'Pilih toko untuk mengatur COA-nya'],
                 produk: ['Produk Toko', 'Pilih toko untuk mengatur produknya'],
@@ -1005,7 +1046,7 @@
                 salin2: ['Salin Fitur: pilih toko sumber', 'Fitur diambil dari toko ini' + (extra ? ' dan dipasang ke ' + (extra.nama || extra.id) : '')]
             }[kind];
             if (!T) return;
-            var NEED_MANAGED = { kuota: 1, paket: 1, versi: 1, hapus: 1, salin: 1 };
+            var NEED_MANAGED = { susun: 1, kuota: 1, paket: 1, versi: 1, hapus: 1, salin: 1 };
             var old = document.getElementById('tw-pick'); if (old) old.remove();
             var o = document.createElement('div'); o.id = 'tw-pick';
             o.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px';
@@ -1045,7 +1086,8 @@
                             return;
                         }
                         close();
-                        if (kind === 'pulau') { openTenantSettings(t.id, 'fitur'); setTimeout(function () { try { var q = document.getElementById('ts-q'); if (q) { q.value = 'oneilverse 2'; FM_PLANS.cariFitur('ts', 'oneilverse 2'); q.scrollIntoView({ block: 'center' }); } var tt = document.getElementById('ts-card-title'); if (tt) tt.innerText = 'Pulau & Kartu Oneilverse 2: centang yang ingin ditampilkan di toko ini'; } catch (e) {} }, 400); }
+                        if (kind === 'susun') towerPulau(t);
+                        else if (kind === 'pulau') { openTenantSettings(t.id, 'fitur'); setTimeout(function () { try { var q = document.getElementById('ts-q'); if (q) { q.value = 'oneilverse 2'; FM_PLANS.cariFitur('ts', 'oneilverse 2'); q.scrollIntoView({ block: 'center' }); } var tt = document.getElementById('ts-card-title'); if (tt) tt.innerText = 'Pulau & Kartu Oneilverse 2: centang yang ingin ditampilkan di toko ini'; } catch (e) {} }, 400); }
                         else if (kind === 'profil' || kind === 'fitur' || kind === 'coa' || kind === 'produk') openTenantSettings(t.id, kind);
                         else if (kind === 'kuota' || kind === 'paket' || kind === 'billing' || kind === 'lokasi' || kind === 'versi') openInspectUMKM(t.id, kind);
                         else if (kind === 'salin') towerPick('salin2', t);
