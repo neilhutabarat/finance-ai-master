@@ -62,6 +62,8 @@
     { key: 'card_grafik', label: 'Oneilverse 2 · Kartu Grafik Income vs Outcome 7 hari', r: { manager: 'o', owner: 'o' } },
     { key: 'card_transaksi', label: 'Oneilverse 2 · Kartu Transaksi Terakhir', r: { manager: 'o', owner: 'o' } },
     { key: 'sat_perbarui', label: 'Oneilverse 2 · Satelit Perbarui Aplikasi (pulau kanan)', r: { manager: 'o', owner: 'o' } },
+    { key: 'denyut', label: 'Oneilverse 2 · Denyut Usaha (percikan transaksi langsung)', r: { manager: 'o', owner: 'o' } },
+    { key: 'tutup_hari', label: 'Oneilverse 2 · Ritual Tutup Hari + sapaan pagi AI', r: { manager: 'o', owner: 'o' } },
     { key: 'instruksi', label: 'Instruksi & Pengawasan Admin', r: { manager: 'o' } },
     { key: 'audit', label: 'Audit (riwayat perubahan)', r: { owner: 'o' } },
     { key: 'export_csv', label: 'Unduh PDF dan CSV laporan', r: { owner: 'o' } },
@@ -94,7 +96,7 @@
   var PLUS_FEATURES = ['barcode', 'stok_scan', 'banyak_usaha', 'admin_usaha', 'properti', 'dashboard', 'analisa', 'audit', 'export_csv', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'backup', 'laporan_bulanan', 'gaji', 'gaji_auto', 'ledger', 'instruksi', 'billing_card'];
   function featTier(f) { return PLUS_FEATURES.indexOf(f.key) >= 0 ? 'plus' : 'basic'; }
   var _lockCol = false; /* tampilkan kolom gembok (hanya di layar ubah fitur toko) */
-  var DEFAULT_ON = ['card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'sat_perbarui']; /* Oneilverse 2: menyala bawaan, Tower bisa mematikan per toko */
+  var DEFAULT_ON = ['card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'sat_perbarui', 'denyut', 'tutup_hari']; /* Oneilverse 2: menyala bawaan, Tower bisa mematikan per toko */
   function defaultFor(key, role, tier) {
     if (DEFAULT_ON.indexOf(key) >= 0) return true;
     if (ALWAYS_ON.indexOf(key) >= 0) return true;
@@ -304,7 +306,7 @@
     { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
     { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'stok_habis'] },
     { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
-    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'ai_asisten', 'card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'sat_perbarui', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
+    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'ai_asisten', 'card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'sat_perbarui', 'denyut', 'tutup_hari', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
     { id: 'ops', label: 'Operasional', keys: ['absensi', 'properti', 'offline_penuh'] },
     { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'clock', 'weather', 'rates', 'billing_card', 'chat'] }
   ];

@@ -99,12 +99,18 @@
         low.length ? ('Ada ' + low.length + ' produk di bawah batas aman: ' + low.slice(0, 3).map(function (p) { return esc(p.name) + ' (' + p.stock + ')'; }).join(', ') + (low.length > 3 ? ', dan lainnya' : '') + '.') : 'Semua stok aman, tidak ada yang mendekati batas minimum.',
         'Hari ini sudah ada ' + sToday.length + ' transaksi dengan omzet ' + rp(omToday) + '.'
       ];
+      var hr0 = new Date().getHours(), yd = new Date(Date.now() - 86400000), yISO = yd.getFullYear() + '-' + String(yd.getMonth() + 1).padStart(2, '0') + '-' + String(yd.getDate()).padStart(2, '0');
+      var omY = sum(sales.filter(function (t) { return t.dateISO === yISO; }));
+      var aiHead;
+      if (P.has('tutup_hari') && hr0 >= 4 && hr0 < 11) aiHead = 'Selamat pagi. Kemarin omzet ' + rp(omY) + (low.length ? (', dan ' + low.length + ' produk perlu dipesan hari ini.') : ', stok semua aman.');
+      else if (P.has('tutup_hari') && hr0 >= 17) aiHead = 'Omzet hari ini ' + rp(omToday) + (sToday.length ? ' dari ' + sToday.length + ' transaksi. Siap tutup hari?' : '. Belum ada transaksi.');
+      else aiHead = 'Omzet hari ini ' + rp(omToday) + (low.length ? (', dan ' + low.length + ' produk stoknya menipis.') : ', dan stok semua aman.');
       aiCardHtml = '<div id="fm-ai-card" class="fm-keep" style="font-family:\'Plus Jakarta Sans\',sans-serif;background:#1D1912;border-radius:20px;padding:20px 18px;margin-bottom:14px;color:#F5F0E4">' +
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">' +
         '<span style="width:7px;height:7px;border-radius:50%;background:#E3A638;display:inline-block"></span>' +
         '<span style="font-size:12px;font-weight:700;color:#E3A638">Asisten AI &middot; pratinjau Oneilverse 2</span>' +
         '</div>' +
-        '<div style="font-family:\'Fraunces\',serif;font-size:18px;line-height:1.5;font-weight:500;margin-bottom:14px">Omzet hari ini ' + rp(omToday) + (low.length ? (', dan ' + low.length + ' produk stoknya menipis.') : ', dan stok semua aman.') + '</div>' +
+        '<div data-ai-head style="font-family:\'Fraunces\',serif;font-size:18px;line-height:1.5;font-weight:500;margin-bottom:14px">' + aiHead + '</div>' +
         '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
         aiQ.map(function (q, i) { return '<button type="button" data-ai-q="' + i + '" style="all:unset;cursor:pointer;background:#262017;color:#D9D2C2;font-size:12px;padding:8px 12px;border-radius:100px">' + esc(q) + '</button>'; }).join('') +
         '</div>' +
@@ -194,6 +200,14 @@
     fit(); setTimeout(fit, 400);
     if (!window._fmFitBound) { window._fmFitBound = 1; var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { var b = document.getElementById(cfg && cfg.el); if (b && window.FM_INSIGHTS && FM_INSIGHTS.fit) FM_INSIGHTS.fit(); }, 160); }); }
     window.FM_INSIGHTS_FIT = fit;
+    try {
+      var inTot = sum(sales), keysNow = txList.map(function (t, i) { return t.id != null ? String(t.id) : (t.dateISO + '|' + t.amount + '|' + t.accountCode + '|' + i); });
+      window.FM_INSIGHTS_DATA = { omToday: omToday, nToday: sToday.length, gross: gross, omMonth: omMonth, grossMonth: grossMonth, top: top, peak: peak, low: low.slice(0, 5).map(function (p) { return { name: p.name, stock: p.stock }; }), pay: pay, rp: rp };
+      if (window.FM_ON2 && FM_ON2.pulse && P.has('denyut')) {
+        if (window.__fmSeen) { var fresh = []; txList.forEach(function (t, i) { if (!window.__fmSeen[keysNow[i]]) fresh.push(t); }); fresh.slice(0, 4).forEach(function (t, i) { setTimeout(function () { FM_ON2.pulse(t.category === 'sales' ? 'in' : 'out', t.amount); }, i * 500); }); }
+        window.__fmSeen = {}; keysNow.forEach(function (k) { window.__fmSeen[k] = 1; });
+      }
+    } catch (e) {}
     if (window.FM_ON2 && FM_ON2.afterRender) FM_ON2.afterRender(box);
     var ob = box.querySelector('[data-open-tg]'); if (ob) { ob.onclick = openTargets; var cd = ob.closest('.fm-ic'); if (cd) { cd.style.cursor = 'pointer'; cd.onclick = function (e) { if (e.target.closest('button')) return; openTargets(); }; } }
     var chatBox = box.querySelector('#fm-ai-chat');
@@ -207,8 +221,9 @@
           var row2 = document.createElement('div');
           row2.style.cssText = 'align-self:flex-start;max-width:82%;background:#16140F;color:#D9D2C2;padding:9px 12px;border-radius:14px;font-size:12.5px;line-height:1.4';
           row2.textContent = aiA[i];
-          chatBox.appendChild(row1); chatBox.appendChild(row2);
-          btn.disabled = true; btn.style.opacity = '.4';
+          chatBox.innerHTML = ''; chatBox.appendChild(row1); chatBox.appendChild(row2);
+          var cardEl = box.querySelector('#fm-ai-card'); if (cardEl) cardEl.classList.add('asked');
+          [].forEach.call(box.querySelectorAll('[data-ai-q]'), function (b2) { b2.disabled = (b2 === btn); b2.style.opacity = (b2 === btn) ? '.4' : ''; });
         };
       });
     }
