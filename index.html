@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Oneilverse - Otorisasi Sistem Enterprise</title>
-    <script src="/js/loader.js?v=v1021"></script>
+    <script src="/js/loader.js?v=v1022"></script>
     <script>try{localStorage.removeItem("fm_dev")}catch(e){}</script>
 <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -109,11 +109,11 @@
         }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="js/dialog.js?v=v1021"></script>
-    <script src="js/theme.js?v=v1021"></script>
-    <script src="js/langit.js?v=v1021" defer></script>
-    <script src="js/logo.js?v=v1021"></script>
-    <script src="js/skin.js?v=v1021"></script>
+    <script src="js/dialog.js?v=v1022"></script>
+    <script src="js/theme.js?v=v1022"></script>
+    <script src="js/langit.js?v=v1022" defer></script>
+    <script src="js/logo.js?v=v1022"></script>
+    <script src="js/skin.js?v=v1022"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -264,6 +264,11 @@
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
 
+            <!-- LENCANA ONEIL SHIELD -->
+            <div class="flex items-center justify-center gap-1.5 pt-1 relative z-20">
+                <span class="text-[10px] font-bold text-slate-400">🛡️ Dilindungi Oneil Shield</span>
+            </div>
+
         </div>
 
         <div class="pt-3 text-[10px] text-slate-500 border-t border-slate-200/80 flex items-center justify-between relative z-20 font-semibold">
@@ -303,31 +308,33 @@
 
 
     <script src="js/tenants.js"></script>
-    <script src="js/config.js?v=v1021"></script>
-    <script src="js/auth.js?v=v1021"></script>
+    <script src="js/config.js?v=v1022"></script>
+    <script src="js/auth.js?v=v1022"></script>
+    <script src="js/shield.js?v=v1022"></script>
     <script>
         let currentRole = 'staff';
         const urlParams = new URLSearchParams(window.location.search);
         let activeTenant = (typeof getActiveTenant === 'function') ? getActiveTenant() : { id: "ID26110901", nama: "Oneilverse", slogan: "Creative Production & Software Infrastructure" };
         let tenantKey = activeTenant ? activeTenant.id : 'ID26110901';
 
-        function getSecurityState() {
-            const key = `fm_security_${tenantKey}`;
-            try {
-                return JSON.parse(localStorage.getItem(key)) || { fails: 0, lockUntil: 0, tier: 0, isBlocked: false };
-            } catch(e) {
-                return { fails: 0, lockUntil: 0, tier: 0, isBlocked: false };
-            }
-        }
-
-        function setSecurityState(state) {
-            const key = `fm_security_${tenantKey}`;
-            localStorage.setItem(key, JSON.stringify(state));
+        // Kunci PIN salah: sekarang dicek di server (Firestore, lewat js/shield.js), bukan cuma localStorage,
+        // supaya tidak bisa dilewati dengan hapus data browser / pindah browser. Kunci tetap PER TOKO
+        // (bukan per peran), sama seperti perilaku sebelumnya.
+        function lockRole() { return 'acct'; }
+        function lockSlot() { return ''; }
+        let secState = { fails: 0, lockUntil: 0, tier: 0, isBlocked: false };
+        function refreshSecState() {
+            if (!window.FM_SHIELD) { checkLockoutStatus(); return Promise.resolve(secState); }
+            return FM_SHIELD.checkLock(tenantKey, lockRole(), lockSlot()).then(function (s) {
+                secState = s;
+                checkLockoutStatus();
+                return s;
+            });
         }
 
         let lockTimerInterval = null;
         function checkLockoutStatus() {
-            const state = getSecurityState();
+            const state = secState;
             const now = Date.now();
             const banner = document.getElementById('lockout-banner');
             const titleEl = document.getElementById('lockout-title');
@@ -354,7 +361,7 @@
                 if (lockTimerInterval) clearInterval(lockTimerInterval);
                 lockTimerInterval = setInterval(() => {
                     const curNow = Date.now();
-                    const remainingMs = state.lockUntil - curNow;
+                    const remainingMs = secState.lockUntil - curNow;
                     if (remainingMs <= 0) {
                         clearInterval(lockTimerInterval);
                         banner.classList.add('hidden');
@@ -383,31 +390,20 @@
         }
 
         function registerFailedAttempt() {
-            const state = getSecurityState();
-            state.fails += 1;
-            const now = Date.now();
-
-            if (state.tier === 0 && state.fails >= 3) {
-                state.tier = 1;
-                state.fails = 0;
-                state.lockUntil = now + (5 * 60 * 1000);
-                alert("Kesalahan sandi 3x! Akses Anda dikunci sementara selama 5 menit.");
-            } else if (state.tier === 1 && state.fails >= 5) {
-                state.tier = 2;
-                state.fails = 0;
-                state.lockUntil = now + (10 * 60 * 1000);
-                alert("Kesalahan sandi 5x! Akses Anda dikunci sementara selama 10 menit.");
-            } else if (state.tier === 2 && state.fails >= 10) {
-                state.isBlocked = true;
-                state.lockUntil = 0;
-                alert("Peringatan Keamanan: Akun UMKM ini telah terblokir permanen karena 10x kesalahan sandi berturut-turut.\n\nSilakan hubungi penyedia platform untuk membuka akun.");
-            } else {
-                const max = state.tier === 0 ? 3 : (state.tier === 1 ? 5 : 10);
-                alert(`Password / PIN Salah! (${state.fails}/${max} percobaan).`);
-            }
-
-            setSecurityState(state);
-            checkLockoutStatus();
+            if (!window.FM_SHIELD) { alert("Password / PIN Salah!"); return; }
+            FM_SHIELD.registerFail(tenantKey, lockRole(), lockSlot()).then(function (state) {
+                secState = state;
+                if (state.isBlocked) {
+                    alert("Peringatan Keamanan: Akun UMKM ini telah terblokir permanen karena 10x kesalahan sandi berturut-turut.\n\nSilakan hubungi penyedia platform untuk membuka akun.");
+                } else if (state.lockUntil && state.lockUntil > Date.now()) {
+                    const mins = Math.round((state.lockUntil - Date.now()) / 60000);
+                    alert(`Kesalahan sandi! Akses Anda dikunci sementara selama ${mins} menit.`);
+                } else {
+                    const max = state.tier === 0 ? 3 : (state.tier === 1 ? 5 : 10);
+                    alert(`Password / PIN Salah! (${state.fails}/${max} percobaan).`);
+                }
+                checkLockoutStatus();
+            });
         }
 
         // Tenant klien tidak ada di dropdown (dropdown disembunyikan), jadi ambil dari ?toko=
@@ -528,13 +524,10 @@
 
             document.getElementById('input-pin').value = "";
             document.getElementById('input-pin').focus();
-            checkLockoutStatus();
+            refreshSecState();
         }
 
         function completeLogin(userObj, targetUrl, param) {
-            const state = getSecurityState();
-            state.fails = 0; state.tier = 0; state.lockUntil = 0;
-            setSecurityState(state);
             localStorage.setItem('currentUser', JSON.stringify(userObj));
             localStorage.setItem('auth_role', userObj.role);
             localStorage.setItem('auth_title', userObj.title);
@@ -550,8 +543,6 @@
             const singlePageMode = activeTenant && activeTenant.isSinglePage;
             const currentTokoParam = `?toko=${encodeURIComponent(selectedKey)}`;
 
-            if (checkLockoutStatus()) return;
-
             const pin = document.getElementById('input-pin').value.trim();
             if (!pin) return alert("Masukkan Password / PIN!");
 
@@ -563,20 +554,26 @@
             if (!window.FM_AUTH) { done(); return alert("Modul keamanan belum termuat. Periksa internet lalu muat ulang halaman."); }
 
             const adminSlot = (role === 'staff' && !document.getElementById('admin-pick-wrap').classList.contains('hidden')) ? document.getElementById('admin-pick').value : '';
-            FM_AUTH.login(tenantKey, role, pin, adminSlot).then(function (r) {
-                done();
-                if (r.legacy) return alert("Akun login untuk peran ini belum diaktifkan. Hubungi provider (Tower Kontrol).");
-                if (!r.ok) {
-                    if (r.reason === 'bad') return registerFailedAttempt();
-                    return alert(FM_AUTH.errText(r.reason));
-                }
-                const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
-                let userObj, targetUrl;
-                if (role === 'partner') { userObj = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey }; targetUrl = "partner.html"; }
-                else if (role === 'staff') { const ac = r.access || {}; userObj = { role: 'staff', title: ac.name || customRoles.staff || 'Admin', permissions: ['kasir'], slot: ac.slot || '', biz: ac.biz || '' }; targetUrl = "kasir.html"; }
-                else if (role === 'manager') { userObj = { role: 'manager', title: customRoles.manager || 'Supervisor / Manager', permissions: ['manager'] }; targetUrl = "manager.html"; }
-                else { userObj = { role: 'owner', title: customRoles.owner || 'Owner Eksekutif', permissions: ['all'] }; targetUrl = "dashboard.html"; }
-                completeLogin(userObj, targetUrl, currentTokoParam);
+
+            refreshSecState().then(function () {
+                if (checkLockoutStatus()) { done(); return; }
+                FM_AUTH.login(tenantKey, role, pin, adminSlot).then(function (r) {
+                    done();
+                    if (r.legacy) return alert("Akun login untuk peran ini belum diaktifkan. Hubungi provider (Tower Kontrol).");
+                    if (!r.ok) {
+                        if (r.reason === 'bad') return registerFailedAttempt();
+                        return alert(FM_AUTH.errText(r.reason));
+                    }
+                    if (window.FM_SHIELD) FM_SHIELD.registerSuccess(tenantKey, role, adminSlot);
+                    secState = { fails: 0, lockUntil: 0, tier: 0, isBlocked: false };
+                    const customRoles = JSON.parse(localStorage.getItem('fm_custom_role_names') || "{}");
+                    let userObj, targetUrl;
+                    if (role === 'partner') { userObj = { role: 'partner', title: 'Partner Pemantau', tenantId: tenantKey }; targetUrl = "partner.html"; }
+                    else if (role === 'staff') { const ac = r.access || {}; userObj = { role: 'staff', title: ac.name || customRoles.staff || 'Admin', permissions: ['kasir'], slot: ac.slot || '', biz: ac.biz || '' }; targetUrl = "kasir.html"; }
+                    else if (role === 'manager') { userObj = { role: 'manager', title: customRoles.manager || 'Supervisor / Manager', permissions: ['manager'] }; targetUrl = "manager.html"; }
+                    else { userObj = { role: 'owner', title: customRoles.owner || 'Owner Eksekutif', permissions: ['all'] }; targetUrl = "dashboard.html"; }
+                    completeLogin(userObj, targetUrl, currentTokoParam);
+                });
             });
         }
 
@@ -679,7 +676,7 @@
             onTenantPickerChange(selectedKey);
 
             setupEasterEgg();
-            checkLockoutStatus();
+            refreshSecState();
             renderTicker();
             setInterval(() => {
                 newsList.unshift(`Berita Baru Terupdate ${new Date().toLocaleTimeString('id-ID')}`);
