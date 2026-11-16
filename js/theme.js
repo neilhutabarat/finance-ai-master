@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.19';
+  var BETA = 'v1.0.20';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.20', '16 Nov 2026', [
+      '[Perbaikan] Struk transaksi di kasir kini bisa digulir (scroll) saat isinya banyak baris, sehingga seluruh daftar dan tombol cetak tetap bisa dijangkau',
+      '[Keamanan] Perubahan hanya pada tampilan struk, tidak mengubah data transaksi atau proses cetak'
+    ]],
     ['v1.0.19', '15 Nov 2026', [
       '[Perbaikan] Buku Besar kini punya akun bawaan Kas/Tunai, memisahkan mutasi penjualan, HPP, operasional, dan prive yang dibayar tunai dari yang dibayar lewat bank',
       '[Keamanan] Pemisahan Kas/Tunai dan Bank di Buku Besar hanya membaca data yang sudah tercatat, tidak mengubah angka transaksi mana pun'
@@ -296,7 +300,8 @@
       st = document.createElement('style'); st.id = 'fm-ctdark';
       st.textContent = 'html[data-fm-ctdark="1"]{' + F + ';background:#fbf7ea!important}' +
         'html[data-fm-ctdark="1"] img,html[data-fm-ctdark="1"] video,html[data-fm-ctdark="1"] canvas,html[data-fm-ctdark="1"] svg image{' + F + '}' +
-        'html[data-fm-ctdark="1"] [style*="z-index: 21474"],html[data-fm-ctdark="1"] #fm-set,html[data-fm-ctdark="1"] #fm-dlg{' + F + '}' +
+        'html[data-fm-ctdark="1"] [style*="z-index: 21474"],html[data-fm-ctdark="1"] #fm-set,html[data-fm-ctdark="1"] #fm-dlg,' +
+        'html[data-fm-ctdark="1"] #main-modal-container,html[data-fm-ctdark="1"] #modal-main,html[data-fm-ctdark="1"] #w-modal-weather,html[data-fm-ctdark="1"] #w-modal-kurs{' + F + '}' +
         '@media print{html[data-fm-ctdark="1"]{filter:none!important}}';
       (document.head || h).appendChild(st);
     } else if (!on && st) st.remove();
