@@ -136,7 +136,24 @@
         '</tbody></table></div>' : '';
       h += '<div class="ios-glass fm-ic fm-ins-main" data-fm-i="Laba &amp; Margin per Produk"><h4>Laba & Margin per Produk</h4>' + ((secP || secN) ? secP + secN : '<div class="fm-sub">Belum ada penjualan.</div>') + '</div>';
     }
-    box.innerHTML = aiCardHtml + h;
+    var mid = '';
+    {
+      var days = [], byD = {};
+      for (var di = 6; di >= 0; di--) { var dd = new Date(); dd.setDate(dd.getDate() - di); var dk = localISO(dd); days.push(dk); byD[dk] = { i: 0, o: 0 }; }
+      txList.forEach(function (t) { var b = byD[t.dateISO]; if (!b) return; if (t.category === 'sales') b.i += t.amount || 0; else b.o += t.amount || 0; });
+      var mx = 1; days.forEach(function (k) { mx = Math.max(mx, byD[k].i, byD[k].o); });
+      var CW = 660, CH = 120, CP = 24;
+      var cx = function (i) { return (CP + i * (CW - 2 * CP) / 6).toFixed(1); };
+      var cy = function (v) { return (CH - 8 - (v / mx) * (CH - 24)).toFixed(1); };
+      var pts = function (key) { return days.map(function (k, i) { return cx(i) + ',' + cy(byD[k][key]); }).join(' '); };
+      var lbl = days.map(function (k, i) { var p = k.split('-'); return '<text x="' + cx(i) + '" y="' + (CH + 14) + '" text-anchor="middle">' + p[2] + '/' + p[1] + '</text>'; }).join('');
+      var csvg = '<svg class="fm-ch" viewBox="0 0 ' + CW + ' ' + (CH + 20) + '" role="img" aria-label="Income dan outcome 7 hari terakhir"><line class="bl" x1="0" y1="' + (CH - 2) + '" x2="' + CW + '" y2="' + (CH - 2) + '"/><line class="bh" x1="0" y1="' + (CH) + '" x2="' + CW + '" y2="' + (CH) + '"/><polyline class="ci" points="' + pts('i') + '"/><polyline class="co" points="' + pts('o') + '"/>' + lbl + '</svg>' +
+        '<div class="fm-lg"><span><i style="background:#7aa487"></i>Income</span><span><i style="background:#b8766a"></i>Outcome</span><span class="fm-sub" style="margin-left:auto">tertinggi ' + rp(mx) + '</span></div>';
+      var recent = txList.map(function (t, i) { return [t, i]; }).sort(function (a, b) { var x = a[0].dateISO || '', y = b[0].dateISO || ''; return x < y ? 1 : x > y ? -1 : a[1] - b[1]; }).slice(0, 5);
+      var rows = recent.length ? recent.map(function (r) { var t = r[0], inc = t.category === 'sales'; return '<div class="fm-tx"><span>' + esc(t.accountName || t.desc || '-') + '</span><b class="' + (inc ? 'pos' : 'neg') + '">' + (inc ? '+ ' : '- ') + rp(t.amount) + '</b></div>'; }).join('') : '<div class="fm-sub">Belum ada transaksi.</div>';
+      mid = '<div class="fm-on2-mid">' + card('Income vs Outcome · 7 hari', csvg) + card('Transaksi terakhir', rows) + '</div>';
+    }
+    box.innerHTML = aiCardHtml + mid + h;
     var ob = box.querySelector('[data-open-tg]'); if (ob) { ob.onclick = openTargets; var cd = ob.closest('.fm-ic'); if (cd) { cd.style.cursor = 'pointer'; cd.onclick = function (e) { if (e.target.closest('button')) return; openTargets(); }; } }
     var chatBox = box.querySelector('#fm-ai-chat');
     if (chatBox) {

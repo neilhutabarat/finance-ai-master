@@ -91,10 +91,6 @@
         html:not(#_)[data-fm-page="manager"], html:not(#_)[data-fm-page="owner"] { background: #0E0D0A !important; }
         html:not(#_)[data-fm-page="manager"] body, html:not(#_)[data-fm-page="owner"] body { background-color: #0E0D0A !important; }
 
-        /* ---- kartu: garis emas di tepi atas ---- */
-        html:not(#_)[data-fm-page="manager"] main .ios-glass { position: relative; overflow: hidden; }
-        html:not(#_)[data-fm-page="manager"] main .ios-glass::before { content: ""; position: absolute; left: 16px; right: 16px; top: 0; height: 2px; border-radius: 0 0 4px 4px; background: linear-gradient(90deg, #E3A638, rgba(227,166,56,0)); pointer-events: none; }
-
         /* ---- tombol aksi: gelap, satu warna emas, chip ikon bergaris ---- */
         html:not(#_)[data-fm-page] #fm-actions .fm-act {
             background: linear-gradient(180deg, rgba(227,166,56,.10), rgba(29,25,18,.92)) !important;
@@ -111,46 +107,66 @@
         html:not(#_)[data-fm-page] #fm-actions .fm-act:first-child i { background: rgba(26,18,6,.15) !important; border-color: rgba(26,18,6,.35) !important; }
         html:not(#_)[data-fm-page] #fm-actions .fm-act:first-child svg { color: #1a1206 !important; stroke: #1a1206 !important; }
 
-        /* ---- pulau dinamis (layar lebar); HP tetap memakai dock bawah lama ---- */
-        @media (min-width: 701px) {
-            html:not(#_) #fm-dock { display: none !important; }
-            html:not(#_)[data-fm-page="manager"] body { padding-left: 96px !important; }
-        }
-        @media (max-width: 700px) { #fm-zone { display: none !important; } }
-        html[data-fm-modal] #fm-zone { opacity: 0; pointer-events: none; transition: opacity .15s; }
-        #fm-zone { position: fixed; left: 14px; top: 50%; transform: translateY(-50%); width: 76px; height: 660px; z-index: 45; pointer-events: none; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-        #fm-island { position: absolute; left: 0; top: 50%; width: 58px; height: 172px; margin-top: -86px; border-radius: 30px; overflow: hidden; cursor: pointer; outline: none; pointer-events: auto;
-            background: linear-gradient(180deg, rgba(227,166,56,.10), rgba(26,22,14,.88)); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(227,166,56,.4); box-shadow: 0 18px 40px -12px #000, inset 0 1px 0 rgba(227,166,56,.35);
-            transition: height 1.15s cubic-bezier(.3,1.15,.5,1), margin-top 1.15s cubic-bezier(.3,1.15,.5,1), width .7s cubic-bezier(.3,1.15,.5,1); }
-        #fm-zone.open #fm-island { height: min(540px, calc(100vh - 48px)); margin-top: calc(min(540px, calc(100vh - 48px)) / -2); width: 76px; }
-        #fm-island .mini { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transition: opacity .25s; }
-        #fm-zone.open #fm-island .mini { opacity: 0; pointer-events: none; }
-        #fm-island .lg { width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(135deg, #E3A638, #c4841c); color: #1a1206; display: grid; place-items: center; font: 800 17px Fraunces, Georgia, serif; box-shadow: 0 0 16px rgba(227,166,56,.45); flex: none; }
-        #fm-island .wd { writing-mode: vertical-rl; transform: rotate(180deg); font: 600 13px Fraunces, Georgia, serif; letter-spacing: .14em; color: #E3A638; }
-        #fm-island .mn { position: absolute; inset: 0; padding: 12px 6px; display: flex; flex-direction: column; align-items: stretch; gap: 2px; opacity: 0; pointer-events: none; overflow-y: auto; scrollbar-width: none; transition: opacity .2s; }
-        #fm-island .mn::-webkit-scrollbar { display: none; }
-        #fm-zone.open #fm-island .mn { opacity: 1; pointer-events: auto; transition: opacity .3s .5s; }
-        #fm-island .tp { display: flex; justify-content: center; padding: 0 0 10px; border-bottom: 1px solid rgba(227,166,56,.22); margin-bottom: 6px; flex: none; }
-        #fm-island .tp .lg { width: 30px; height: 30px; font-size: 15px; }
-        #fm-island .it { all: unset; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; padding: 7px 2px; border-radius: 13px; font-size: 9.5px; font-weight: 600; line-height: 1.1; text-align: center; color: #cfc4aa; cursor: pointer; flex: none; opacity: 0; transform: translateY(10px); }
-        #fm-island .it span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        #fm-zone.open #fm-island .it { opacity: 1; transform: none; transition: opacity .35s, transform .5s cubic-bezier(.2,.9,.3,1.2), background .2s, color .2s; transition-delay: calc(.5s + var(--i) * 55ms), calc(.5s + var(--i) * 55ms), 0s, 0s; }
-        #fm-island .it:hover, #fm-island .it:focus-visible { background: rgba(227,166,56,.14); color: #fff; }
-        #fm-island .it.ai { background: linear-gradient(135deg, rgba(227,166,56,.22), rgba(82,161,136,.14)); color: #F5F0E4; border: 1px solid rgba(227,166,56,.4); margin-bottom: 4px; }
-        #fm-island .it.dg { color: #e58c85; }
-        #fm-island .it svg, .fm-sat svg { width: 20px; height: 20px; stroke: #E3A638; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-        #fm-island .it.dg svg { stroke: #e58c85; }
-        #fm-island .sp { flex: 1; min-height: 6px; }
-        .fm-sat { all: unset; box-sizing: border-box; position: absolute; left: 8px; width: 42px; height: 42px; margin-top: -21px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; pointer-events: auto;
-            background: rgba(30,26,18,.92); border: 1px solid rgba(227,166,56,.4); box-shadow: 0 8px 18px -8px #000;
-            transition: transform .6s cubic-bezier(.34,1.56,.5,1), opacity .5s, filter .5s, box-shadow .5s; }
-        .fm-sat.ai { background: linear-gradient(135deg, #E3A638, #c4841c); } .fm-sat.ai svg { stroke: #1a1206; }
-        .fm-sat.gone { opacity: 0; filter: blur(6px); transform: scale(.12) rotate(var(--r)); pointer-events: none; transition: transform .4s cubic-bezier(.5,0,.9,.4), opacity .35s, filter .35s; }
-        .fm-sat.back { box-shadow: 0 0 26px 8px rgba(227,166,56,.75); }
-        .fm-pt { position: fixed; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: #E3A638; box-shadow: 0 0 8px #E3A638; pointer-events: none; z-index: 60; }
-        
-@media (prefers-reduced-motion: reduce) { #fm-zone * { transition-duration: .01s !important; transition-delay: 0s !important; } }
+        :root{--st-noise:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .85  0 0 0 0 .66  0 0 0 0 .3  0 0 0 .75 -.28'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");--st-crack:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='160'><g fill='none' stroke='black' stroke-opacity='.55' stroke-width='1'><path d='M20 0l8 22-10 18 14 20-6 30'/><path d='M210 160l-6-26 14-14-8-24 18-16'/></g><g fill='none' stroke='%23e8c070' stroke-opacity='.18' stroke-width='1'><path d='M21 0l8 22-10 18 14 20-6 30'/></g></svg>");--st-vein:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><filter id='v'><feTurbulence type='turbulence' baseFrequency='.012 .03' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 .95  0 0 0 0 .72  0 0 0 0 .25  0 0 0 3.2 -1.75'/></filter><rect width='100%' height='100%' filter='url(%23v)'/></svg>")}
+        /* ---- batu emas: lempeng ---- */
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] header.oneui-hero,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] header.oneui-hero{background-image:var(--st-crack),var(--st-vein),var(--st-noise),linear-gradient(145deg,#4f3e1e,#2a2112 55%,#1b160b)!important;background-color:#2a2112!important;border:0!important;border-radius:7px 13px 8px 12px!important;box-shadow:inset 2px 2px 0 rgba(255,226,150,.34),inset 3px 3px 5px rgba(255,226,150,.08),inset -2px -2px 0 rgba(0,0,0,.7),0 0 0 1px #080603,0 4px 0 #17110a,0 5px 0 #080603,0 16px 24px -10px #000!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:#bf8b37;text-shadow:0 1px 0 rgba(255,228,160,.38),0 -1px 1px rgba(0,0,0,.95)}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] header.oneui-hero,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] header.oneui-hero{padding-top:12px!important;padding-bottom:12px!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass::before,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass::after,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass::before,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass::after{display:none!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass [class*="text-"]:not(.fm-keep *),html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass h1,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass h2,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass h3,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass h4,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass label,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] header.oneui-hero p,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] header.oneui-hero span,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass [class*="text-"]:not(.fm-keep *),html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass h1,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass h2,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass h3,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass h4,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass label,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] header.oneui-hero p,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] header.oneui-hero span{color:#bf8b37!important;text-shadow:0 1px 0 rgba(255,228,160,.38),0 -1px 1px rgba(0,0,0,.95)!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass .fm-row b,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass .fm-sub b,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass .fm-row b,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass .fm-sub b{color:#dcb465!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass .fm-sub,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass .fm-sub{color:#8f6a2c!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass .pos,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass .fm-ok,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass .fm-tx b.pos,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass .pos,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass .fm-ok,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass .fm-tx b.pos{color:#7aa487!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass .neg,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass .fm-tx b.neg,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass .neg,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass .fm-tx b.neg{color:#b8766a!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass input,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass textarea,html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass select,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass input,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass textarea,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass select{background:linear-gradient(180deg,#0f0c06,#1b1508)!important;border:0!important;border-radius:8px!important;box-shadow:inset 0 3px 6px #000,inset 0 -1px 0 rgba(255,226,150,.22),inset 2px 0 4px rgba(0,0,0,.6)!important;color:#d1a14a!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass button[class*="bg-"],html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main section button[class*="bg-slate"],html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass button[class*="bg-"],html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main section button[class*="bg-slate"]{background-image:var(--st-noise),linear-gradient(145deg,#5a4620,#33280f)!important;background-color:#33280f!important;border:0!important;border-radius:9px!important;box-shadow:inset 1px 1px 0 rgba(255,226,150,.35),inset -1px -1px 0 rgba(0,0,0,.6),0 4px 8px -3px #000!important;color:#bf8b37!important;text-shadow:0 1px 0 rgba(255,228,160,.38),0 -1px 1px rgba(0,0,0,.95)!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] main .ios-glass svg:not(.fm-ch):not(.fm-keep *),html:not(#_):not(#__):not(#___)[data-fm-page="owner"] main .ios-glass svg:not(.fm-ch):not(.fm-keep *){stroke:#d29a3f!important;filter:drop-shadow(0 1px 0 rgba(255,228,160,.4)) drop-shadow(0 -1px .6px rgba(0,0,0,.95))}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #kas-total-in,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #kas-total-in{color:#7aa487!important;font-family:Fraunces,Georgia,serif!important;text-shadow:0 1.5px 0 rgba(255,228,160,.3),0 -1.5px 1px #000!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #kas-total-out,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #kas-total-out{color:#b8766a!important;font-family:Fraunces,Georgia,serif!important;text-shadow:0 1.5px 0 rgba(255,228,160,.3),0 -1.5px 1px #000!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #kas-net,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #kas-net{color:#c9953c!important;font-family:Fraunces,Georgia,serif!important;text-shadow:0 1.5px 0 rgba(255,228,160,.3),0 -1.5px 1px #000!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #kas-net.fm-neg,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #kas-net.fm-neg{color:#b8766a!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #stat-total-pajak-sumbang,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #stat-total-pajak-sumbang{color:#c9953c!important;font-family:Fraunces,Georgia,serif!important;text-shadow:0 1.5px 0 rgba(255,228,160,.3),0 -1.5px 1px #000!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #topbar-store-name,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #topbar-store-name{font-family:Fraunces,Georgia,serif!important;color:#b98430!important;text-shadow:0 1.5px 0 rgba(255,228,160,.42),0 -1.5px 1px rgba(0,0,0,.95)!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #tenant-badge-indicator,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #tenant-badge-indicator{background:linear-gradient(180deg,#0f0c06,#1b1508)!important;border:0!important;border-radius:8px!important;box-shadow:inset 0 3px 6px #000,inset 0 -1px 0 rgba(255,226,150,.22),inset 2px 0 4px rgba(0,0,0,.6)!important;color:#d1a14a!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #tier-badge-indicator,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #tier-badge-indicator{display:none!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] header .fm-logo-wrap,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] header .fm-logo-wrap{border-radius:50%!important;padding:10px!important;display:grid!important;place-items:center;background:radial-gradient(circle at 32% 28%,#6b5428,#2a2111 72%)!important;box-shadow:inset 2px 2px 3px rgba(255,226,150,.35),inset -3px -4px 6px rgba(0,0,0,.75),0 0 0 2px #0b0905,0 6px 12px -4px #000!important;border:0!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] header .fm-logo-wrap svg,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] header .fm-logo-wrap svg{filter:drop-shadow(-1px -1px 0 rgba(255,236,180,.6)) drop-shadow(2px 3px 2px rgba(0,0,0,.9))!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #fm-ai-card,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #fm-ai-card{background-image:var(--st-crack),var(--st-vein),var(--st-noise),linear-gradient(145deg,#4f3e1e,#2a2112 55%,#1b160b)!important;background-color:#2a2112!important;border:0!important;border-radius:7px 13px 8px 12px!important;box-shadow:inset 2px 2px 0 rgba(255,226,150,.34),inset 3px 3px 5px rgba(255,226,150,.08),inset -2px -2px 0 rgba(0,0,0,.7),0 0 0 1px #080603,0 4px 0 #17110a,0 5px 0 #080603,0 16px 24px -10px #000!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:#bf8b37;text-shadow:0 1px 0 rgba(255,228,160,.38),0 -1px 1px rgba(0,0,0,.95)!important;border-radius:7px 13px 8px 12px!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #fm-ai-card *,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #fm-ai-card *{color:#bf8b37!important;text-shadow:0 1px 0 rgba(255,228,160,.38),0 -1px 1px rgba(0,0,0,.95)!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #fm-ai-card [data-ai-q],html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #fm-ai-card [data-ai-q]{background:linear-gradient(180deg,#0f0c06,#1b1508)!important;border:0!important;border-radius:8px!important;box-shadow:inset 0 3px 6px #000,inset 0 -1px 0 rgba(255,226,150,.22),inset 2px 0 4px rgba(0,0,0,.6)!important;color:#d1a14a!important;border-radius:99px!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] #fm-ai-card #fm-ai-chat > div,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] #fm-ai-card #fm-ai-chat > div{background:linear-gradient(180deg,#0f0c06,#1b1508)!important;border:0!important;border-radius:8px!important;box-shadow:inset 0 3px 6px #000,inset 0 -1px 0 rgba(255,226,150,.22),inset 2px 0 4px rgba(0,0,0,.6)!important;color:#d1a14a!important}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] .fm-bar,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] .fm-bar{background:#0f0c06!important;box-shadow:inset 0 2px 4px #000!important;border-radius:6px}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] .fm-bar i,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] .fm-bar i{background:linear-gradient(90deg,#c9953c,#e9b84f)!important}
+        .fm-on2-mid{display:grid;grid-template-columns:7fr 5fr;gap:12px;margin:12px 0}@media(max-width:1023px){.fm-on2-mid{grid-template-columns:1fr}}
+        .fm-ch{width:100%;height:auto;display:block}.fm-ch text{fill:#8f6a2c;font:600 10px 'Plus Jakarta Sans',sans-serif}.fm-ch polyline{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 0 rgba(255,228,160,.3)) drop-shadow(0 -1px 1px #000)}.fm-ch .ci{stroke:#7aa487}.fm-ch .co{stroke:#b8766a}.fm-ch .bl{stroke:#0a0804;stroke-width:3}.fm-ch .bh{stroke:rgba(255,228,160,.25);stroke-width:1}
+        .fm-lg{display:flex;gap:14px;font-size:11px;margin-top:4px}.fm-lg i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+        html:not(#_):not(#__):not(#___)[data-fm-page="manager"] .fm-tx,html:not(#_):not(#__):not(#___)[data-fm-page="owner"] .fm-tx{display:flex;justify-content:space-between;gap:10px;padding:7px 11px;margin-top:6px;font-size:12px;background:linear-gradient(180deg,#0f0c06,#1b1508)!important;border:0!important;border-radius:8px!important;box-shadow:inset 0 3px 6px #000,inset 0 -1px 0 rgba(255,226,150,.22),inset 2px 0 4px rgba(0,0,0,.6)!important;color:#d1a14a!important}
+        .fm-tx span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        /* ---- pulau kiri + kanan (layar lebar); HP tetap dock bawah + tombol aksi lama ---- */
+        @media(min-width:701px){html:not(#_) #fm-dock{display:none!important}html:not(#_) #fm-actions{display:none!important}html:not(#_) .fm-hd-right{display:none!important}html:not(#_) #fm-refresh{display:none!important}html:not(#_)[data-fm-page="manager"] body,html:not(#_)[data-fm-page="owner"] body{padding-left:96px!important;padding-right:96px!important}}
+        @media(max-width:700px){.fm-zone{display:none!important}}
+        html[data-fm-modal] .fm-zone{opacity:0;pointer-events:none;transition:opacity .15s}
+        .fm-zone{position:fixed;top:50%;transform:translateY(-50%);width:78px;height:700px;z-index:45;pointer-events:none;font-family:'Plus Jakarta Sans',system-ui,sans-serif}.fm-zone.l{left:14px}.fm-zone.r{right:14px}
+        .fm-isl{position:absolute;top:50%;width:58px;height:172px;margin-top:-86px;border-radius:30px;overflow:hidden;cursor:pointer;outline:none;pointer-events:auto;will-change:height,margin-top;background-image:var(--st-crack),var(--st-vein),var(--st-noise),linear-gradient(145deg,#4f3e1e,#2a2112 55%,#1b160b);background-color:#2a2112;box-shadow:inset 2px 2px 0 rgba(255,226,150,.34),inset -2px -2px 0 rgba(0,0,0,.7),0 0 0 1px #080603,0 4px 0 #17110a,0 5px 0 #080603,0 16px 24px -10px #000;transition:height 1.15s cubic-bezier(.3,1.15,.5,1),margin-top 1.15s cubic-bezier(.3,1.15,.5,1),width .7s cubic-bezier(.3,1.15,.5,1)}.fm-zone.l .fm-isl{left:0}.fm-zone.r .fm-isl{right:0}
+        .fm-zone.open .fm-isl{height:min(540px,calc(100vh - 48px));margin-top:calc(min(540px,calc(100vh - 48px))/-2);width:78px}
+        .fm-isl .mini{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .25s}.fm-zone.open .fm-isl .mini{opacity:0;pointer-events:none}
+        .fm-med{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#e9b84f;flex:none;background:radial-gradient(circle at 32% 28%,#6b5428,#2a2111 72%);box-shadow:inset 2px 2px 3px rgba(255,226,150,.35),inset -3px -4px 6px rgba(0,0,0,.75),0 0 0 2px #0b0905,0 6px 12px -4px #000}.fm-med svg{width:26px;height:26px;fill:currentColor;stroke:none;filter:drop-shadow(-1px -1px 0 rgba(255,236,180,.6)) drop-shadow(2px 3px 2px rgba(0,0,0,.9))}
+        .fm-med.gold{background:linear-gradient(145deg,#f0c15a,#b57c1d);box-shadow:inset 2px 2px 0 rgba(255,244,200,.7),inset -2px -3px 0 rgba(90,50,0,.6),0 0 0 2px #0b0905,0 6px 14px -3px rgba(227,166,56,.45)}.fm-med.gold svg{fill:none;stroke:#4a2e06;stroke-width:2.4;stroke-linecap:round;filter:drop-shadow(0 1px 0 rgba(255,236,180,.65))}
+        .fm-isl .wd{writing-mode:vertical-rl;transform:rotate(180deg);font:700 13px Fraunces,Georgia,serif;letter-spacing:.14em;color:#b98430;text-shadow:0 1px 0 rgba(255,228,160,.4),0 -1px 1px #000}
+        .fm-isl .mn{position:absolute;inset:0;padding:12px 6px;display:flex;flex-direction:column;align-items:stretch;gap:2px;opacity:0;pointer-events:none;overflow-y:auto;scrollbar-width:none;transition:opacity .2s}.fm-isl .mn::-webkit-scrollbar{display:none}.fm-zone.open .fm-isl .mn{opacity:1;pointer-events:auto;transition:opacity .3s .5s}
+        .fm-isl .tp:empty{display:none}
+        .fm-isl .tp{display:flex;justify-content:center;padding:0 0 10px;border-bottom:1px solid rgba(0,0,0,.6);box-shadow:0 1px 0 rgba(255,226,150,.18);margin-bottom:6px;flex:none}.fm-isl .tp .fm-med{width:36px;height:36px}.fm-isl .tp .fm-med svg{width:22px;height:22px}
+        .fm-isl .it{all:unset;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:3px;width:100%;padding:7px 2px;border-radius:10px;font-size:9.5px;font-weight:600;line-height:1.1;text-align:center;color:#bf8b37;text-shadow:0 1px 0 rgba(255,228,160,.35),0 -1px 1px #000;cursor:pointer;flex:none;opacity:0;transform:translateY(10px)}
+        .fm-isl .it span{max-width:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;word-break:break-word}
+        .fm-zone.open .fm-isl .it{opacity:1;transform:none;transition:opacity .35s,transform .5s cubic-bezier(.2,.9,.3,1.2),background .2s;transition-delay:calc(.5s + var(--i)*45ms),calc(.5s + var(--i)*45ms),0s}
+        .fm-isl .it:hover,.fm-isl .it:focus-visible{background:linear-gradient(180deg,#0f0c06,#1b1508);box-shadow:inset 0 3px 6px #000}
+        .fm-isl .it.gold{background:linear-gradient(145deg,#f0c15a,#b57c1d);color:#3a2404;text-shadow:0 1px 0 rgba(255,236,180,.6);box-shadow:inset 1.5px 1.5px 0 rgba(255,244,200,.7),inset -1.5px -2px 0 rgba(90,50,0,.6);margin-bottom:4px}.fm-isl .it.gold svg{stroke:#4a2e06;filter:drop-shadow(0 1px 0 rgba(255,236,180,.6))}
+        .fm-isl .it.dg{color:#b8766a}.fm-isl .it.dg svg{stroke:#b8766a}.fm-isl .sp{flex:1;min-height:6px}
+        .fm-isl .it svg,.fm-sat svg{width:20px;height:20px;stroke:#d29a3f;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none;filter:drop-shadow(0 1px 0 rgba(255,228,160,.4)) drop-shadow(0 -1px .6px rgba(0,0,0,.95))}
+        .fm-sat{all:unset;box-sizing:border-box;position:absolute;width:58px;height:34px;margin-top:-17px;border-radius:7px 12px 8px 11px;display:grid;place-items:center;cursor:pointer;pointer-events:auto;font:600 11px 'Plus Jakarta Sans',sans-serif;white-space:nowrap;color:#bf8b37;text-shadow:0 1px 0 rgba(255,228,160,.4),0 -1px 1px #000;background-image:var(--st-noise),linear-gradient(145deg,#4f3e1e,#2a2112);background-color:#2a2112;box-shadow:inset 1.5px 1.5px 0 rgba(255,226,150,.34),inset -1.5px -1.5px 0 rgba(0,0,0,.7),0 0 0 1px #080603,0 3px 0 #17110a,0 8px 12px -6px #000;transition:transform .6s cubic-bezier(.34,1.56,.5,1),opacity .5s,filter .5s}.fm-zone.l .fm-sat{left:0}.fm-zone.r .fm-sat{right:0}.fm-sat svg{width:17px;height:17px}
+        .fm-sat.ai{color:#3a2404;background:linear-gradient(145deg,#f0c15a,#b57c1d);text-shadow:0 1px 0 rgba(255,236,180,.6)}.fm-sat.ai svg{stroke:#4a2e06}.fm-sat.dg{color:#b8766a}.fm-sat.dg svg{stroke:#b8766a}
+        .fm-sat.gone{opacity:0;filter:blur(6px);transform:scale(.12) rotate(var(--r));pointer-events:none;transition:transform .4s cubic-bezier(.5,0,.9,.4),opacity .35s,filter .35s}.fm-sat.back{box-shadow:0 0 26px 8px rgba(227,166,56,.75)}
+        .fm-pt{position:fixed;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#E3A638;box-shadow:0 0 8px #E3A638;pointer-events:none;z-index:60}
+        @media (prefers-reduced-motion: reduce){.fm-zone *{transition-duration:.01s!important;transition-delay:0s!important}}
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col antialiased selection:bg-amber-600 selection:text-white pb-6">
@@ -1371,93 +1387,143 @@ window.logout = async function () {
 <script id="fm-on2-island">
 (function(){
   var tries = 0;
-  function init(){
-    var dock = document.getElementById('fm-dock');
-    if (!dock || !dock.querySelector('.fm-dk')) { if (++tries < 60) return setTimeout(init, 250); return; }
-    if (document.getElementById('fm-zone')) return;
-    var zone = document.createElement('div'); zone.id = 'fm-zone';
-    var isl = document.createElement('div'); isl.id = 'fm-island'; isl.tabIndex = 0; isl.setAttribute('role','navigation'); isl.setAttribute('aria-label','Menu Oneilverse');
-    isl.innerHTML = '<div class="mini"><div class="lg">O</div><div class="wd">Oneilverse</div></div><div class="mn"><div class="tp"><div class="lg">O</div></div></div>';
-    var mn = isl.querySelector('.mn'), n = 0;
-    function item(label, svg, cls, fn, title){
-      var b = document.createElement('button'); b.type='button'; b.className = 'it ' + (cls||''); b.style.setProperty('--i', n++); b.title = title || label;
-      b.innerHTML = svg + '<span>' + label + '</span>'; b.addEventListener('click', function(e){ e.stopPropagation(); fn(); close(); });
-      mn.appendChild(b); return b;
-    }
-    var aiSvg = '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>';
-    function goAI(){ var c = document.getElementById('fm-ai-card'); if (c) c.scrollIntoView({behavior:'smooth', block:'center'}); }
-    var aiIt = item('Tanya AI', aiSvg, 'ai', goAI, 'Tanya Akuntan AI');
-    var kids = Array.prototype.slice.call(dock.children), sepDone = false;
-    kids.forEach(function(k){
-      if (k.classList.contains('fm-sep')) { if (!sepDone) { var sp = document.createElement('div'); sp.className='sp'; mn.appendChild(sp); sepDone = true; } return; }
-      if (!k.classList.contains('fm-dk')) return;
-      var sp2 = k.querySelector('span'), sv = k.querySelector('svg');
-      if (!sp2 || !sv) return;
-      var dg = /danger|keluar/i.test(k.className + ' ' + sp2.textContent);
-      item(sp2.textContent.trim(), sv.outerHTML, dg ? 'dg' : '', function(){ k.click(); });
-    });
-    zone.appendChild(isl);
-    var sats = [];
-    function actByLabel(re){ var a = document.querySelectorAll('#fm-actions .fm-act'); for (var i=0;i<a.length;i++) if (re.test(a[i].textContent)) return a[i]; return null; }
-    function addSat(top, ico, title, cls, fn, r){
-      var s = document.createElement('button'); s.type='button'; s.className='fm-sat ' + (cls||''); s.title = title; s.setAttribute('aria-label', title);
-      s.style.top = 'calc(50% ' + top + 'px)'; s.innerHTML = ico; s.style.setProperty('--r', r + 'deg');
-      s.addEventListener('click', function(e){ e.stopPropagation(); fn(); });
-      zone.appendChild(s); sats.push(s); return s;
-    }
-    var aiSat = addSat('- 130', aiSvg, 'Tanya Akuntan AI', 'ai', goAI, 200);
-    var kasirA = actByLabel(/Buka Kasir/i), lapA = actByLabel(/Laporan Harian|Neraca/i);
-    function clone(a){ var sv = a.querySelector('svg'); return sv ? sv.outerHTML : ''; }
-    if (kasirA) addSat('+ 130', clone(kasirA), 'Buka Kasir Baru', '', function(){ kasirA.click(); }, -180);
-    if (lapA) addSat('- 200', clone(lapA), lapA.textContent.trim(), '', function(){ lapA.click(); }, 160);
-    document.body.appendChild(zone);
+  var aiSvg = '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>';
+  var plusSvg = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+  var refSvg = '<svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 00-14-4M4 5v4h4M4 13a8 8 0 0014 4M20 19v-4h-4"/></svg>';
+  var outSvg = '<svg viewBox="0 0 24 24"><path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/></svg>';
+  function mark(c){ try { return window.FM_LOGO ? FM_LOGO.mark('100%', { tile: false, color: c || '#e9b84f' }) : ''; } catch (e) { return ''; } }
+  function txt(el){ return el ? String(el.textContent || '').replace(/\s+/g, ' ').trim() : ''; }
 
+  /* ---- fabrik pulau ---- */
+  function makeIsland(side, cfg){
+    var zone = document.createElement('div'); zone.className = 'fm-zone ' + side;
+    var isl = document.createElement('div'); isl.className = 'fm-isl'; isl.tabIndex = 0; isl.setAttribute('role', 'navigation'); isl.setAttribute('aria-label', cfg.label);
+    isl.innerHTML = '<div class="mini">' + cfg.mini + '</div><div class="mn"><div class="tp">' + cfg.top + '</div></div>';
+    var mn = isl.querySelector('.mn'), n = 0, api = { zone: zone, sats: [], items: {} };
+    function close(){ api.close(); }
+    api.item = function(label, svg, cls, fn, title, key){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'it ' + (cls || ''); b.style.setProperty('--i', n++); b.title = title || label;
+      b.innerHTML = svg + '<span>' + label + '</span>';
+      b.addEventListener('click', function(e){ e.stopPropagation(); fn(); close(); });
+      mn.appendChild(b); if (key) api.items[key] = b; return b;
+    };
+    api.spacer = function(){ var sp = document.createElement('div'); sp.className = 'sp'; mn.appendChild(sp); };
+    api.sat = function(top, html, title, cls, fn, r){
+      var s = document.createElement('button'); s.type = 'button'; s.className = 'fm-sat ' + (cls || ''); s.title = title; s.setAttribute('aria-label', title);
+      s.style.top = 'calc(50% ' + top + 'px)'; s.innerHTML = html; s.style.setProperty('--r', r + 'deg');
+      s.addEventListener('click', function(e){ e.stopPropagation(); if (fn) fn(); });
+      s._off = false; zone.appendChild(s); api.sats.push(s); return s;
+    };
+    api.vis = function(s, off){ s._off = !!off; s.style.display = off ? 'none' : ''; };
+    zone.appendChild(isl);
+    function center(s){ var r = s.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }
     function spark(x, y, dx, dy, dur, ease, rev){
       var p = document.createElement('i'); p.className = 'fm-pt'; p.style.left = x + 'px'; p.style.top = y + 'px'; document.body.appendChild(p);
-      var a = rev ? [{transform:'translate('+dx+'px,'+dy+'px) scale(.4)',opacity:0},{transform:'translate('+dx*.5+'px,'+dy*.5+'px) scale(1)',opacity:1,offset:.5},{transform:'translate(0,0) scale(.6)',opacity:1}]
-                  : [{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+dx+'px,'+dy+'px) scale(0)',opacity:0}];
-      var an = p.animate(a, {duration: dur, easing: ease, fill:'forwards'}); an.onfinish = function(){ p.remove(); };
+      var a = rev ? [{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.4)', opacity: 0 }, { transform: 'translate(' + dx * .5 + 'px,' + dy * .5 + 'px) scale(1)', opacity: 1, offset: .5 }, { transform: 'translate(0,0) scale(.6)', opacity: 1 }]
+                  : [{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(0)', opacity: 0 }];
+      var an = p.animate(a, { duration: dur, easing: ease, fill: 'forwards' }); an.onfinish = function(){ p.remove(); };
     }
-    function center(s){ var r = s.getBoundingClientRect(); return [r.left + r.width/2, r.top + r.height/2]; }
-    function burst(s){
-      var c = center(s);
-      for (var i=0;i<12;i++){ var a = Math.random()*Math.PI*2, d = 30 + Math.random()*55; spark(c[0], c[1], Math.cos(a)*d, Math.sin(a)*d, 700 + Math.random()*400, 'cubic-bezier(.2,.8,.3,1)', false); }
-    }
+    function burst(s){ var c = center(s); for (var i = 0; i < 12; i++){ var a = Math.random() * 6.283, d = 30 + Math.random() * 55; spark(c[0], c[1], Math.cos(a) * d, Math.sin(a) * d, 700 + Math.random() * 400, 'cubic-bezier(.2,.8,.3,1)', false); } }
     function regather(s){
       var c = center(s);
-      for (var i=0;i<14;i++){ var a = Math.random()*Math.PI*2, d = 55 + Math.random()*50; spark(c[0], c[1], Math.cos(a)*d, Math.sin(a)*d, 800 + Math.random()*300, 'cubic-bezier(.4,0,.6,1)', true); }
-      setTimeout(function(){
-        if (s._gone) return;
-        s.classList.remove('gone'); s.classList.add('back');
-        setTimeout(function(){ s.classList.remove('back'); }, 700);
-      }, 850);
+      for (var i = 0; i < 14; i++){ var a = Math.random() * 6.283, d = 55 + Math.random() * 50; spark(c[0], c[1], Math.cos(a) * d, Math.sin(a) * d, 800 + Math.random() * 300, 'cubic-bezier(.4,0,.6,1)', true); }
+      setTimeout(function(){ if (s._gone) return; s.classList.remove('gone'); s.classList.add('back'); setTimeout(function(){ s.classList.remove('back'); }, 700); }, 850);
     }
     var raf = 0, until = 0;
     function loop(){
       var r = isl.getBoundingClientRect(), isOpen = zone.classList.contains('open');
-      sats.forEach(function(s){
-        if (s.style.display === 'none') return;
+      api.sats.forEach(function(s){
+        if (s._off) return;
         var c = center(s), inside = c[1] > r.top + 6 && c[1] < r.bottom - 6;
-        if (isOpen && inside && !s._gone) { s._gone = true; s.classList.add('gone'); burst(s); }
-        else if (!isOpen && !inside && s._gone) { s._gone = false; regather(s); }
+        if (isOpen && inside && !s._gone){ s._gone = true; s.classList.add('gone'); burst(s); }
+        else if (!isOpen && !inside && s._gone){ s._gone = false; regather(s); }
       });
       if (performance.now() < until) raf = requestAnimationFrame(loop);
     }
     function kick(){ until = performance.now() + 2000; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); }
     var ot, ct;
-    function open(){
+    api.open = function(){
       clearTimeout(ct); if (zone.classList.contains('open')) return;
-      var has = !!document.getElementById('fm-ai-card');
-      aiIt.style.display = has ? '' : 'none'; aiSat.style.display = has ? '' : 'none';
+      if (cfg.beforeOpen) cfg.beforeOpen(api);
       zone.classList.add('open'); kick();
+    };
+    api.close = function(){ clearTimeout(ot); if (!zone.classList.contains('open')) return; zone.classList.remove('open'); kick(); };
+    isl.addEventListener('mouseenter', function(){ clearTimeout(ct); ot = setTimeout(api.open, 120); });
+    isl.addEventListener('mouseleave', function(){ clearTimeout(ot); ct = setTimeout(api.close, 320); });
+    isl.addEventListener('focus', api.open);
+    zone.addEventListener('focusout', function(e){ if (!zone.contains(e.relatedTarget)) ct = setTimeout(api.close, 200); });
+    isl.addEventListener('click', function(){ if (!zone.classList.contains('open')) api.open(); });
+    document.addEventListener('click', function(e){ if (!zone.contains(e.target)) api.close(); });
+    document.body.appendChild(zone);
+    return api;
+  }
+
+  function init(){
+    var dock = document.getElementById('fm-dock'), acts = document.querySelectorAll('#fm-actions .fm-act');
+    if ((!dock || !dock.querySelector('.fm-dk') || !acts.length) && ++tries < 60) return setTimeout(init, 250);
+    if (document.querySelector('.fm-zone')) return;
+
+    /* ---- header: medali logo batu + sembunyikan baris kontrol (pindah ke satelit kanan) ---- */
+    var wrap = document.querySelector('header .fm-logo-wrap');
+    if (wrap && !wrap.getAttribute('data-st')) { wrap.setAttribute('data-st', '1'); wrap.innerHTML = mark('#e9b84f'); }
+    var clk = document.getElementById('realtime-clock-display');
+    var hr = clk && clk.closest('.flex-wrap'); if (hr) hr.classList.add('fm-hd-right');
+
+    /* ---- pulau kiri: menu ---- */
+    var L = makeIsland('l', {
+      label: 'Menu Oneilverse',
+      mini: '<div class="fm-med">' + mark('#e9b84f') + '</div><div class="wd">Oneilverse</div>',
+      top: '<div class="fm-med">' + mark('#e9b84f') + '</div>',
+      beforeOpen: function(a){ var has = !!document.getElementById('fm-ai-card'); a.vis(a.items.ai, !has); a.vis(aiSat, !has); }
+    });
+    function goAI(){ var c = document.getElementById('fm-ai-card'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    L.item('Tanya AI', aiSvg, 'gold', goAI, 'Tanya Akuntan AI', 'ai');
+    var sepDone = false;
+    if (dock) Array.prototype.slice.call(dock.children).forEach(function(k){
+      if (k.classList.contains('fm-sep')) { if (!sepDone) { L.spacer(); sepDone = true; } return; }
+      if (!k.classList.contains('fm-dk')) return;
+      var sp = k.querySelector('span'), sv = k.querySelector('svg'); if (!sp || !sv) return;
+      var dg = /danger|keluar/i.test(k.className + ' ' + sp.textContent);
+      L.item(sp.textContent.trim(), sv.outerHTML, dg ? 'dg' : '', function(){ k.click(); });
+    });
+    var aiSat = L.sat('- 130', aiSvg, 'Tanya Akuntan AI', 'ai', goAI, 200);
+
+    /* ---- pulau kanan: aksi cepat ---- */
+    var firstAct = acts[0];
+    var R = makeIsland('r', {
+      label: 'Aksi cepat',
+      mini: '<div class="fm-med gold">' + plusSvg + '</div>',
+      top: ''
+    });
+    var rtop = R.zone.querySelector('.tp .fm-med'); if (rtop) { rtop.style.cursor = 'pointer'; rtop.addEventListener('click', function(e){ e.stopPropagation(); if (firstAct) firstAct.click(); R.close(); }); }
+    Array.prototype.forEach.call(acts, function(a, i){
+      var sv = a.querySelector('svg'), sp = a.querySelector('span'); if (!sp) return;
+      var c = sp.cloneNode(true); Array.prototype.forEach.call(c.querySelectorAll('[data-piu-badge]'), function(x){ x.remove(); });
+      var label = txt(c); if (!label) return;
+      R.item(label, sv ? sv.outerHTML : plusSvg, i === 0 ? 'gold' : '', function(){ a.click(); });
+    });
+    /* satelit: jam, suhu, kurs, perbarui, keluar */
+    var sClock = R.sat('- 118', '<span>--:--</span>', 'Jam', '', null, 150);
+    var sTemp = R.sat('- 172', '<span>--</span>', 'Cuaca', '', function(){ if (window.openWeatherModal) openWeatherModal(); }, -170);
+    var sKurs = R.sat('+ 118', '<span>--</span>', 'Kurs', '', function(){ if (window.openKursModal) openKursModal(); }, 190);
+    R.sat('+ 172', refSvg, 'Perbarui aplikasi', '', function(){ var b = document.getElementById('fm-refresh'); if (b) b.click(); else location.reload(); }, -200);
+    R.sat('+ 226', outSvg, 'Keluar', 'dg', function(){ if (typeof logout === 'function') logout(); }, 170);
+    function sync(){
+      var m = /\d{1,2}[.:]\d{2}/.exec(txt(clk)); sClock.firstChild.textContent = m ? m[0].replace('.', ':') : '--:--'; sClock.title = txt(clk) || 'Jam';
+      var wt = document.getElementById('weather-text'), kt = document.getElementById('kurs-text');
+      var box = document.getElementById('premium-widgets-container'), hidden = !box || box.classList.contains('hidden');
+      var w = /-?\d+\s*°\s*C?/.exec(txt(wt)); sTemp.firstChild.textContent = w ? w[0].replace(/\s/g, '') : '--'; sTemp.title = txt(wt) || 'Cuaca';
+      var k = txt(kt); sKurs.firstChild.textContent = (!k || /memuat/i.test(k)) ? '--' : k.replace(/^Rp\s*/i, '').slice(0, 9); sKurs.title = k || 'Kurs';
+      R.vis(sTemp, hidden || !w); R.vis(sKurs, hidden || !k || /memuat/i.test(k));
     }
-    function close(){ clearTimeout(ot); if (!zone.classList.contains('open')) return; zone.classList.remove('open'); kick(); }
-    isl.addEventListener('mouseenter', function(){ clearTimeout(ct); ot = setTimeout(open, 120); });
-    isl.addEventListener('mouseleave', function(){ clearTimeout(ot); ct = setTimeout(close, 320); });
-    isl.addEventListener('focus', open);
-    zone.addEventListener('focusout', function(e){ if (!zone.contains(e.relatedTarget)) ct = setTimeout(close, 200); });
-    isl.addEventListener('click', function(){ if (!zone.classList.contains('open')) open(); });
-    document.addEventListener('click', function(e){ if (!zone.contains(e.target)) close(); });
+    sync(); setInterval(sync, 1500);
+
+    /* laba bersih rugi -> warna bata */
+    var net = document.getElementById('kas-net');
+    if (net && window.MutationObserver) {
+      var chk = function(){ net.classList.toggle('fm-neg', /^\s*(-|\(|Rp\s*-)/.test(net.textContent || '')); };
+      chk(); new MutationObserver(chk).observe(net, { childList: true, characterData: true, subtree: true });
+    }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
