@@ -7,7 +7,7 @@
   var PATH = (location.pathname || '').toLowerCase();
   var IS_TOWER = /provider/.test(PATH);
   var ROLE = IS_TOWER ? 'dev' : /kasir/.test(PATH) ? 'staff' : /manager/.test(PATH) ? 'manager' : /dashboard/.test(PATH) ? 'owner' : '';
-  if (!ROLE || ROLE === 'manager') { window.FM_CHAT = null; return; }
+  if (!ROLE) { window.FM_CHAT = null; return; }
 
   var COL = 'global_chat', CFG = 'global_chat_cfg', MAXLEN = 140, COOLDOWN = 5000;
   var S = { msgs: [], cfg: { enabled: true, muted: [] }, err: false, open: false, kasirOk: true, last: 0, seen: 0, first: true, towerEl: null };
@@ -22,7 +22,7 @@
   function me() {
     if (IS_TOWER) return { tid: 'DEV', role: 'dev', label: 'DEV' };
     var t = g(function () { return getActiveTenant(); }, null), tid = t && t.id ? String(t.id).toUpperCase() : '';
-    return { tid: tid, role: ROLE, label: tid + (ROLE === 'staff' ? '-K' : '-O') };
+    return { tid: tid, role: ROLE, label: tid + (ROLE === 'staff' ? '-K' : ROLE === 'manager' ? '-M' : '-O') };
   }
   function ready() { return typeof db !== 'undefined' && db && g(function () { return window.FM_AUTH ? FM_AUTH.curUser() : firebase.auth().currentUser; }, null); }
 
@@ -122,6 +122,7 @@
     if (built || IS_TOWER) return;
     if (window.FM_PLANS && !FM_PLANS.has('chat')) return;
     built = true;
+    if (ROLE === 'manager') return; /* Manager (ON2): chat tampil di slot kartu, bukan panel melayang */
     var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
     var side = ROLE === 'staff' ? 'kasir' : 'owner';
     var tab = document.createElement('button'); tab.id = 'fmc-tab'; tab.className = side; tab.type = 'button'; tab.innerHTML = 'Chat <i id="fmc-n"></i>';
@@ -200,6 +201,7 @@
     var inp = $('fmc-txt'); if (inp) { var why = blocked(); inp.disabled = !!why; inp.placeholder = why || ('Tulis pesan (maks ' + MAXLEN + ' huruf)'); }
     var tf = $('tw-cfeed'); if (tf) { tf.innerHTML = feedHtml(60); stickScroll(tf); }
     if ($('fmc-mod')) paintMod();
+    try { if (window.FM_CHAT && FM_CHAT.onPaint) FM_CHAT.onPaint(); } catch (e) {}
   }
 
   /* Hapus seluruh isi Chat Universe, dipanggil langsung dari tile KENDALI (tanpa buka panel moderasi dulu) */
@@ -224,10 +226,10 @@
     if (started) return; started = true;
     var tries = 0;
     (function wait() {
-      if (ready()) { build(); subscribe(); return; }
+      if (ready()) { build(); if (ROLE === 'manager' && window.FM_PLANS && !FM_PLANS.has('chat')) return; subscribe(); return; }
       if (++tries < 80) setTimeout(wait, 500);
     })();
   }
-  window.FM_CHAT = { mountTower: mountTower, openModeration: openModeration, send: send, state: S, clearAll: clearAll };
+  window.FM_CHAT = { mountTower: mountTower, openModeration: openModeration, send: send, state: S, clearAll: clearAll, me: me, unread: unread, markSeen: markSeen };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

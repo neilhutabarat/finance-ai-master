@@ -114,13 +114,13 @@
     var h = '';
     {
       h += '<div class="fm-ins-grid">';
-      h += card('Ringkasan Hari Ini', line('Omzet', rp(omToday)) + line('Laba kotor', rp(gross)) + line('Jumlah nota', sToday.length) + line('Terlaris', top ? esc(top[0]) + ' (' + top[1] + ')' : '-') + line('Jam ramai', peak ? peak[0] + ':00' : '-'));
-      h += card('Metode Bayar Hari Ini', line('Tunai', rp(pay.tunai)) + line('QRIS', rp(pay.qris)) + line('Transfer', rp(pay.transfer)) + (pay.petty ? line('Petty Cash', rp(pay.petty)) : '') + '<div class="fm-sub">Cocokkan uang laci dengan baris Tunai. Petty Cash dananya terpisah, tidak ikut baris Tunai.</div>');
+      if (P.has('card_ringkasan')) h += card('Ringkasan Hari Ini', line('Omzet', rp(omToday)) + line('Laba kotor', rp(gross)) + line('Jumlah nota', sToday.length) + line('Terlaris', top ? esc(top[0]) + ' (' + top[1] + ')' : '-') + line('Jam ramai', peak ? peak[0] + ':00' : '-'));
+      if (P.has('card_metode')) h += card('Metode Bayar Hari Ini', line('Tunai', rp(pay.tunai)) + line('QRIS', rp(pay.qris)) + line('Transfer', rp(pay.transfer)) + (pay.petty ? line('Petty Cash', rp(pay.petty)) : '') + '<div class="fm-sub">Cocokkan uang laci dengan baris Tunai. Petty Cash dananya terpisah, tidak ikut baris Tunai.</div>');
       var tgt = '<div class="fm-sub" style="margin:0">Hari ini <b>' + rp(omToday) + '</b></div>' + bar(omToday, targets.day || 0) + '<div class="fm-sub" style="margin:6px 0 0">Bulan ini <b>' + rp(omMonth) + '</b></div>' + bar(omMonth, targets.month || 0);
       if (!targets.day && !targets.month) tgt += '<div class="fm-sub">' + (cfg.editTargets ? 'Isi target di bawah untuk melihat progres.' : 'Target belum diisi oleh owner.') + '</div>';
       if (cfg.editTargets) tgt += '<div class="fm-tg"><button type="button" data-open-tg style="grid-column:1/-1">Atur target</button></div>';
-      h += card('Target Omzet', tgt);
-      h += card('Stok Menipis', low.length ? low.slice(0, 5).map(function (p) { return line(esc(p.name), p.stock + '/' + (typeof p.minStock === 'number' ? p.minStock : 5)); }).join('') + (low.length > 5 ? '<div class="fm-sub">+' + (low.length - 5) + ' produk lain</div>' : '') : '<div class="fm-ok">Semua stok aman.</div>');
+      if (P.has('card_target')) h += card('Target Omzet', tgt);
+      if (P.has('card_stok')) h += card('Stok Menipis', low.length ? low.slice(0, 5).map(function (p) { return line(esc(p.name), p.stock + '/' + (typeof p.minStock === 'number' ? p.minStock : 5)); }).join('') + (low.length > 5 ? '<div class="fm-sub">+' + (low.length - 5) + ' produk lain</div>' : '') : '<div class="fm-ok">Semua stok aman.</div>');
       h += '</div>';
       var nonAgg = {};
       sales.filter(function (t) { return !t.isProduct; }).forEach(function (t) {
@@ -151,9 +151,50 @@
         '<div class="fm-lg"><span><i style="background:#7aa487"></i>Income</span><span><i style="background:#b8766a"></i>Outcome</span><span class="fm-sub" style="margin-left:auto">tertinggi ' + rp(mx) + '</span></div>';
       var recent = txList.map(function (t, i) { return [t, i]; }).sort(function (a, b) { var x = a[0].dateISO || '', y = b[0].dateISO || ''; return x < y ? 1 : x > y ? -1 : a[1] - b[1]; }).slice(0, 5);
       var rows = recent.length ? recent.map(function (r) { var t = r[0], inc = t.category === 'sales'; return '<div class="fm-tx"><span>' + esc(t.accountName || t.desc || '-') + '</span><b class="' + (inc ? 'pos' : 'neg') + '">' + (inc ? '+ ' : '- ') + rp(t.amount) + '</b></div>'; }).join('') : '<div class="fm-sub">Belum ada transaksi.</div>';
-      mid = '<div class="fm-on2-mid">' + card('Income vs Outcome · 7 hari', csvg) + card('Transaksi terakhir', rows) + '</div>';
+      mid = '<div class="fm-on2-mid">' + (P.has('card_grafik') ? card('Income vs Outcome · 7 hari', csvg) : '') + (P.has('card_transaksi') ? card('Transaksi terakhir', rows) : '') + '</div>';
     }
     box.innerHTML = aiCardHtml + mid + h;
+    /* ---- ON2: satelit di kartu angka, rincian saat disentuh, dan pas satu layar ---- */
+    try {
+      var inS = 0, outS = 0, nIn = 0, nOut = 0, gIn = {}, gOut = {};
+      txList.forEach(function (t) { var a = t.amount || 0, nm = t.accountName || t.desc || '-'; if (t.category === 'sales') { inS += a; nIn++; gIn[nm] = (gIn[nm] || 0) + a; } else { outS += a; nOut++; gOut[nm] = (gOut[nm] || 0) + a; } });
+      var top4 = function (g) { var arr = Object.keys(g).map(function (k) { return [k, g[k]]; }).sort(function (x, y) { return y[1] - x[1]; }); return { list: arr.slice(0, 4), more: Math.max(0, arr.length - 4) }; };
+      var dropHtml = function (g, cls) { var o = top4(g); return o.list.map(function (r) { return '<div><span>' + esc(r[0]) + '</span><b class="' + cls + '">' + rp(r[1]) + '</b></div>'; }).join('') + (o.more ? '<div class="mo">+ ' + o.more + ' lainnya</div>' : '') || '<div><span>Belum ada data</span></div>'; };
+      var margin = inS ? Math.round((inS - outS) / inS * 100) : 0;
+      var specs = [
+        ['kas-total-in', nIn + ' transaksi', 'jade', dropHtml(gIn, 'pos')],
+        ['kas-total-out', nOut + ' transaksi', 'rose', dropHtml(gOut, 'neg')],
+        ['kas-net', 'Margin ' + margin + '%', margin < 0 ? 'rose' : 'jade', '<div><span>Income</span><b class="pos">' + rp(inS) + '</b></div><div><span>Outcome</span><b class="neg">' + rp(outS) + '</b></div><div><span>Selisih</span><b class="' + (inS - outS < 0 ? 'neg' : 'pos') + '">' + (inS - outS < 0 ? '-' : '') + rp(Math.abs(inS - outS)) + '</b></div>'],
+        ['stat-total-pajak-sumbang', 'PPN 12%', '', '']
+      ];
+      specs.forEach(function (sp) {
+        var el = document.getElementById(sp[0]), card = el && el.closest('.ios-glass'); if (!card) return;
+        var ch = card.querySelector(':scope > .fm-kchip'); if (!ch) { ch = document.createElement('div'); card.appendChild(ch); }
+        ch.className = 'fm-kchip ' + sp[2]; ch.textContent = sp[1];
+        var dr = card.querySelector(':scope > .fm-kdrop');
+        if (sp[3]) {
+          if (!dr) { dr = document.createElement('div'); dr.className = 'fm-kdrop'; card.appendChild(dr); }
+          dr.innerHTML = sp[3];
+          if (!card._xp) {
+            card._xp = 1; var ot, ct;
+            card.addEventListener('mouseenter', function () { clearTimeout(ct); ot = setTimeout(function () { if (!card.classList.contains('xp')) { card.classList.add('xp'); if (window.FM_FX) FM_FX.burstEl(card.querySelector(':scope > .fm-kchip')); } }, 160); });
+            card.addEventListener('mouseleave', function () { clearTimeout(ot); ct = setTimeout(function () { card.classList.remove('xp'); }, 260); });
+          }
+        }
+      });
+    } catch (e) { console.warn('kchips', e); }
+    var fit = function () {
+      try {
+        [].forEach.call(box.querySelectorAll('.fm-ic'), function (c) {
+          var rows = [].slice.call(c.querySelectorAll('.fm-row,.fm-tx')); rows.forEach(function (r) { r.style.display = ''; });
+          var lim = c.getBoundingClientRect().bottom - 20; rows.forEach(function (r) { if (r.getBoundingClientRect().bottom > lim) r.style.display = 'none'; });
+        });
+      } catch (e) {}
+    };
+    fit(); setTimeout(fit, 400);
+    if (!window._fmFitBound) { window._fmFitBound = 1; var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { var b = document.getElementById(cfg && cfg.el); if (b && window.FM_INSIGHTS && FM_INSIGHTS.fit) FM_INSIGHTS.fit(); }, 160); }); }
+    window.FM_INSIGHTS_FIT = fit;
+    if (window.FM_ON2 && FM_ON2.afterRender) FM_ON2.afterRender(box);
     var ob = box.querySelector('[data-open-tg]'); if (ob) { ob.onclick = openTargets; var cd = ob.closest('.fm-ic'); if (cd) { cd.style.cursor = 'pointer'; cd.onclick = function (e) { if (e.target.closest('button')) return; openTargets(); }; } }
     var chatBox = box.querySelector('#fm-ai-chat');
     if (chatBox) {
@@ -174,6 +215,7 @@
   }
 
   window.FM_INSIGHTS = {
+    fit: function () { if (window.FM_INSIGHTS_FIT) window.FM_INSIGHTS_FIT(); },
     mount: function (c) { cfg = c; render(); },
     render: render, exportCSV: exportCSV
   };
