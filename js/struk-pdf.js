@@ -49,6 +49,7 @@
     lr('Petugas:', txt('#receipt-staff'), false);
     line();
     c('Terima kasih atas pembayaran Anda.'); c('Simpan struk ini sebagai bukti sah.');
+    c((window.FM_SHIELD ? FM_SHIELD.badgeText() : 'Dilindungi Oneil Shield'));
     return L;
   }
 

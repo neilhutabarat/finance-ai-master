@@ -3,11 +3,17 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.21';
+  var BETA = 'v1.0.22';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.22', '16 Nov 2026', [
+      '[Keamanan] Kunci PIN salah (3x = 5 menit, 5x = 10 menit, 10x = diblokir) sekarang dicek di server (Oneil Shield v2.0), bukan cuma di penyimpanan browser, jadi tidak bisa dilewati dengan hapus data browser atau pindah perangkat',
+      '[Keamanan] Setiap login berhasil kini tercatat (waktu & perangkat), dan login dari perangkat baru ditandai serta dilaporkan ke Tower',
+      '[Keamanan] Skor keamanan toko kini tampil di panel Oneil Shield, beserta ringkasan keamanan bulanan untuk Owner',
+      '[Perbaikan] Lencana "Dilindungi Oneil Shield" kini tampil di portal login, dalam aplikasi, struk, dan laporan PDF'
+    ]],
     ['v1.0.21', '16 Nov 2026', [
       '[Perbaikan] Transaksi dengan Tanggal Transaksi yang diset ke tanggal lampau kini benar-benar tercatat di tanggal tersebut di struk, Mutasi, dan Buku Besar, tidak lagi otomatis memakai tanggal hari ini',
       '[Keamanan] Perubahan hanya memperbaiki tanggal yang ditampilkan/tercatat, tidak mengubah nominal atau akun transaksi mana pun'
@@ -430,7 +436,7 @@
     }
     if (window.FM_I18N && FM_I18N.has && FM_I18N.has()) { var _ln = FM_I18N.lang(); h += '<div class="fm-sec"><div class="fm-lab">Bahasa / Language</div><div class="fm-modes"><button class="fm-mode ' + (_ln === 'id' ? 'on' : '') + '" data-lang="id">Indonesia</button><button class="fm-mode ' + (_ln === 'en' ? 'on' : '') + '" data-lang="en">English</button></div></div>'; }
     if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur Toko</button></div>';
-    if (window.FM_SHIELD) h += '<div class="fm-sec"><button class="fm-btn" data-shield style="width:100%;padding:13px">🛡️ Oneil Shield — Keamanan</button></div>';
+    if (window.FM_SHIELD) h += '<div class="fm-sec"><button class="fm-btn" data-shield style="width:100%;padding:13px">🛡️ Oneil Shield v' + FM_SHIELD.ver + ' — Keamanan</button></div>';
     if (false) h += '<div class="fm-sec"><button class="fm-btn" data-logout style="width:100%;padding:13px;color:#fda4af">Keluar dari Akun</button></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>' + BETA + '</b></div></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.slice(0, SHOW_LAST).map(function (n, i) {
@@ -440,7 +446,16 @@
 
     var lo = box.querySelector('[data-logout]'); if (lo) lo.onclick = function () { document.getElementById('fm-set').style.display = 'none'; window.FM_LOGOUT(); };
     var pb = box.querySelector('[data-plans]'); if (pb) pb.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_PLANS) FM_PLANS.openModal(); };
-    var sh = box.querySelector('[data-shield]'); if (sh) sh.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_SHIELD) FM_SHIELD.openPanel(); };
+    var sh = box.querySelector('[data-shield]'); if (sh) sh.onclick = function () {
+      document.getElementById('fm-set').style.display = 'none';
+      if (!window.FM_SHIELD) return;
+      var ctx = null;
+      try {
+        var at = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
+        if (at && at.id) ctx = { tid: at.id, role: 'acct', slot: '' };
+      } catch (e) {}
+      FM_SHIELD.openPanel(ctx);
+    };
     box.querySelector('[data-close]').onclick = function () { document.getElementById('fm-set').style.display = 'none'; };
     box.querySelectorAll('[data-ctm]').forEach(function (b) { b.onclick = function () { try { localStorage.setItem('fm_ct_mode', b.getAttribute('data-ctm')); } catch (e) {} applyCtMode(); render(); }; });
     box.querySelectorAll('[data-twg]').forEach(function (b) { b.onclick = function () { try { localStorage.setItem('fm_glass_tw', b.getAttribute('data-twg')); } catch (e) {} window.dispatchEvent(new Event('fm:glass')); render(); }; });

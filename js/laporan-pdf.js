@@ -76,6 +76,7 @@
     if (y < 60) { newPage(); }
     text(MX, y, 'TOTAL BERSIH (income - outcome)', 'F2', 9.5); rtext(W - MX, y, rp(income - outcome), 'F2', 9.5);
     pages.forEach(function (pg, i) { cur = pg; text(W / 2 - 30, 22, 'Halaman ' + (i + 1) + ' / ' + pages.length, 'F1', 8); });
+    cur = pages[pages.length - 1]; text(MX, 22, (window.FM_SHIELD ? FM_SHIELD.badgeText() : 'Dilindungi Oneil Shield'), 'F1', 8);
     var objs = [], pageIds = [], n = 4;
     var contents = pages.map(function (pg) { return 'BT\n' + pg.join('\n') + '\nET'; });
     var parts = [];
