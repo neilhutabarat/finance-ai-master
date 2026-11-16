@@ -14,30 +14,31 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --app-bg: #070d18;
+            --app-bg: #0E0D0A;
             --ios-card: rgba(255, 255, 255, 0.94);
-            --ios-border: rgba(226, 232, 240, 0.95);
+            --ios-border: rgba(227, 166, 56, 0.16);
             --oneui-squircle: 24px;
         }
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-            background-color: #070d18; background-image: radial-gradient(at 0% 0%, rgba(30, 27, 75, 0.45) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(49, 16, 66, 0.35) 0px, transparent 50%); padding-bottom: 48px;
+            background-color: #0E0D0A; background-image: radial-gradient(at 0% 0%, rgba(227, 166, 56, 0.08) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(82, 161, 136, 0.07) 0px, transparent 50%); padding-bottom: 48px;
             -webkit-tap-highlight-color: transparent;
         }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .font-mono { font-family: 'Fraunces', serif; font-feature-settings: 'tnum'; }
+        .fm-ic h4, h1#topbar-store-name { font-family: 'Fraunces', serif; }
         .oneui-hero {
             border-bottom-left-radius: 36px;
             border-bottom-right-radius: 36px;
-            background: linear-gradient(145deg, #070d18 0%, #0f172a 40%, #1e1b4b 50%, #311042 100%);
+            background: linear-gradient(145deg, #0E0D0A 0%, #171310 45%, #26200F 100%);
         }
         .ios-glass {
-            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%), rgba(15, 23, 42, 0.88);
-            box-shadow: 0 12px 35px -10px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.18);
-            
+            background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%), rgba(22, 20, 15, 0.9);
+            box-shadow: 0 12px 35px -10px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.06);
+
             border: 1px solid var(--ios-border);
             border-radius: var(--oneui-squircle);
         }
@@ -70,7 +71,7 @@
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
 </head>
-<body class="text-white min-h-screen flex flex-col antialiased selection:bg-purple-600 selection:text-white pb-6">
+<body class="text-white min-h-screen flex flex-col antialiased selection:bg-amber-600 selection:text-white pb-6">
 
     <!-- HEADER SUPERVISOR / MANAGER -->
     <header class="oneui-hero text-white px-5 sm:px-8 pt-6 pb-7 shadow-xl relative overflow-hidden">
@@ -102,7 +103,7 @@
                 <div>
                     <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
                         <h1 id="topbar-store-name" class="font-extrabold text-2xl sm:text-3xl tracking-tight text-white">Oneilverse</h1>
-                        <span id="tenant-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-purple-500/30 border border-purple-400/40 text-purple-200">
+                        <span id="tenant-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-500/30 border border-amber-400/40 text-amber-200">
                             ID26110901
                         </span>
                         <span id="tier-badge-indicator" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-gradient-to-r from-amber-400/30 via-yellow-300/30 to-amber-500/30 border border-yellow-400/60 text-yellow-200 shadow-[0_0_12px_rgba(234,179,8,0.3)]">
@@ -116,7 +117,7 @@
             <div class="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
                 <div class="glass-capsule-dark px-3.5 py-1.5 text-xs text-white flex items-center space-x-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <i data-lucide="clock" class="w-3.5 h-3.5 text-purple-300"></i>
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-300"></i>
                     <span id="realtime-clock-display" class="font-mono font-semibold tracking-wide text-[11px] sm:text-xs">Memuat Waktu...</span>
                 </div>
 
@@ -131,7 +132,7 @@
                 </div>
             </div>
 
-                <div class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-purple-500/25 border border-purple-300/30 flex items-center shadow-sm text-purple-100">
+                <div class="ios-pill px-3.5 py-1.5 text-xs font-bold bg-amber-500/25 border border-amber-300/30 flex items-center shadow-sm text-amber-100">
                     <span id="user-role-display">Role: Supervisor / Manager</span>
                 </div>
                 <button onclick="logout()" class="ios-pill px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 text-xs font-bold flex items-center space-x-1 transition active:scale-95">
@@ -210,7 +211,7 @@
             <section data-fm-panel="instruksi" data-title="Instruksi &amp; Pengawasan Admin" data-sub="Kirim catatan atau arahan ke kasir" data-ic="send" class="lg:col-span-5 ios-glass p-5 sm:p-6 shadow-sm space-y-4">
                 <div class="border-b border-white/10/80 pb-3 flex justify-between items-center">
                     <h2 class="text-base font-extrabold text-white flex items-center space-x-2">
-                        <div class="w-7 h-7 rounded-lg bg-purple-700 text-white flex items-center justify-center shadow">
+                        <div class="w-7 h-7 rounded-lg bg-amber-700 text-white flex items-center justify-center shadow">
                             <i data-lucide="send" class="w-4 h-4"></i>
                         </div>
                         <span>Instruksi & Pengawasan Admin</span>
@@ -219,8 +220,8 @@
 
                 <div class="p-4 rounded-2xl bg-slate-900/50 border border-white/10 space-y-2.5">
                     <span class="text-xs font-bold text-white block">Kirim Catatan / Arahan ke Kasir:</span>
-                    <input type="text" id="mgr-instruction-title" placeholder="Judul Pesan" class="w-full bg-slate-900 border border-slate-300 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500">
-                    <textarea id="mgr-instruction-msg" rows="3" placeholder="Tulis instruksi atau konfirmasi pengeluaran..." class="w-full bg-slate-900 border border-slate-300 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                    <input type="text" id="mgr-instruction-title" placeholder="Judul Pesan" class="w-full bg-slate-900 border border-slate-300 rounded-xl p-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500">
+                    <textarea id="mgr-instruction-msg" rows="3" placeholder="Tulis instruksi atau konfirmasi pengeluaran..." class="w-full bg-slate-900 border border-slate-300 rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-amber-500"></textarea>
                     <div class="flex justify-end">
                         <button onclick="submitManagerInstruction()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm flex items-center space-x-1">
                             <i data-lucide="send" class="w-3.5 h-3.5"></i>
@@ -234,7 +235,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button onclick="openModal('mutasi')" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
                         <div class="flex items-center space-x-3 text-left">
-                            <div class="w-10 h-10 rounded-xl bg-slate-900/10 flex items-center justify-center text-purple-300">
+                            <div class="w-10 h-10 rounded-xl bg-slate-900/10 flex items-center justify-center text-amber-300">
                                 <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
                             </div>
                             <div>
@@ -258,30 +259,30 @@
                         <i data-lucide="chevron-right" class="w-4 h-4 text-amber-200"></i>
                     </button>
 
-                    <button onclick="openModal('ledger')" class="p-4 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
+                    <button onclick="openModal('ledger')" class="p-4 rounded-2xl bg-amber-700 hover:bg-amber-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
                         <div class="flex items-center space-x-3 text-left">
-                            <div class="w-10 h-10 rounded-xl bg-slate-900/10 flex items-center justify-center text-purple-200">
+                            <div class="w-10 h-10 rounded-xl bg-slate-900/10 flex items-center justify-center text-amber-200">
                                 <i data-lucide="book-open" class="w-5 h-5"></i>
                             </div>
                             <div>
                                 <h4 class="font-bold text-xs">Buku Besar</h4>
-                                <p class="text-[10px] text-purple-200">YouTube, Server, AI, Tools</p>
+                                <p class="text-[10px] text-amber-200">YouTube, Server, AI, Tools</p>
                             </div>
                         </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-purple-300"></i>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-amber-300"></i>
                     </button>
 
-                    <button onclick="openModal('closing_history')" class="p-4 rounded-2xl bg-indigo-700 hover:bg-indigo-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
+                    <button onclick="openModal('closing_history')" class="p-4 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white flex items-center justify-between shadow-md transition active:scale-98">
                         <div class="flex items-center space-x-3 text-left">
                             <div class="w-10 h-10 rounded-xl bg-slate-900/20 flex items-center justify-center text-white">
                                 <i data-lucide="history" class="w-5 h-5"></i>
                             </div>
                             <div>
                                 <h4 class="font-bold text-xs">Rekap Closing Kasir</h4>
-                                <p class="text-[10px] text-indigo-100">Catatan penyerahan uang kas</p>
+                                <p class="text-[10px] text-teal-100">Catatan penyerahan uang kas</p>
                             </div>
                         </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-indigo-200"></i>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-teal-200"></i>
                     </button>
                 </div>
             </section>
@@ -380,12 +381,12 @@
 
                 <!-- 5. KELOLA AKUN COA (TAMBAH, EDIT, HAPUS & TERHUBUNG OTOMATIS KE KASIR) -->
                 <div id="popup-content-coa_mgmt" class="space-y-4 hidden">
-                    <div class="bg-purple-950/70 border border-purple-200 rounded-2xl p-4 space-y-3">
-                        <span class="text-xs font-black text-purple-950 block">Tambah Akun Baru (COA):</span>
+                    <div class="bg-amber-950/70 border border-amber-200 rounded-2xl p-4 space-y-3">
+                        <span class="text-xs font-black text-amber-950 block">Tambah Akun Baru (COA):</span>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <input type="text" id="new-coa-code" placeholder="Kode (misal: 108 / 208)" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-mono font-bold outline-none">
-                            <input type="text" id="new-coa-name" placeholder="Nama Akun" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
-                            <select id="new-coa-cat" class="bg-slate-900 border border-purple-300 rounded-xl p-2 text-xs font-bold outline-none">
+                            <input type="text" id="new-coa-code" placeholder="Kode (misal: 108 / 208)" class="bg-slate-900 border border-amber-300 rounded-xl p-2 text-xs font-mono font-bold outline-none">
+                            <input type="text" id="new-coa-name" placeholder="Nama Akun" class="bg-slate-900 border border-amber-300 rounded-xl p-2 text-xs font-bold outline-none">
+                            <select id="new-coa-cat" class="bg-slate-900 border border-amber-300 rounded-xl p-2 text-xs font-bold outline-none">
                                 <option value="sales">Income (Pemasukan)</option>
                                 <option value="cogs">Outcome (Produksi)</option>
                                 <option value="expense">Outcome (Operasional)</option>
@@ -398,7 +399,7 @@
                             </select>
                         </div>
                         <div class="flex justify-end">
-                            <button onclick="saveNewCOAByManager()" class="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm">
+                            <button onclick="saveNewCOAByManager()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 px-4 rounded-xl text-xs transition active:scale-95 shadow-sm">
                                 + Simpan Akun
                             </button>
                         </div>
@@ -425,15 +426,15 @@
 
                 <!-- 6. PERMOHONAN PENAMBAHAN KASIR BARU KE PROVIDER -->
                 <div id="popup-content-add_cashier_request" class="space-y-4 hidden">
-                    <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-3">
+                    <div class="p-4 rounded-2xl bg-teal-50 border border-teal-200 space-y-3">
                         <div>
-                            <h4 class="font-black text-sm text-indigo-950">Buka Terminal Admin Baru</h4>
-                            <p class="text-xs text-indigo-800/80">Permohonan akan langsung dikirimkan ke portal penyedia platform untuk aktivasi lisensi.</p>
+                            <h4 class="font-black text-sm text-teal-950">Buka Terminal Admin Baru</h4>
+                            <p class="text-xs text-teal-800/80">Permohonan akan langsung dikirimkan ke portal penyedia platform untuk aktivasi lisensi.</p>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                             <div>
                                 <label class="font-bold text-slate-300 block mb-1">Jenis Terminal:</label>
-                                <select id="req-role" class="w-full bg-slate-900 border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
+                                <select id="req-role" class="w-full bg-slate-900 border border-teal-300 rounded-xl p-2.5 font-bold outline-none">
                                     <option value="kasir">Kasir</option>
                                     <option value="manager">Manager</option>
                                     <option value="owner">Owner</option>
@@ -441,7 +442,7 @@
                             </div>
                             <div>
                                 <label class="font-bold text-slate-300 block mb-1">Jumlah Tambahan:</label>
-                                <select id="req-cashier-qty" class="w-full bg-slate-900 border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
+                                <select id="req-cashier-qty" class="w-full bg-slate-900 border border-teal-300 rounded-xl p-2.5 font-bold outline-none">
                                     <option value="1">+1 Terminal</option>
                                     <option value="2">+2 Terminal</option>
                                     <option value="3">+3 Terminal</option>
@@ -449,11 +450,11 @@
                             </div>
                             <div>
                                 <label class="font-bold text-slate-300 block mb-1">Nama / Keterangan Terminal:</label>
-                                <input type="text" id="req-cashier-name" placeholder="Misal: Kasir Meja 2 / Kasir Lantai 2" class="w-full bg-slate-900 border border-indigo-300 rounded-xl p-2.5 font-bold outline-none">
+                                <input type="text" id="req-cashier-name" placeholder="Misal: Kasir Meja 2 / Kasir Lantai 2" class="w-full bg-slate-900 border border-teal-300 rounded-xl p-2.5 font-bold outline-none">
                             </div>
                         </div>
                         <div class="flex justify-end pt-1">
-                            <button onclick="submitCashierRequest()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition active:scale-95 shadow-md flex items-center space-x-1.5">
+                            <button onclick="submitCashierRequest()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition active:scale-95 shadow-md flex items-center space-x-1.5">
                                 <i data-lucide="send" class="w-3.5 h-3.5"></i>
                                 <span>Kirim Permohonan ke Penyedia</span>
                             </button>
@@ -472,10 +473,10 @@
 
     <!-- MODAL EDIT TRANSAKSI KHUSUS MANAGER -->
     <div id="modal-mgr-edit" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl modal-sheet space-y-4 border border-purple-200">
+        <div class="bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl modal-sheet space-y-4 border border-amber-200">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-black text-sm text-white flex items-center space-x-1.5">
-                    <i data-lucide="edit-3" class="w-4 h-4 text-purple-600"></i>
+                    <i data-lucide="edit-3" class="w-4 h-4 text-amber-600"></i>
                     <span>Koreksi Transaksi Sah</span>
                 </h3>
                 <button onclick="closeManagerEditModal()" class="text-slate-400 hover:text-slate-400">
@@ -490,7 +491,7 @@
                 </div>
                 <div>
                     <label class="font-bold text-slate-400 block mb-1">Nominal Transaksi (Rp)</label>
-                    <input type="text" id="mgr-edit-amount" oninput="formatInputThousand(this)" class="w-full bg-purple-50/50 border border-purple-300 rounded-xl p-3 text-base font-black text-purple-950 outline-none font-mono">
+                    <input type="text" id="mgr-edit-amount" oninput="formatInputThousand(this)" class="w-full bg-amber-50/50 border border-amber-300 rounded-xl p-3 text-base font-black text-amber-950 outline-none font-mono">
                 </div>
                 <div>
                     <label class="font-bold text-slate-400 block mb-1">Keterangan Koreksi</label>
@@ -498,7 +499,7 @@
                 </div>
             </div>
             <div class="flex space-x-2 pt-2">
-                <button onclick="saveManagerCorrection()" class="flex-1 bg-purple-700 hover:bg-purple-800 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95 shadow-sm">
+                <button onclick="saveManagerCorrection()" class="flex-1 bg-amber-700 hover:bg-amber-800 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95 shadow-sm">
                     Simpan Perubahan
                 </button>
                 <button onclick="closeManagerEditModal()" class="px-4 bg-white/10 hover:bg-slate-200 text-slate-400 font-bold py-2.5 rounded-xl text-xs transition">
@@ -713,7 +714,7 @@
                     <td class="py-2.5 px-3 text-right font-black text-rose-600 font-mono">${tx.category !== 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
                     <td class="py-2.5 px-3 text-right font-black font-mono">Rp ${formatThousandSeparator(tx.runningBalance)}</td>
                     <td class="py-2.5 px-3 text-center whitespace-nowrap space-x-1">
-                        <button onclick="openManagerEdit('${tx.id}')" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg font-bold text-[10px] border border-purple-200">Koreksi</button>
+                        <button onclick="openManagerEdit('${tx.id}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg font-bold text-[10px] border border-amber-200">Koreksi</button>
                         <button onclick="managerDeleteTx('${tx.id}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-bold text-[10px] border border-rose-200">Void</button>
                     </td>
                 `;
