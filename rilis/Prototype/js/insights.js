@@ -222,6 +222,9 @@
           row2.style.cssText = 'align-self:flex-start;max-width:82%;background:#16140F;color:#D9D2C2;padding:9px 12px;border-radius:14px;font-size:12.5px;line-height:1.4';
           row2.textContent = aiA[i];
           chatBox.innerHTML = ''; chatBox.appendChild(row1); chatBox.appendChild(row2);
+          var again = document.createElement('button'); again.type = 'button'; again.setAttribute('data-ai-again', '1'); again.textContent = 'Pertanyaan lain';
+          again.onclick = function () { chatBox.innerHTML = ''; var cd = box.querySelector('#fm-ai-card'); if (cd) cd.classList.remove('asked'); [].forEach.call(box.querySelectorAll('[data-ai-q]'), function (b3) { b3.disabled = false; b3.style.opacity = ''; }); };
+          chatBox.appendChild(again);
           var cardEl = box.querySelector('#fm-ai-card'); if (cardEl) cardEl.classList.add('asked');
           [].forEach.call(box.querySelectorAll('[data-ai-q]'), function (b2) { b2.disabled = (b2 === btn); b2.style.opacity = (b2 === btn) ? '.4' : ''; });
         };

@@ -96,7 +96,14 @@
   var PLUS_FEATURES = ['barcode', 'stok_scan', 'banyak_usaha', 'admin_usaha', 'properti', 'dashboard', 'analisa', 'audit', 'export_csv', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'backup', 'laporan_bulanan', 'gaji', 'gaji_auto', 'ledger', 'instruksi', 'billing_card'];
   function featTier(f) { return PLUS_FEATURES.indexOf(f.key) >= 0 ? 'plus' : 'basic'; }
   var _lockCol = false; /* tampilkan kolom gembok (hanya di layar ubah fitur toko) */
-  var DEFAULT_ON = ['card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'sat_perbarui', 'denyut', 'tutup_hari']; /* Oneilverse 2: menyala bawaan, Tower bisa mematikan per toko */
+  /* Oneilverse 2: isi pulau kiri/kanan, diatur per toko dari Control Tower (semua menyala bawaan) */
+  var ISL_LEFT = [['pl_ai', 'Menu · Tanya AI'], ['pl_chat', 'Menu · Chat global'], ['pl_mutasi', 'Menu · Mutasi'], ['pl_pajak', 'Menu · Pajak'], ['pl_bukubesar', 'Menu · Buku Besar'], ['pl_closing', 'Menu · Closing'], ['pl_tema', 'Menu · Tema'], ['pl_pengaturan', 'Menu · Pengaturan'], ['pl_keluar', 'Menu · Keluar'], ['pl_laba', 'Menu · Laba Produk'],
+    ['sl_ai', 'Satelit · Tanya AI'], ['sl_chat', 'Satelit · Chat'], ['sl_mutasi', 'Satelit · Mutasi'], ['sl_bantuan', 'Satelit · Bantuan'], ['sl_pengaturan', 'Satelit · Pengaturan'], ['sl_pajak', 'Satelit · Pajak']];
+  var ISL_RIGHT = [['pr_kasir', 'Aksi · Buka Kasir Baru'], ['pr_coa', 'Aksi · Kelola Akun (COA)'], ['pr_stok', 'Aksi · Stok & Closing'], ['pr_gaji', 'Aksi · Laporan Gaji'], ['pr_piutang', 'Aksi · Piutang & Utang'], ['pr_ringkasan', 'Aksi · Ringkasan Usaha'], ['pr_diskon', 'Aksi · Diskon & Promo'], ['pr_aruskas', 'Aksi · Arus Kas & Anggaran'], ['pr_neraca', 'Aksi · Neraca'], ['pr_neracaai', 'Aksi · Neraca AI'], ['pr_grafik', 'Aksi · Grafik'], ['pr_penjelasan', 'Aksi · Penjelasan Laporan'], ['pr_modal', 'Aksi · Perubahan Modal'], ['pr_susut', 'Aksi · Penyusutan Aset'], ['pr_stokhabis', 'Aksi · Stok Habis'], ['pr_harian', 'Aksi · Laporan Harian'], ['pr_pajak', 'Aksi · Laporan Pajak'], ['pr_absensi', 'Aksi · Absensi'], ['pr_properti', 'Aksi · Properti'], ['pr_backup', 'Aksi · Backup & Ekspor'], ['pr_bulanan', 'Aksi · Laporan Bulanan'], ['pr_analisa', 'Aksi · Analisa Keuangan'], ['pr_instruksi', 'Aksi · Instruksi & Pengawasan Admin'], ['pr_fitur', 'Aksi · Fitur Toko'],
+    ['sr_keluar', 'Satelit · Keluar']];
+  ISL_LEFT.concat(ISL_RIGHT).forEach(function (p) { FEATURES.push({ key: p[0], label: 'Oneilverse 2 · ' + p[1], r: { manager: 'o', owner: 'o' } }); });
+  var ISL_LK = ISL_LEFT.map(function (p) { return p[0]; }), ISL_RK = ISL_RIGHT.map(function (p) { return p[0]; }).concat(['sat_perbarui', 'clock', 'weather', 'rates']);
+  var DEFAULT_ON = ['card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'sat_perbarui', 'denyut', 'tutup_hari'].concat(ISL_LK, ISL_RK); /* Oneilverse 2: menyala bawaan, Tower bisa mematikan per toko */
   function defaultFor(key, role, tier) {
     if (DEFAULT_ON.indexOf(key) >= 0) return true;
     if (ALWAYS_ON.indexOf(key) >= 0) return true;
@@ -306,9 +313,11 @@
     { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
     { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'stok_habis'] },
     { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
-    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'ai_asisten', 'card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'sat_perbarui', 'denyut', 'tutup_hari', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
+    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'ai_asisten', 'card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'denyut', 'tutup_hari', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
     { id: 'ops', label: 'Operasional', keys: ['absensi', 'properti', 'offline_penuh'] },
-    { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'clock', 'weather', 'rates', 'billing_card', 'chat'] }
+    { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'billing_card', 'chat'] },
+    { id: 'pkr', label: 'Oneilverse 2 · Pulau KIRI (menu & satelit)', keys: ISL_LK },
+    { id: 'pkn', label: 'Oneilverse 2 · Pulau KANAN (aksi cepat & satelit)', keys: ISL_RK }
   ];
 
   /* Penempatan fitur untuk tampilan Tower (hanya label + pengelompokan, tidak mengubah hak akses):
