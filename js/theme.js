@@ -3,11 +3,16 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.23';
+  var BETA = 'v1.0.24';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.24', '16 Nov 2026', [
+      '[Perbaikan] Daftar Mutasi Kas (kasir & manager) sekarang bisa diurutkan terbaru-dulu atau terlama-dulu lewat tombol di pojok kanan atas, defaultnya terbaru di atas',
+      '[Perbaikan] Pilihan Metode Bayar / Terima dipindahkan ke area input barang (sebelumnya di bawah dekat tombol cetak struk), supaya kelihatan saat menginput barang',
+      '[Keamanan] Kedua perubahan ini hanya tampilan/urutan, tidak mengubah data transaksi, saldo, atau proses pencatatan pembukuan'
+    ]],
     ['v1.0.23', '16 Nov 2026', [
       '[Perbaikan] Toko yang sedang masa DEMO kini menampilkan watermark besar "DEMO VERSION" di layar selama masa demo aktif, selain label kecil yang sudah ada, supaya lebih jelas membedakan toko uji coba dari toko sungguhan',
       '[Keamanan] Watermark hanya tampilan, tidak mengubah data atau proses apa pun, dan otomatis hilang begitu toko bukan lagi status demo'
