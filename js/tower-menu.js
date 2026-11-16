@@ -39,6 +39,7 @@
       { key: 'klien_baru', t: 'Klien Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko, pilih jenis usaha' },
       { key: 'profil_toko', t: 'Profil Toko', ic: 'store', run: "towerPick('profil')", d: 'Nama, slogan, warna, logo' },
       { key: 'fitur_toko', t: 'Fitur Toko', ic: 'grid', run: "towerPick('fitur')", d: 'Centang fitur per peran' },
+      { key: 'pulau_on2', t: 'Pulau & Kartu ON2', ic: 'spark', run: "towerPick('pulau')", d: 'Atur pulau kiri/kanan, kartu, denyut, dan tutup hari per toko' },
       { key: 'coa_toko', t: 'COA Toko', ic: 'list', run: "towerPick('coa')", d: 'Daftar akun toko' },
       { key: 'stok_katalog', t: 'Stok & Katalog', ic: 'box', run: "FM_LAB.open('template')", d: 'Isi katalog awal, simpan & salin template toko' },
       { key: 'kuota_terminal', t: 'Kuota Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Kasir, Manager, Owner' },

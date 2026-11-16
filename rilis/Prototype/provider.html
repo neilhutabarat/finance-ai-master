@@ -75,7 +75,7 @@
     <script src="js/langit.js?v=proto" defer></script>
     <script src="js/logo.js?v=proto"></script>
     <script src="js/skin.js?v=proto"></script>
-    <script src="js/tower-menu.js?v=proto"></script>
+    <script src="js/tower-menu.js?v=on2c"></script>
     <script src="js/tower-lab.js?v=proto"></script>
     <script src="js/admins.js?v=proto"></script>
     <script src="js/tower-monitor.js?v=proto"></script>
@@ -990,6 +990,7 @@
             var T = {
                 profil: ['Profil Toko', 'Pilih toko: nama, slogan, warna, logo'],
                 fitur: ['Fitur Toko', 'Pilih toko: centang fitur per peran'],
+                pulau: ['Pulau & Kartu ON2', 'Pilih toko: atur pulau kiri/kanan, kartu, denyut, dan tutup hari'],
                 coa: ['COA Toko', 'Pilih toko untuk mengatur COA-nya'],
                 produk: ['Produk Toko', 'Pilih toko untuk mengatur produknya'],
                 kuota: ['Kuota Terminal', 'Pilih toko untuk mengatur jumlah terminal'],
@@ -1044,7 +1045,8 @@
                             return;
                         }
                         close();
-                        if (kind === 'profil' || kind === 'fitur' || kind === 'coa' || kind === 'produk') openTenantSettings(t.id, kind);
+                        if (kind === 'pulau') { openTenantSettings(t.id, 'fitur'); setTimeout(function () { try { var q = document.getElementById('ts-q'); if (q) { q.value = 'oneilverse 2'; FM_PLANS.cariFitur('ts', 'oneilverse 2'); q.scrollIntoView({ block: 'center' }); } var tt = document.getElementById('ts-card-title'); if (tt) tt.innerText = 'Pulau & Kartu Oneilverse 2: centang yang ingin ditampilkan di toko ini'; } catch (e) {} }, 400); }
+                        else if (kind === 'profil' || kind === 'fitur' || kind === 'coa' || kind === 'produk') openTenantSettings(t.id, kind);
                         else if (kind === 'kuota' || kind === 'paket' || kind === 'billing' || kind === 'lokasi' || kind === 'versi') openInspectUMKM(t.id, kind);
                         else if (kind === 'salin') towerPick('salin2', t);
                         else if (kind === 'salin2') { if (confirm('Salin fitur ' + (t.nama || t.id) + ' ke ' + (extra.nama || extra.id) + '? Fitur ' + (extra.nama || extra.id) + ' yang sekarang akan diganti.')) towerSaveFeatures(extra, towerEffFeatures(t)).then(function () { ctAudit(extra.id, 'SALIN_FITUR', 'Provider menyalin fitur dari ' + t.id, '-', t.id); alert('Fitur tersalin ke ' + (extra.nama || extra.id) + '.'); }).catch(function (e) { fmPermAlert(e); }); }
