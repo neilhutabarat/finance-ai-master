@@ -2431,7 +2431,7 @@
                     }
                 });
                 const netOmzet = incMonth - outMonth;
-                const masterTag = tenant.isMaster ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">MASTER</span>' : '' + (window.FM_LAB ? FM_LAB.badge(tenant.id) : '');
+                const masterTag = window.FM_LAB ? FM_LAB.badge(tenant.id) : '';
                 const localTag = tenantSource[tenant.id] === 'firestore' ? '' : '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-400/30" title="Data dibaca dari browser ini, bukan dari server">LOKAL</span>';
 
                 const tr = document.createElement('tr');
@@ -2895,7 +2895,7 @@
             const keep = sel.value;
             let h = '<option value="ALL">Semua Toko (Broadcast Global)</option>';
             listNetworkTenants().forEach(function (t) {
-                h += '<option value="' + escHtml(t.id) + '">' + escHtml(t.id) + ' - ' + escHtml(t.nama) + (t.isMaster ? ' (Master)' : '') + '</option>';
+                h += '<option value="' + escHtml(t.id) + '">' + escHtml(t.id) + ' - ' + escHtml(t.nama) + '</option>';
             });
             sel.innerHTML = h;
             if (keep) sel.value = keep;

@@ -11,7 +11,8 @@
   function pad(n) { return String(n).padStart(2, '0'); }
   function clock(ms, off) { var d = new Date(ms + off * 3600000); return pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()); }
   function rp(n) { return g(function () { return formatThousand(n); }, 'Rp ' + Math.round(n || 0)); }
-  function tenants() { return g(function () { return billTenants(); }, []); }
+  function isDemoId(id) { return /^ID0{4,}/i.test(String(id || '')); }
+  function tenants() { return g(function () { return billTenants(); }, []).filter(function (t) { return !isDemoId(t.id) && !t.isMaster; }); }
   function ctrl(id) { return g(function () { return getCtrl(id); }, {}); }
   function txs(id) { return g(function () { return getTenantTxList(id); }, []); }
   function online(id) { return g(function () { return onlineSessions(id); }, []); }
@@ -227,22 +228,62 @@
     if (st.state === 'lewat' || st.state === 'tempo') return { v: '+' + dur(now - (st.overdueFrom || now)), c: st.state === 'lewat' ? 'r' : 'y', live: st.overdueFrom };
     return { v: g(function () { return FM_BILL.dateText(st.E); }, '-'), c: '', };
   }
+  var SORT = { key: 'last', dir: -1 };
+  var SORTKEY = ['', 'id', 'nama', 'kota', 'trx', 'inc', 'out', 'lab', 'tax', '', 'vs', 'on', 'bill', 'due', 'last'];
+  function setSort(key) {
+    if (!key) return;
+    if (SORT.key === key) SORT.dir = -SORT.dir; else { SORT.key = key; SORT.dir = key === 'id' || key === 'nama' || key === 'kota' ? 1 : -1; }
+    renderTable();
+    [].forEach.call(document.querySelectorAll('#tw-tbw th[data-sk]'), function (th) {
+      th.classList.toggle('sorted', th.getAttribute('data-sk') === SORT.key);
+      th.querySelector && (function () { var m = th.querySelector('.sk-ar'); if (m) m.textContent = th.getAttribute('data-sk') === SORT.key ? (SORT.dir > 0 ? ' ▲' : ' ▼') : ''; })();
+    });
+  }
   function renderTable() {
     var box = $('tw-rows'); if (!box) return;
     if (Date.now() - aggAt > 4000) compute();
-    var now = Date.now(), ts = tenants(), html = '';
+    var now = Date.now(), ts = tenants(), rows = [];
     ts.forEach(function (tn) {
       var a = agg[tn.id] || { inc: 0, out: 0, tax: 0, trx: 0, today: 0, yest: 0, sp: [0, 0, 0, 0, 0, 0, 0] };
       var on = online(tn.id).length, sus = suspended(tn.id), bc = billCell(tn.id, now), dc = dueCell(tn.id, now);
       var ps = g(function () { return presenceState(tn.id); }, on ? 'on' : 'off'), lamp = ps === 'on' ? 'g blink' : ps === 'afk' ? 'y' : 'r';
-      var vs = a.yest ? Math.round((a.today - a.yest) / a.yest * 100) : null, vsT, vsC;
-      if (a.today === a.yest) { vsT = '▬ 0%'; vsC = 'm'; } else if (vs === null) { vsT = '▲ baru'; vsC = 'g'; } else if (vs > 0) { vsT = '▲ ' + vs + '%'; vsC = 'g'; } else { vsT = '▼ ' + Math.abs(vs) + '%'; vsC = 'r'; }
+      var vs = a.yest ? Math.round((a.today - a.yest) / a.yest * 100) : null, vsT, vsC, vsN;
+      if (a.today === a.yest) { vsT = '▬ 0%'; vsC = 'm'; vsN = 0; } else if (vs === null) { vsT = '▲ baru'; vsC = 'g'; vsN = 1e9; } else if (vs > 0) { vsT = '▲ ' + vs + '%'; vsC = 'g'; vsN = vs; } else { vsT = '▼ ' + Math.abs(vs) + '%'; vsC = 'r'; vsN = vs; }
+      var lastMs = on ? now : g(function () { return lastActiveMs(tn.id); }, 0);
       var last = on ? 'sekarang' : g(function () { return agoText(lastActiveMs(tn.id)); }, '-'), geo = geoOf(tn.id), lab = a.inc - a.out;
-      html += '<tr><td class="' + lamp + '">●</td><td class="w">' + esc(tn.id) + '</td><td class="w">' + esc(tn.nama) + (sus ? ' <span class="r">(beku)</span>' : '') + '</td><td>' + esc(geo && geo.name ? geo.name : '-') + '</td>' +
-        '<td class="n">' + a.trx + '</td><td class="n">' + nf(a.inc) + '</td><td class="n">' + nf(a.out) + '</td><td class="n ' + (lab < 0 ? 'r' : 'g') + '">' + nf(lab) + '</td><td class="n">' + nf(a.tax) + '</td>' +
-        '<td class="' + (vsC === 'r' ? 'y' : vsC === 'g' ? 'g' : 'm') + '">' + spark(a.sp) + '</td><td class="n ' + vsC + '">' + vsT + '</td><td class="n ' + (on ? 'g' : 'm') + '">' + on + '</td>' +
-        '<td class="n ' + bc.c + '"><span data-live="' + esc(tn.id) + '">' + bc.v + '</span></td><td class="' + dc.c + '"><span' + (dc.live ? ' data-due="' + esc(tn.id) + '"' : '') + '>' + dc.v + '</span></td><td class="' + (on ? 'g' : 'm') + '">' + esc(last) + '</td></tr>';
+      var kotaName = geo && geo.name ? geo.name : '-';
+      rows.push({
+        tn: tn, a: a, on: on, sus: sus, bc: bc, dc: dc, lamp: lamp, vsT: vsT, vsC: vsC, vsN: vsN, last: last, lastMs: lastMs, kota: kotaName, lab: lab,
+        billN: g(function () { return FM_BILL.meter(ctrl(tn.id).billing, now); }, 0)
+      });
     });
+    rows.sort(function (ra, rb) {
+      var k = SORT.key, d = SORT.dir, va, vb;
+      switch (k) {
+        case 'id': va = ra.tn.id; vb = rb.tn.id; break;
+        case 'nama': va = ra.tn.nama; vb = rb.tn.nama; break;
+        case 'kota': va = ra.kota; vb = rb.kota; break;
+        case 'trx': va = ra.a.trx; vb = rb.a.trx; break;
+        case 'inc': va = ra.a.inc; vb = rb.a.inc; break;
+        case 'out': va = ra.a.out; vb = rb.a.out; break;
+        case 'lab': va = ra.lab; vb = rb.lab; break;
+        case 'tax': va = ra.a.tax; vb = rb.a.tax; break;
+        case 'vs': va = ra.vsN; vb = rb.vsN; break;
+        case 'on': va = ra.on; vb = rb.on; break;
+        case 'bill': va = ra.billN; vb = rb.billN; break;
+        case 'due': va = ra.dc.live || 0; vb = rb.dc.live || 0; break;
+        default: va = ra.lastMs; vb = rb.lastMs;
+      }
+      if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); return va < vb ? -d : va > vb ? d : 0; }
+      return (va - vb) * d;
+    });
+    var html = rows.map(function (r) {
+      var tn = r.tn, a = r.a, on = r.on, sus = r.sus, bc = r.bc, dc = r.dc;
+      return '<tr><td class="' + r.lamp + '">●</td><td class="w" title="' + esc(tn.id) + '">' + esc(tn.id) + '</td><td class="w wrap" title="' + esc(tn.nama) + '">' + esc(tn.nama) + (sus ? ' <span class="r">(beku)</span>' : '') + '</td><td class="wrap" title="' + esc(r.kota) + '">' + esc(r.kota) + '</td>' +
+        '<td class="n">' + a.trx + '</td><td class="n">' + nf(a.inc) + '</td><td class="n">' + nf(a.out) + '</td><td class="n ' + (r.lab < 0 ? 'r' : 'g') + '">' + nf(r.lab) + '</td><td class="n">' + nf(a.tax) + '</td>' +
+        '<td class="' + (r.vsC === 'r' ? 'y' : r.vsC === 'g' ? 'g' : 'm') + '">' + spark(a.sp) + '</td><td class="n ' + r.vsC + '">' + r.vsT + '</td><td class="n ' + (on ? 'g' : 'm') + '">' + on + '</td>' +
+        '<td class="n ' + bc.c + '"><span data-live="' + esc(tn.id) + '">' + bc.v + '</span></td><td class="' + dc.c + '"><span' + (dc.live ? ' data-due="' + esc(tn.id) + '"' : '') + '>' + dc.v + '</span></td><td class="' + (on ? 'g' : 'm') + '">' + esc(r.last) + '</td></tr>';
+    }).join('');
     box.innerHTML = html || '<tr><td colspan="15" class="m" style="padding:14px">Belum ada toko terdaftar.</td></tr>';
   }
   function tickLive() {
@@ -313,7 +354,10 @@
       '<div id="tw-bar"><span class="pgs"><button data-pg="mon" class="on">MONITOR</button><button data-pg="ken">KENDALI</button></span><span id="tw-df" class="g">● SIAGA 5</span><span id="tw-on"></span><span id="tw-tk" class="m"></span><span id="tw-al" class="m"></span><span class="sp"></span><span id="tw-clk" class="m"></span>' +
       '<button id="tw-snd" class="pl"></button><button id="tw-eco" class="pl"></button><button id="tw-set" class="pl">Atur</button><button id="tw-out" class="pl bad">Keluar</button></div>' +
       '<div id="tw-mon"><div id="tw-strip">' + cell(1, 'OMZET HARI INI') + cell(2, 'OMZET BULAN INI') + cell(3, 'PENGELUARAN BULAN INI') + cell(4, 'PAJAK DISUMBANG') + cell(5, 'BILLING BERJALAN', 'g') + cell(6, 'BILLING UJI COBA', 'y') + cell(7, 'PROYEKSI BULAN INI') + '</div>' +
-      '<div id="tw-tbw"><table><thead><tr>' + th.map(function (h, i) { return '<th' + (num[i] ? ' class="n"' : '') + '>' + h + '</th>'; }).join('') + '</tr></thead><tbody id="tw-rows"></tbody></table></div>' +
+      '<div id="tw-tbw"><table><thead><tr>' + th.map(function (h, i) {
+        var sk = SORTKEY[i], cls = (num[i] ? 'n' : '') + (sk && SORT.key === sk ? ' sorted' : '');
+        return '<th' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + (sk ? ' data-sk="' + sk + '"' : '') + '>' + h + (sk ? '<span class="sk-ar">' + (SORT.key === sk ? (SORT.dir > 0 ? ' ▲' : ' ▼') : '') + '</span>' : '') + '</th>';
+      }).join('') + '</tr></thead><tbody id="tw-rows"></tbody></table></div>' +
       '<div id="tw-bot"><div class="bx"><h4>LOG TRANSAKSI</h4><div id="tw-log"></div></div><div class="bx"><h4>JAM SIBUK</h4><div id="tw-jam"></div><h4 style="margin-top:10px">PERHATIAN</h4><div id="tw-attn"></div></div><div class="bx"><h4>CHAT GLOBAL <span class="m">(kamu: DEV)</span></h4><div id="tw-chat" class="tw-chat"></div></div></div></div>' +
       '<div id="tw-ken"></div>';
     document.body.appendChild(root);
@@ -334,6 +378,7 @@
       else if (b.id === 'tw-out') { SND.click(); if (window.FM_LOGOUT) FM_LOGOUT(); }
     });
     $('tw-ken').addEventListener('click', function (e) { if (e.target.closest('.fm-act') && !e.target.closest('.tw-soon')) SND.click(); });
+    $('tw-tbw').addEventListener('click', function (e) { var th = e.target.closest('th[data-sk]'); if (th) { SND.click(); setSort(th.getAttribute('data-sk')); } });
     ['mousemove', 'mousedown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) { document.addEventListener(ev, function () { lastTouch = Date.now(); }, { passive: true }); });
     document.addEventListener('keydown', function (e) {
       var tag = (document.activeElement && document.activeElement.tagName) || '';
@@ -368,8 +413,8 @@
     '#tw-mon{flex:1 1 0;min-height:0;display:none;flex-direction:column;padding:0 16px 10px}',
     'html[data-tw-pg="mon"] #tw-mon{display:flex}html[data-tw-pg="mon"] #tw-ken{display:none}html[data-tw-pg="ken"] #tw-mon{display:none}html[data-tw-pg="ken"] #tw-ken{display:flex}',
     '#tw-strip{flex:none;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-bottom:1px solid #2a2a2a;overflow:hidden}#tw-strip>div{min-width:0;padding:6px 8px;border-right:1px solid #1e1e1e}#tw-strip>div:last-child{border:0}#tw-strip small{display:block;color:#666;font-size:9.5px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#tw-strip b{display:block;font-size:clamp(11px,1.15vw,16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#tw-strip b.g{color:#3ddc84}#tw-strip b.y{color:#f5c542}',
-    '#tw-tbw{flex:1.25 1 0;min-height:60px;overflow-x:hidden;overflow-y:auto;margin-top:4px}#tw-tbw table{width:100%;table-layout:fixed;border-collapse:collapse}#tw-tbw th{position:sticky;top:0;background:#000;font-weight:400;color:#666;text-align:left;border-bottom:1px solid #333;padding:3px 4px;font-size:clamp(8px,.72vw,10px);letter-spacing:.02em;white-space:normal;line-height:1.1;overflow:hidden;vertical-align:bottom}#tw-tbw td{padding:4px;border-bottom:1px solid #151515;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(9px,.82vw,12px)}#tw-tbw .n{text-align:right}',
-    '#tw-tbw th:nth-child(1){width:1.2%}#tw-tbw th:nth-child(2){width:7.2%}#tw-tbw th:nth-child(3){width:9.5%}#tw-tbw th:nth-child(4){width:8%}#tw-tbw th:nth-child(5){width:4.8%}#tw-tbw th:nth-child(6){width:7.8%}#tw-tbw th:nth-child(7){width:7.8%}#tw-tbw th:nth-child(8){width:7%}#tw-tbw th:nth-child(9){width:6%}#tw-tbw th:nth-child(10){width:6.6%}#tw-tbw th:nth-child(11){width:5.6%}#tw-tbw th:nth-child(12){width:5%}#tw-tbw th:nth-child(13){width:8.4%}#tw-tbw th:nth-child(14){width:9.6%}#tw-tbw th:nth-child(15){width:5.5%}',
+    '#tw-tbw{flex:1.25 1 0;min-height:60px;overflow-x:hidden;overflow-y:auto;margin-top:4px}#tw-tbw table{width:100%;table-layout:fixed;border-collapse:collapse}#tw-tbw th{position:sticky;top:0;background:#000;font-weight:400;color:#666;text-align:left;border-bottom:1px solid #333;padding:3px 4px;font-size:clamp(8px,.72vw,10px);letter-spacing:.02em;white-space:normal;line-height:1.1;overflow:hidden;vertical-align:bottom;cursor:default}#tw-tbw th[data-sk]{cursor:pointer;user-select:none}#tw-tbw th[data-sk]:hover{color:#bbb}#tw-tbw th.sorted{color:#ddd}#tw-tbw .sk-ar{color:#5ab0ff}#tw-tbw td{padding:4px;border-bottom:1px solid #151515;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(9px,.82vw,12px);vertical-align:top}#tw-tbw td.wrap{white-space:normal;overflow-wrap:anywhere;text-overflow:clip;line-height:1.25}#tw-tbw .n{text-align:right}',
+    '#tw-tbw th:nth-child(1){width:1.2%}#tw-tbw th:nth-child(2){width:7.2%}#tw-tbw th:nth-child(3){width:11.5%}#tw-tbw th:nth-child(4){width:10%}#tw-tbw th:nth-child(5){width:4.8%}#tw-tbw th:nth-child(6){width:7%}#tw-tbw th:nth-child(7){width:7%}#tw-tbw th:nth-child(8){width:6.6%}#tw-tbw th:nth-child(9){width:6%}#tw-tbw th:nth-child(10){width:6.6%}#tw-tbw th:nth-child(11){width:5.2%}#tw-tbw th:nth-child(12){width:4.6%}#tw-tbw th:nth-child(13){width:7.8%}#tw-tbw th:nth-child(14){width:8.1%}#tw-tbw th:nth-child(15){width:5.5%}',
     '#tw-bot{flex:1 1 0;min-height:90px;display:grid;grid-template-columns:1.5fr 1fr 1.1fr;gap:16px;margin-top:8px}.bx{min-height:0;min-width:0;display:flex;flex-direction:column;border-top:1px solid #333;padding-top:5px}.bx h4{margin:0 0 4px;font-weight:400;color:#666;font-size:10px;letter-spacing:.1em}',
     '#tw-log{flex:1 1 0;min-height:0;overflow:hidden;display:flex;flex-direction:column}.ln{display:flex;gap:10px;word-break:break-word;flex:none}.ln .t{color:#555;flex:none}.ln.sale .m{color:#3ddc84}.ln.up .m{color:#3ddc84}.ln.cost .m{color:#999}.ln.down .m{color:#f5c542}.ln.alarm .m{color:#ff5252}.ln.sys .m{color:#eee}',
     '.caret{font-style:normal;color:#3ddc84}',
