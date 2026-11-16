@@ -1,7 +1,12 @@
-/* rollout.js — rollout bertarget per toko/paket.
-   Tujuan: saat ada rilis baru, toko paket Basic tetap di versi stabil terakhir sampai Tower
-   sengaja menaikkannya, sementara toko paket Plus otomatis mencoba versi terbaru lebih dulu.
-   Tower bisa juga mengunci satu toko tertentu ke versi manapun (override), terlepas dari paketnya.
+/* rollout.js — rollout bertarget per toko/generasi Oneilverse.
+   Tujuan: setiap toko punya "generasi" (Generasi 1 = Oneilverse, Generasi 2 = Oneilverse 2, dst, lihat
+   tenant.generation — kosong/tidak diisi dianggap Generasi 1, supaya semua toko lama otomatis aman).
+   Tiap generasi punya titik bekunya sendiri di Firestore (app_meta/rollout, field generations.<n>.pin):
+   kalau diisi versi, toko generasi itu TERKUNCI ke folder /rilis/<versi>/ tersebut dan tidak ikut
+   berubah walau kode di akar situs terus dikembangkan (misalnya saat Tower sedang membangun generasi
+   berikutnya). Kalau dikosongkan, toko generasi itu mengikuti kode TERBARU di akar situs apa adanya.
+   Tower juga bisa mengunci satu toko tertentu ke versi manapun lewat tenant.pinnedVersion (override,
+   menang dari pengaturan generasi).
 
    Cara kerja: versi-versi lama disimpan sebagai salinan lengkap di folder /rilis/<versi>/.
    Skrip ini mengecek versi mana yang seharusnya dipakai toko ini (dari Firestore, dokumen publik
@@ -10,8 +15,8 @@
 
    File ini SELALU dimuat dengan path absolut (/js/rollout.js) di semua halaman, termasuk salinan lama
    di dalam /rilis/, supaya toko yang terkunci ke versi lama tetap bisa "naik" saat Tower menaikkan
-   default paketnya — tanpa perlu menyalin ulang skrip ini ke setiap folder rilis lama. JANGAN pindahkan
-   file ini ke dalam folder /rilis/ atau memuatnya dengan path relatif. */
+   titik beku generasinya — tanpa perlu menyalin ulang skrip ini ke setiap folder rilis lama. JANGAN
+   pindahkan file ini ke dalam folder /rilis/ atau memuatnya dengan path relatif. */
 (function () {
   'use strict';
   if (/provider|partner/.test(location.pathname)) return; // Tower & Mitra selalu memakai kode versi terbaru
@@ -72,14 +77,21 @@
     } catch (e) {}
   }
 
+  // Jaga-jaga: kalau dokumen app_meta/rollout belum diisi bentuk generations (belum sempat disimpan Tower)
+  // atau Firestore tak terjangkau, Generasi 1 tetap aman terkunci ke titik ini, TIDAK ikut kode akar.
+  var FALLBACK_GEN1_PIN = 'v1.0.23';
+
   function decide(cfg) {
     try {
       var key = String(fmTokoParam() || 'id26110901').toLowerCase().trim();
       var tn = TENANTS_CONFIG[key];
+      var gen = String((tn && tn.generation) || '1');
       var target = tn && tn.pinnedVersion ? slug(tn.pinnedVersion) : '';
-      if (!target && cfg) {
-        var tier = (tn && tn.tier) || 'basic';
-        target = slug(cfg[tier] || cfg.basic || '');
+      if (!target) {
+        var gc = cfg && cfg.generations && cfg.generations[gen];
+        if (gc && gc.pin) target = slug(gc.pin);
+        else if (!cfg || !cfg.generations) { if (gen === '1') target = slug(FALLBACK_GEN1_PIN); }
+        // kalau titik beku generasi ini memang sengaja dikosongkan Tower, toko ikut kode terbaru di akar
       }
       var running = slug((window.FM_RELEASES && FM_RELEASES.beta) || '');
       if (target && running && target === running) { pinUpdateCheck(); return; }

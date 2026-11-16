@@ -1397,9 +1397,10 @@
             }).catch(function () { alert(base); });
         }
 
-        // ===== ROLLOUT BERTARGET (versi default per paket + kunci manual per toko) =====
+        // ===== ROLLOUT BERTARGET PER GENERASI ONEILVERSE (bukan lagi per paket Basic/Plus) =====
+        // Tiap toko punya "generasi" (tenant.generation; kosong = Generasi 1 = Oneilverse). Tiap generasi
+        // punya titik beku sendiri (pin ke folder /rilis/<versi>/, atau kosong = ikut kode terbaru di akar).
         // Daftar versi yang tersedia sebagai salinan lengkap di folder /rilis/<versi>/.
-        // Tambahkan slug versi baru di sini begitu folder rilisnya dibuat.
         const FM_ROLLOUT_VERSIONS = [];
         /* Daftar versi terisi otomatis dari rilis/index.json (dibuat tiap rilis); daftar di atas tetap dipakai sebagai cadangan. */
         try {
@@ -1414,40 +1415,73 @@
                 });
             }).catch(function () {});
         } catch (e) {}
-        let FM_ROLLOUT_CFG = { basic: 'Prototype', plus: 'Prototype' };
+        let FM_ROLLOUT_CFG = { generations: { '1': { label: 'Oneilverse', pin: 'v1.0.23' } } };
         let rolloutPanelFor = null;
 
         function startRolloutListener() {
             if (!(typeof db !== 'undefined' && db)) return;
             db.collection('app_meta').doc('rollout').onSnapshot(function (doc) {
                 try {
-                    if (doc.exists && doc.data().json) FM_ROLLOUT_CFG = JSON.parse(doc.data().json);
+                    if (doc.exists && doc.data().json) {
+                        const parsed = JSON.parse(doc.data().json);
+                        if (parsed && parsed.generations) FM_ROLLOUT_CFG = parsed;
+                    }
                 } catch (e) {}
                 renderRolloutDefaults();
                 if (rolloutPanelFor) { const tn = TENANTS_CONFIG[rolloutPanelFor]; if (tn) renderInspectRollout(tn); }
             }, function () {});
         }
 
-        function saveRolloutDefaults(basic, plus) {
+        function saveGenerations(generations) {
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
-            if (!confirm('Ubah default rollout?\nBasic → ' + basic + '\nPlus → ' + plus + '\n\nSemua toko yang tidak dikunci manual akan ikut berpindah saat laman mereka dibuka lagi.')) return;
-            db.collection('app_meta').doc('rollout').set({ json: JSON.stringify({ basic: basic, plus: plus }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
-                .then(function () { alert('Default rollout tersimpan.'); })
+            if (!confirm('Simpan pengaturan generasi?\n\nToko di tiap generasi yang tidak dikunci manual akan ikut berpindah saat laman mereka dibuka lagi.')) return;
+            db.collection('app_meta').doc('rollout').set({ json: JSON.stringify({ generations: generations }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+                .then(function () { alert('Pengaturan generasi tersimpan.'); })
                 .catch(function (e) { fmPermAlert(e); });
+        }
+
+        function genRowHtml(n, g) {
+            const label = (g && g.label) || ('Generasi ' + n);
+            const pin = (g && g.pin) || '';
+            const opt = ['<option value="">Ikuti kode terbaru (tidak dibekukan)</option>'].concat(
+                FM_ROLLOUT_VERSIONS.map(function (v) { return '<option value="' + v + '"' + (v === pin ? ' selected' : '') + '>Bekukan ke ' + v + '</option>'; })
+            ).join('');
+            const delBtn = n !== '1' ? '<button type="button" class="gen-del" data-n="' + n + '" style="all:unset;cursor:pointer;color:#f87171;font-size:15px;padding:0 4px">✕</button>' : '<span style="width:15px;display:inline-block"></span>';
+            return '<div class="gen-row" data-n="' + n + '" style="display:flex;gap:6px;align-items:center;margin-bottom:8px">' +
+                '<input class="gen-label" data-n="' + n + '" value="' + escHtml(label) + '" placeholder="Nama generasi" style="flex:1;min-width:0;background:#0f172a;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:7px 9px;font-size:12px;color:#fff">' +
+                '<select class="gen-pin" data-n="' + n + '" style="flex:1.3;min-width:0;background:#0f172a;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:7px 9px;font-size:12px;color:#fff">' + opt + '</select>' +
+                delBtn + '</div>';
         }
 
         // Dipanggil dari tile "Rollout Versi" di KENDALI (dibuat di tower-menu.js)
         function renderRolloutDefaults() {
             const el = document.getElementById('tw-rollout-defaults');
             if (!el) return;
-            const opt = function (cur) { return FM_ROLLOUT_VERSIONS.map(function (v) { return '<option value="' + v + '"' + (v === cur ? ' selected' : '') + '>' + v + '</option>'; }).join(''); };
+            const gens = (FM_ROLLOUT_CFG && FM_ROLLOUT_CFG.generations) || { '1': { label: 'Oneilverse', pin: 'v1.0.23' } };
+            const nums = Object.keys(gens).sort(function (a, b) { return (+a) - (+b); });
+            let rows = ''; nums.forEach(function (n) { rows += genRowHtml(n, gens[n]); });
             el.innerHTML =
-                '<div class="grid grid-cols-2 gap-3">' +
-                '<div><label class="block text-[11px] text-slate-400 mb-1">Default Basic</label><select id="rd-basic" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2 text-xs text-white outline-none">' + opt(FM_ROLLOUT_CFG.basic) + '</select></div>' +
-                '<div><label class="block text-[11px] text-slate-400 mb-1">Default Plus</label><select id="rd-plus" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2 text-xs text-white outline-none">' + opt(FM_ROLLOUT_CFG.plus) + '</select></div>' +
-                '</div><button id="rd-save" class="mt-3 w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-black text-xs transition">Simpan Default</button>';
-            document.getElementById('rd-save').onclick = function () {
-                saveRolloutDefaults(document.getElementById('rd-basic').value, document.getElementById('rd-plus').value);
+                '<div id="gen-rows">' + rows + '</div>' +
+                '<button id="gen-add" type="button" style="width:100%;padding:7px;margin-bottom:8px;border-radius:10px;border:1px dashed rgba(255,255,255,.25);background:transparent;color:#cbd5e1;font-size:12px;cursor:pointer">+ Tambah Generasi</button>' +
+                '<button id="gen-save" class="w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-black text-xs transition">Simpan Generasi</button>';
+            el.querySelector('#gen-add').onclick = function () {
+                const rows2 = el.querySelectorAll('.gen-row');
+                const used = Array.prototype.map.call(rows2, function (r) { return parseInt(r.getAttribute('data-n'), 10); });
+                let next = 2; while (used.indexOf(next) >= 0) next++;
+                el.querySelector('#gen-rows').insertAdjacentHTML('beforeend', genRowHtml(String(next), { label: 'Oneilverse ' + next, pin: '' }));
+                Array.prototype.forEach.call(el.querySelectorAll('.gen-del'), bindDel);
+            };
+            function bindDel(btn) { btn.onclick = function () { btn.closest('.gen-row').remove(); }; }
+            Array.prototype.forEach.call(el.querySelectorAll('.gen-del'), bindDel);
+            el.querySelector('#gen-save').onclick = function () {
+                const out = {};
+                Array.prototype.forEach.call(el.querySelectorAll('.gen-row'), function (r) {
+                    const n = r.getAttribute('data-n');
+                    const label = r.querySelector('.gen-label').value.trim() || ('Generasi ' + n);
+                    const pin = r.querySelector('.gen-pin').value;
+                    out[n] = { label: label, pin: pin };
+                });
+                saveGenerations(out);
             };
         }
 
@@ -1457,19 +1491,29 @@
             if (!isManaged(tenant)) { box.classList.add('hidden'); box.innerHTML = ''; rolloutPanelFor = null; return; }
             if (rolloutPanelFor === tenant.id) return;
             rolloutPanelFor = tenant.id;
-            const tier = tenant.tier || 'basic';
-            const ikut = FM_ROLLOUT_CFG[tier] || FM_ROLLOUT_CFG.basic || '-';
-            const opt = ['<option value="">Ikuti default paket (' + ikut + ')</option>'].concat(
+            const gens = (FM_ROLLOUT_CFG && FM_ROLLOUT_CFG.generations) || { '1': { label: 'Oneilverse', pin: 'v1.0.23' } };
+            const curGen = String(tenant.generation || '1');
+            const genOpt = Object.keys(gens).sort(function (a, b) { return (+a) - (+b); }).map(function (n) {
+                return '<option value="' + n + '"' + (n === curGen ? ' selected' : '') + '>' + escHtml((gens[n] && gens[n].label) || ('Generasi ' + n)) + '</option>';
+            }).join('');
+            const genPin = (gens[curGen] && gens[curGen].pin) || '';
+            const ikut = genPin || 'kode terbaru';
+            const opt = ['<option value="">Ikuti generasi (' + ikut + ')</option>'].concat(
                 FM_ROLLOUT_VERSIONS.map(function (v) { return '<option value="' + v + '"' + (tenant.pinnedVersion === v ? ' selected' : '') + '>Kunci ke ' + v + '</option>'; })
             ).join('');
-            const ikutShield = FM_SHIELD_CFG[tier] || FM_SHIELD_CFG.basic || '2.0';
-            const sopt = ['<option value="">Ikuti default paket (v' + ikutShield + ')</option>'].concat(
+            const ikutShield = (FM_SHIELD_CFG && FM_SHIELD_CFG.default) || '2.0';
+            const sopt = ['<option value="">Ikuti default (v' + ikutShield + ')</option>'].concat(
                 FM_SHIELD_VERSIONS.map(function (v) { return '<option value="' + v + '"' + (tenant.shieldVersion === v ? ' selected' : '') + '>Kunci ke v' + v + '</option>'; })
             ).join('');
             box.classList.remove('hidden');
             box.innerHTML =
+                '<span class="font-black text-sm text-white block mb-1">Generasi Toko Ini</span>' +
+                '<p class="text-[11px] text-slate-400 mb-2">Saat ini: <b class="text-violet-300">' + escHtml((gens[curGen] && gens[curGen].label) || ('Generasi ' + curGen)) + '</b></p>' +
+                '<select id="ir-gen" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">' + genOpt + '</select>' +
+                '<button id="ir-gen-save" class="mt-2 w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-black text-xs transition">Simpan Generasi</button>' +
+                '<div style="margin:14px 0 8px;border-top:1px solid rgba(255,255,255,.1)"></div>' +
                 '<span class="font-black text-sm text-white block mb-1">Versi Aplikasi Toko Ini</span>' +
-                '<p class="text-[11px] text-slate-400 mb-2">Paket ' + (TIER_LABEL[tier] || tier) + ' — saat ini ikut versi: <b class="text-violet-300">' + (tenant.pinnedVersion || ikut) + '</b></p>' +
+                '<p class="text-[11px] text-slate-400 mb-2">Saat ini ikut versi: <b class="text-violet-300">' + (tenant.pinnedVersion || ikut) + '</b></p>' +
                 '<select id="ir-version" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">' + opt + '</select>' +
                 '<button id="ir-save" class="mt-2 w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-black text-xs transition">Simpan Versi</button>' +
                 '<div style="margin:14px 0 8px;border-top:1px solid rgba(255,255,255,.1)"></div>' +
@@ -1477,6 +1521,9 @@
                 '<p class="text-[11px] text-slate-400 mb-2">Saat ini ikut versi: <b class="text-emerald-300">' + (tenant.shieldVersion ? 'v' + tenant.shieldVersion : 'v' + ikutShield) + '</b></p>' +
                 '<select id="ir-shield" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">' + sopt + '</select>' +
                 '<button id="ir-shield-save" class="mt-2 w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition">Simpan Versi Shield</button>';
+            document.getElementById('ir-gen-save').onclick = function () {
+                setTenantGeneration(tenant.id, document.getElementById('ir-gen').value);
+            };
             document.getElementById('ir-save').onclick = function () {
                 setTenantPinnedVersion(tenant.id, document.getElementById('ir-version').value);
             };
@@ -1491,13 +1538,13 @@
             ov.id = 'tw-rollout-modal';
             ov.style.cssText = 'position:fixed;inset:0;z-index:2147483200;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px';
             ov.innerHTML =
-                '<div style="width:100%;max-width:420px;background:#0b0b10;border:1px solid rgba(167,139,250,.35);border-radius:20px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)">' +
+                '<div style="width:100%;max-width:440px;max-height:88vh;overflow:auto;background:#0b0b10;border:1px solid rgba(167,139,250,.35);border-radius:20px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)">' +
                 '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="color:#fff;font-size:14px">Rollout Versi</b><button id="tw-rollout-close" style="all:unset;cursor:pointer;color:#94a3b8;font-size:13px">Tutup</button></div>' +
-                '<p style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:10px">Default versi untuk toko yang <b>tidak dikunci manual</b>. Plus otomatis dapat versi terbaru lebih dulu (ladang uji coba); Basic tetap di versi stabil sampai dinaikkan manual di sini. Untuk mengunci satu toko tertentu, pakai tombol Versi Toko di ruang Kendali.</p>' +
+                '<p style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:10px">Tiap generasi Oneilverse punya titik beku sendiri. Kosongkan titik bekunya kalau generasi itu mau ikut kode terbaru di akar situs (dipakai saat generasi itu masih dikembangkan). Toko yang belum punya generasi otomatis dianggap Generasi 1. Untuk mengunci satu toko tertentu, pakai tombol Versi Toko di ruang Kendali.</p>' +
                 '<div id="tw-rollout-defaults"></div>' +
                 '<div style="margin:16px 0 4px;border-top:1px solid rgba(255,255,255,.1)"></div>' +
                 '<div style="display:flex;align-items:center;gap:6px;margin:10px 0 4px"><b style="color:#fff;font-size:13px">🛡️ Rollout Oneil Shield</b></div>' +
-                '<p style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:10px">Terpisah dari versi aplikasi di atas. Dipakai untuk menjanjikan paket Plus dapat pembaruan keamanan Oneil Shield lebih dulu.</p>' +
+                '<p style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:10px">Terpisah dari versi aplikasi di atas, supaya pembaruan keamanan Oneil Shield bisa dinaikkan sendiri tanpa ikut menaikkan versi aplikasi.</p>' +
                 '<div id="tw-shield-rollout-defaults"></div>' +
                 '</div>';
             document.body.appendChild(ov);
@@ -1509,6 +1556,18 @@
         function closeRolloutModal() { const ov = document.getElementById('tw-rollout-modal'); if (ov) ov.remove(); }
         window.openRolloutModal = openRolloutModal;
 
+        function setTenantGeneration(tenantId, gen) {
+            const key = String(tenantId).toLowerCase();
+            const tn = TENANTS_CONFIG[key];
+            if (!isManaged(tn)) return alert('Generasi hanya dapat diatur untuk toko yang dikelola Tower.');
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+            const cfg = Object.assign({}, tn); delete cfg.fromRegistry;
+            if (gen && gen !== '1') cfg.generation = gen; else delete cfg.generation;
+            db.collection('tenants_registry').doc(key).set({ id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+                .then(function () { rolloutPanelFor = null; alert('Generasi toko tersimpan. Berlaku saat laman toko dibuka lagi.'); })
+                .catch(function (e) { fmPermAlert(e); });
+        }
+
         function setTenantPinnedVersion(tenantId, version) {
             const key = String(tenantId).toLowerCase();
             const tn = TENANTS_CONFIG[key];
@@ -1517,7 +1576,7 @@
             const cfg = Object.assign({}, tn); delete cfg.fromRegistry;
             if (version) cfg.pinnedVersion = version; else delete cfg.pinnedVersion;
             db.collection('tenants_registry').doc(key).set({ id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
-                .then(function () { rolloutPanelFor = null; alert(version ? ('Toko dikunci ke versi ' + version + '. Berlaku saat laman toko dibuka lagi.') : 'Toko kembali mengikuti default paket.'); })
+                .then(function () { rolloutPanelFor = null; alert(version ? ('Toko dikunci ke versi ' + version + '. Berlaku saat laman toko dibuka lagi.') : 'Toko kembali mengikuti generasinya.'); })
                 .catch(function (e) { fmPermAlert(e); });
         }
 
@@ -1525,23 +1584,26 @@
         // Versi Shield yang tersedia sebagai file di js/shield/shield-<versi>.js. Daftar ini HARUS sinkron
         // dengan KNOWN_VERSIONS di js/shield.js (pemuat) — tambahkan versi baru di DUA tempat itu sekaligus.
         const FM_SHIELD_VERSIONS = ['2.0'];
-        let FM_SHIELD_CFG = { basic: '2.0', plus: '2.0' };
+        let FM_SHIELD_CFG = { default: '2.0' };
 
         function startShieldRolloutListener() {
             if (!(typeof db !== 'undefined' && db)) return;
             db.collection('app_meta').doc('rollout_shield').onSnapshot(function (doc) {
                 try {
-                    if (doc.exists && doc.data().json) FM_SHIELD_CFG = JSON.parse(doc.data().json);
+                    if (doc.exists && doc.data().json) {
+                        const parsed = JSON.parse(doc.data().json);
+                        FM_SHIELD_CFG = { default: parsed.default || parsed.basic || parsed.plus || '2.0' };
+                    }
                 } catch (e) {}
                 renderShieldRolloutDefaults();
                 if (rolloutPanelFor) { const tn = TENANTS_CONFIG[rolloutPanelFor]; if (tn) renderInspectRollout(tn); }
             }, function () {});
         }
 
-        function saveShieldRolloutDefaults(basic, plus) {
+        function saveShieldRolloutDefaults(def) {
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
-            if (!confirm('Ubah default Oneil Shield?\nBasic → v' + basic + '\nPlus → v' + plus + '\n\nSemua toko yang tidak dikunci manual akan ikut berpindah saat laman mereka dibuka lagi.')) return;
-            db.collection('app_meta').doc('rollout_shield').set({ json: JSON.stringify({ basic: basic, plus: plus }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+            if (!confirm('Ubah default Oneil Shield ke v' + def + '?\n\nSemua toko yang tidak dikunci manual akan ikut berpindah saat laman mereka dibuka lagi.')) return;
+            db.collection('app_meta').doc('rollout_shield').set({ json: JSON.stringify({ default: def }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
                 .then(function () { alert('Default Oneil Shield tersimpan.'); })
                 .catch(function (e) { fmPermAlert(e); });
         }
@@ -1552,12 +1614,10 @@
             if (!el) return;
             const opt = function (cur) { return FM_SHIELD_VERSIONS.map(function (v) { return '<option value="' + v + '"' + (v === cur ? ' selected' : '') + '>v' + v + '</option>'; }).join(''); };
             el.innerHTML =
-                '<div class="grid grid-cols-2 gap-3">' +
-                '<div><label class="block text-[11px] text-slate-400 mb-1">Default Basic</label><select id="sd-basic" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2 text-xs text-white outline-none">' + opt(FM_SHIELD_CFG.basic) + '</select></div>' +
-                '<div><label class="block text-[11px] text-slate-400 mb-1">Default Plus</label><select id="sd-plus" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2 text-xs text-white outline-none">' + opt(FM_SHIELD_CFG.plus) + '</select></div>' +
-                '</div><button id="sd-save" class="mt-3 w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition">Simpan Default Shield</button>';
+                '<div><label class="block text-[11px] text-slate-400 mb-1">Default Oneil Shield</label><select id="sd-default" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2 text-xs text-white outline-none">' + opt(FM_SHIELD_CFG.default) + '</select></div>' +
+                '<button id="sd-save" class="mt-3 w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition">Simpan Default Shield</button>';
             document.getElementById('sd-save').onclick = function () {
-                saveShieldRolloutDefaults(document.getElementById('sd-basic').value, document.getElementById('sd-plus').value);
+                saveShieldRolloutDefaults(document.getElementById('sd-default').value);
             };
         }
 
@@ -1569,7 +1629,7 @@
             const cfg = Object.assign({}, tn); delete cfg.fromRegistry;
             if (version) cfg.shieldVersion = version; else delete cfg.shieldVersion;
             db.collection('tenants_registry').doc(key).set({ id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
-                .then(function () { rolloutPanelFor = null; alert(version ? ('Oneil Shield toko ini dikunci ke v' + version + '. Berlaku saat laman toko dibuka lagi.') : 'Oneil Shield toko ini kembali mengikuti default paket.'); })
+                .then(function () { rolloutPanelFor = null; alert(version ? ('Oneil Shield toko ini dikunci ke v' + version + '. Berlaku saat laman toko dibuka lagi.') : 'Oneil Shield toko ini kembali mengikuti default.'); })
                 .catch(function (e) { fmPermAlert(e); });
         }
 
