@@ -20,12 +20,12 @@
         :root {
             --app-bg: #0E0D0A;
             --ios-card: rgba(255, 255, 255, 0.94);
-            --ios-border: rgba(227, 166, 56, 0.16);
+            --ios-border: rgba(227, 166, 56, 0.32);
             --oneui-squircle: 24px;
         }
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-            background-color: #0E0D0A; background-image: radial-gradient(at 0% 0%, rgba(227, 166, 56, 0.08) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(82, 161, 136, 0.07) 0px, transparent 50%); padding-bottom: 48px;
+            background-color: #0E0D0A; background-image: radial-gradient(at 0% 0%, rgba(227, 166, 56, 0.22) 0px, transparent 55%), radial-gradient(at 100% 100%, rgba(82, 161, 136, 0.14) 0px, transparent 55%); padding-bottom: 48px;
             -webkit-tap-highlight-color: transparent;
         }
         .font-mono { font-family: 'Fraunces', serif; font-feature-settings: 'tnum'; }
@@ -33,14 +33,16 @@
         .oneui-hero {
             border-bottom-left-radius: 36px;
             border-bottom-right-radius: 36px;
-            background: linear-gradient(145deg, #0E0D0A 0%, #171310 45%, #26200F 100%);
+            background: linear-gradient(145deg, #0E0D0A 0%, #241A0C 45%, #4A3310 100%);
+            box-shadow: inset 0 -1px 0 rgba(227,166,56,.4);
         }
         .ios-glass {
-            background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%), rgba(22, 20, 15, 0.9);
-            box-shadow: 0 12px 35px -10px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.06);
+            background: linear-gradient(135deg, rgba(227,166,56,0.07) 0%, rgba(255,255,255,0.01) 100%), rgba(26, 23, 16, 0.92);
+            box-shadow: 0 12px 35px -10px rgba(0,0,0,0.8), inset 0 1px 0 rgba(227,166,56,0.1);
 
             border: 1px solid var(--ios-border);
             border-radius: var(--oneui-squircle);
+            border-top-color: rgba(227,166,56,.5);
         }
         .ios-pill {
             border-radius: 9999px;
@@ -164,10 +166,10 @@
             </div>
             <div class="ios-glass p-5 flex flex-col justify-between bg-slate-900/5 border-white/20">
                 <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-extrabold text-white uppercase tracking-wider">Laba Bersih</span>
+                    <span class="text-[11px] font-extrabold text-amber-300 uppercase tracking-wider">Laba Bersih</span>
                     <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
                 </div>
-                <h3 id="kas-net" class="text-2xl sm:text-3xl font-black text-white my-1 font-mono">Rp 0</h3>
+                <h3 id="kas-net" class="text-2xl sm:text-3xl font-black text-amber-400 my-1 font-mono">Rp 0</h3>
             </div>
             <div class="ios-glass p-5 flex flex-col justify-between">
                 <div class="flex items-center justify-between">
