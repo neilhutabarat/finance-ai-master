@@ -99,7 +99,7 @@
         low.length ? ('Ada ' + low.length + ' produk di bawah batas aman: ' + low.slice(0, 3).map(function (p) { return esc(p.name) + ' (' + p.stock + ')'; }).join(', ') + (low.length > 3 ? ', dan lainnya' : '') + '.') : 'Semua stok aman, tidak ada yang mendekati batas minimum.',
         'Hari ini sudah ada ' + sToday.length + ' transaksi dengan omzet ' + rp(omToday) + '.'
       ];
-      aiCardHtml = '<div id="fm-ai-card" style="font-family:\'Plus Jakarta Sans\',sans-serif;background:#1D1912;border-radius:20px;padding:20px 18px;margin-bottom:14px;color:#F5F0E4">' +
+      aiCardHtml = '<div id="fm-ai-card" class="fm-keep" style="font-family:\'Plus Jakarta Sans\',sans-serif;background:#1D1912;border-radius:20px;padding:20px 18px;margin-bottom:14px;color:#F5F0E4">' +
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">' +
         '<span style="width:7px;height:7px;border-radius:50%;background:#E3A638;display:inline-block"></span>' +
         '<span style="font-size:12px;font-weight:700;color:#E3A638">Asisten AI &middot; pratinjau Oneilverse 2</span>' +
