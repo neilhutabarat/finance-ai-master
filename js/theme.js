@@ -3,11 +3,15 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.20';
+  var BETA = 'v1.0.21';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.21', '16 Nov 2026', [
+      '[Perbaikan] Transaksi dengan Tanggal Transaksi yang diset ke tanggal lampau kini benar-benar tercatat di tanggal tersebut di struk, Mutasi, dan Buku Besar, tidak lagi otomatis memakai tanggal hari ini',
+      '[Keamanan] Perubahan hanya memperbaiki tanggal yang ditampilkan/tercatat, tidak mengubah nominal atau akun transaksi mana pun'
+    ]],
     ['v1.0.20', '16 Nov 2026', [
       '[Perbaikan] Struk transaksi di kasir kini bisa digulir (scroll) saat isinya banyak baris, sehingga seluruh daftar dan tombol cetak tetap bisa dijangkau',
       '[Keamanan] Perubahan hanya pada tampilan struk, tidak mengubah data transaksi atau proses cetak'
