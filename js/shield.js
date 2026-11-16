@@ -266,34 +266,5 @@
     deviceLabel: deviceLabel
   };
 
-  /* ============ lencana kecil yang menempel di layar (kasir/manager/owner) ============ */
-  function mountMiniBadge() {
-    if (document.getElementById('fm-shield-mini')) return;
-    var b = document.createElement('button'); b.id = 'fm-shield-mini';
-    b.setAttribute('aria-label', 'Oneil Shield');
-    b.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:999;border:0;cursor:pointer;background:rgba(15,23,42,.72);color:#93c5fd;font:700 10.5px system-ui,-apple-system,sans-serif;padding:5px 9px;border-radius:999px;display:flex;align-items:center;gap:4px;box-shadow:0 2px 10px rgba(0,0,0,.25)';
-    b.innerHTML = '<span>🛡️</span><span>v' + VER + '</span>';
-    b.onclick = function () {
-      var ctx = null;
-      try {
-        var at = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
-        if (at && at.id) ctx = { tid: at.id, role: 'acct', slot: '' };
-      } catch (e) {}
-      openPanel(ctx);
-    };
-    document.body.appendChild(b);
-  }
-
-  window.FM_SHIELD = {
-    touch: touch, openPanel: openPanel, ver: VER,
-    status: function () { var s = seen(); return { lastContactDays: s ? days(now() - s) : 0, locked: locked() }; },
-    checkLock: checkLock, registerFail: registerFail, registerSuccess: registerSuccess,
-    badgeHtml: badgeHtml, badgeText: badgeText, maybeMonthlyReport: maybeMonthlyReport, renderMonthlyPopup: renderMonthlyPopup,
-    deviceLabel: deviceLabel
-  };
-
-  if (IS_CLIENT_PAGE) {
-    (function boot() { setTimeout(checkOffline, 5000); setInterval(checkOffline, 60 * 60 * 1000); })();
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountMiniBadge); else mountMiniBadge();
-  }
+  if (IS_CLIENT_PAGE) { (function boot() { setTimeout(checkOffline, 5000); setInterval(checkOffline, 60 * 60 * 1000); })(); }
 })();
