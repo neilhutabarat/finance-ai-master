@@ -167,8 +167,20 @@
       var badTx = txs.filter(function (x) { return !(Number(x.amount) > 0); });
       if (badTx.length) A({ kind: 'info', key: 'txnol', title: 'Transaksi dengan nominal kosong atau nol (dari 500 terakhir)', count: badTx.length, detail: badTx.slice(0, 4).map(function (x) { return x._id; }).join(', ') });
       if (coa.length) {
-        var lost = txs.filter(function (x) { return x.accountCode != null && x.accountCode !== '' && !codes[String(x.accountCode)]; });
-        if (lost.length) A({ kind: 'info', key: 'txakun', title: 'Transaksi memakai akun COA yang sudah tidak ada (dari 500 terakhir)', count: lost.length, detail: Object.keys(lost.reduce(function (m, x) { m[x.accountCode] = 1; return m; }, {})).slice(0, 6).join(', ') });
+        /* transaksi produk memakai KODE PRODUK sebagai accountCode, bukan akun COA: jangan dihitung sebagai yatim */
+        var pcodes = {}; prods.forEach(function (p) { if (p.code != null) pcodes[String(p.code)] = 1; pcodes[String(p._id)] = 1; });
+        var lost = txs.filter(function (x) { return !x.isProduct && x.accountCode != null && x.accountCode !== '' && !codes[String(x.accountCode)] && !pcodes[String(x.accountCode)]; });
+        if (lost.length) {
+          var lostMap = {};
+          lost.forEach(function (x) { var k = String(x.accountCode); if (!lostMap[k]) lostMap[k] = { code: k, name: String(x.accountName || '').trim(), category: String(x.category || '').trim(), n: 0 }; lostMap[k].n++; });
+          var lostList = Object.keys(lostMap).map(function (k) { return lostMap[k]; });
+          var okCats = { sales: 1, income: 1, cogs: 1, expense: 1, prive: 1, bank: 1, petty: 1, aset: 1, hutang: 1, modal: 1, kas: 1 };
+          var restorable = lostList.every(function (m) { return m.name && okCats[m.category]; });
+          var det = lostList.slice(0, 6).map(function (m) { return m.code + (m.name ? ' ' + m.name : '') + ' (' + m.n + ' transaksi)'; }).join(', ');
+          if (restorable) A({ kind: 'fix', key: 'txakun', title: 'Transaksi memakai akun COA yang sudah tidak ada (dari 500 terakhir)', count: lost.length, detail: det, fixLabel: 'Pulihkan akun COA dari data transaksinya (kode, nama, kategori sama)',
+            run: function () { var cur = (coa || []).slice(); lostList.forEach(function (m) { if (!cur.some(function (c) { return String(c.code) === m.code; })) cur.push({ code: m.code, name: m.name, category: m.category }); }); return d.collection('tenant_settings').doc(id).set({ coa: cur, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); } });
+          else A({ kind: 'info', key: 'txakun', title: 'Transaksi memakai akun COA yang sudah tidak ada (dari 500 terakhir)', count: lost.length, detail: det + ' — nama/kategori tidak tercatat di transaksi, buat ulang akunnya manual' });
+        }
       }
       /* fitur yang saling bergantung */
       var dep = [['stok_input', 'stok'], ['stok_closing', 'stok'], ['jual_produk', 'stok'], ['gaji_auto', 'gaji']], msgs = [];
