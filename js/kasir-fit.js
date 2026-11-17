@@ -9,6 +9,8 @@
   /* ---- Pemadatan form (desktop): rapatkan ruang, bukan sekadar mengecilkan ---- */
   var S = 'html[data-fm-page="kasir"][data-fm-fit] body main>.grid:nth-child(2)>section:first-child', C = S + '>div.space-y-3\\.5';
   var CSS = '@media (min-width:1024px) and (min-height:540px){' +
+    'html[data-fm-page="kasir"][data-fm-fit] body main>.grid:nth-child(2)>section.lg\\:col-span-5{grid-column:span 8/span 8!important}' +
+    'html[data-fm-page="kasir"][data-fm-fit] body main>.grid:nth-child(2)>section.lg\\:col-span-7{grid-column:span 4/span 4!important}' +
     S + '{padding:8px 12px!important;gap:5px!important;display:flex!important;flex-direction:column!important}' +
     S + '>*{margin:0!important}' +
     S + '>.border-b{padding:0!important;min-height:0!important}' +
@@ -17,12 +19,14 @@
     S + ' label{font-size:10px!important;line-height:1.1!important;margin-bottom:1px!important}' +
     S + ' input:not([type=checkbox]):not([type=radio]):not([type=file]),' + S + ' select{padding:4px 8px!important;font-size:12px!important;min-height:0!important;border-radius:10px!important;line-height:1.2!important}' +
     S + '>div.grid button{padding:5px 6px!important;font-size:11px!important;border-radius:10px!important}' +
-    C + '{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px 8px!important;align-items:start!important}' +
+    C + '{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px 8px!important;align-items:start!important}' +
     C + '>*{margin:0!important;grid-column:span 1}' +
     C + '>#barcode-block,' + C + '>#barcode-locked,' + C + '>#product-grid-wrap,' + C + '>#btn-save-draft{grid-column:1/-1!important}' +
-    C + '>div:has(>#tx-account){grid-column:span 2!important}' +
+    C + '>div:has(>#tx-account),' + C + '>#tx-qty-wrap{grid-column:span 2!important}' +
     C + '>#tx-qty2-wrap{grid-column:span 2!important}' +
-    C + '>div:has(>#tx-desc){grid-column:span 2!important}' +
+    C + '>div:has(>#tx-amount){grid-column:span 2!important}' +
+    C + '>div:has(>#tx-desc){grid-column:span 3!important}' +
+    C + '>div:has(>#pay-method){grid-column:span 2!important}' +
     C + ' #tx-cat-badge{margin-top:2px!important;padding:1px 6px!important;font-size:10px!important;border-radius:8px!important}' +
     C + ' #tx-qty-wrap>.flex:first-child,' + C + ' #tx-qty2-wrap>label{margin-bottom:1px!important}' +
     C + ' #tx-qty-wrap button[onclick^="changeQty"],' + C + ' #tx-qty2-wrap button[onclick^="changeQty2"]{width:26px!important;height:26px!important;font-size:15px!important;border-radius:9px!important;padding:0!important;flex:none!important}' +
@@ -36,7 +40,7 @@
     C + ' #pajak-preview-box{margin-top:3px!important;padding:4px 8px!important;font-size:10px!important}' +
     C + ' #pay-bank-extra{margin-top:3px!important}' +
     C + ' #btn-save-draft{padding-top:6px!important;padding-bottom:6px!important;font-size:12px!important;border-radius:12px!important}' +
-    C + ' #product-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;max-height:50px!important;overflow-y:auto!important;scrollbar-width:none!important}' +
+    C + ' #product-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important;max-height:50px!important;overflow-y:auto!important;scrollbar-width:none!important}' +
     C + ' #product-grid::-webkit-scrollbar{display:none!important}' +
     C + ' #product-grid>button{padding:3px 6px!important;border-width:1px!important;border-radius:9px!important;height:46px!important;overflow:hidden!important}' +
     C + ' #product-grid>button>div:first-child>div:first-child{width:24px!important;height:24px!important;font-size:11px!important;border-radius:7px!important}' +
