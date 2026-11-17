@@ -82,7 +82,10 @@
             var tn = TENANTS_CONFIG[key];
             if (tn && tn.shieldVersion) return tn.shieldVersion;
             var tier = (tn && tn.tier) || 'basic';
-            return (cfg && (cfg[tier] || cfg.basic)) || DEFAULT_VERSION;
+            /* DIPERBAIKI 18 Nov 2026: Tower menyimpan pilihan sebagai { default: '2.1' }, bukan per paket.
+               Sebelumnya baris ini hanya mencari cfg[tier] dan cfg.basic, jadi pilihan Tower selalu terabaikan
+               dan semua toko tetap memakai versi bawaan 2.0. */
+            return (cfg && (cfg[tier] || cfg.default || cfg.basic)) || DEFAULT_VERSION;
         } catch (e) { return DEFAULT_VERSION; }
     }
 
