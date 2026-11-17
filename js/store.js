@@ -32,8 +32,70 @@
             var keys = ''; try { keys = snap.exists ? Object.keys(snap.data() || {}).join(',') : ''; } catch (e) {}
             errBanner('Dokumen pengaturan toko "' + id + '" di server ' + (snap.exists ? 'ada tapi TIDAK berisi daftar akun (isi: ' + (keys || 'kosong') + ')' : 'TIDAK ADA') + '. Yang tampil adalah akun bawaan. Jangan mengubah akun dulu; hubungi Neil.');
         }
+
+        /* ---- Jalur cadangan: baca daftar akun langsung dari server lewat REST ----
+           Jalur ini TIDAK lewat SDK Firestore, jadi tidak terpengaruh salinan offline (IndexedDB),
+           urutan muat skrip, atau SDK yang belum siap. Dipakai persis seperti theme.js membaca logo toko.
+           Juga mencoba variasi huruf besar/kecil ID toko, karena nama dokumen di server membedakan keduanya. */
+        var REST_URL = 'https://firestore.googleapis.com/v1/projects/finance-ai-master-byneilverse/databases/(default)/documents/tenant_settings/';
+        var REST_KEY = 'AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI';
+        function restParseCoa(txt) {
+            try {
+                var f = JSON.parse(txt).fields || {};
+                var arr = f.coa && f.coa.arrayValue && f.coa.arrayValue.values;
+                if (!arr) return { exists: true, coa: null, keys: Object.keys(f).join(',') };
+                var out = [];
+                arr.forEach(function (v) {
+                    var m = v.mapValue && v.mapValue.fields; if (!m) return;
+                    out.push({
+                        code: (m.code && (m.code.stringValue != null ? m.code.stringValue : m.code.integerValue)) || '',
+                        name: (m.name && m.name.stringValue) || '',
+                        category: (m.category && m.category.stringValue) || ''
+                    });
+                });
+                return { exists: true, coa: out, keys: Object.keys(f).join(',') };
+            } catch (e) { return { exists: false, coa: null, keys: '' }; }
+        }
+        function restGet(docId, done) {
+            try {
+                var x = new XMLHttpRequest();
+                x.open('GET', REST_URL + encodeURIComponent(docId) + '?key=' + REST_KEY, true);
+                x.onload = function () { done(x.status === 200 ? restParseCoa(x.responseText) : { exists: false, coa: null, keys: '', code: 'HTTP ' + x.status }); };
+                x.onerror = function () { done({ exists: false, coa: null, keys: '', code: 'jaringan' }); };
+                x.send();
+            } catch (e) { done({ exists: false, coa: null, keys: '', code: 'gagal' }); }
+        }
+        function restLoadCoa(force) {
+            var ids = [id], up = String(id).toUpperCase(), lo = String(id).toLowerCase();
+            if (ids.indexOf(up) < 0) ids.push(up);
+            if (ids.indexOf(lo) < 0) ids.push(lo);
+            var i = 0, tried = [];
+            (function next() {
+                if (i >= ids.length) {
+                    errBanner('Daftar akun toko tidak ditemukan di server. Dokumen yang dicoba: ' + tried.join(' | ') + '. Yang tampil adalah akun bawaan. Jangan mengubah akun dulu; kirim pesan ini ke Neil.');
+                    return;
+                }
+                var docId = ids[i++];
+                restGet(docId, function (r) {
+                    tried.push(docId + ' → ' + (r.coa ? r.coa.length + ' akun' : (r.exists ? 'ada, tanpa daftar akun (isi: ' + (r.keys || 'kosong') + ')' : 'tidak ada' + (r.code ? ' (' + r.code + ')' : ''))));
+                    if (r.coa && r.coa.length) {
+                        st.docId = docId; st.coa = r.coa; st.coaLoaded = true; st.serverSeen = true;
+                        okBanner(); notify();
+                        if (docId !== id && hasDb) { try { resubscribe(docId); } catch (e) {} }
+                        return;
+                    }
+                    next();
+                });
+            })();
+        }
+        function resubscribe(docId) {
+            st.unsubs.push(db.collection('tenant_settings').doc(docId).onSnapshot(function (snap) {
+                var d = snap.exists ? snap.data() : null;
+                if (d && Array.isArray(d.coa)) { st.coa = d.coa; st.coaLoaded = true; if (!(snap.metadata && snap.metadata.fromCache)) st.serverSeen = true; okBanner(); notify(); }
+            }, function () {}));
+        }
         function okBanner() { try { var b = document.getElementById('fm-store-err'); if (b) b.remove(); } catch (e) {} }
-        var st = { coa: null, coaLoaded: false, serverSeen: false, closings: null, products: [], listeners: [], unsubs: [], started: false };
+        var st = { docId: id, coa: null, coaLoaded: false, serverSeen: false, closings: null, products: [], listeners: [], unsubs: [], started: false };
 
         function notify() { st.listeners.forEach(function (f) { try { f(); } catch (e) { console.error(e); } }); }
         function ord(p) { return (typeof p.order === 'number' && isFinite(p.order)) ? p.order : 1e9; }
@@ -56,7 +118,7 @@
             // Simpan hasil closing stok mingguan (riwayat + HPP) di dokumen pengaturan toko
             addStockClosing: function (rec) {
                 var list = (st.closings || []).slice(); list.unshift(cp(rec)); st.closings = list; notify();
-                if (hasDb) return db.collection('tenant_settings').doc(id).set({ stockClosings: cp(list), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                if (hasDb) return db.collection('tenant_settings').doc(st.docId).set({ stockClosings: cp(list), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
                 lsSet(clsKey, list); return Promise.resolve();
             },
             // Pindah akun COA: taruh 'from' di posisi 'to' (klik dan seret)
@@ -71,7 +133,7 @@
                 st.started = true;
                 hasDb = (typeof db !== 'undefined' && db);
                 if (hasDb) {
-                    st.unsubs.push(db.collection('tenant_settings').doc(id).onSnapshot(function (snap) {
+                    st.unsubs.push(db.collection('tenant_settings').doc(st.docId).onSnapshot(function (snap) {
                         var d = snap.exists ? snap.data() : null;
                         st.coa = (d && Array.isArray(d.coa)) ? d.coa : null;
                         st.coaLoaded = true; if (!(snap.metadata && snap.metadata.fromCache)) { st.serverSeen = true; okBanner(); if (st.coa === null) noCoaBanner(snap); }
@@ -87,10 +149,12 @@
                         st.products = list; sortProducts();
                         notify();
                     }, function (e) { console.warn('store.js: gagal membaca produk', e); }));
+                    /* jalur cadangan REST: selalu dicoba bila 2,5 detik belum ada daftar akun dari server */
+                    setTimeout(function () { if (!st.serverSeen || st.coa === null) restLoadCoa(false); }, 2500);
                     /* jaring pengaman: bila dalam 4 detik belum ada data DARI SERVER (hanya salinan lama di perangkat), ambil langsung dari server */
                     setTimeout(function () {
                         if (st.serverSeen || !st.started) return;
-                        db.collection('tenant_settings').doc(id).get({ source: 'server' }).then(function (snap) {
+                        db.collection('tenant_settings').doc(st.docId).get({ source: 'server' }).then(function (snap) {
                             st.serverSeen = true; st.coaLoaded = true;
                             var d = snap.exists ? snap.data() : null;
                             st.coa = (d && Array.isArray(d.coa)) ? d.coa : null;
@@ -101,6 +165,7 @@
                         });
                     }, 4000);
                 } else {
+                    restLoadCoa(true);
                     var c = lsGet(coaKey, null);
                     st.coa = Array.isArray(c) ? c : null; st.closings = lsGet(clsKey, []);
                     st.products = lsGet(prodKey, []); sortProducts();
@@ -114,7 +179,7 @@
                 /* pengaman: jangan menimpa daftar akun asli di server dengan daftar bawaan bila daftar asli belum berhasil dimuat */
                 if (hasDb && !st.serverSeen && (typeof navigator === 'undefined' || navigator.onLine !== false)) { try { alert('Daftar akun belum termuat dari server, jadi penyimpanan dibatalkan supaya akun yang sudah ada tidak tertimpa. Muat ulang halaman; bila berulang, hubungi Neil.'); } catch (e) {} return Promise.reject(new Error('COA belum termuat')); }
                 st.coa = cp(list); notify();
-                if (hasDb) return db.collection('tenant_settings').doc(id).set({ coa: cp(list), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                if (hasDb) return db.collection('tenant_settings').doc(st.docId).set({ coa: cp(list), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
                 lsSet(coaKey, st.coa); return Promise.resolve();
             },
             saveProduct: function (p) {
