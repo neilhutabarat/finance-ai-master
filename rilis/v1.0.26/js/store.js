@@ -28,6 +28,10 @@
                 if (b) b.textContent = msg;
             } catch (e) {}
         }
+        function noCoaBanner(snap) {
+            var keys = ''; try { keys = snap.exists ? Object.keys(snap.data() || {}).join(',') : ''; } catch (e) {}
+            errBanner('Dokumen pengaturan toko "' + id + '" di server ' + (snap.exists ? 'ada tapi TIDAK berisi daftar akun (isi: ' + (keys || 'kosong') + ')' : 'TIDAK ADA') + '. Yang tampil adalah akun bawaan. Jangan mengubah akun dulu; hubungi Neil.');
+        }
         function okBanner() { try { var b = document.getElementById('fm-store-err'); if (b) b.remove(); } catch (e) {} }
         var st = { coa: null, coaLoaded: false, serverSeen: false, closings: null, products: [], listeners: [], unsubs: [], started: false };
 
@@ -70,7 +74,7 @@
                     st.unsubs.push(db.collection('tenant_settings').doc(id).onSnapshot(function (snap) {
                         var d = snap.exists ? snap.data() : null;
                         st.coa = (d && Array.isArray(d.coa)) ? d.coa : null;
-                        st.coaLoaded = true; if (!(snap.metadata && snap.metadata.fromCache)) { st.serverSeen = true; okBanner(); }
+                        st.coaLoaded = true; if (!(snap.metadata && snap.metadata.fromCache)) { st.serverSeen = true; okBanner(); if (st.coa === null) noCoaBanner(snap); }
                         st.closings = (d && Array.isArray(d.stockClosings)) ? d.stockClosings : [];
                         notify();
                     }, function (e) {
@@ -91,7 +95,7 @@
                             var d = snap.exists ? snap.data() : null;
                             st.coa = (d && Array.isArray(d.coa)) ? d.coa : null;
                             st.closings = (d && Array.isArray(d.stockClosings)) ? d.stockClosings : st.closings;
-                            okBanner(); notify();
+                            okBanner(); if (st.coa === null) noCoaBanner(snap); notify();
                         }).catch(function (e) {
                             errBanner('Server belum bisa dihubungi untuk memuat daftar akun (' + ((e && e.code) || 'error') + '). Yang tampil bisa jadi salinan lama atau akun bawaan. Jangan mengubah akun dulu; periksa internet lalu muat ulang.');
                         });
