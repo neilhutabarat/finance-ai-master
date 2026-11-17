@@ -228,6 +228,67 @@
   /* =====================================================================
      TAMPILAN
      ===================================================================== */
+
+  /* =====================================================================
+     CEK & PULIHKAN COA (semua toko). Bagian "cek" hanya membaca.
+     Pemulihan hanya MENAMBAH akun yang hilang (kode, nama, kategori diambil dari transaksi), tidak menghapus apa pun.
+     ===================================================================== */
+  var DEF_COA = { '101': 1, '102': 1, '201': 1, '301': 1, '302': 1, '303': 1, '304': 1, '305': 1, '401': 1 };
+  var OKCAT = { sales: 1, income: 1, cogs: 1, expense: 1, prive: 1, bank: 1, petty: 1, aset: 1, hutang: 1, modal: 1, kas: 1 };
+  function coaCheckTenant(t) {
+    var d = DB(), id = t.id;
+    return Promise.all([d.collection('tenant_settings').doc(id).get(), d.collection('tx_' + id).get(), d.collection('tp_' + id).get()]).then(function (r) {
+      var exists = r[0].exists, coa = (exists && Array.isArray(r[0].data().coa)) ? r[0].data().coa : [];
+      var codes = {}; coa.forEach(function (c) { codes[String(c.code)] = 1; });
+      var pc = {}; r[2].forEach(function (x) { var v = x.data(); if (v.code != null) pc[String(v.code)] = 1; pc[String(x.id)] = 1; });
+      var lost = {}, nTx = 0;
+      r[1].forEach(function (x) {
+        var v = x.data(); nTx++;
+        if (v.isProduct || v.accountCode == null || v.accountCode === '') return;
+        var k = String(v.accountCode); if (codes[k] || pc[k]) return;
+        if (!lost[k]) lost[k] = { code: k, name: String(v.accountName || '').trim(), category: String(v.category || '').trim(), n: 0 };
+        lost[k].n++;
+      });
+      var lostList = Object.keys(lost).map(function (k) { return lost[k]; });
+      var onlyDefault = coa.length > 0 && coa.every(function (c) { return DEF_COA[String(c.code)]; });
+      return { t: t, exists: exists, coa: coa, nTx: nTx, lost: lostList, onlyDefault: onlyDefault };
+    }).catch(function (e) { return { t: t, err: (e && e.message) || String(e) }; });
+  }
+  function coaRestore(info) {
+    var d = DB(), id = info.t.id, cur = info.coa.slice();
+    info.lost.forEach(function (m) { if (m.name && OKCAT[m.category] && !cur.some(function (c) { return String(c.code) === m.code; })) cur.push({ code: m.code, name: m.name, category: m.category }); });
+    return d.collection('tenant_settings').doc(id).set({ coa: cur, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).then(function () { try { ctAudit(id, 'PULIHKAN_COA', 'Memulihkan ' + (cur.length - info.coa.length) + ' akun COA dari transaksi', '-', String(cur.length)); } catch (e) {} });
+  }
+  function openCoa() {
+    if (!DB()) return alert('Firestore belum terhubung. Masuk ke Tower dulu.');
+    var ov = towerOverlay('tw-coacheck', 'Cek & Pulihkan COA', 'Semua toko. Mengecek hanya membaca; memulihkan hanya menambah akun',
+      '<div style="overflow:auto;padding:0 18px 16px"><div id="cc-note" style="font-size:12px;opacity:.8;margin-bottom:8px">Membaca COA dan transaksi tiap toko…</div><div id="cc-out"></div></div>');
+    var out = ov.el.querySelector('#cc-out'), note = ov.el.querySelector('#cc-note');
+    var list = listNetworkTenants().filter(function (t) { return !t.deletedByTower && !t.isSinglePage && isManaged(t); }), res = [], p = Promise.resolve();
+    list.forEach(function (t, i) { p = p.then(function () { note.textContent = 'Membaca ' + (t.nama || t.id) + ' (' + (i + 1) + '/' + list.length + ')…'; return coaCheckTenant(t).then(function (r) { res.push(r); }); }); });
+    p.then(function () {
+      var bad = res.filter(function (r) { return r.err || !r.exists || !r.coa.length || r.lost.length || r.onlyDefault; }).length;
+      note.innerHTML = '<b style="color:' + (bad ? '#fcd34d' : '#6ee7b7') + '">Selesai.</b> ' + res.length + ' toko dibaca, ' + bad + ' perlu perhatian. Tidak ada yang diubah.';
+      out.innerHTML = res.map(function (r, i) {
+        var nm = H(r.t.nama || r.t.id) + ' <span style="opacity:.55">[' + H(r.t.id) + ']</span>';
+        if (r.err) return '<div style="padding:9px 11px;margin-bottom:6px;border-radius:12px;background:rgba(255,255,255,.05);font-size:12px"><b>' + nm + '</b><br><span style="color:#fda4af">Tidak bisa dibaca: ' + H(r.err) + '</span></div>';
+        var col = (!r.exists || !r.coa.length) ? '#fda4af' : (r.lost.length || r.onlyDefault) ? '#fcd34d' : '#6ee7b7';
+        var st = !r.exists ? 'Dokumen pengaturan toko TIDAK ADA' : !r.coa.length ? 'Daftar akun KOSONG' : r.coa.length + ' akun' + (r.onlyDefault ? ' (hanya akun bawaan 101-401)' : '');
+        var lostTxt = r.lost.length ? '<div style="margin-top:3px;font-size:11px;color:#fcd34d">Dipakai transaksi tapi tidak ada di COA: ' + H(r.lost.slice(0, 8).map(function (m) { return m.code + ' ' + (m.name || '?') + ' [' + (m.category || '?') + '] ×' + m.n; }).join('; ')) + '</div>' : '';
+        var canFix = r.lost.some(function (m) { return m.name && OKCAT[m.category]; });
+        return '<div style="padding:9px 11px;margin-bottom:6px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:12px"><b>' + nm + '</b><br><span style="color:' + col + ';font-weight:800">' + H(st) + '</span> <span style="opacity:.6">· ' + fmtN(r.nTx) + ' transaksi dibaca</span>' + lostTxt +
+          (canFix ? '<br><button data-fix="' + i + '" style="' + BTN + 'background:#059669;margin-top:6px">Pulihkan ' + r.lost.filter(function (m) { return m.name && OKCAT[m.category]; }).length + ' akun dari transaksi</button>' : '') + '</div>';
+      }).join('') || '<div style="padding:16px;text-align:center">Tidak ada toko.</div>';
+      [].forEach.call(out.querySelectorAll('[data-fix]'), function (b) {
+        b.onclick = function () {
+          var r = res[+b.getAttribute('data-fix')];
+          if (!confirm('Pulihkan akun COA ' + (r.t.nama || r.t.id) + ' dari transaksinya?\n\nHanya menambah akun yang hilang, tidak menghapus apa pun.')) return;
+          b.disabled = true; b.textContent = 'Memulihkan…';
+          coaRestore(r).then(function () { b.textContent = 'Selesai. Cek ulang lewat tombol ini.'; }).catch(function (e) { b.disabled = false; b.textContent = 'Gagal: ' + ((e && e.message) || e); });
+        };
+      });
+    }).catch(function (e) { note.innerHTML = '<span style="color:#fda4af">Gagal: ' + H(e && e.message) + '</span>'; });
+  }
   function open() {
     if (!DB()) return alert('Firestore belum terhubung. Masuk ke Tower dulu.');
     last = last || { clean: null, data: null, at: 0 };
@@ -236,6 +297,7 @@
       '<button data-a="scan" style="' + BTN + 'background:#0891b2">1. Pindai</button>' +
       '<button data-a="clean" style="' + BTN + 'background:#7c3aed">2. Bersihkan Server</button>' +
       '<button data-a="fix" style="' + BTN + 'background:#059669">3. Periksa &amp; Perbaiki Bug Data</button>' +
+      '<button data-a="coa" style="' + BTN + 'background:#d97706">Cek &amp; Pulihkan COA</button>' +
       '<button data-a="copy" style="' + BTN + 'background:#334155">Salin Laporan</button></div>' +
       '<div id="hl-note" style="font-size:12px;opacity:.75;margin-bottom:8px">Pindai hanya membaca. Toko yang masih terdaftar tidak pernah disentuh oleh pembersihan. Bug di tampilan atau tombol aplikasi tidak bisa dideteksi di sini: kirim screenshot-nya ke Claude.</div>' +
       '<div id="hl-out"></div></div>');
@@ -306,6 +368,7 @@
         });
       });
     });
+    ov.el.querySelector('[data-a=coa]').onclick = function () { openCoa(); };
     ov.el.querySelector('[data-a=copy]').onclick = function () {
       if (!last || (!last.clean && !last.data)) return alert('Belum ada hasil. Tekan Pindai dulu.');
       var L = ['LAPORAN KESEHATAN SISTEM — ' + new Date().toLocaleString('id-ID')];
@@ -317,5 +380,5 @@
       else prompt('Salin laporan:', txt);
     };
   }
-  window.FM_HEALTH = { open: open, _scanClean: scanClean, _scanData: scanData, _runClean: runClean };
+  window.FM_HEALTH = { open: open, openCoa: openCoa, _scanClean: scanClean, _scanData: scanData, _runClean: runClean };
 })();
