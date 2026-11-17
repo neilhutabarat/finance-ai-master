@@ -3,11 +3,18 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.25';
+  var BETA = 'v1.0.26';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.0.26', '18 Nov 2026', [
+      '[Perbaikan] Form Input Transaksi di kasir (layar komputer) kini muat dalam satu layar, tidak perlu digulir lagi',
+      '[Perbaikan] Pilihan akun transaksi kini menampilkan juga akun Aset (beli mesin, kendaraan, tanah, persediaan) dan Bayar/Cicil Hutang, sehingga Neraca bisa tersusun lengkap',
+      '[Perbaikan] Transaksi akun non-produk kini punya kolom Jumlah dan Harga Satuan; nominal dihitung otomatis (jumlah x harga satuan) dan masih bisa diubah',
+      '[Perbaikan] Neraca memperhitungkan pembelian aset dan pembayaran hutang dari transaksi kasir',
+      '[Keamanan] Dukungan Oneil Shield v2.1 (peringatan login dari perangkat baru, skor keamanan lebih rinci)'
+    ]],
     ['v1.0.25', '16 Nov 2026', [
       '[Perbaikan] Metode Bayar / Terima kini punya pilihan baru "Petty Cash" (di bawah Bank, sejajar QRIS & Transfer), terhubung ke akun Kas Kecil/Petty Cash yang ditambahkan di Kelola Akun (COA)',
       '[Perbaikan] Owner/Manager sekarang bisa menambah akun COA berkategori "Kas Kecil / Petty Cash" di menu Kelola Akun',

@@ -141,6 +141,7 @@
     <script src="js/langit.js?v=proto" defer></script>
     <script src="js/logo.js?v=proto"></script>
     <script src="js/skin.js?v=proto"></script>
+    <script src="js/kasir-fit.js?v=fit1" defer></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
@@ -404,6 +405,16 @@
                             <option value="">-- Memuat Akun COA & Produk --</option>
                         </select>
                         <div id="tx-cat-badge" class="hidden mt-1.5 text-[11px] font-black px-2.5 py-1 rounded-xl border"></div>
+                    </div>
+
+                    <div id="tx-qty2-wrap" class="hidden">
+                        <label class="text-xs font-black text-slate-700 block mb-1">Jumlah &amp; Harga Satuan <span class="text-[10px] font-bold text-slate-500">(isi harga satuan, nominal dihitung otomatis)</span></label>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="changeQty2(-1)" class="w-12 h-12 rounded-2xl bg-white border border-slate-300 text-xl font-black text-slate-700 active:scale-95">&minus;</button>
+                            <input type="number" id="tx-qty2" min="1" value="1" oninput="onQty2Change()" class="flex-1 text-center glass-input rounded-2xl p-3 text-xl font-black outline-none">
+                            <button type="button" onclick="changeQty2(1)" class="w-12 h-12 rounded-2xl bg-white border border-slate-300 text-xl font-black text-slate-700 active:scale-95">+</button>
+                        </div>
+                        <input type="text" id="tx-price2" inputmode="numeric" oninput="formatInputThousand(this); onQty2Change()" placeholder="Harga satuan (Rp), kosongkan bila nominal total diketik manual" class="mt-2 w-full glass-input rounded-2xl p-3 text-sm font-black outline-none font-mono">
                     </div>
 
                     <div id="tx-qty-wrap" class="hidden">
@@ -898,7 +909,9 @@
                 sales: "1. INCOME (PEMASUKAN USAHA)",
                 cogs: "2. OUTCOME PRODUKSI (MUSIC/VIDEO/HPP)",
                 expense: "3. OUTCOME OPERASIONAL (TOOLS, SERVER, DLL)",
-                prive: "4. PRIVE (PENARIKAN MODAL OWNER)"
+                prive: "4. PRIVE (PENARIKAN MODAL OWNER)",
+                aset: "5. ASET (BELI MESIN, KENDARAAN, TANAH, PERSEDIAAN, DLL)",
+                hutang: "6. BAYAR / CICIL HUTANG"
             };
 
             Object.keys(categories).forEach(catKey => {
@@ -1032,6 +1045,11 @@
         }
 
         function onQtyChange() { applyQtyToForm(); }
+        function onQty2Change() {
+            const q = Math.max(1, parseInt(document.getElementById('tx-qty2').value) || 1), p = parseThousandSeparator(document.getElementById('tx-price2').value) || 0;
+            if (p > 0) { document.getElementById('tx-amount').value = formatThousandSeparator(q * p); calculateTaxPreview(); }
+        }
+        function changeQty2(delta) { const el = document.getElementById('tx-qty2'); el.value = Math.max(1, (parseInt(el.value) || 1) + delta); onQty2Change(); }
         function changeQty(delta) {
             const el = document.getElementById('tx-qty');
             el.value = (parseInt(el.value) || 1) + delta;
@@ -1045,6 +1063,7 @@
             const taxPill = document.getElementById('tax-estimate-pill');
 
             document.getElementById('tx-qty-wrap').classList.add('hidden');
+            { const q2 = document.getElementById('tx-qty2-wrap'); if (q2) { q2.classList.toggle('hidden', !(opt && opt.value && opt.dataset.isProduct !== 'true')); if (preserveQty !== true) { document.getElementById('tx-qty2').value = 1; document.getElementById('tx-price2').value = ''; } } }
             setAmountLocked(false);
 
             if (opt && opt.dataset.isProduct === "true") {
@@ -1065,9 +1084,11 @@
                     sales: { text: "INCOME (+ Kas Masuk)", color: "text-emerald-800 bg-emerald-50 border-emerald-200" },
                     cogs: { text: "OUTCOME Produksi (- Kas Keluar + Pajak 12%)", color: "text-amber-800 bg-amber-50 border-amber-200" },
                     expense: { text: "OUTCOME Operasional (- Kas Keluar + Pajak 12%)", color: "text-rose-800 bg-rose-50 border-rose-200" },
-                    prive: { text: "PRIVE Pemilik (- Kas Keluar)", color: "text-purple-800 bg-purple-50 border-purple-200" }
+                    prive: { text: "PRIVE Pemilik (- Kas Keluar)", color: "text-purple-800 bg-purple-50 border-purple-200" },
+                    aset: { text: "ASET (- Kas Keluar, masuk Neraca, bukan beban)", color: "text-sky-800 bg-sky-50 border-sky-200" },
+                    hutang: { text: "BAYAR HUTANG (- Kas Keluar, kurangi hutang)", color: "text-slate-800 bg-slate-100 border-slate-300" }
                 };
-                const cfg = map[opt.dataset.category];
+                const cfg = map[opt.dataset.category] || { text: 'AKUN COA', color: 'text-slate-800 bg-slate-100 border-slate-300' };
                 badge.innerText = cfg.text;
                 badge.className = `mt-1.5 text-[11px] font-black px-2.5 py-1 rounded-xl border inline-block ${cfg.color}`;
                 badge.classList.remove('hidden');
@@ -1135,6 +1156,7 @@
                 dcRes = prodObj ? fmDisc(prodObj, un, qty, discManual) : { gross: unitPrice * qty, disc: 0, net: unitPrice * qty, name: '' };
                 amount = dcRes.net; // harga selalu dari produk (dikurangi diskon), tidak bisa diketik kasir
             }
+            if (!isProd) { const q2v = document.getElementById('tx-qty2'); qty = Math.max(1, parseInt(q2v && q2v.value) || 1); unitPrice = parseThousandSeparator((document.getElementById('tx-price2') || {}).value) || 0; }
             const taxAmount = (isOutcome && !isProd) ? Math.round(amount * 0.12) : 0;
             const dppAmount = (isOutcome && !isProd) ? (amount - taxAmount) : amount;
 
@@ -1205,7 +1227,7 @@
                 item.innerHTML = `
                     <div>
                         <div class="flex items-center space-x-1.5">
-                            <span class="font-black text-slate-900">${d.isProduct ? '📦 ' : ''}[${fmEsc(d.accountCode)}] ${fmEsc(d.accountName)}${d.isProduct ? ' ×' + (d.qty || 1) + uLbl(d) : ''}${d.discount ? ' <span class="text-emerald-700 text-[10px]">(diskon -Rp ' + formatThousandSeparator(d.discount) + ')</span>' : ''}</span>
+                            <span class="font-black text-slate-900">${d.isProduct ? '📦 ' : ''}[${fmEsc(d.accountCode)}] ${fmEsc(d.accountName)}${d.isProduct ? ' ×' + (d.qty || 1) + uLbl(d) : (d.qty > 1 ? ' ×' + d.qty : '')}${d.discount ? ' <span class="text-emerald-700 text-[10px]">(diskon -Rp ' + formatThousandSeparator(d.discount) + ')</span>' : ''}</span>
                             <span class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${d.category === 'sales' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${d.category.toUpperCase()}</span>
                         </div>
                         <p class="text-[11px] text-slate-500 font-medium">${fmEsc(d.desc || '-')}</p>
@@ -1245,6 +1267,7 @@
                 }
             }
             if (d.isProduct) { document.getElementById('tx-qty').value = d.qty || 1; window.__editUnit = d.unitName || null; { const dd = document.getElementById('tx-disc'); if (dd) dd.value = d.discManual || ''; } document.getElementById('tx-unit').dataset.for = ''; }
+            { const q2e = document.getElementById('tx-qty2'); if (q2e && !d.isProduct) { q2e.value = d.qty || 1; const p2e = document.getElementById('tx-price2'); if (p2e) p2e.value = d.unitPrice ? formatThousandSeparator(d.unitPrice) : ''; } }
             updateCategoryBadge(true);
             document.getElementById('btn-save-text').innerText = "Simpan Perubahan Draft";
             document.getElementById('btn-cancel-edit').classList.remove('hidden');
@@ -1309,6 +1332,7 @@
             document.getElementById('edit-draft-id').value = "";
             document.getElementById('tx-qty-wrap').classList.add('hidden');
             document.getElementById('tx-qty').value = 1;
+            { const q2r = document.getElementById('tx-qty2'), q2w = document.getElementById('tx-qty2-wrap'); if (q2r) q2r.value = 1; { const p2r = document.getElementById('tx-price2'); if (p2r) p2r.value = ''; } if (q2w) q2w.classList.add('hidden'); }
             { const dd = document.getElementById('tx-disc'); if (dd) dd.value = ''; }
             setAmountLocked(false);
             document.getElementById('tx-amount').value = "";
@@ -1437,14 +1461,14 @@
             lastReceipt = {
                 store: (document.getElementById('receipt-store-name') || {}).innerText || '',
                 when: receiptFull + ' ' + nowTime, total: total, pay: payFull,
-                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) + (d.discount ? ' (diskon -' + formatThousandSeparator(d.discount) + ')' : '') : '') + ' = ' + (d.category === 'sales' ? '' : '-') + 'Rp ' + formatThousandSeparator(d.amount)))
+                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) + (d.discount ? ' (diskon -' + formatThousandSeparator(d.discount) + ')' : '') : (d.qty > 1 ? ' x' + d.qty : '')) + ' = ' + (d.category === 'sales' ? '' : '-') + 'Rp ' + formatThousandSeparator(d.amount)))
             };
             const rList = document.getElementById('receipt-items-list');
             rList.innerHTML = "";
             draftList.forEach(d => {
                 const row = document.createElement('div');
                 row.className = "flex justify-between";
-                row.innerHTML = `<span>${d.isProduct ? '📦 ' : ''}${fmEsc(d.accountName)}${d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) : ''}</span><span>${d.category === 'sales' ? '' : '-'}Rp ${formatThousandSeparator(d.amount)}</span>`;
+                row.innerHTML = `<span>${d.isProduct ? '📦 ' : ''}${fmEsc(d.accountName)}${d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) : (d.qty > 1 ? ' x' + d.qty : '')}</span><span>${d.category === 'sales' ? '' : '-'}Rp ${formatThousandSeparator(d.amount)}</span>`;
                 rList.appendChild(row);
             });
 
