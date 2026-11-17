@@ -182,6 +182,13 @@
           else A({ kind: 'info', key: 'txakun', title: 'Transaksi memakai akun COA yang sudah tidak ada (dari 500 terakhir)', count: lost.length, detail: det + ' — nama/kategori tidak tercatat di transaksi, buat ulang akunnya manual' });
         }
       }
+      var rugi = prods.filter(function (p) { return p.forSale === true && Number(p.sellPrice) > 0 && Number(p.hpp) > Number(p.sellPrice); });
+      if (rugi.length) A({ kind: 'info', key: 'hppdiatas', title: 'Produk dijual di bawah harga modal (HPP lebih besar dari harga jual)', count: rugi.length, detail: rugi.slice(0, 4).map(function (p) { return (p.name || p.code) + ' (modal ' + fmtN(p.hpp) + ', jual ' + fmtN(p.sellPrice) + ')'; }).join(', ') });
+      var okC = { sales: 1, income: 1, cogs: 1, expense: 1, prive: 1, bank: 1, petty: 1, aset: 1, hutang: 1, modal: 1, kas: 1 };
+      var badCat = coa.filter(function (c) { return !okC[String(c.category || '')]; });
+      if (badCat.length) A({ kind: 'info', key: 'coakategori', title: 'Akun COA dengan kategori kosong atau tidak dikenal (laporan & Neraca bisa salah)', count: badCat.length, detail: badCat.slice(0, 5).map(function (c) { return c.code + ' ' + (c.name || '') + ' [' + (c.category || 'kosong') + ']'; }).join(', ') });
+      var noNm = coa.filter(function (c) { return !String(c.name || '').trim(); });
+      if (noNm.length) A({ kind: 'info', key: 'coatanpanama', title: 'Akun COA tanpa nama', count: noNm.length, detail: noNm.slice(0, 6).map(function (c) { return c.code; }).join(', ') });
       /* fitur yang saling bergantung */
       var dep = [['stok_input', 'stok'], ['stok_closing', 'stok'], ['jual_produk', 'stok'], ['gaji_auto', 'gaji']], msgs = [];
       dep.forEach(function (p) {
@@ -200,6 +207,17 @@
     var p = Promise.resolve();
     for (var i = 0; i < pairs.length; i += 400) (function (part) { p = p.then(function () { var b = DB().batch(); part.forEach(function (x) { b.update(x[0], x[1]); }); return b.commit(); }); })(pairs.slice(i, i + 400));
     return p;
+  }
+  function diffNote(dd) {
+    var KEY = 'fm_health_prev', cur = {}, prev = null, msg = '';
+    dd.forEach(function (x) { cur[x.tenant + '|' + x.key] = x.count || 1; });
+    try { prev = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+    if (prev && prev.v) {
+      var nw = Object.keys(cur).filter(function (k) { return !(k in prev.v); }).length, gone = Object.keys(prev.v).filter(function (k) { return !(k in cur); }).length;
+      msg = ' Dibanding pindai ' + new Date(prev.at).toLocaleString('id-ID') + ': ' + nw + ' temuan baru, ' + gone + ' sudah beres.';
+    }
+    try { localStorage.setItem(KEY, JSON.stringify({ at: Date.now(), v: cur })); } catch (e) {}
+    return msg;
   }
   function scanData(say) {
     var list = tenantsToCheck(), res = [], p = Promise.resolve();
@@ -242,7 +260,7 @@
       return scanClean().then(function (c) { last.clean = c; return scanData(say); }).then(function (dd) {
         last.data = dd; last.at = Date.now();
         var fixable = dd.filter(function (x) { return x.kind === 'fix'; }), info = dd.filter(function (x) { return x.kind === 'info'; });
-        note.innerHTML = '<b style="color:#6ee7b7">Pindai selesai.</b> Sampah: ' + last.clean.length + ' jenis · Bug data bisa diperbaiki: ' + fixable.length + ' · Perlu keputusanmu: ' + info.length + '. Tidak ada yang diubah.';
+        note.innerHTML = '<b style="color:#6ee7b7">Pindai selesai.</b> Sampah: ' + last.clean.length + ' jenis · Bug data bisa diperbaiki: ' + fixable.length + ' · Perlu keputusanmu: ' + info.length + '. Tidak ada yang diubah.' + diffNote(dd);
         out.innerHTML = rowsHtml(last.clean, false, 'Sampah di server (bisa dibersihkan)', '#c4b5fd') + rowsHtml(fixable, false, 'Bug data yang bisa diperbaiki otomatis', '#6ee7b7') + rowsHtml(info, false, 'Perlu keputusanmu (hanya dilaporkan)', '#fcd34d') +
           ((last.clean.length + dd.length) ? '' : '<div style="padding:16px;text-align:center;font-size:13px;color:#6ee7b7">Server bersih, tidak ada temuan.</div>');
       });
@@ -268,9 +286,16 @@
       return scanData(say).then(function (dd) {
         last.data = dd;
         var fixable = dd.filter(function (x) { return x.kind === 'fix'; }), info = dd.filter(function (x) { return x.kind === 'info'; });
-        note.innerHTML = '<b style="color:#6ee7b7">Pemeriksaan selesai.</b> ' + fixable.length + ' bisa diperbaiki otomatis, ' + info.length + ' hanya dilaporkan.';
-        out.innerHTML = rowsHtml(fixable, true, 'Bisa diperbaiki otomatis', '#6ee7b7') + (fixable.length ? '<button id="hl-fx" style="' + BTN + 'background:#059669;width:100%;margin-top:8px">Perbaiki yang dicentang</button>' : '') + rowsHtml(info, false, 'Perlu keputusanmu (hanya dilaporkan)', '#fcd34d') +
+        note.innerHTML = '<b style="color:#6ee7b7">Pemeriksaan selesai.</b> ' + fixable.length + ' bisa diperbaiki otomatis, ' + info.length + ' hanya dilaporkan.' + diffNote(dd);
+        out.innerHTML = rowsHtml(fixable, true, 'Bisa diperbaiki otomatis', '#6ee7b7') + (fixable.length ? '<button id="hl-fx" style="' + BTN + 'background:#059669;width:100%;margin-top:8px">Perbaiki yang dicentang</button><button id="hl-fxall" style="' + BTN + 'background:#0d9488;width:100%;margin-top:6px">Perbaiki semua yang aman (' + fixable.length + ')</button>' : '') + rowsHtml(info, false, 'Perlu keputusanmu (hanya dilaporkan)', '#fcd34d') +
           (dd.length ? '' : '<div style="padding:16px;text-align:center;font-size:13px;color:#6ee7b7">Tidak ada bug data.</div>');
+        var ba = out.querySelector('#hl-fxall');
+        if (ba) ba.onclick = guard(function () {
+          if (!confirm('Perbaiki SEMUA ' + fixable.length + ' temuan yang aman secara otomatis?')) return;
+          var p = Promise.resolve(), n = 0;
+          fixable.forEach(function (it) { p = p.then(function () { say('Memperbaiki ' + it.nama + ': ' + it.title + '…'); return it.run().then(function () { n++; try { ctAudit(it.tenant, 'PERBAIKI_DATA', it.title + ': ' + it.fixLabel, '-', String(it.count)); } catch (e) {} }); }); });
+          return p.then(function () { note.innerHTML = '<b style="color:#6ee7b7">Selesai. ' + n + ' temuan diperbaiki.</b> Jalankan pemeriksaan lagi untuk memastikan.'; out.innerHTML = ''; });
+        });
         var b = out.querySelector('#hl-fx');
         if (b) b.onclick = guard(function () {
           var sel = picked(fixable); if (!sel.length) return alert('Centang minimal satu.');

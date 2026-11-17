@@ -26,7 +26,7 @@
     var IS_LOGIN_PAGE = /^index\.html?$|^$/.test(p);
     if (!IS_CLIENT_PAGE && !IS_LOGIN_PAGE) return; // hanya halaman klien + portal login
 
-    var KNOWN_VERSIONS = ['2.0']; // <- tambahkan versi baru di sini begitu filenya dibuat
+    var KNOWN_VERSIONS = ['2.0', '2.1']; // <- tambahkan versi baru di sini begitu filenya dibuat
     var DEFAULT_VERSION = '2.0';
 
     function slug(v) { return String(v || '').replace(/^v/i, '').trim(); }
