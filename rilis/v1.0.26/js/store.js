@@ -17,7 +17,7 @@
         var id = tenant.id;
         var hasDb = (typeof db !== 'undefined' && db);
         var coaKey = 'fm_custom_coa_' + id, clsKey = 'fm_stock_closings_' + id, prodKey = 'fm_products_' + id;
-        var st = { coa: null, closings: null, products: [], listeners: [], unsubs: [], started: false };
+        var st = { coa: null, coaLoaded: false, closings: null, products: [], listeners: [], unsubs: [], started: false };
 
         function notify() { st.listeners.forEach(function (f) { try { f(); } catch (e) { console.error(e); } }); }
         function ord(p) { return (typeof p.order === 'number' && isFinite(p.order)) ? p.order : 1e9; }
@@ -58,9 +58,21 @@
                     st.unsubs.push(db.collection('tenant_settings').doc(id).onSnapshot(function (snap) {
                         var d = snap.exists ? snap.data() : null;
                         st.coa = (d && Array.isArray(d.coa)) ? d.coa : null;
+                        st.coaLoaded = true; try { var eb = document.getElementById('fm-store-err'); if (eb) eb.remove(); } catch (e) {}
                         st.closings = (d && Array.isArray(d.stockClosings)) ? d.stockClosings : [];
                         notify();
-                    }, function (e) { console.warn('store.js: gagal membaca COA', e); }));
+                    }, function (e) {
+                        console.warn('store.js: gagal membaca COA', e);
+                        /* beri tahu terang-terangan: daftar akun yang tampil BUKAN daftar asli toko */
+                        try {
+                            if (!document.getElementById('fm-store-err') && document.body) {
+                                var b = document.createElement('div'); b.id = 'fm-store-err';
+                                b.style.cssText = 'position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:2147483600;max-width:94vw;background:#7f1d1d;color:#fff;border:1px solid #fca5a5;border-radius:14px;padding:8px 14px;font:700 12px system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.5)';
+                                b.textContent = 'Daftar akun (COA) toko gagal dimuat dari server (' + ((e && e.code) || 'error') + '). Yang tampil adalah akun bawaan, bukan akun asli toko. Jangan mengubah akun dulu; hubungi Neil.';
+                                document.body.appendChild(b);
+                            }
+                        } catch (e2) {}
+                    }));
                     st.unsubs.push(db.collection('tp_' + id).onSnapshot(function (snap) {
                         var list = [];
                         snap.forEach(function (d) { var x = d.data(); x.code = x.code || d.id; x.sellPrice = num(x.sellPrice); x.hpp = num(x.hpp); x.stock = num(x.stock); x.barcode = x.barcode ? String(x.barcode) : ''; list.push(x); });
@@ -78,6 +90,8 @@
             stop: function () { st.unsubs.forEach(function (u) { try { u(); } catch (e) {} }); st.unsubs = []; st.started = false; },
 
             saveCOA: function (list) {
+                /* pengaman: jangan menimpa daftar akun asli di server dengan daftar bawaan bila daftar asli belum berhasil dimuat */
+                if (hasDb && !st.coaLoaded) { try { alert('Daftar akun belum termuat dari server, jadi penyimpanan dibatalkan supaya akun yang sudah ada tidak tertimpa. Muat ulang halaman; bila berulang, hubungi Neil.'); } catch (e) {} return Promise.reject(new Error('COA belum termuat')); }
                 st.coa = cp(list); notify();
                 if (hasDb) return db.collection('tenant_settings').doc(id).set({ coa: cp(list), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
                 lsSet(coaKey, st.coa); return Promise.resolve();
