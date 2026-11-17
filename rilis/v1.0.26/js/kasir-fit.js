@@ -9,8 +9,8 @@
   /* ---- Pemadatan form (desktop): rapatkan ruang, bukan sekadar mengecilkan ---- */
   var S = 'html[data-fm-page="kasir"][data-fm-fit] body main>.grid:nth-child(2)>section:first-child', C = S + '>div.space-y-3\\.5';
   var CSS = '@media (min-width:1024px) and (min-height:540px){' +
-    'html[data-fm-page="kasir"][data-fm-fit] body main>.grid:nth-child(2)>section.lg\\:col-span-5{grid-column:span 8/span 8!important}' +
-    'html[data-fm-page="kasir"][data-fm-fit] body main>.grid:nth-child(2)>section.lg\\:col-span-7{grid-column:span 4/span 4!important}' +
+    'html[data-fm-page="kasir"][data-fm-fit] body main>.grid:nth-child(2)>section.lg\\:col-span-5{grid-column:span 7/span 7!important;container-type:inline-size;container-name:kform}' +
+    'html[data-fm-page="kasir"][data-fm-fit] body main>.grid:nth-child(2)>section.lg\\:col-span-7{grid-column:span 5/span 5!important;container-type:inline-size;container-name:kdraft}' +
     S + '{padding:8px 12px!important;gap:5px!important;display:flex!important;flex-direction:column!important}' +
     S + '>*{margin:0!important}' +
     S + '>.border-b{padding:0!important;min-height:0!important}' +
@@ -50,6 +50,28 @@
     C + ' #product-grid>button>div:last-child:not(:first-child){display:none!important}' +
     C + ' #product-grid-wrap>.flex{margin-bottom:2px!important}' +
     C + ' #product-grid-search{width:130px!important;padding:2px 8px!important;font-size:11px!important}' +
+
+    /* kolom kiri sempit -> 4 kolom berpasangan, tidak ada yang bertabrakan */
+    '@container kform (max-width:700px){' +
+      C + '{grid-template-columns:repeat(4,minmax(0,1fr))!important}' +
+      C + '>div:has(>#tx-account),' + C + '>#tx-qty-wrap,' + C + '>#tx-qty2-wrap,' + C + '>div:has(>#tx-amount),' + C + '>div:has(>#tx-desc),' + C + '>div:has(>#pay-method),' + C + '>div:has(>#tx-staff){grid-column:span 2!important}' +
+      C + ' #product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}' +
+    '}' +
+    C + ' #pay-bank-warn{font-size:9px!important;line-height:1.2!important;margin:0!important}' +
+    C + ' #tx-lock-note{white-space:nowrap!important}' +
+    /* kolom kanan: isi ikut menyusut mengikuti lebarnya, tidak pernah terpotong */
+    '@container kdraft (max-width:620px){' +
+      'html[data-fm-page="kasir"][data-fm-fit] body #draft-count-badge{white-space:nowrap!important;flex:none!important;font-size:9.5px!important;padding:2px 8px!important}' +
+      'html[data-fm-page="kasir"][data-fm-fit] body section.lg\\:col-span-7>div:first-child>div:first-child{gap:8px!important;flex-wrap:nowrap!important}' +
+      'html[data-fm-page="kasir"][data-fm-fit] body section.lg\\:col-span-7>div:first-child>div:first-child span.uppercase{font-size:10px!important;letter-spacing:0!important;line-height:1.15!important}' +
+      'html[data-fm-page="kasir"][data-fm-fit] body section.lg\\:col-span-7>div:first-child>div:last-child{flex-direction:row!important;gap:10px!important;align-items:center!important}' +
+      'html[data-fm-page="kasir"][data-fm-fit] body #btn-finalize{white-space:nowrap!important;padding:9px 14px!important;font-size:12px!important;width:auto!important;flex:none!important}' +
+      'html[data-fm-page="kasir"][data-fm-fit] body #draft-total-amount{font-size:17px!important;white-space:nowrap!important}' +
+      'html[data-fm-page="kasir"][data-fm-fit] body section.lg\\:col-span-7>.grid-cols-3{gap:8px!important}' +
+      'html[data-fm-page="kasir"][data-fm-fit] body section.lg\\:col-span-7>.grid-cols-3>div{padding:8px 6px!important;min-width:0!important}' +
+      'html[data-fm-page="kasir"][data-fm-fit] body section.lg\\:col-span-7>.grid-cols-3>div>span:first-child{font-size:9px!important;letter-spacing:0!important;white-space:nowrap!important}' +
+      'html[data-fm-page="kasir"][data-fm-fit] body #kas-total-in,html[data-fm-page="kasir"][data-fm-fit] body #kas-total-out,html[data-fm-page="kasir"][data-fm-fit] body #kas-net{font-size:clamp(11px,3.3cqw,19px)!important;white-space:nowrap!important;display:block!important}' +
+    '}' +
   '}';
   (function () { var st = document.createElement('style'); st.id = 'fm-kcompact'; st.textContent = CSS; (document.head || document.documentElement).appendChild(st); })();
   var MQ = '(min-width:1024px) and (min-height:540px)', MIN = 0.78, busy = false, t = null;
