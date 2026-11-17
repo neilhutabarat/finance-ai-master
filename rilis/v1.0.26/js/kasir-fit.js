@@ -57,6 +57,18 @@
       C + '>div:has(>#tx-account),' + C + '>#tx-qty-wrap,' + C + '>#tx-qty2-wrap,' + C + '>div:has(>#tx-amount),' + C + '>div:has(>#tx-desc),' + C + '>div:has(>#pay-method),' + C + '>div:has(>#tx-staff){grid-column:span 2!important}' +
       C + ' #product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}' +
     '}' +
+
+    /* Metode Bayar dinamis: pilihan Bank/QRIS/rekening berjajar sejajar, bukan menumpuk ke bawah (tidak ada ruang kosong) */
+    C + '>div:has(>#pay-method){display:flex!important;flex-wrap:wrap!important;gap:3px 8px!important;align-items:flex-start!important}' +
+    C + '>div:has(>#pay-method)>label{flex:1 0 100%!important}' +
+    C + '>div:has(>#pay-method)>select,' + C + '>div:has(>#pay-method) #pay-sub,' + C + '>div:has(>#pay-method) #pay-bank-acc{flex:1 1 120px!important;min-width:0!important;width:auto!important}' +
+    C + '>div:has(>#pay-method)>#pay-bank-extra:not(.hidden){display:contents!important;margin:0!important}' +
+    C + '>div:has(>#pay-method) #pay-bank-warn{flex:1 0 100%!important}' +
+    C + ':has(#pay-bank-extra:not(.hidden))>div:has(>#pay-method){grid-column:1/-1!important}' +
+    '@container kform (min-width:701px){' +
+      C + ':has(#pay-bank-extra:not(.hidden))>div:has(>#tx-desc){grid-column:span 4!important}' +
+      C + ':has(#pay-bank-extra:not(.hidden))>div:has(>#tx-staff){grid-column:span 2!important}' +
+    '}' +
     C + ' #pay-bank-warn{font-size:9px!important;line-height:1.2!important;margin:0!important}' +
     C + ' #tx-lock-note{white-space:nowrap!important}' +
     /* kolom kanan: isi ikut menyusut mengikuti lebarnya, tidak pernah terpotong */

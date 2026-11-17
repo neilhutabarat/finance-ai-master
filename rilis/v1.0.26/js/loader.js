@@ -108,6 +108,8 @@
   function urls() {
     var l = [location.pathname + location.search, '/version.json', '/js/rollout.js'];
     [].forEach.call(document.querySelectorAll('script[src],link[rel="stylesheet"][href]'), function (n) { var u = n.getAttribute('src') || n.getAttribute('href'); if (u && sameOrigin(u)) l.push(new URL(u, location.href).pathname + new URL(u, location.href).search); });
+    /* seperti Ctrl+Shift+R: ikutkan SEMUA berkas yang benar-benar dimuat halaman ini (skrip yang dimuat dinamis, gambar, font), bukan hanya yang tertulis di HTML */
+    try { performance.getEntriesByType('resource').forEach(function (r) { if (sameOrigin(r.name) && !/googleapis|firestore|identitytoolkit/.test(r.name)) { var p = new URL(r.name); l.push(p.pathname + p.search); } }); } catch (e) {}
     return l.filter(function (u, i) { return l.indexOf(u) === i; });
   }
   function run() {
