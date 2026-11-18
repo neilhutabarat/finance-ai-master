@@ -44,9 +44,9 @@
         /* angka: huruf rapi dengan lebar digit seragam, tidak goyang saat berubah */
         K + 'main .ios-glass .font-mono,' + K + 'main .fm-ic b,' + K + 'main .fm-ic td{font-family:' + NUM + '!important;font-variant-numeric:tabular-nums;letter-spacing:-.02em}' +
         K + 'main>.grid:first-child h3{font-weight:800!important;letter-spacing:-.03em!important}' +
-        K + 'main>.grid:first-child>.ios-glass>div:first-child>span{font-weight:700!important;letter-spacing:.05em!important}' +
+        K + 'main>.grid:first-child>.ios-glass>div.justify-between:not(.absolute)>span{font-weight:700!important;letter-spacing:.05em!important}' +
         /* ikon kartu atas: kotak lembut, warnanya mengikuti arti angka */
-        K + 'main>.grid:first-child>.ios-glass>div:first-child>svg,' + K + 'main>.grid:first-child>.ios-glass>div:first-child>i{width:24px!important;height:24px!important;padding:5px;margin:-4px 0;border-radius:8px;box-sizing:border-box;flex:none;' +
+        K + 'main>.grid:first-child>.ios-glass>div.justify-between:not(.absolute)>svg,' + K + 'main>.grid:first-child>.ios-glass>div.justify-between:not(.absolute)>i{width:24px!important;height:24px!important;padding:5px;margin:-4px 0;border-radius:8px;box-sizing:border-box;flex:none;' +
           'background:color-mix(in srgb,currentColor 14%,transparent);stroke-width:2.2}' +
         /* kartu ringkasan: ikon kecil di depan judul, baris dipisah garis halus */
         K + 'main .fm-ic h4{position:relative;padding-left:24px!important;min-height:18px;display:flex;align-items:center}' +
@@ -87,6 +87,31 @@
     }
   } catch (e) {}
 
+  /* ===== TAMPILAN DARI CT (Tower) — tema dan warna latar per toko =====
+     tenant.tampilan = { look: 'base' | 'original', latar: 'kabut' | 'krem' | 'netral' | 'daun' }.
+     Tema dari CT diterapkan sekali setiap kali CT mengubahnya; setelah itu toko masih boleh
+     mengganti sendiri lewat Pengaturan sampai CT mengubahnya lagi. */
+  try {
+    var tn0 = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
+    var tpl = (tn0 && tn0.tampilan) || {};
+    var toko0 = ''; try { toko0 = (new URLSearchParams(location.search).get('toko') || '').toLowerCase().trim(); } catch (e) {}
+    if (/^(kabut|krem|netral|daun)$/.test(tpl.latar || '')) document.documentElement.setAttribute('data-fm-latar', tpl.latar);
+    if (toko0 && (tpl.look === 'base' || tpl.look === 'original')) {
+      var kCt = 'fm_ct_look_' + toko0, kLook = 'fm_look_' + toko0;
+      if (document.documentElement.getAttribute('data-fm-look') === tpl.look) sessionStorage.removeItem('fm_ct_look_rl');
+      if (localStorage.getItem(kCt) !== tpl.look) {
+        localStorage.setItem(kCt, tpl.look);
+        localStorage.setItem(kLook, tpl.look);
+        var kini = document.documentElement.getAttribute('data-fm-look');
+        if (kini && kini !== tpl.look && !sessionStorage.getItem('fm_ct_look_rl')) {
+          sessionStorage.setItem('fm_ct_look_rl', '1');
+          location.reload();
+          return;
+        }
+      }
+    }
+  } catch (e) {}
+
   /* ===== RUPA ONE UI (v1.1.0) — sesuai desain yang disetujui =====
      latar abu kebiruan, kartu putih tanpa garis, kotak isian abu lembut, tombol kapsul satu warna,
      ikon di depan label, huruf Plus Jakarta Sans. Posisi dan urutan elemen tidak berubah.
@@ -100,6 +125,8 @@
       var oc =
         /* token warna: biasa | pra-balik */
         'html{--o-ink:#0f172a;--o-bg:#eef1f6;--o-surf:#ffffff;--o-surf2:#f4f6fa;--o-line:#e5e9f0;--o-ink2:#5b6676;--o-acc:var(--fm-accent,#4f46e5);--o-on:#ffffff;--o-sh:rgba(15,23,42,.07);--o-sh2:rgba(15,23,42,.18);--o-ash:rgba(79,70,229,.45)}' +
+        'html[data-fm-latar="krem"]{--o-bg:#f4efe6}html[data-fm-latar="netral"]{--o-bg:#f1f1f2}html[data-fm-latar="daun"]{--o-bg:#e9f1ec}' +
+        'html[data-fm-invert][data-fm-latar="krem"]{--o-bg:#140f06!important}html[data-fm-invert][data-fm-latar="netral"]{--o-bg:#0e0e0f!important}html[data-fm-invert][data-fm-latar="daun"]{--o-bg:#0a120d!important}' +
         'html[data-fm-invert]{--o-ink:#e1e9fc;--o-bg:#0c0f14;--o-surf:#000000;--o-surf2:#0b0906;--o-line:#13171e;--o-ink2:#909bab;--o-acc:#8693ff;--o-on:#000000;--o-sh:rgba(240,232,213,.07);--o-sh2:rgba(240,232,213,.18);--o-ash:rgba(134,147,255,.45)}' +
         /* huruf */
         H + ' body,' + H + ' body button,' + H + ' body input,' + H + ' body select,' + H + ' body textarea,' + H + ' body h1,' + H + ' body h2,' + H + ' body h3,' + H + ' body h4{font-family:' + JK + '!important}' +
@@ -110,6 +137,7 @@
         /* kartu Base: putih, tanpa garis, bayangan halus */
         B0 + ' body main .ios-glass,' + B0 + ' body main .white-ice-glass-card{background:var(--o-surf)!important;background-image:none!important;border:0!important;border-radius:20px!important;' +
           'box-shadow:0 1px 2px var(--o-sh),0 10px 26px -14px var(--o-sh2)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}' +
+        B0 + ' body main .ios-glass>.absolute[class*="blur"],' + B0 + ' body main .white-ice-glass-card>.absolute[class*="blur"]{display:none!important}' +
         B0 + ' body main .ios-glass::before,' + B0 + ' body main .white-ice-glass-card::before{display:none!important}' +
         B0 + ' body header.oneui-hero{border:0!important;box-shadow:0 1px 2px var(--o-sh),0 10px 26px -16px var(--o-sh2)!important}' +
         /* kotak di dalam kartu: abu lembut tanpa garis */
@@ -123,9 +151,16 @@
         H + ' body #btn-save-draft *,' + H + ' body #btn-finalize *{color:inherit!important}' +
         H + ' body #btn-save-draft:active,' + H + ' body #btn-finalize:active{transform:translateY(1px)!important}' +
         /* kartu angka Owner/Manager: ikon di depan label, label abu, angka tebal */
-        H + ' body main>.grid:first-child>.ios-glass>div:first-child{flex-direction:row-reverse!important;justify-content:flex-end!important;gap:8px!important}' +
-        H + ' body main>.grid:first-child>.ios-glass>div:first-child>span{color:var(--o-ink2)!important}' +
+        H + ' body main>.grid:first-child>.ios-glass>div.justify-between:not(.absolute){flex-direction:row-reverse!important;justify-content:flex-end!important;gap:8px!important}' +
+        H + ' body main>.grid:first-child>.ios-glass>div.justify-between:not(.absolute)>span{color:var(--o-ink2)!important}' +
         H + ' body main>.grid:first-child h3{font-weight:800!important;letter-spacing:-.03em!important}' +
+        H + ' body main>.grid:first-child>.ios-glass>div.justify-between:not(.absolute)>svg{width:24px!important;height:24px!important;padding:5px;margin:-4px 0;border-radius:8px;box-sizing:border-box;flex:none;background:color-mix(in srgb,currentColor 14%,transparent);stroke-width:2.2}' +
+        /* header lebih tipis: jam, cuaca, kurs, peran, dan tombol tersusun 2 baris (sebelumnya 3), isi dan sisi tetap sama */
+        '@media(min-width:1024px){' +
+          H + ' body header.oneui-hero .font-mono{font-family:' + JK + '!important;font-variant-numeric:tabular-nums;letter-spacing:0!important}' +
+          H + ' body header.oneui-hero>div>div:last-child{gap:6px!important;justify-content:flex-end!important}' +
+          H + ' body header.oneui-hero #premium-widgets-container{display:contents!important}' +
+        '}' +
         /* baris ringkasan */
         H + ' body main .fm-ic .fm-row>span{color:var(--o-ink2)!important;opacity:1!important}' +
         H + ' body main .fm-ic .fm-row b{font-weight:700}';
@@ -148,10 +183,14 @@
     R + '#fm-rail{position:fixed;left:0;right:0;display:flex;align-items:center;justify-content:center;pointer-events:none;height:56px}' +
     R + '#fm-rail>*{pointer-events:auto}' +
     /* pulau tengah */
-    R + '#fm-pil{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;height:52px;padding:0 8px;' +
+    R + '#fm-pil{position:relative;z-index:3;display:flex;align-items:center;justify-content:flex-start;height:52px;padding:0;' +
       'background:#fff;border-radius:999px;box-shadow:0 2px 6px rgba(15,23,42,.07),0 16px 36px -14px rgba(15,23,42,.38);' +
-      'overflow:hidden;width:60px;transition:width 1.56s cubic-bezier(.16,1,.3,1);box-sizing:border-box}' +
-    R + '#fm-rail.fm-open #fm-pil{width:var(--fmw,420px)}' +
+      'overflow:hidden;width:60px;transform:translateX(0);transition:width 1.56s cubic-bezier(.16,1,.3,1),transform 1.56s cubic-bezier(.16,1,.3,1);box-sizing:border-box}' +
+    R + '#fm-rail.fm-open #fm-pil{width:var(--fmw,420px);transform:translateX(var(--ps,0px))}' +
+    /* logo selalu tepat di tengah: saat diam isi digeser supaya logo di tengah pil; saat terbuka pil memanjang tidak sama kiri-kanan bila jumlah menu ganjil */
+    R + '#fm-pil>:first-child{margin-left:var(--sx0,10px);transition:margin-left 1.56s cubic-bezier(.16,1,.3,1)}' +
+    R + '#fm-rail.fm-open #fm-pil>:first-child{margin-left:8px}' +
+    R + '#fm-pil>:last-child{margin-right:8px}' +
     R + '#fm-pil>*{flex:none}' +
     R + '#fm-pil .fm-lg{width:40px;min-width:40px;height:40px;display:grid;place-items:center;color:#0f172a;cursor:pointer}' +
     R + '#fm-pil .fm-i2{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 11px;border-radius:14px;' +
@@ -172,10 +211,10 @@
     R + '#fm-rail .fm-s2.fmL2{transform:translateY(-50%) translateX(calc(var(--h0,30px) * -1 - 8px - var(--w1,96px)))}' +
     R + '#fm-rail .fm-s2.fmR1{transform:translateY(-50%) translateX(calc(var(--h0,30px) + 8px))}' +
     R + '#fm-rail .fm-s2.fmR2{transform:translateY(-50%) translateX(calc(var(--h0,30px) + 8px + var(--w3,96px)))}' +
-    R + '#fm-rail.fm-open .fm-s2.fmL1{transform:translateY(-50%) translateX(calc(var(--hw,210px) * -1 - 8px))}' +
-    R + '#fm-rail.fm-open .fm-s2.fmL2{transform:translateY(-50%) translateX(calc(var(--hw,210px) * -1 - 8px - var(--w1,96px)))}' +
-    R + '#fm-rail.fm-open .fm-s2.fmR1{transform:translateY(-50%) translateX(calc(var(--hw,210px) + 8px))}' +
-    R + '#fm-rail.fm-open .fm-s2.fmR2{transform:translateY(-50%) translateX(calc(var(--hw,210px) + 8px + var(--w3,96px)))}' +
+    R + '#fm-rail.fm-open .fm-s2.fmL1{transform:translateY(-50%) translateX(calc(var(--pl,210px) * -1 - 8px))}' +
+    R + '#fm-rail.fm-open .fm-s2.fmL2{transform:translateY(-50%) translateX(calc(var(--pl,210px) * -1 - 8px - var(--w1,96px)))}' +
+    R + '#fm-rail.fm-open .fm-s2.fmR1{transform:translateY(-50%) translateX(calc(var(--pr,210px) + 8px))}' +
+    R + '#fm-rail.fm-open .fm-s2.fmR2{transform:translateY(-50%) translateX(calc(var(--pr,210px) + 8px + var(--w3,96px)))}' +
     'html[data-fm-invert="1"] #fm-rail{filter:invert(1) hue-rotate(180deg)}' +
     '@media(prefers-reduced-motion:reduce){' + R + '#fm-pil,' + R + '#fm-rail .fm-s2{transition:none!important}}';
 
@@ -243,12 +282,19 @@
         try {
           var semula = rail.classList.contains('fm-open'), tr = pil.style.transition;
           pil.style.transition = 'none'; rail.classList.add('fm-open');
-          pil.style.width = 'auto'; var lebar = pil.offsetWidth; pil.style.width = '';
+          pil.style.width = 'auto';
+          var lgx = pil.querySelector('.fm-lg'), f = pil.firstElementChild, l = pil.lastElementChild;
+          var L = lgx.offsetLeft - f.offsetLeft, Rr = (l.offsetLeft + l.offsetWidth) - (lgx.offsetLeft + lgx.offsetWidth);
+          pil.style.width = '';
           if (!semula) rail.classList.remove('fm-open');
           void pil.offsetWidth; pil.style.transition = tr;
-          if (!(lebar > 0)) return;
-          rail.style.setProperty('--fmw', lebar + 'px');
-          rail.style.setProperty('--hw', (lebar / 2) + 'px');
+          if (!(L >= 0 && Rr >= 0)) return;
+          var pl = 8 + L + 20, pr = 20 + Rr + 8;
+          rail.style.setProperty('--fmw', (pl + pr) + 'px');
+          rail.style.setProperty('--pl', pl + 'px');
+          rail.style.setProperty('--pr', pr + 'px');
+          rail.style.setProperty('--ps', ((pr - pl) / 2) + 'px');
+          rail.style.setProperty('--sx0', (30 - (L + 20)) + 'px');
           rail.style.setProperty('--h0', '30px');
           if (kiri1) rail.style.setProperty('--w1', (kiri1.offsetWidth + 8) + 'px');
           if (kanan1) rail.style.setProperty('--w3', (kanan1.offsetWidth + 8) + 'px');

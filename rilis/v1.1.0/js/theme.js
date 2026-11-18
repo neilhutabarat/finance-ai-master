@@ -20,7 +20,10 @@
       '[Perbaikan] Dock pulau di halaman Owner dan Manager tidak lagi tampil hitam saat tema Base',
       '[Perbaikan] Kartu Kasir (saldo, formulir, draft, total) lebih bersih dengan angka rupiah yang rapi; letak dan ukuran tidak berubah',
       '[Perbaikan] Dock pulau tidak lagi terpotong oleh lapisan halaman, dan tombol Chat yang muncul belakangan ikut menjadi pulau',
-      '[Keamanan] (menyusul pada rilis ini)'
+      '[Perbaikan] Header Kasir, Manager, dan Owner lebih tipis: jam, cuaca, kurs, peran, dan tombol tersusun 2 baris, bukan 3',
+      '[Perbaikan] Halaman Partner ikut tampilan baru; hiasan bayangan buram di kartu angka dihilangkan pada tema Base',
+      '[Perbaikan] Logo Oneilverse di dock selalu tepat di tengah, juga saat jumlah menu ganjil',
+      '[Keamanan] Halaman toko tidak bisa lagi dimuat di dalam bingkai situs lain, mencegah tombol aplikasi ditimpa halaman palsu (clickjacking)'
     ]],
     ['v1.0.26', '18 Nov 2026', [
       '[Perbaikan] Daftar akun (COA) di Kasir dan Manager sempat hanya menampilkan 9 akun bawaan; sekarang selalu dimuat langsung dari server',
