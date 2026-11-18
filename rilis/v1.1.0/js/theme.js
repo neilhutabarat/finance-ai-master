@@ -23,6 +23,9 @@
       '[Perbaikan] Header Kasir, Manager, dan Owner lebih tipis: jam, cuaca, kurs, peran, dan tombol tersusun 2 baris, bukan 3',
       '[Perbaikan] Halaman Partner ikut tampilan baru; hiasan bayangan buram di kartu angka dihilangkan pada tema Base',
       '[Perbaikan] Logo Oneilverse di dock selalu tepat di tengah, juga saat jumlah menu ganjil',
+      '[Baru] Mode gelap pekat: tombol Tema di toko kini berpindah antara One UI terang dan gelap pekat, lengkap di Kasir, Manager, Owner, dan Partner; semua tulisan diperiksa agar tetap terbaca',
+      '[Perbaikan] Pilihan tema kaca tidak lagi ada di toko; One UI atau Kaca kini hanya ditentukan dari Control Tower',
+      '[Perbaikan] Pulau satelit menyesuaikan halaman: Manager dan Owner yang tidak punya Absen dan Stok memakai menu halamannya sendiri, dan tombol Tema selalu tersedia',
       '[Keamanan] Halaman toko tidak bisa lagi dimuat di dalam bingkai situs lain, mencegah tombol aplikasi ditimpa halaman palsu (clickjacking)'
     ]],
     ['v1.0.26', '18 Nov 2026', [

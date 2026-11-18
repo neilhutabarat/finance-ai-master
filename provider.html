@@ -1550,8 +1550,9 @@
                 FM_SHIELD_VERSIONS.map(function (v) { return '<option value="' + v + '"' + (tenant.shieldVersion === v ? ' selected' : '') + '>Kunci ke v' + v + '</option>'; })
             ).join('');
             const tpl = tenant.tampilan || {};
-            const lookOpt = [['', 'Biarkan toko memilih sendiri'], ['base', 'Base (bersih, gaya One UI)'], ['original', 'Original (kaca + wallpaper)']]
-                .map(function (o) { return '<option value="' + o[0] + '"' + ((tpl.look || '') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
+            const lookNow = (tpl.look === 'original') ? 'original' : 'base';
+            const lookOpt = [['base', 'One UI (bersih, bawaan)'], ['original', 'Kaca / Glass (wallpaper)']]
+                .map(function (o) { return '<option value="' + o[0] + '"' + (lookNow === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
             const latarOpt = [['kabut', 'Abu kebiruan'], ['krem', 'Krem'], ['netral', 'Abu netral'], ['daun', 'Hijau daun']]
                 .map(function (o) { return '<option value="' + o[0] + '"' + ((tpl.latar || 'kabut') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
             box.classList.remove('hidden');
@@ -1572,7 +1573,7 @@
                 '<button id="ir-shield-save" class="mt-2 w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition">Simpan Versi Shield</button>' +
                 '<div style="margin:14px 0 8px;border-top:1px solid rgba(255,255,255,.1)"></div>' +
                 '<span class="font-black text-sm text-white block mb-1">🎨 Tampilan Toko Ini (v1.1.0 ke atas)</span>' +
-                '<p class="text-[11px] text-slate-400 mb-2">Tema dan warna latar yang dipakai Kasir, Manager, dan Owner. Berlaku saat laman toko dibuka lagi.</p>' +
+                '<p class="text-[11px] text-slate-400 mb-2">Hanya Tower yang memilih One UI atau Kaca. Di toko, tombol Tema hanya berpindah terang/gelap. Berlaku saat laman toko dibuka lagi.</p>' +
                 '<label class="text-[11px] text-slate-300 font-bold block mb-1">Tema</label>' +
                 '<select id="ir-look" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none mb-2">' + lookOpt + '</select>' +
                 '<label class="text-[11px] text-slate-300 font-bold block mb-1">Warna latar (tema Base)</label>' +
@@ -1635,7 +1636,7 @@
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const cfg = Object.assign({}, tn); delete cfg.fromRegistry;
             const t = {};
-            if (look === 'base' || look === 'original') t.look = look;
+            t.look = (look === 'original') ? 'original' : 'base';
             if (latar && latar !== 'kabut') t.latar = latar;
             cfg.tampilan = t;
             db.collection('tenants_registry').doc(key).set({ id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
