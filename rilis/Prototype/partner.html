@@ -429,7 +429,7 @@
             const chronoList = [...txList].reverse();
             let runningBalance = 0;
             const withBalance = chronoList.map(tx => {
-                if (tx.category === 'sales') runningBalance += tx.amount;
+                if (fmKasMasuk(tx.category)) runningBalance += tx.amount;
                 else runningBalance -= tx.amount;
                 return { ...tx, runningBalance };
             });
@@ -442,7 +442,7 @@
                 tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-slate-500 text-xs">Belum ada transaksi sah tercatat.</td></tr>`;
             } else {
                 displayList.forEach(tx => {
-                    if (tx.category === 'sales') totalIn += tx.amount;
+                    if (fmKasMasuk(tx.category)) totalIn += tx.amount;
                     else totalOut += tx.amount;
 
                     const tr = document.createElement('tr');
@@ -453,7 +453,7 @@
                             <span class="font-bold text-white block">[${fmEsc(tx.accountCode)}] ${fmEsc(tx.accountName)}</span>
                             <span class="text-[10px] text-slate-400">${fmEsc(tx.desc || '-')}</span>
                         </td>
-                        <td class="py-3 px-4 text-right font-black text-emerald-400 font-mono">${tx.category === 'sales' ? formatThousand(tx.amount) : '-'}</td>
+                        <td class="py-3 px-4 text-right font-black text-emerald-400 font-mono">${fmKasMasuk(tx.category) ? formatThousand(tx.amount) : '-'}</td>
                         <td class="py-3 px-4 text-right font-black text-rose-400 font-mono">${tx.category !== 'sales' ? formatThousand(tx.amount) : '-'}</td>
                         <td class="py-3 px-4 text-right font-black font-mono text-white">${formatThousand(tx.runningBalance)}</td>
                     `;
@@ -463,7 +463,7 @@
 
             const rl = document.getElementById('partner-recent-list');
             if (rl) {
-                rl.innerHTML = displayList.length ? displayList.slice(0, 8).map(tx => '<div class="fm-row"><span style="min-width:0"><b style="font-weight:700">' + fmEsc(tx.accountName) + '</b><span class="fm-sub" style="display:block">' + fmEsc((tx.dateFull || '') + ' ' + (tx.date || '')) + '</span></span><b class="' + (tx.category === 'sales' ? 'pos' : 'neg') + '">' + (tx.category === 'sales' ? '+' : '-') + formatThousand(tx.amount) + '</b></div>').join('') : '<div class="fm-empty">Belum ada transaksi tercatat.<br><span>Mutasi kas masuk dan keluar akan tampil di sini.</span></div>';
+                rl.innerHTML = displayList.length ? displayList.slice(0, 8).map(tx => '<div class="fm-row"><span style="min-width:0"><b style="font-weight:700">' + fmEsc(tx.accountName) + '</b><span class="fm-sub" style="display:block">' + fmEsc((tx.dateFull || '') + ' ' + (tx.date || '')) + '</span></span><b class="' + (fmKasMasuk(tx.category) ? 'pos' : 'neg') + '">' + (fmKasMasuk(tx.category) ? '+' : '-') + formatThousand(tx.amount) + '</b></div>').join('') : '<div class="fm-empty">Belum ada transaksi tercatat.<br><span>Mutasi kas masuk dan keluar akan tampil di sini.</span></div>';
             }
             const net = totalIn - totalOut;
             document.getElementById('card-total-income').innerText = formatThousand(totalIn);

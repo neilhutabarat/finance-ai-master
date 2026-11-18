@@ -35,7 +35,7 @@
     var all = ((cfg && cfg.tx && cfg.tx()) || []).slice();
     var r = range(), open = 0, inn = 0, out = 0, list = [];
     all.forEach(function (t) {
-      var sg = t.category === 'sales' ? 1 : -1, d = t.dateISO || '';
+      var sg = fmKasMasuk(t.category) ? 1 : -1, d = t.dateISO || '';
       if (d < r[0]) open += sg * t.amount;
       else if (d <= r[1]) { list.push(t); if (sg > 0) inn += t.amount; else out += t.amount; }
     });
@@ -48,7 +48,7 @@
     var num = ((document.getElementById('ms-wa') || {}).value || '').replace(/[^0-9]/g, '');
     if (num) { try { localStorage.setItem('fm_ms_wa', num); } catch (e) {} if (num[0] === '0') num = '62' + num.slice(1); }
     var L = ['*Mutasi ' + store() + '*', 'Periode: ' + periodText(d), ''];
-    var max = 40; d.list.slice(0, max).forEach(function (t) { L.push(dmy(t.dateISO).slice(0, 5) + ' ' + (t.category === 'sales' ? '+' : '-') + rp(t.amount) + ' ' + (t.accountName || '') + (t.desc && t.desc !== t.accountName ? ' (' + t.desc + ')' : '')); });
+    var max = 40; d.list.slice(0, max).forEach(function (t) { L.push(dmy(t.dateISO).slice(0, 5) + ' ' + (fmKasMasuk(t.category) ? '+' : '-') + rp(t.amount) + ' ' + (t.accountName || '') + (t.desc && t.desc !== t.accountName ? ' (' + t.desc + ')' : '')); });
     if (d.list.length > max) L.push('... dan ' + (d.list.length - max) + ' transaksi lainnya');
     L.push('', 'Saldo awal: ' + rp(d.open), 'Total masuk: ' + rp(d.inn), 'Total keluar: ' + rp(d.out), '*Saldo akhir: ' + rp(d.close) + '*');
     window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(L.join('\n')), '_blank');
@@ -56,7 +56,7 @@
   function printIt() {
     var d = data(); if (!d.list.length) return alert('Tidak ada transaksi pada periode ini.');
     var bal = d.open, h = '<h1>' + esc(store()) + '</h1><h2>Mutasi ' + esc(periodText(d)) + '</h2><table><thead><tr><th>Tanggal</th><th>Uraian</th><th class="r">Debit</th><th class="r">Kredit</th><th class="r">Saldo</th></tr></thead><tbody><tr><td colspan="4">Saldo awal</td><td class="r">' + rp(d.open) + '</td></tr>';
-    d.list.forEach(function (t) { var sg = t.category === 'sales'; bal += sg ? t.amount : -t.amount; h += '<tr><td>' + esc(dmy(t.dateISO)) + ' ' + esc(t.date || '') + '</td><td>[' + esc(t.accountCode) + '] ' + esc(t.accountName) + (t.desc && t.desc !== t.accountName ? '<br><small>' + esc(t.desc) + '</small>' : '') + '</td><td class="r">' + (sg ? rp(t.amount) : '-') + '</td><td class="r">' + (sg ? '-' : rp(t.amount)) + '</td><td class="r">' + rp(bal) + '</td></tr>'; });
+    d.list.forEach(function (t) { var sg = fmKasMasuk(t.category); bal += sg ? t.amount : -t.amount; h += '<tr><td>' + esc(dmy(t.dateISO)) + ' ' + esc(t.date || '') + '</td><td>[' + esc(t.accountCode) + '] ' + esc(t.accountName) + (t.desc && t.desc !== t.accountName ? '<br><small>' + esc(t.desc) + '</small>' : '') + '</td><td class="r">' + (sg ? rp(t.amount) : '-') + '</td><td class="r">' + (sg ? '-' : rp(t.amount)) + '</td><td class="r">' + rp(bal) + '</td></tr>'; });
     h += '<tr class="tot"><td colspan="2">Total</td><td class="r">' + rp(d.inn) + '</td><td class="r">' + rp(d.out) + '</td><td class="r">' + rp(d.close) + '</td></tr></tbody></table>';
     var w = window.open('', '_blank'); if (!w) return alert('Pop-up dicegah browser. Izinkan pop-up untuk mencetak.');
     w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Mutasi</title><style>body{font-family:Arial,sans-serif;color:#111;margin:24px}h1{font-size:18px;margin:0}h2{font-size:14px;margin:2px 0 14px;font-weight:400;color:#555}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #ccc;padding:6px;text-align:left;vertical-align:top}td.r,th.r{text-align:right}.tot td{font-weight:700;border-top:2px solid #111}@media print{button{display:none}}</style></head><body>' + h + '<p><button onclick="window.print()">Cetak</button></p></body></html>');

@@ -35,7 +35,7 @@
       var a = Number(t.amount) || 0, nm = t.accountName || t.desc || '(tanpa akun)', p = pay(t);
       var wk = 'Minggu ' + Math.min(5, Math.ceil(Number(String(t.dateISO).slice(8, 10)) / 7));
       var w = r.week[wk] = r.week[wk] || { i: 0, o: 0 }, mm = r.meth[p] = r.meth[p] || { i: 0, o: 0 };
-      if (t.category === 'sales') { r.inn[nm] = (r.inn[nm] || 0) + a; r.ti += a; w.i += a; mm.i += a; }
+      if (fmKasMasuk(t.category)) { r.inn[nm] = (r.inn[nm] || 0) + a; r.ti += a; w.i += a; mm.i += a; }
       else if (t.category === 'prive') { r.prive += a; w.o += a; mm.o += a; }
       else { r.out[nm] = (r.out[nm] || 0) + a; r.to += a; w.o += a; mm.o += a; }
     });
@@ -43,7 +43,7 @@
   }
   function expectedCash(day, opening) {
     var i = 0, o = 0;
-    txs().forEach(function (t) { if (t.dateISO !== day || pay(t) !== 'tunai') return; var a = Number(t.amount) || 0; if (t.category === 'sales') i += a; else o += a; });
+    txs().forEach(function (t) { if (t.dateISO !== day || pay(t) !== 'tunai') return; var a = Number(t.amount) || 0; if (fmKasMasuk(t.category)) i += a; else o += a; });
     return { i: i, o: o, exp: (Number(opening) || 0) + i - o };
   }
 

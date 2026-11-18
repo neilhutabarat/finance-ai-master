@@ -42,8 +42,8 @@
       var a = Math.round(Number(t.amount) || 0); if (!(a > 0)) return;
       var k = idx[mode === 'hari' ? di : di.slice(0, 7)]; if (k == null) return;
       var b = out[k], c = t.category; n++;
-      if (c === 'sales') b.sales += a; else if (c === 'cogs') b.cogs += a; else if (c === 'prive') b.prive += a; else b.exp += a;
-      if (c === 'cogs' || (c !== 'sales' && c !== 'prive')) { var nm = String(t.accountName || (c === 'cogs' ? 'Harga pokok' : 'Biaya lain')); exp[nm] = (exp[nm] || 0) + a; }
+      if (c === 'sales') b.sales += a; else if (c === 'cogs') b.cogs += a; else if (c === 'prive') b.prive += a; else if (c === 'modal') b.modal = (b.modal || 0) + a; else b.exp += a;
+      if (c === 'cogs' || (c !== 'sales' && c !== 'prive' && c !== 'modal')) { var nm = String(t.accountName || (c === 'cogs' ? 'Harga pokok' : 'Biaya lain')); exp[nm] = (exp[nm] || 0) + a; }
     });
     out.forEach(function (b) { b.laba = b.sales - b.cogs - b.exp; b.keluar = b.cogs + b.exp + b.prive; });
     return { rows: out, n: n, exp: exp };

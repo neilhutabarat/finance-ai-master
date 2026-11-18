@@ -41,19 +41,25 @@
 
   /* ---- hitungan ---- */
   function calc(day) {
-    var s = N.start || '0000-00-00', sales = 0, cogs = 0, exp = 0, prive = 0;
+    var s = N.start || '0000-00-00', sales = 0, cogs = 0, exp = 0, prive = 0, asetBeli = 0, hutangBayar = 0, asetTx = {}, modalTx = {};
     txs().forEach(function (t) {
       var d = t.dateISO || ''; if (d < s || d > day) return; var a = Number(t.amount) || 0;
-      if (t.category === 'sales') sales += a; else if (t.category === 'cogs') cogs += a; else if (t.category === 'prive') prive += a; else exp += a;
+      if (t.category === 'sales') sales += a; else if (t.category === 'cogs') cogs += a; else if (t.category === 'prive') prive += a;
+      else if (t.category === 'aset') { asetBeli += a; var an = t.accountName || t.desc || 'Aset'; asetTx[an] = (asetTx[an] || 0) + a; }
+      else if (t.category === 'hutang') hutangBayar += a;
+      else if (t.category === 'modal') { var mn = t.accountName || t.desc || 'Setoran modal'; modalTx[mn] = (modalTx[mn] || 0) + a; }
+      else exp += a;
     });
-    var op = opening(), kas = op.kas + sales - cogs - exp - prive, laba = sales - cogs - exp;
+    var op = opening(), modalSetor = Object.keys(modalTx).reduce(function (x, k) { return x + modalTx[k]; }, 0);
+    var kas = op.kas + sales - cogs - exp - prive - asetBeli - hutangBayar + modalSetor, laba = sales - cogs - exp;
     var tot = { piutang: 0, utang: 0 };
     try { if (f('piutang') && window.FM_PIU && FM_PIU.totals) tot = FM_PIU.totals(bv()); } catch (e) {}
     var persed = 0; if (f('stok')) prods().forEach(function (p) { persed += Math.max(0, Number(p.stock) || 0) * (Number(p.hpp) || 0); });
     var its = N.items.filter(function (i) { return !bv() || (i.biz || '') === bv(); });
-    var asetItems = its.filter(function (i) { return i.type === 'aset'; }), utangItems = its.filter(function (i) { return i.type === 'utang'; }), modalItems = its.filter(function (i) { return i.type === 'modal'; });
+    var asetItems = its.filter(function (i) { return i.type === 'aset'; }).concat(Object.keys(asetTx).map(function (k) { return { id: '', name: k + ' (dibeli lewat transaksi)', amount: asetTx[k] }; })), utangItems = its.filter(function (i) { return i.type === 'utang'; }), modalItems = its.filter(function (i) { return i.type === 'modal'; });
     var sum = function (a) { return a.reduce(function (x, i) { return x + (Number(i.amount) || 0); }, 0); };
-    var aset = kas + tot.piutang + persed + sum(asetItems), liab = tot.utang + sum(utangItems);
+    var aset = kas + tot.piutang + persed + sum(asetItems), liab = tot.utang + sum(utangItems) - hutangBayar;
+    modalItems = modalItems.concat(Object.keys(modalTx).map(function (k) { return { id: '', name: k + ' (lewat transaksi)', amount: modalTx[k] }; }));
     var modalTambah = sum(modalItems), ekuitasDicatat = op.modal + modalTambah + laba - prive, plug = aset - liab - ekuitasDicatat;
     return { kas: kas, laba: laba, prive: prive, piutang: tot.piutang, utang: tot.utang, persed: persed, asetItems: asetItems, utangItems: utangItems, modalItems: modalItems,
       aset: aset, liab: liab, modalAwal: op.modal, modalTambah: modalTambah, plug: plug, ekuitas: aset - liab };

@@ -37,6 +37,7 @@
       if (String(t.dateISO || '').slice(0, 7) !== ym) return; var a = Number(t.amount) || 0, nm = t.accountName || t.desc || '(tanpa akun)'; r.n++;
       if (t.category === 'sales') { r.omzet += a; r.inn[nm] = (r.inn[nm] || 0) + a; r.disc += Number(t.discount) || 0; }
       else if (t.category === 'prive') r.prive += a;
+      else if (t.category === 'modal') { r.modal = (r.modal || 0) + a; r.inn[nm] = (r.inn[nm] || 0) + a; }
       else { if (t.category === 'cogs') r.cogs += a; else r.exp += a; r.out[nm] = (r.out[nm] || 0) + a; }
     });
     r.laba = r.omzet - r.cogs - r.exp; return r;

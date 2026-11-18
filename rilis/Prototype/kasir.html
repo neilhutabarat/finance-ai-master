@@ -902,11 +902,12 @@
                 expense: "3. BIAYA OPERASIONAL  (gaji, sewa, listrik, transport)",
                 prive: "4. PRIVE  (uang diambil pemilik untuk pribadi)",
                 aset: "5. ASET  (beli mesin, kendaraan, tanah, persediaan)",
-                hutang: "6. HUTANG  (bayar atau cicil utang)"
+                hutang: "6. HUTANG  (bayar atau cicil utang)",
+                modal: "7. MODAL  (setoran modal pemilik, menambah kas)"
             };
             const SECTIONS = [
                 { head: "\u2500\u2500\u2500\u2500\u2500 LABA RUGI \u2500\u2500\u2500\u2500\u2500", cats: ["sales", "cogs", "expense"] },
-                { head: "\u2500\u2500\u2500\u2500\u2500\u2500 NERACA \u2500\u2500\u2500\u2500\u2500\u2500", cats: ["prive", "aset", "hutang"] }
+                { head: "\u2500\u2500\u2500\u2500\u2500\u2500 NERACA \u2500\u2500\u2500\u2500\u2500\u2500", cats: ["prive", "aset", "hutang", "modal"] }
             ];
             /* baris induk kelompok: penunjuk arah saja, tidak bisa dipilih */
             function coaHeadRow(text) {
@@ -1086,7 +1087,10 @@
                     sales: { text: "INCOME (+ Kas Masuk)", color: "text-emerald-800 bg-emerald-50 border-emerald-200" },
                     cogs: { text: "OUTCOME Produksi (- Kas Keluar + Pajak 12%)", color: "text-amber-800 bg-amber-50 border-amber-200" },
                     expense: { text: "OUTCOME Operasional (- Kas Keluar + Pajak 12%)", color: "text-rose-800 bg-rose-50 border-rose-200" },
-                    prive: { text: "PRIVE Pemilik (- Kas Keluar)", color: "text-purple-800 bg-purple-50 border-purple-200" }
+                    prive: { text: "PRIVE Pemilik (- Kas Keluar)", color: "text-purple-800 bg-purple-50 border-purple-200" },
+                    aset: { text: "ASET (- Kas Keluar, masuk Neraca, bukan beban)", color: "text-sky-800 bg-sky-50 border-sky-200" },
+                    hutang: { text: "BAYAR HUTANG (- Kas Keluar, kurangi hutang)", color: "text-slate-800 bg-slate-100 border-slate-300" },
+                    modal: { text: "MODAL (+ Kas Masuk, bukan pendapatan)", color: "text-emerald-800 bg-emerald-50 border-emerald-200" }
                 };
                 const cfg = map[opt.dataset.category];
                 badge.innerText = cfg.text;
@@ -1227,12 +1231,12 @@
                     <div>
                         <div class="flex items-center space-x-1.5">
                             <span class="font-black text-slate-900">${d.isProduct ? '📦 ' : ''}[${fmEsc(d.accountCode)}] ${fmEsc(d.accountName)}${d.isProduct ? ' ×' + (d.qty || 1) + uLbl(d) : ''}${d.discount ? ' <span class="text-emerald-700 text-[10px]">(diskon -Rp ' + formatThousandSeparator(d.discount) + ')</span>' : ''}</span>
-                            <span class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${d.category === 'sales' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${d.category.toUpperCase()}</span>
+                            <span class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${fmKasMasuk(d.category) ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${d.category.toUpperCase()}</span>
                         </div>
                         <p class="text-[11px] text-slate-500 font-medium">${fmEsc(d.desc || '-')}</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <span class="font-black font-mono ${d.category === 'sales' ? 'text-slate-900' : 'text-rose-700'}">${d.category === 'sales' ? '' : '-'}Rp ${formatThousandSeparator(d.amount)}</span>
+                        <span class="font-black font-mono ${fmKasMasuk(d.category) ? 'text-slate-900' : 'text-rose-700'}">${fmKasMasuk(d.category) ? '' : '-'}Rp ${formatThousandSeparator(d.amount)}</span>
                         <button onclick="editDraftItem('${d.id}')" class="p-1 rounded-lg hover:bg-slate-100 text-slate-600" title="Edit">
                             <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
                         </button>
@@ -1279,7 +1283,7 @@
 
         function localISO() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
         /* Penjualan menambah, pengeluaran mengurangi: struk dan total antrean memakai nilai bertanda */
-        function sgnAmt(d) { return d.category === 'sales' ? d.amount : -d.amount; }
+        function sgnAmt(d) { return fmKasMasuk(d.category) ? d.amount : -d.amount; }
         function fmSigned(n) { return (n < 0 ? '-' : '') + 'Rp ' + formatThousandSeparator(Math.abs(n)); }
         let lastReceipt = null;
         function currentPay() {
@@ -1458,14 +1462,14 @@
             lastReceipt = {
                 store: (document.getElementById('receipt-store-name') || {}).innerText || '',
                 when: receiptFull + ' ' + nowTime, total: total, pay: payFull,
-                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) + (d.discount ? ' (diskon -' + formatThousandSeparator(d.discount) + ')' : '') : '') + ' = ' + (d.category === 'sales' ? '' : '-') + 'Rp ' + formatThousandSeparator(d.amount)))
+                items: draftList.map(d => (d.accountName + (d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) + (d.discount ? ' (diskon -' + formatThousandSeparator(d.discount) + ')' : '') : '') + ' = ' + (fmKasMasuk(d.category) ? '' : '-') + 'Rp ' + formatThousandSeparator(d.amount)))
             };
             const rList = document.getElementById('receipt-items-list');
             rList.innerHTML = "";
             draftList.forEach(d => {
                 const row = document.createElement('div');
                 row.className = "flex justify-between";
-                row.innerHTML = `<span>${d.isProduct ? '📦 ' : ''}${fmEsc(d.accountName)}${d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) : ''}</span><span>${d.category === 'sales' ? '' : '-'}Rp ${formatThousandSeparator(d.amount)}</span>`;
+                row.innerHTML = `<span>${d.isProduct ? '📦 ' : ''}${fmEsc(d.accountName)}${d.isProduct ? ' x' + (d.qty || 1) + uLbl(d) : ''}</span><span>${fmKasMasuk(d.category) ? '' : '-'}Rp ${formatThousandSeparator(d.amount)}</span>`;
                 rList.appendChild(row);
             });
 
@@ -1492,7 +1496,7 @@
             let totalIn = 0;
             let totalOut = 0;
             activeTx.forEach(t => {
-                if (t.category === 'sales') totalIn += t.amount;
+                if (fmKasMasuk(t.category)) totalIn += t.amount;
                 else totalOut += t.amount;
             });
             const drawerBalance = totalIn - totalOut;
@@ -1583,7 +1587,7 @@
             let shiftOut = 0;
 
             activeTx.forEach(t => {
-                if (t.category === 'sales') shiftIn += t.amount;
+                if (fmKasMasuk(t.category)) shiftIn += t.amount;
                 else shiftOut += t.amount;
             });
 
@@ -1618,14 +1622,14 @@
             const chronoList = fmSortChrono(myTx()); // selalu dihitung dari yang terlama dulu, supaya Saldo berjalan benar
             let runningBalance = 0;
             const withBalance = chronoList.map(tx => {
-                if (tx.category === 'sales') runningBalance += tx.amount;
+                if (fmKasMasuk(tx.category)) runningBalance += tx.amount;
                 else runningBalance -= tx.amount;
                 return { ...tx, runningBalance };
             });
 
             const displayList = fmMutasiDesc ? withBalance.slice().reverse() : withBalance;
             displayList.forEach(tx => {
-                if (tx.category === 'sales') totalIn += tx.amount;
+                if (fmKasMasuk(tx.category)) totalIn += tx.amount;
                 else totalOut += tx.amount;
 
                 const tr = document.createElement('tr');
@@ -1633,7 +1637,7 @@
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono text-slate-600">${tx.dateFull} ${tx.date}</td>
                     <td class="py-2.5 px-3 font-bold text-slate-900">${tx.isProduct ? '📦 ' : ''}[${fmEsc(tx.accountCode)}] ${fmEsc(tx.accountName)}<br><span class="text-[10px] text-slate-500 font-normal">${fmEsc(tx.desc || '-')}${(window.FM_BIZ && FM_BIZ.tag) ? FM_BIZ.tag(tx) : ''}</span></td>
-                    <td class="py-2.5 px-3 text-right font-black text-emerald-600 font-mono">${tx.category === 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-emerald-600 font-mono">${fmKasMasuk(tx.category) ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
                     <td class="py-2.5 px-3 text-right font-black text-rose-600 font-mono">${tx.category !== 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
                     <td class="py-2.5 px-3 text-right font-black font-mono text-slate-900">Rp ${formatThousandSeparator(tx.runningBalance)}</td>
                     <td class="py-2.5 px-3 text-center text-slate-500 text-[10px]">${fmEsc(tx.staff)}</td>

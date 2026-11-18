@@ -27,7 +27,7 @@
     list.sort(function (a, b) { return dOf(a).localeCompare(dOf(b)) || (key(a) - key(b)); });
     return list;
   }
-  function sgn(t) { return t.category === 'sales' ? 1 : -1; }
+  function sgn(t) { return fmKasMasuk(t.category) ? 1 : -1; }
 
   /* ---------- PDF ---------- */
   function ascii(t) {
@@ -45,7 +45,7 @@
     function line(yy, g) { cur.push('ET ' + (g || 0.6) + ' G 0.5 w ' + MX + ' ' + yy.toFixed(1) + ' m ' + (W - MX) + ' ' + yy.toFixed(1) + ' l S BT'); }
     function cut(s, n) { s = ascii(s); return s.length > n ? s.slice(0, n - 1) + '.' : s; }
     var income = 0, outcome = 0;
-    list.forEach(function (t) { if (t.category === 'sales') income += t.amount || 0; else outcome += t.amount || 0; });
+    list.forEach(function (t) { if (fmKasMasuk(t.category)) income += t.amount || 0; else outcome += t.amount || 0; });
     var lr = null; try { if (window.FM_LR && FM_LR.compute) lr = FM_LR.compute(st.p === 'kustom' ? 'kustom' : st.p); } catch (e) {}
     newPage();
     text(MX, y, tn.nama || 'Laporan Transaksi', 'F2', 15); y -= 16;

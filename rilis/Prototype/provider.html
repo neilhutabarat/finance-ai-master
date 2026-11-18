@@ -2816,7 +2816,7 @@
                 tr.innerHTML = `
                     <td class="py-2 px-3 text-slate-400 font-mono text-[10px]">${escHtml(tx.dateFull || '')} ${escHtml(tx.date || '')}</td>
                     <td class="py-2 px-3"><span class="font-bold text-white">[${escHtml(tx.accountCode)}] ${escHtml(tx.accountName)}</span><br><span class="text-[10px] text-slate-400">${escHtml(tx.desc || '-')}</span></td>
-                    <td class="py-2 px-3 text-right font-black text-emerald-400 font-mono">${tx.category === 'sales' ? formatThousand(tx.amount) : '-'}</td>
+                    <td class="py-2 px-3 text-right font-black text-emerald-400 font-mono">${fmKasMasuk(tx.category) ? formatThousand(tx.amount) : '-'}</td>
                     <td class="py-2 px-3 text-right font-black text-rose-400 font-mono">${tx.category !== 'sales' ? formatThousand(tx.amount) : '-'}</td>
                     <td class="py-2 px-3 text-center text-slate-400 text-[10px]">${escHtml(tx.staff || 'Kasir')}</td>
                 `;

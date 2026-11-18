@@ -734,7 +734,7 @@
                     groups[t.accountCode].count += 1;
                     groups[t.accountCode].total += t.amount;
                 }
-                if (t.category === 'sales') totalIncome += t.amount;
+                if (fmKasMasuk(t.category)) totalIncome += t.amount;
                 else totalOutcome += t.amount;
             });
 
@@ -752,7 +752,7 @@
             tbody.innerHTML = "";
             const activeItems = Object.values(groups).filter(g => g.total > 0 && g.category !== 'prive');
             activeItems.forEach(item => {
-                const isInc = item.category === 'sales';
+                const isInc = fmKasMasuk(item.category);
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-white/5 text-xs";
                 tr.innerHTML = `
@@ -872,7 +872,7 @@
             const chronoList = fmSortChrono(fmV(txList));
             let runningBalance = 0;
             const withBalance = chronoList.map(tx => {
-                if (tx.category === 'sales') runningBalance += tx.amount;
+                if (fmKasMasuk(tx.category)) runningBalance += tx.amount;
                 else runningBalance -= tx.amount;
                 return { ...tx, runningBalance };
             });
@@ -883,7 +883,7 @@
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono">${tx.dateFull} ${tx.date}</td>
                     <td class="py-2.5 px-3 font-bold">[${fmEsc(tx.accountCode)}] ${fmEsc(tx.accountName)}<br><span class="text-[10px] text-slate-400 font-normal">${fmEsc(tx.desc || '-')} (${fmEsc(tx.staff)})${(window.FM_BIZ && FM_BIZ.tag) ? FM_BIZ.tag(tx) : ''}</span></td>
-                    <td class="py-2.5 px-3 text-right font-black text-emerald-600 font-mono">${tx.category === 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-black text-emerald-600 font-mono">${fmKasMasuk(tx.category) ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
                     <td class="py-2.5 px-3 text-right font-black text-rose-600 font-mono">${tx.category !== 'sales' ? 'Rp ' + formatThousandSeparator(tx.amount) : '-'}</td>
                     <td class="py-2.5 px-3 text-right font-black font-mono">Rp ${formatThousandSeparator(tx.runningBalance)}</td>
                     <td class="py-2.5 px-3 text-center">

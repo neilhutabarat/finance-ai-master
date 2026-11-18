@@ -37,6 +37,8 @@
       if (c === 'sales') {
         r.sales += v; r.nSales++; var pm = (t.pay === 'qris' || t.pay === 'transfer') ? t.pay : 'tunai'; r.byPay[pm] += v;
         if (t.isProduct) { var k = t.accountCode || t.accountName || '?'; var o = r.prod[k] = r.prod[k] || { name: t.accountName || k, qty: 0, amt: 0 }; o.qty += (Number(t.qty) > 0 ? Number(t.qty) : 1); o.amt += v; }
+      } else if (c === 'modal') {
+        r.modal = (r.modal || 0) + v;
       } else {
         if (c === 'prive') r.prive += v; else if (c === 'cogs') r.cogs += v; else r.exp += v;
         if (c !== 'prive') { var nm = String(t.accountName || (c === 'cogs' ? 'Modal bahan' : 'Biaya lain')); r.byExp[nm] = (r.byExp[nm] || 0) + v; }

@@ -52,6 +52,7 @@
       var a = Math.round(Number(t.amount) || 0); if (!(a > 0)) return;
       var bank = (t.pay === 'qris' || t.pay === 'transfer'), c = t.category; r.n++;
       if (c === 'sales') { r.sales += a; if (bank) r.bank += a; else r.kas += a; }
+      else if (c === 'modal') { r.modal = (r.modal || 0) + a; if (bank) r.bank += a; else r.kas += a; }
       else { if (c === 'cogs') r.cogs += a; else if (c === 'prive') r.prive += a; else r.exp += a; if (bank) r.bank -= a; else r.kas -= a; }
     });
     r.laba = r.sales - r.cogs - r.exp; return r;

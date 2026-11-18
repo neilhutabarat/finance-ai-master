@@ -19,7 +19,7 @@
       var d = t.dateISO || ''; if (d < f) return;
       var b = (window.FM_BIZ && FM_BIZ.ofTx) ? (FM_BIZ.ofTx(t) || '') : '';
       var k = b || '(Umum)', o = by[k] = by[k] || { name: k, in: 0, out: 0, n: 0, staff: {} };
-      var isIn = t.category === 'sales', a = Number(t.amount) || 0;
+      var isIn = fmKasMasuk(t.category), a = Number(t.amount) || 0;
       if (t.category === 'prive') return;
       o.n++; if (isIn) o.in += a; else o.out += a;
       var s = o.staff[t.staff || '-'] = o.staff[t.staff || '-'] || { in: 0, out: 0, n: 0 }; s.n++; if (isIn) s.in += a; else s.out += a;
