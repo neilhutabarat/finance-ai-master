@@ -3,6 +3,19 @@
    2) Layar yang sama muncul saat berpindah halaman.
    3) Tombol merah "Perbarui Aplikasi": hapus cache aplikasi + service worker, unduh ulang file halaman ini, lalu muat ulang.
       Login, data toko, dan pengaturan tampilan TIDAK dihapus. Progres yang ditampilkan adalah jumlah file yang benar-benar diunduh ulang. */
+/* [Keamanan v1.1.0] Anti-bingkai (clickjacking): halaman toko tidak boleh dimuat di dalam bingkai situs lain,
+   supaya tombol Kasir/Manager/Owner tidak bisa ditimpa halaman palsu yang menipu pengguna untuk menekannya.
+   Bingkai dari situs sendiri tetap boleh. */
+(function () {
+  try {
+    if (window.top === window.self) return;
+    var sama = false;
+    try { sama = window.top.location.hostname === window.location.hostname; } catch (e) { sama = false; }
+    if (sama) return;
+    document.documentElement.style.setProperty('display', 'none', 'important');
+    try { window.top.location.replace(window.location.href); } catch (e) {}
+  } catch (e) {}
+})();
 (function () {
   'use strict';
   if (window.__fmLoader) return; window.__fmLoader = true;
