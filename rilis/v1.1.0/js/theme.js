@@ -9,6 +9,8 @@
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
     ['v1.1.0', '18 Nov 2026', [
+      '[Perbaikan] Header toko dibuat lebih tipis supaya isi halaman lebih lega',
+      '[Perbaikan] Dock bawah jadi pulau: logo Oneilverse di tengah, menu terkuak saat kursor menyentuh logo, dan Chat, Tema, Absen, Stok menjadi pulau terpisah yang menggeser ke tepi',
       '[Perbaikan] Layar muat baru: tiga titik saling berpapasan dan tulisan Oneilverse disapu kilau halus; nomor versi kembali tampil sebagai teks biasa',
       '[Perbaikan] Layar muat tidak lagi menahan halaman, jadi aplikasi terbuka begitu siap',
       '[Keamanan] (menyusul pada rilis ini)'
