@@ -13,10 +13,12 @@
       '[Perbaikan] Dock bawah jadi pulau: logo Oneilverse di tengah, menu terkuak saat kursor menyentuh logo, dan Chat, Tema, Absen, Stok menjadi pulau terpisah yang menggeser ke tepi',
       '[Perbaikan] Layar muat baru: tiga titik saling berpapasan dan tulisan Oneilverse disapu kilau halus; nomor versi kembali tampil sebagai teks biasa',
       '[Perbaikan] Layar muat tidak lagi menahan halaman, jadi aplikasi terbuka begitu siap',
-      '[Perbaikan] Kartu Owner lebih bersih: tanpa garis abu, bayangan halus, sudut lebih bulat, dan angka rupiah memakai huruf yang rapi; letak dan ukuran kartu tidak berubah',
-      '[Perbaikan] Setiap kartu Owner diberi ikon kecil (ringkasan, metode bayar, target, stok, laba per produk) supaya lebih cepat dikenali',
+      '[Perbaikan] Kartu Owner dan Manager lebih bersih: tanpa garis abu, bayangan halus, sudut lebih bulat, dan angka rupiah memakai huruf yang rapi; letak dan ukuran kartu tidak berubah',
+      '[Perbaikan] Setiap kartu Owner dan Manager diberi ikon kecil (ringkasan, metode bayar, target, stok, laba per produk) supaya lebih cepat dikenali',
       '[Perbaikan] Tema Original (kaca) tetap tersedia, kini dengan tepi kartu tipis yang terang',
       '[Perbaikan] Dock pulau di halaman Owner dan Manager tidak lagi tampil hitam saat tema Base',
+      '[Perbaikan] Kartu Kasir (saldo, formulir, draft, total) lebih bersih dengan angka rupiah yang rapi; letak dan ukuran tidak berubah',
+      '[Perbaikan] Dock pulau tidak lagi terpotong oleh lapisan halaman, dan tombol Chat yang muncul belakangan ikut menjadi pulau',
       '[Keamanan] (menyusul pada rilis ini)'
     ]],
     ['v1.0.26', '18 Nov 2026', [

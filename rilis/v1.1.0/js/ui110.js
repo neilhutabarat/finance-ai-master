@@ -16,10 +16,11 @@
      Halaman Owner/Manager pada tema Base dibalik warnanya oleh theme.js (filter invert),
      jadi semua warna di sini memakai currentColor atau variabel yang ikut terbalik. */
   try {
-    if (/dashboard/.test(pth) && !document.getElementById('fm-ui110-kartu')) {
-      var K = 'html[data-fm-page="owner"]:not(#_):not(#__):not(#___) body ';
-      var KB = 'html[data-fm-page="owner"][data-fm-look="base"]:not(#_):not(#__):not(#___) body ';
-      var KO = 'html[data-fm-page="owner"][data-fm-look="original"]:not(#_):not(#__):not(#___) body ';
+    var PG = ':is([data-fm-page="owner"],[data-fm-page="manager"])';
+    if (/dashboard|manager/.test(pth) && !document.getElementById('fm-ui110-kartu')) {
+      var K = 'html' + PG + ':not(#_):not(#__):not(#___) body ';
+      var KB = 'html' + PG + '[data-fm-look="base"]:not(#_):not(#__):not(#___) body ';
+      var KO = 'html' + PG + '[data-fm-look="original"]:not(#_):not(#__):not(#___) body ';
       var NUM = '"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,system-ui,sans-serif';
       function mk(d) {
         return 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>') + '")';
@@ -33,8 +34,8 @@
       };
       var kc =
         /* warna bayangan & tepi: biasa, dan versi pra-balik untuk halaman yang dibalik */
-        'html[data-fm-page="owner"]{--u-sh1:rgba(15,23,42,.05);--u-sh2:rgba(15,23,42,.20);--u-edge:rgba(255,255,255,.6)}' +
-        'html[data-fm-page="owner"][data-fm-invert]{--u-sh1:rgba(240,232,213,.05);--u-sh2:rgba(240,232,213,.20);--u-edge:rgba(0,0,0,.6)}' +
+        'html' + PG + '{--u-sh1:rgba(15,23,42,.05);--u-sh2:rgba(15,23,42,.20);--u-edge:rgba(255,255,255,.6)}' +
+        'html' + PG + '[data-fm-invert]{--u-sh1:rgba(240,232,213,.05);--u-sh2:rgba(240,232,213,.20);--u-edge:rgba(0,0,0,.6)}' +
         /* Base: tanpa garis abu, diganti bayangan halus berlapis; kilap kaca dilepas supaya bersih */
         KB + 'main .ios-glass{border-color:transparent!important;border-radius:20px!important;box-shadow:0 1px 2px var(--u-sh1),0 10px 26px -14px var(--u-sh2)!important}' +
         KB + 'main .ios-glass::before{display:none!important}' +
@@ -63,6 +64,26 @@
             K + 'main .fm-ic:not(' + Object.keys(IKON).map(function (n) { return '[data-fm-i="' + n + '"]'; }).join('):not(') + ') h4::after{display:none}';
       var ks = document.createElement('style'); ks.id = 'fm-ui110-kartu'; ks.textContent = kc;
       (document.head || document.documentElement).appendChild(ks);
+    }
+  } catch (e) {}
+
+  /* ===== KARTU KASIR (v1.1.0) — hanya rupa, posisi dan ukuran tetap ===== */
+  try {
+    if (/kasir/.test(pth) && !document.getElementById('fm-ui110-kasir')) {
+      var Q = 'html[data-fm-page="kasir"]:not(#_):not(#__):not(#___) body ';
+      var QB = 'html[data-fm-page="kasir"][data-fm-look="base"]:not([data-fm-black]):not(#_):not(#__):not(#___) body ';
+      var QO = 'html[data-fm-page="kasir"][data-fm-look="original"]:not([data-fm-black]):not(#_):not(#__):not(#___) body ';
+      var NUMK = '"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,system-ui,sans-serif';
+      var qc =
+        QB + 'main .white-ice-glass-card{border-color:transparent!important;border-radius:20px!important;box-shadow:0 1px 2px rgba(15,23,42,.05),0 10px 26px -14px rgba(15,23,42,.22)!important}' +
+        QB + 'main .white-ice-glass-card::before{display:none!important}' +
+        QO + 'main .white-ice-glass-card{border:1px solid rgba(255,255,255,.6)!important;border-radius:20px!important}' +
+        /* angka rupiah: huruf rapi, lebar digit seragam (kolom isian nominal tidak diubah) */
+        Q + 'main .font-mono:not(input){font-family:' + NUMK + '!important;font-variant-numeric:tabular-nums;letter-spacing:-.02em!important}' +
+        Q + '#kasir-live-balance{font-weight:800!important;letter-spacing:-.035em!important}' +
+        Q + '#kas-total-in,' + Q + '#kas-total-out,' + Q + '#kas-net,' + Q + '#draft-total-amount{font-weight:800!important}';
+      var qs = document.createElement('style'); qs.id = 'fm-ui110-kasir'; qs.textContent = qc;
+      (document.head || document.documentElement).appendChild(qs);
     }
   } catch (e) {}
 
