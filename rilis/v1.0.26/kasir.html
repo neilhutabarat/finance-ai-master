@@ -905,34 +905,53 @@
             select.innerHTML = '<option value="">-- Pilih Akun COA / Produk --</option>';
 
             // 1. Akun Standar COA
+            /* Urutan PSAK: 1-4 komponen Laba Rugi, 5-7 komponen Neraca.
+               Nama kelompok sengaja memakai bahasa sehari-hari supaya kasir di toko mana pun langsung paham. */
             const categories = {
-                sales: "1. INCOME (PEMASUKAN USAHA)",
-                cogs: "2. OUTCOME PRODUKSI (MUSIC/VIDEO/HPP)",
-                expense: "3. OUTCOME OPERASIONAL (TOOLS, SERVER, DLL)",
-                prive: "4. PRIVE (PENARIKAN MODAL OWNER)",
-                aset: "5. ASET (BELI MESIN, KENDARAAN, TANAH, PERSEDIAAN, DLL)",
-                hutang: "6. BAYAR / CICIL HUTANG"
+                sales: "1. PENJUALAN  (uang masuk dari jualan)",
+                cogs: "2. HARGA POKOK PENJUALAN / HPP  (bahan, barang dagang)",
+                expense: "3. BIAYA OPERASIONAL  (gaji, sewa, listrik, transport)",
+                prive: "4. PRIVE  (uang diambil pemilik untuk pribadi)",
+                aset: "5. ASET  (beli mesin, kendaraan, tanah, persediaan)",
+                hutang: "6. HUTANG  (bayar atau cicil utang)"
             };
-
-            Object.keys(categories).forEach(catKey => {
-                const group = document.createElement('optgroup');
-                group.label = categories[catKey];
-                coa.filter(c => c.category === catKey && adminBizOk(c.biz)).forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.code;
-                    opt.innerText = `[${c.code}] ${c.name}`;
-                    opt.dataset.category = c.category;
-                    opt.dataset.name = c.name;
-                    group.appendChild(opt);
+            const SECTIONS = [
+                { head: "\u2500\u2500\u2500\u2500\u2500 LABA RUGI \u2500\u2500\u2500\u2500\u2500", cats: ["sales", "cogs", "expense", "prive"] },
+                { head: "\u2500\u2500\u2500\u2500\u2500\u2500 NERACA \u2500\u2500\u2500\u2500\u2500\u2500", cats: ["aset", "hutang"] }
+            ];
+            /* baris induk kelompok: penunjuk arah saja, tidak bisa dipilih */
+            function coaHeadRow(text) {
+                const o = document.createElement('option');
+                o.value = ''; o.disabled = true; o.innerText = text;
+                o.style.fontWeight = '800'; o.style.color = '#1e293b'; o.style.background = '#e2e8f0';
+                return o;
+            }
+            const inCat = catKey => coa.some(c => c.category === catKey && adminBizOk(c.biz));
+            SECTIONS.forEach(sec => {
+                const filled = sec.cats.filter(inCat);
+                if (!filled.length) return;   /* induk kelompok yang belum punya akun sama sekali tidak ditampilkan */
+                select.appendChild(coaHeadRow(sec.head));
+                filled.forEach(catKey => {
+                    const group = document.createElement('optgroup');
+                    group.label = categories[catKey];
+                    coa.filter(c => c.category === catKey && adminBizOk(c.biz)).forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.code;
+                        opt.innerText = `[${c.code}] ${c.name}`;
+                        opt.dataset.category = c.category;
+                        opt.dataset.name = c.name;
+                        group.appendChild(opt);
+                    });
+                    select.appendChild(group);
                 });
-                select.appendChild(group);
             });
 
             // 2. Produk Inventaris Minimarket dari Manager
             let products = fmSaleProducts(); /* hanya produk dari Induk stok yang 'Dijual di kasir' (fitur Jual Produk, diatur Tower + Manager) */
-            if (products.length > 0) {
+            if (products.filter(p => p.stock > 0).length > 0) {
+                select.appendChild(coaHeadRow("\u2500\u2500\u2500\u2500 PRODUK TOKO \u2500\u2500\u2500\u2500"));
                 const prodGroup = document.createElement('optgroup');
-                prodGroup.label = "5. PRODUK INVENTARIS TOKO";
+                prodGroup.label = "PRODUK TOKO  (stok berkurang otomatis)";
                 products.forEach(p => {
                     if (p.stock > 0) {
                         const opt = document.createElement('option');
