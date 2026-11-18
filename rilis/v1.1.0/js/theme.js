@@ -26,6 +26,8 @@
       '[Baru] Mode gelap pekat: tombol Tema di toko kini berpindah antara One UI terang dan gelap pekat, lengkap di Kasir, Manager, Owner, dan Partner; semua tulisan diperiksa agar tetap terbaca',
       '[Perbaikan] Pilihan tema kaca tidak lagi ada di toko; One UI atau Kaca kini hanya ditentukan dari Control Tower',
       '[Perbaikan] Pulau satelit menyesuaikan halaman: Manager dan Owner yang tidak punya Absen dan Stok memakai menu halamannya sendiri, dan tombol Tema selalu tersedia',
+      '[Perbaikan] Mode offline: nomor versi penyimpanan dinaikkan, jadi salinan halaman lama di browser tidak lagi menimpa tampilan baru saat jaringan lambat (penyebab tampilan sempat balik ke versi lama)',
+      '[Perbaikan] Mode offline: salinan kini dicocokkan menurut nomor versi berkas, dan dua berkas tampilan yang belum pernah ikut tersimpan (ui110.js, kasir-fit.js) kini disimpan juga',
       '[Keamanan] Halaman toko tidak bisa lagi dimuat di dalam bingkai situs lain, mencegah tombol aplikasi ditimpa halaman palsu (clickjacking)'
     ]],
     ['v1.0.26', '18 Nov 2026', [
