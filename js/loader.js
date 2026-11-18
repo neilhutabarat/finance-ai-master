@@ -11,17 +11,20 @@
   var CSS = '#fm-ld{position:fixed;inset:0;z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f6f3ec;color:#334155;font:700 14px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;opacity:1;transition:opacity .3s ease}' +
     '#fm-ld.fm-ld-out{opacity:0;pointer-events:none}' +
     'html[data-fm-invert="1"] #fm-ld,html[data-fm-ctdark] #fm-ld{filter:invert(1) hue-rotate(180deg)}html[data-fm-invert="1"] #fm-refresh,html[data-fm-ctdark] #fm-refresh{filter:invert(1) hue-rotate(180deg)}' +
-    '#fm-ld .fm-ld-dots{display:flex;gap:10px;align-items:flex-end;height:46px}#fm-ld .fm-ld-dots i{display:block;width:15px;height:15px;border-radius:50%;background:#dc2626;transform-origin:50% 100%;animation:fmhop .72s cubic-bezier(.3,.7,.4,1) infinite}#fm-ld .fm-ld-dots i:nth-child(2){background:#f59e0b;animation-delay:.12s}#fm-ld .fm-ld-dots i:nth-child(3){background:#2563eb;animation-delay:.24s}' +
+    '#fm-ld .fm-ld-dots{position:relative;width:76px;height:34px}#fm-ld .fm-ld-dots i{position:absolute;top:10px;left:31px;display:block;width:14px;height:14px;border-radius:50%;background:#dc2626;animation:fmorb 2.1s cubic-bezier(.45,0,.55,1) infinite}#fm-ld .fm-ld-dots i:nth-child(2){background:#f59e0b;animation-delay:-.7s}#fm-ld .fm-ld-dots i:nth-child(3){background:#2563eb;animation-delay:-1.4s}' +
     '#fm-ld .fm-ld-bar{width:200px;height:6px;border-radius:99px;background:rgba(15,23,42,.1);overflow:hidden;display:none}#fm-ld .fm-ld-bar i{display:block;height:100%;width:0;background:#dc2626;border-radius:99px;transition:width .2s ease}' +
     '#fm-ld.fm-ld-upd .fm-ld-bar{display:block}#fm-ld .fm-ld-s{font-weight:500;font-size:12px;opacity:.65;min-height:15px}#fm-ld .fm-ld-t{font-size:18px;font-weight:800;letter-spacing:.01em}' +
-    '@keyframes fmhop{0%,100%{transform:translateY(0) scale(1.25,.7)}18%{transform:translateY(0) scale(.9,1.15)}55%{transform:translateY(-30px) scale(.92,1.1)}85%{transform:translateY(0) scale(1.05,.95)}}@media(prefers-reduced-motion:reduce){#fm-ld .fm-ld-dots i{animation:none}}' +
+    '@keyframes fmorb{0%{transform:translateX(-31px) scale(.72);opacity:.55}25%{transform:translateX(0) scale(1.12);opacity:1}50%{transform:translateX(31px) scale(.72);opacity:.55}75%{transform:translateX(0) scale(1.12);opacity:1}100%{transform:translateX(-31px) scale(.72);opacity:.55}}' +
+    '#fm-ld .fm-ld-t{background:linear-gradient(90deg,currentColor 0 38%,rgba(120,120,130,.45) 46%,currentColor 54% 100%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:fmsheen 2.6s ease-in-out infinite}' +
+    '@keyframes fmsheen{0%{background-position:120% 0}60%,100%{background-position:-60% 0}}@media(prefers-reduced-motion:reduce){#fm-ld .fm-ld-dots i,#fm-ld .fm-ld-t{animation:none}#fm-ld .fm-ld-t{-webkit-text-fill-color:currentColor}}' +
     '@keyframes fmrfx{0%{transform:scale(1) rotate(0);box-shadow:0 0 0 0 rgba(220,38,38,.7)}15%{transform:scale(1.12) rotate(-5deg)}30%{transform:scale(1.12) rotate(5deg)}45%{transform:scale(1.08) rotate(-3deg);box-shadow:0 0 0 12px rgba(220,38,38,0)}60%,100%{transform:scale(1) rotate(0);box-shadow:0 0 0 0 rgba(220,38,38,0)}}' +
     'html body #fm-refresh.fm-rf-new{animation:fmrfx 1.5s ease-in-out infinite!important;font-size:12.5px!important;background:#b91c1c!important}@media(prefers-reduced-motion:reduce){html body #fm-refresh.fm-rf-new{animation:none!important;outline:3px solid rgba(220,38,38,.5)}}' +
     'html body #fm-refresh{border:0!important;border-radius:999px!important;background:#dc2626!important;background-image:none!important;color:#fff!important;font:700 12px/1 system-ui,-apple-system,Segoe UI,Roboto,sans-serif!important;padding:7px 13px!important;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(220,38,38,.35)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;filter:none!important;opacity:1!important;text-shadow:none!important;flex:0 0 auto}' +
     'html body #fm-refresh:hover{background:#b91c1c!important}#fm-refresh:active{transform:scale(.97)}html body #fm-refresh.fm-rf-fix{position:fixed!important;right:8px!important;top:5px!important;bottom:auto!important;margin:0!important;min-height:0!important;height:auto!important;padding:5px 10px!important;font-size:11px!important;z-index:2147483000}';
   var st = document.createElement('style'); st.id = 'fm-ld-css'; st.textContent = CSS; (document.head || root).appendChild(st);
 
-  function verText() { var v = (window.FM_RELEASES && FM_RELEASES.beta) || ''; if (v) { try { localStorage.setItem('fm_ld_ver', v); } catch (e) {} } else { try { v = localStorage.getItem('fm_ld_ver') || ''; } catch (e) {} } return v; }
+  function verText() { var v = (window.FM_RELEASES && FM_RELEASES.beta) || ''; if (!v) { var pm = /\/rilis\/(v[\d.]+)\//.exec(location.pathname); v = pm ? pm[1] : 'v1.0.26'; } if (v) { try { localStorage.setItem('fm_ld_ver', v); } catch (e) {} } else { try { v = localStorage.getItem('fm_ld_ver') || ''; } catch (e) {} } return v; }
+
   function build(text) {
     if (ld && ld.parentNode) { ld.classList.remove('fm-ld-out'); ld.querySelector('.fm-ld-t').textContent = text; return ld; }
     ld = document.createElement('div'); ld.id = 'fm-ld'; ld.setAttribute('role', 'status'); ld.setAttribute('aria-live', 'polite');
@@ -58,6 +61,8 @@
   function urls() {
     var l = [location.pathname + location.search, '/version.json', '/js/rollout.js'];
     [].forEach.call(document.querySelectorAll('script[src],link[rel="stylesheet"][href]'), function (n) { var u = n.getAttribute('src') || n.getAttribute('href'); if (u && sameOrigin(u)) l.push(new URL(u, location.href).pathname + new URL(u, location.href).search); });
+    /* seperti Ctrl+Shift+R: ikutkan SEMUA berkas yang benar-benar dimuat halaman ini (skrip yang dimuat dinamis, gambar, font), bukan hanya yang tertulis di HTML */
+    try { performance.getEntriesByType('resource').forEach(function (r) { if (sameOrigin(r.name) && !/googleapis|firestore|identitytoolkit/.test(r.name)) { var p = new URL(r.name); l.push(p.pathname + p.search); } }); } catch (e) {}
     return l.filter(function (u, i) { return l.indexOf(u) === i; });
   }
   function run() {

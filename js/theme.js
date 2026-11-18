@@ -3,12 +3,22 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.0.0';
-  var BETA = 'v1.0.26';
+  var BETA = 'v1.1.0';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.1.0', '18 Nov 2026', [
+      '[Perbaikan] Layar muat baru: tiga titik saling berpapasan dan tulisan Oneilverse disapu kilau halus; nomor versi kembali tampil sebagai teks biasa',
+      '[Perbaikan] Layar muat tidak lagi menahan halaman, jadi aplikasi terbuka begitu siap',
+      '[Keamanan] (menyusul pada rilis ini)'
+    ]],
     ['v1.0.26', '18 Nov 2026', [
+      '[Perbaikan] Daftar akun (COA) di Kasir dan Manager sempat hanya menampilkan 9 akun bawaan; sekarang selalu dimuat langsung dari server',
+      '[Perbaikan] Tombol Simpan ke Antrean Draft sempat gagal tanpa pesan apa pun; sudah diperbaiki',
+      '[Perbaikan] Pilihan akun transaksi dikelompokkan mengikuti urutan PSAK dengan induk Laba Rugi dan Neraca, memakai bahasa sehari-hari',
+      '[Perbaikan] Setoran Modal pemilik kini dihitung sebagai kas masuk dan tidak lagi dihitung sebagai biaya, sehingga laba dan Neraca benar',
+      '[Keamanan] Pilihan versi Oneil Shield dari Tower kini benar-benar diterapkan ke toko; sebelumnya semua toko tetap memakai v2.0 apa pun pilihannya',
       '[Perbaikan] Form Input Transaksi di kasir (layar komputer) kini muat dalam satu layar, tidak perlu digulir lagi',
       '[Perbaikan] Pilihan akun transaksi kini menampilkan juga akun Aset (beli mesin, kendaraan, tanah, persediaan) dan Bayar/Cicil Hutang, sehingga Neraca bisa tersusun lengkap',
       '[Perbaikan] Transaksi akun non-produk kini punya kolom Jumlah dan Harga Satuan; nominal dihitung otomatis (jumlah x harga satuan) dan masih bisa diubah',
