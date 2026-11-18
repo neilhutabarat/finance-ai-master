@@ -13,6 +13,7 @@
       '[Perbaikan] Dock bawah jadi pulau: logo Oneilverse di tengah, menu terkuak saat kursor menyentuh logo, dan Chat, Tema, Absen, Stok menjadi pulau terpisah yang menggeser ke tepi',
       '[Perbaikan] Layar muat baru: tiga titik saling berpapasan dan tulisan Oneilverse disapu kilau halus; nomor versi kembali tampil sebagai teks biasa',
       '[Perbaikan] Layar muat tidak lagi menahan halaman, jadi aplikasi terbuka begitu siap',
+      '[Perbaikan] Tampilan baru bergaya One UI di Kasir, Manager, dan Owner: latar abu kebiruan, kartu putih tanpa garis, kotak isian abu lembut, tombol utama berbentuk kapsul satu warna, ikon di depan label, dan huruf Plus Jakarta Sans',
       '[Perbaikan] Kartu Owner dan Manager lebih bersih: tanpa garis abu, bayangan halus, sudut lebih bulat, dan angka rupiah memakai huruf yang rapi; letak dan ukuran kartu tidak berubah',
       '[Perbaikan] Setiap kartu Owner dan Manager diberi ikon kecil (ringkasan, metode bayar, target, stok, laba per produk) supaya lebih cepat dikenali',
       '[Perbaikan] Tema Original (kaca) tetap tersedia, kini dengan tepi kartu tipis yang terang',
