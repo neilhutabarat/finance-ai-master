@@ -7,7 +7,7 @@
   'use strict';
   var ROLES = ['kasir', 'manager', 'owner'];
   var RLABEL = { kasir: 'Admin', manager: 'Manager', owner: 'Owner' };
-  var ORDER = { basic: 0, plus: 1, pro: 1 };
+  var ORDER = { basic: 0, plus: 1, pro: 2 };
   // c = inti (core), o = tambahan (opt); soon = belum tersedia
   var FEATURES = [
     { key: 'input', label: 'Catat Transaksi: form, Antrean Draft, Cetak Struk', r: { kasir: 'c' } },
@@ -90,7 +90,39 @@
   }
   /* Default per paket: Basic = hanya fitur inti (merah). Plus = fitur tambahan berikut sudah tercentang (hijau, boleh dicabut). */
   var PLUS_KEYS = ['neraca', 'dashboard', 'analisa', 'audit', 'export_csv', 'ledger', 'stok', 'stok_input:manager', 'stok_closing:manager', 'gaji', 'mutasi_wa', 'wa_receipt', 'bukti'];
-  function tierOf(tn) { var t = tn && tn.tier; return ORDER[t] != null && ORDER[t] >= 1 ? 'plus' : 'basic'; }
+
+  /* ===== Paket Basic/Plus/Pro (dirakit Tower, isinya kosong sampai diisi manual) =====
+     Disimpan di app_meta/paket_catalog = { json } (dibaca klien tanpa login, seperti wallpaper/rollout/store_catalog).
+     Bentuk: { plus: { <key>: { kasir:bool, manager:bool, owner:bool } }, pro: { ... } }.
+     Pro otomatis mewarisi semua isi Plus (tidak perlu dicentang dua kali), lalu ditambah isi Pro sendiri. */
+  var PAKET_KEY = 'fm_paket_cat_v1', PAKET_CAT = null, PAKET_AT = 0;
+  function loadPaketCat() { try { var v = JSON.parse(localStorage.getItem(PAKET_KEY) || 'null'); PAKET_CAT = (v && typeof v === 'object') ? v : null; } catch (e) { PAKET_CAT = null; } }
+  loadPaketCat();
+  function setPaketCat(c) { PAKET_CAT = c && typeof c === 'object' ? c : null; try { if (PAKET_CAT) localStorage.setItem(PAKET_KEY, JSON.stringify(PAKET_CAT)); else localStorage.removeItem(PAKET_KEY); } catch (e) {} try { window.dispatchEvent(new CustomEvent('fm:paketcat')); } catch (e) {} }
+  function fetchPaketCat(cb) {
+    try {
+      var url = 'https://firestore.googleapis.com/v1/projects/finance-ai-master-byneilverse/databases/(default)/documents/app_meta/paket_catalog?key=AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI';
+      fetch(url, { cache: 'no-store' }).then(function (r) { return r.status === 404 ? { __none: 1 } : (r.ok ? r.json() : null); }).then(function (d) {
+        if (d && d.__none) setPaketCat(null);
+        else if (d && d.fields && d.fields.json && d.fields.json.stringValue) { var j = JSON.parse(d.fields.json.stringValue); if (j && typeof j === 'object') setPaketCat(j); }
+        PAKET_AT = Date.now(); if (cb) cb();
+      }).catch(function () { if (cb) cb(); });
+    } catch (e) { if (cb) cb(); }
+  }
+  function paketHas(tier, key, role) {
+    if (!PAKET_CAT) return false;
+    var p = PAKET_CAT[tier]; if (!p || !p[key]) return false;
+    return p[key][role] === true;
+  }
+  /* kadaluarsa: toko punya tenggat (planUntil) yang sudah lewat -> diperlakukan BASIC sampai Tower memperpanjang */
+  function isExpired(tn) { return !!(tn && tn.planUntil && tn.tier && tn.tier !== 'basic' && Date.now() > Number(tn.planUntil)); }
+  function lastPaidTier(tn) { var t = tn && tn.tier; return (t === 'pro' || t === 'plus') ? t : 'basic'; }
+  function tierOf(tn) {
+    if (isExpired(tn)) return 'basic';
+    var t = tn && tn.tier;
+    if (t === 'pro') return 'pro';
+    return ORDER[t] != null && ORDER[t] >= 1 ? 'plus' : 'basic';
+  }
   var ALWAYS_ON = ['wallpaper', 'theme']; /* tampilan dasar: menyala di semua paket */
   /* Penanda tingkat untuk tampilan Tower: PLUS = fitur premium (pantas bayar), sisanya BASIC. Hanya label + urutan, tidak mengubah hak akses. */
   var PLUS_FEATURES = ['barcode', 'stok_scan', 'banyak_usaha', 'admin_usaha', 'properti', 'dashboard', 'analisa', 'audit', 'export_csv', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'backup', 'laporan_bulanan', 'gaji', 'gaji_auto', 'ledger', 'instruksi', 'billing_card'];
@@ -113,8 +145,20 @@
   function defaultFor(key, role, tier) {
     if (DEFAULT_ON.indexOf(key) >= 0) return true;
     if (ALWAYS_ON.indexOf(key) >= 0) return true;
-    if (tier !== 'plus') return false;
-    return PLUS_KEYS.indexOf(key) >= 0 || PLUS_KEYS.indexOf(key + ':' + role) >= 0;
+    if (tier === 'basic' || !tier) return false;
+    if (tier === 'plus') return PLUS_KEYS.indexOf(key) >= 0 || PLUS_KEYS.indexOf(key + ':' + role) >= 0 || paketHas('plus', key, role);
+    if (tier === 'pro') return PLUS_KEYS.indexOf(key) >= 0 || PLUS_KEYS.indexOf(key + ':' + role) >= 0 || paketHas('plus', key, role) || paketHas('pro', key, role);
+    return false;
+  }
+  /* dipakai untuk tombol "terkunci" (gelap, bukan hilang) saat paket sudah habis: apa yang SEHARUSNYA menyala
+     kalau paket toko ini belum habis (dibandingkan dengan keadaan sekarang yang sudah dianggap basic). */
+  function wouldHaveAtPaidTier(key, role, tn) {
+    var f = find(key); if (!f || f.r[role] !== 'o') return false;
+    if (!tn || !isExpired(tn)) return false;
+    var v = tn.features ? tn.features[key] : undefined;
+    if (v && typeof v === 'object' && typeof v[role] === 'boolean') return v[role]; // centangan manual, bukan dari paket
+    if (v === true || v === false) return false; // sudah ditangani sebagai centangan manual juga
+    return defaultFor(key, role, lastPaidTier(tn));
   }
   function tierDefaults(tier) {
     var out = {};
@@ -512,37 +556,59 @@
   function cardOf(el) { return el ? (el.closest('.ios-glass') || (el.parentElement && el.parentElement.parentElement)) : null; }
   function hide(el) { if (el) el.style.setProperty('display', 'none', 'important'); }
   function drop(sel) { [].slice.call(document.querySelectorAll(sel)).forEach(function (b) { if (b.parentNode) b.parentNode.removeChild(b); }); }
+  var LOCK_MSG = 'Fitur ini mati karena paket toko sudah habis waktunya. Hubungi penyedia aplikasi untuk memperpanjang paket.';
+  var _lockStyleDone = false;
+  function lockEls(sel) {
+    if (!_lockStyleDone) {
+      _lockStyleDone = true;
+      var s = document.createElement('style'); s.id = 'fm-locked-style';
+      s.textContent = '.fm-locked-fitur{opacity:.4!important;filter:grayscale(.65);cursor:not-allowed!important}';
+      document.head.appendChild(s);
+    }
+    [].slice.call(document.querySelectorAll(sel)).forEach(function (b) {
+      if (b.getAttribute('data-fm-locked')) return;
+      b.setAttribute('data-fm-locked', '1');
+      b.classList.add('fm-locked-fitur');
+      b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); alert(LOCK_MSG); }, true);
+    });
+  }
+  /* sembunyikan total (fitur memang tidak termasuk paket apapun) ATAU kunci gelap saja (fitur pernah aktif, paket baru habis) */
+  function dropOrLock(sel, key, role) {
+    role = role || pageRole();
+    var tn = tenant();
+    if (wouldHaveAtPaidTier(key, role, tn)) lockEls(sel); else drop(sel);
+  }
   function applyDom() {
     var role = pageRole();
     try { localStorage.setItem('fm_offline_full', has('offline_penuh', role) ? '1' : '0'); } catch (e) {}
-    if (!has('tax', role)) { drop('button[onclick*="openModal(\'tax\')"]'); hide(cardOf(document.getElementById('stat-total-pajak-sumbang'))); }
-    if (!has('coa', role)) drop('button[onclick*="openModal(\'coa_mgmt\')"]');
+    if (!has('tax', role)) { dropOrLock('button[onclick*="openModal(\'tax\')"]', 'tax', role); hide(cardOf(document.getElementById('stat-total-pajak-sumbang'))); }
+    if (!has('coa', role)) dropOrLock('button[onclick*="openModal(\'coa_mgmt\')"]', 'coa', role);
     if (!has('wallpaper', role)) { try { document.documentElement.style.removeProperty('--fm-wp'); } catch (e) {} }
-    if (!has('stok', role)) drop('button[onclick*="FM_STOK"]');
-    if (!has('gaji', role)) drop('button[onclick*="FM_GAJI"]');
-    if (!has('diskon', role)) drop('button[onclick*="FM_PROMO"]');
-    if (!has('laporan_bulanan', role)) drop('button[onclick*="FM_LAPBUL"]');
-    if (!has('backup', role)) drop('button[onclick*="FM_BACKUP"]');
-    if (!has('absensi', role)) drop('button[onclick*="FM_ABS"]');
-    if (!has('properti', role)) drop('button[onclick*="FM_PROP"]');
-    if (!has('pajak_bulanan', role)) drop('button[onclick*="FM_PAJAK"]');
-    if (!has('neraca', role)) drop('button[onclick*="FM_NERACA."]');
-    if (!has('neraca_ai', role)) drop('button[onclick*="FM_NAI"]');
-    if (!has('grafik', role)) drop('button[onclick*="FM_GRAFIK"]');
-    if (!has('penjelasan', role)) drop('button[onclick*="FM_PENJ"]');
-    if (!has('perubahan_modal', role)) drop('button[onclick*="FM_MODAL"]');
-    if (!has('penyusutan', role)) drop('button[onclick*="FM_ASET"]');
-    if (!has('stok_habis', role)) drop('button[onclick*="FM_STOKHABIS"]');
-    if (!has('harian_wa', role)) drop('button[onclick*="FM_HARIAN"]');
-    if (!has('arus_kas', role) && !has('anggaran', role) && !has('rekon', role)) drop('button[onclick*="FM_KAS"]');
-    if (!has('banyak_usaha', role)) drop('button[onclick*="FM_USAHA_SUM"]');
-    if (!has('admin_usaha', role)) drop('button[onclick*="FM_ADMINS"]');
-    if (!has('piutang', role)) drop('button[onclick*="FM_PIU"]');
-    if (!has('ledger', role)) drop('button[onclick*="openModal(\'ledger\')"]');
-    if (!has('audit', role)) drop('button[onclick*="openModal(\'audit_trail\')"]');
-    if (!has('export_csv', role)) drop('button[onclick*="exportCSV"], button[onclick*="FM_LAPORAN"]');
-    if (!has('instruksi', role)) drop('section[data-fm-panel="instruksi"]');
-    if (!has('analisa', role)) drop('[data-fm-panel="analisa"]');
+    if (!has('stok', role)) dropOrLock('button[onclick*="FM_STOK"]', 'stok', role);
+    if (!has('gaji', role)) dropOrLock('button[onclick*="FM_GAJI"]', 'gaji', role);
+    if (!has('diskon', role)) dropOrLock('button[onclick*="FM_PROMO"]', 'diskon', role);
+    if (!has('laporan_bulanan', role)) dropOrLock('button[onclick*="FM_LAPBUL"]', 'laporan_bulanan', role);
+    if (!has('backup', role)) dropOrLock('button[onclick*="FM_BACKUP"]', 'backup', role);
+    if (!has('absensi', role)) dropOrLock('button[onclick*="FM_ABS"]', 'absensi', role);
+    if (!has('properti', role)) dropOrLock('button[onclick*="FM_PROP"]', 'properti', role);
+    if (!has('pajak_bulanan', role)) dropOrLock('button[onclick*="FM_PAJAK"]', 'pajak_bulanan', role);
+    if (!has('neraca', role)) dropOrLock('button[onclick*="FM_NERACA."]', 'neraca', role);
+    if (!has('neraca_ai', role)) dropOrLock('button[onclick*="FM_NAI"]', 'neraca_ai', role);
+    if (!has('grafik', role)) dropOrLock('button[onclick*="FM_GRAFIK"]', 'grafik', role);
+    if (!has('penjelasan', role)) dropOrLock('button[onclick*="FM_PENJ"]', 'penjelasan', role);
+    if (!has('perubahan_modal', role)) dropOrLock('button[onclick*="FM_MODAL"]', 'perubahan_modal', role);
+    if (!has('penyusutan', role)) dropOrLock('button[onclick*="FM_ASET"]', 'penyusutan', role);
+    if (!has('stok_habis', role)) dropOrLock('button[onclick*="FM_STOKHABIS"]', 'stok_habis', role);
+    if (!has('harian_wa', role)) dropOrLock('button[onclick*="FM_HARIAN"]', 'harian_wa', role);
+    if (!has('arus_kas', role) && !has('anggaran', role) && !has('rekon', role)) dropOrLock('button[onclick*="FM_KAS"]', 'arus_kas', role);
+    if (!has('banyak_usaha', role)) dropOrLock('button[onclick*="FM_USAHA_SUM"]', 'banyak_usaha', role);
+    if (!has('admin_usaha', role)) dropOrLock('button[onclick*="FM_ADMINS"]', 'admin_usaha', role);
+    if (!has('piutang', role)) dropOrLock('button[onclick*="FM_PIU"]', 'piutang', role);
+    if (!has('ledger', role)) dropOrLock('button[onclick*="openModal(\'ledger\')"]', 'ledger', role);
+    if (!has('audit', role)) dropOrLock('button[onclick*="openModal(\'audit_trail\')"]', 'audit', role);
+    if (!has('export_csv', role)) dropOrLock('button[onclick*="exportCSV"], button[onclick*="FM_LAPORAN"]', 'export_csv', role);
+    if (!has('instruksi', role)) dropOrLock('section[data-fm-panel="instruksi"]', 'instruksi', role);
+    if (!has('analisa', role)) dropOrLock('[data-fm-panel="analisa"]', 'analisa', role);
     if (!has('wa_receipt', role)) hide(document.getElementById('btn-wa-receipt'));
     if (!has('clock', role)) { var c = document.getElementById('realtime-clock-display'); if (c) hide(c.parentElement); }
     if (!has('bukti', role)) {
@@ -550,7 +616,10 @@
     }
   }
   try { LOADED_SIG = rentSig(); } catch (e) { LOADED_SIG = ''; }
-  if (!/provider\.html$/i.test(location.pathname)) applyDom();
+  if (!/provider\.html$/i.test(location.pathname)) {
+    applyDom();
+    try { fetchPaketCat(function () { applyDom(); }); } catch (e) {}
+  }
 
   /* ---- jendela "Fitur Toko" (daftar yang aktif di mode ini) ---- */
   function openModal() {
@@ -569,5 +638,6 @@
   }
 
   window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, periods: PERIODS, permUntil: PERM_UNTIL, price: sprice, sold: ssold, free: sfree, features: featList, bundles: function () { return (CAT && CAT.bundles) || []; }, trialOn: function () { return !(CAT && CAT.trial === false); }, quote: squote, disc: sdisc, untilFor: untilForPeriod, cat: function () { return CAT; }, setCat: storeSetCat, fetchCat: fetchCat, catAt: function () { return CAT_AT; }, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
-    ISLES: ISL_G, readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; } };
+    ISLES: ISL_G, readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; },
+    PAKET: { cat: function () { return PAKET_CAT; }, setCat: setPaketCat, fetchCat: fetchPaketCat, isExpired: isExpired, lastPaidTier: lastPaidTier } };
 })();

@@ -312,7 +312,7 @@ const COA_TEMPLATES = {
   kosong: { label: "Kosong (isi sendiri)", coa: [] }
 };
 
-function registrySig(c) { return c ? [c.tier, c.nama, c.slogan, c.warna, c.warnaAksen, c.logoText, JSON.stringify(c.features || {}), JSON.stringify(c.featureLocks || {}), c.deleted ? 'x' : '', c.pinnedVersion || '', c.shieldVersion || '', c.generation || '', JSON.stringify(c.tampilan || {})].join("|") : ""; }
+function registrySig(c) { return c ? [c.tier, c.nama, c.slogan, c.warna, c.warnaAksen, c.logoText, JSON.stringify(c.features || {}), JSON.stringify(c.featureLocks || {}), c.deleted ? 'x' : '', c.pinnedVersion || '', c.shieldVersion || '', c.generation || '', JSON.stringify(c.tampilan || {}), c.planUntil || ''].join("|") : ""; }
 
 // Fitur per toko (diatur dari Tower). Jika belum diatur, fitur dianggap aktif.
 function tenantHasFeature(tn, key) { return !(tn && tn.features && tn.features[key] === false); }
@@ -328,7 +328,7 @@ function registryMerge(cfg) {
     // toko bawaan file tidak boleh ditimpa, KECUALI toko master (uji coba): hanya field yang boleh diatur Tower
     if (!TENANTS_CONFIG[k].isMaster) return null;
     var m = TENANTS_CONFIG[k];
-    ["nama", "slogan", "warna", "warnaAksen", "logoText", "tier", "features", "featureLocks", "customCOA", "locations", "pinnedVersion", "shieldVersion", "generation", "usaha", "tampilan"].forEach(function (f) { if (cfg[f] !== undefined) m[f] = cfg[f]; });
+    ["nama", "slogan", "warna", "warnaAksen", "logoText", "tier", "features", "featureLocks", "customCOA", "locations", "pinnedVersion", "shieldVersion", "generation", "usaha", "tampilan", "planUntil"].forEach(function (f) { if (cfg[f] !== undefined) m[f] = cfg[f]; });
     m.deletedByTower = cfg.deleted === true;
     return k;
   }

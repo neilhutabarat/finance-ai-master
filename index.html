@@ -112,7 +112,7 @@
     <script src="js/dialog.js?v=proto"></script>
     <script src="js/theme.js?v=proto"></script>
     <script src="js/langit.js?v=proto" defer></script>
-    <script src="js/logo.js?v=proto"></script>
+    <script src="js/logo.js?v=paket1"></script>
     <script src="js/skin.js?v=proto"></script>
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
@@ -473,9 +473,10 @@
                 h.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:11px;margin-top:0;font-size:30px;font-weight:700;letter-spacing:-.012em;line-height:1';
                 if (oldWrap && oldWrap !== h && !oldWrap.querySelector('#login-logo-trigger') && oldWrap.parentElement) oldWrap.style.display = 'none';
             }
-            const t = (tn && tn.tier === 'pro') ? 'plus' : ((tn && tn.tier) || 'basic');
+            let tExpired = false; try { tExpired = !!(window.FM_PLANS && FM_PLANS.PAKET && FM_PLANS.PAKET.isExpired(tn)); } catch (e) {}
+            const t = tExpired ? 'basic' : ((tn && tn.tier) || 'basic');
             const tx = document.getElementById('login-brand-text');
-            if (tx) tx.innerHTML = 'oneilverse' + ((t === 'plus' && window.FM_LOGO) ? FM_LOGO.plus() : '');
+            if (tx) tx.innerHTML = 'oneilverse' + (!window.FM_LOGO ? '' : t === 'pro' ? FM_LOGO.pro() : t === 'plus' ? FM_LOGO.plus() : '');
         }
 
         function applyTenantBranding(tn) {

@@ -144,7 +144,7 @@
                 place(); window.addEventListener('resize', place);
             }
             var tx = document.getElementById('fm-cb-text');
-            if (tx) tx.innerHTML = 'oneilverse' + (t === 'plus' ? FM_LOGO.plus() : '');
+            if (tx) tx.innerHTML = 'oneilverse' + (t === 'pro' ? FM_LOGO.pro() : t === 'plus' ? FM_LOGO.plus() : '');
         } catch (e) {}
     }
 
@@ -168,8 +168,9 @@
             if (document.title) document.title = document.title.replace(/^Oneilverse/, tn.nama);
 
             var tierEl = document.getElementById('tier-badge-indicator');
-            var t = (tn.tier === 'pro') ? 'plus' : (tn.tier || 'basic');
-            if (tierEl) tierEl.style.display = 'none'; // Basic tanpa lencana; Plus ditandai "+" di ujung nama
+            var tierExpired = false; try { tierExpired = !!(window.FM_PLANS && FM_PLANS.PAKET && FM_PLANS.PAKET.isExpired(tn)); } catch (e) {}
+            var t = tierExpired ? 'basic' : (tn.tier || 'basic');
+            if (tierEl) tierEl.style.display = 'none'; // Basic tanpa lencana; Plus ditandai "+", Pro ditandai "PRO" di ujung nama
 
             centerBrand(t);
         } catch (e) { console.warn('ctrl.js: gagal menerapkan nama toko', e); }
