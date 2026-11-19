@@ -33,6 +33,7 @@
       { key: 'billing_jaringan', t: 'Billing Jaringan', ic: 'chart', find: 'Billing Jaringan', d: 'Tagihan, jatuh tempo, cicilan, uji coba' },
       { key: 'pengingat_jatuh_tempo', t: 'Pengingat Jatuh Tempo', ic: 'bell', run: "towerDue()", d: 'Toko yang tagihannya dekat' },
       { key: 'paket_billing', t: 'Paket & Billing', ic: 'tag', run: "towerPick('paket')", d: 'Basic atau Plus, lalu tagihan' },
+      { key: 'isi_paket_fitur', t: 'Isi Paket Plus/Pro', ic: 'list', run: "openModal('paket_fitur')", d: 'Isi fitur Plus & Pro, atur harga, lalu terapkan ke toko' },
       { key: 'store', t: 'Store', ic: 'tag', run: "FM_TSTORE.open()", d: 'Permintaan sewa, sewa aktif, beri sewa, dan katalog harga fitur' }
     ] },
     { id: 'bangun', title: 'Siapkan Toko Baru', hint: 'Untuk klien baru', c: '#6fc7c0', items: [
