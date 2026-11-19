@@ -19,7 +19,7 @@
     return '<span class="fm-plus ' + (cls || '') + '" aria-label="Plus" style="display:inline-block;transform:skewX(-14deg);font-weight:800;margin-left:1px">+</span>';
   }
   function pro(cls) {
-    return '<span class="fm-pro ' + (cls || '') + '" aria-label="Pro" style="display:inline-block;vertical-align:text-top;position:relative;top:-.35em;margin-left:4px;padding:1px 5px 0;border-radius:5px;background:#17140c;color:#b89659;font-size:.42em;font-weight:800;letter-spacing:.06em;line-height:1.5">PRO</span>';
+    return '<span class="fm-pro ' + (cls || '') + '" aria-label="Pro" style="display:inline-block;vertical-align:text-top;position:relative;top:-.35em;margin-left:4px;padding:1px 5px 0;border-radius:5px;background:#17140c;color:#cda75c;font-size:.42em;font-weight:800;letter-spacing:.06em;line-height:1.5">PRO</span>';
   }
   function wordmark(cls) {
     return '<span class="fm-wordmark ' + (cls || '') + '">ONEILVERSE</span>';
