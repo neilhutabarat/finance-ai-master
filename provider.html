@@ -73,7 +73,7 @@
     <script src="js/dialog.js?v=proto"></script>
     <script src="js/theme.js?v=proto"></script>
     <script src="js/langit.js?v=proto" defer></script>
-    <script src="js/logo.js?v=proto"></script>
+    <script src="js/logo.js?v=paket1"></script>
     <script src="js/skin.js?v=proto"></script>
     <script src="js/tower-menu.js?v=on2c"></script>
     <script src="js/tower-lab.js?v=proto"></script>
@@ -260,6 +260,7 @@
         <div id="fm-actions" class="fm-actions">
             <button data-fm-action data-ic="list" onclick="openModal('provider_coa_mgmt')"><span>COA Provider</span></button>
             <button data-fm-action data-ic="tag" onclick="openModal('pricing')"><span>Harga Paket</span></button>
+            <button data-fm-action data-ic="list" onclick="openModal('paket_fitur')"><span>Isi Paket Plus/Pro</span></button>
             <button data-fm-action data-ic="archive" onclick="openModal('former')"><span>Toko Berhenti</span><span id="former-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-black"></span></button>
             <button data-fm-action data-ic="chart" onclick="openModal('billing_net')"><span>Billing Jaringan</span></button>
             <button data-fm-action data-ic="key" onclick="openModal('akun_login')"><span>Akun Login</span></button>
@@ -574,14 +575,28 @@
                     <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-400/30 space-y-3 text-xs">
                         <span class="font-black text-sm text-white block">Harga Paket per Bulan (Rp)</span>
                         <p class="text-slate-400">Harga bulanan Anda tentukan sendiri. Paket tahunan otomatis dihitung 12 bulan dikurangi diskon.</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div><label class="font-bold text-slate-300 block mb-1">Basic</label><input id="pr-basic" type="number" min="0" oninput="previewPricing()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Plus</label><input id="pr-plus" type="number" min="0" oninput="previewPricing()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-amber-200 block mb-1">Pro</label><input id="pr-pro" type="number" min="0" oninput="previewPricing()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                         </div>
                         <div><label class="font-bold text-slate-300 block mb-1">Diskon Paket Tahunan (%)</label><input id="pr-disc" type="number" min="0" max="90" value="20" oninput="previewPricing()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                         <div id="pr-preview" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300 space-y-1"></div>
                         <button onclick="savePricing()" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition">Simpan Harga</button>
                         <p class="text-slate-500 text-[11px]">Perubahan harga hanya berlaku untuk pembelian/perubahan paket berikutnya. Klien yang sudah berjalan tetap memakai harga saat mereka membeli.</p>
+                    </div>
+                </div>
+
+                <div id="popup-content-paket_fitur" class="space-y-4 hidden">
+                    <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-400/30 space-y-3 text-xs">
+                        <span class="font-black text-sm text-white block">Isi Paket Plus &amp; Pro</span>
+                        <p class="text-slate-400">Centang fitur yang masuk paket Plus dan paket Pro. Kosong = belum ditentukan. Paket Pro otomatis mewarisi semua centangan Plus, jadi cukup centang tambahannya saja di kolom Pro. Basic selalu hanya fitur inti (tidak diatur di sini).</p>
+                        <div class="flex gap-2 border-b border-white/10 pb-2">
+                            <button id="pf-tab-plus" onclick="pfSwitchTab('plus')" class="flex-1 py-2 rounded-xl bg-sky-600 text-white font-black text-xs">Paket Plus</button>
+                            <button id="pf-tab-pro" onclick="pfSwitchTab('pro')" class="flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 font-black text-xs">Paket Pro</button>
+                        </div>
+                        <div id="pf-body" class="max-h-[50vh] overflow-y-auto space-y-1"></div>
+                        <button onclick="savePaketFitur()" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition">Simpan Isi Paket</button>
                     </div>
                 </div>
 
@@ -756,7 +771,7 @@
 
     <script src="js/tenants.js"></script>
     <script src="js/auth.js?v=proto"></script>
-    <script src="js/plans.js?v=on2c"></script>
+    <script src="js/plans.js?v=paket1"></script>
     <script src="js/templates.js?v=proto"></script>
     <script src="js/widgets.js?v=proto"></script>
     <script>window.NO_AUTO_STORE = true;</script>
@@ -1150,7 +1165,14 @@
             return all;
         }
 
-        function tierBadgeHtml() { return ''; } // paket Basic/Plus/Pro belum dipakai
+        function tierBadgeHtml(tn) {
+            const tier = (tn && tn.tier) || 'basic';
+            if (tier === 'basic') return '';
+            let expired = false; try { expired = !!(window.FM_PLANS && FM_PLANS.PAKET && FM_PLANS.PAKET.isExpired(tn)); } catch (e) {}
+            if (expired) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-slate-700 text-slate-300 border border-slate-500/40" title="Paket habis, berjalan sebagai Basic">' + TIER_LABEL[tier].toUpperCase() + ' HABIS</span>';
+            if (tier === 'pro') return '<span class="px-1.5 py-0.5 rounded text-[9px] font-black" style="background:#17140c;color:#b89659;border:1px solid rgba(184,150,89,.4)">PRO</span>';
+            return '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-sky-500/20 text-sky-300 border border-sky-400/30">+</span>';
+        }
 
         function finBadgeHtml(net, small) {
             const sz = small ? 'px-2.5 py-0.5 rounded text-[9px]' : 'px-2 py-0.5 rounded text-[10px]';
@@ -1255,8 +1277,8 @@
         }
 
         // ===== HARGA PAKET & TAGIHAN =====
-        let pricing = { basic: { monthly: 0 }, plus: { monthly: 119000 }, yearlyDiscountPct: 20 };
-        const TIER_LABEL = { basic: 'Basic', plus: 'Plus', pro: 'Plus' };
+        let pricing = { basic: { monthly: 0 }, plus: { monthly: 119000 }, pro: { monthly: 0 }, yearlyDiscountPct: 20 };
+        const TIER_LABEL = { basic: 'Basic', plus: 'Plus', pro: 'Pro' };
 
         function rp(n) { return formatThousand(Math.round(n || 0)); }
 
@@ -1282,6 +1304,7 @@
         function fillPricingForm() {
             document.getElementById('pr-basic').value = pricing.basic.monthly || 0;
             document.getElementById('pr-plus').value = pricing.plus.monthly || '';
+            document.getElementById('pr-pro').value = (pricing.pro && pricing.pro.monthly) || '';
             document.getElementById('pr-disc').value = pricing.yearlyDiscountPct;
             previewPricing();
         }
@@ -1289,7 +1312,7 @@
         function previewPricing() {
             const g = function (id) { return Math.max(0, parseInt(document.getElementById(id).value) || 0); };
             const disc = Math.min(90, Math.max(0, parseFloat(document.getElementById('pr-disc').value) || 0));
-            const rows = [['Basic', g('pr-basic')], ['Plus', g('pr-plus')]].map(function (x) {
+            const rows = [['Basic', g('pr-basic')], ['Plus', g('pr-plus')], ['Pro', g('pr-pro')]].map(function (x) {
                 const yearly = Math.round(x[1] * 12 * (1 - disc / 100));
                 return '<div class="flex justify-between"><span>' + x[0] + '</span><span class="font-mono">' + rp(x[1]) + '/bln • ' + rp(yearly) + '/thn (hemat ' + rp(x[1] * 12 - yearly) + ')</span></div>';
             });
@@ -1341,7 +1364,7 @@
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const g = function (id) { return Math.max(0, parseInt(document.getElementById(id).value) || 0); };
             const disc = Math.min(90, Math.max(0, parseFloat(document.getElementById('pr-disc').value) || 0));
-            const data = { basic: { monthly: g('pr-basic') }, plus: { monthly: g('pr-plus') }, yearlyDiscountPct: disc, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+            const data = { basic: { monthly: g('pr-basic') }, plus: { monthly: g('pr-plus') }, pro: { monthly: g('pr-pro') }, yearlyDiscountPct: disc, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
             db.collection('provider_settings').doc('pricing').set(data).then(function () { alert('Harga paket tersimpan.'); })
                 .catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
@@ -1354,11 +1377,39 @@
                     pricing = {
                         basic: { monthly: Number(d.basic && d.basic.monthly) || 0 },
                         plus: { monthly: Number(d.plus && d.plus.monthly) || 119000 },
+                        pro: { monthly: Number(d.pro && d.pro.monthly) || 0 },
                         yearlyDiscountPct: (typeof d.yearlyDiscountPct === 'number') ? d.yearlyDiscountPct : 20
                     };
                 }
                 if (document.getElementById('nt-planprev')) previewNewTenantPlan();
             }, function (e) { console.error('Provider: gagal membaca harga', e); });
+        }
+
+        // ===== ISI PAKET PLUS & PRO (fitur yang masuk tiap paket, dirakit sendiri Tower) =====
+        let paketCat = { plus: {}, pro: {} }, pfTab = 'plus';
+        function startPaketFiturListener() {
+            if (!(typeof db !== 'undefined' && db)) return;
+            db.collection('app_meta').doc('paket_catalog').onSnapshot(function (doc) {
+                var j = null;
+                if (doc.exists) { try { j = JSON.parse(doc.data().json || '{}'); } catch (e) { j = null; } }
+                paketCat = { plus: (j && j.plus) || {}, pro: (j && j.pro) || {} };
+                if (window.FM_PLANS && FM_PLANS.PAKET) FM_PLANS.PAKET.setCat(paketCat);
+                if (document.getElementById('popup-content-paket_fitur') && !document.getElementById('popup-content-paket_fitur').classList.contains('hidden')) pfSwitchTab(pfTab);
+            }, function (e) { console.error('Provider: gagal membaca paket', e); });
+        }
+        function pfSwitchTab(tab) {
+            pfTab = tab;
+            document.getElementById('pf-tab-plus').className = 'flex-1 py-2 rounded-xl font-black text-xs ' + (tab === 'plus' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300');
+            document.getElementById('pf-tab-pro').className = 'flex-1 py-2 rounded-xl font-black text-xs ' + (tab === 'pro' ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-300');
+            document.getElementById('pf-body').innerHTML = FM_PLANS.checklistHtml('pf-' + tab, paketCat[tab] || {}, true);
+        }
+        function savePaketFitur() {
+            if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
+            paketCat[pfTab] = FM_PLANS.readChecklist('pf-' + pfTab);
+            const data = { json: JSON.stringify({ plus: paketCat.plus, pro: paketCat.pro }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+            db.collection('app_meta').doc('paket_catalog').set(data).then(function () {
+                alert('Isi paket ' + (pfTab === 'plus' ? 'Plus' : 'Pro') + ' tersimpan. Toko yang sedang memakai paket ini akan menerima fiturnya saat halaman dibuka kembali.');
+            }).catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
         // warna aksen diturunkan otomatis dari warna utama
@@ -1410,20 +1461,24 @@
             };
         }
 
-        function setTenantPlan(tenantId, tier, cycle, custom, disc) {
+        function setTenantPlan(tenantId, tier, cycle, custom, disc, durasiBulan) {
             const key = String(tenantId).toLowerCase();
             const tn = TENANTS_CONFIG[key];
             if (!isManaged(tn)) return alert('Paket hanya dapat diubah untuk toko yang dikelola Tower.');
-            if (tier === 'pro') tier = 'plus';
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const r = computePlan(tier, cycle, custom, disc);
-            if (!confirm('Ubah paket ' + tn.nama + ' menjadi ' + (tier === 'basic' ? 'BASIC' : '+') + '?\n\nFitur toko TIDAK diubah — hanya label paket yang berganti. Untuk mengatur fitur, buka "Fitur Toko".')) return;
+            const bulan = Math.min(12, Math.max(1, parseInt(durasiBulan) || 1));
+            const planUntil = tier === 'basic' ? null : (function () { const d = new Date(); d.setMonth(d.getMonth() + bulan); return d.getTime(); })();
+            const labelPaket = tier === 'basic' ? 'BASIC' : (TIER_LABEL[tier] || tier).toUpperCase() + ' selama ' + bulan + ' bulan (sampai ' + new Date(planUntil).toLocaleDateString('id-ID') + ')';
+            if (!confirm('Terapkan paket ' + tn.nama + ' menjadi ' + labelPaket + '?\n\nFitur bawaan paket ini akan dinyalakan (fitur yang digembok 🔒 tetap dipertahankan). Setelah durasi habis, toko otomatis kembali ke Basic.')) return;
             const cfg = Object.assign({}, tn); delete cfg.fromRegistry; cfg.tier = tier;
-            /* paket hanya mengganti label tingkat; fitur toko dibiarkan apa adanya agar setelan tidak terhapus (lihat gembok 🔒 untuk kendali) */
+            cfg.planUntil = planUntil;
+            /* nyalakan fitur bawaan paket (dari "Isi Paket Plus/Pro"), fitur yang digembok tidak ikut diubah */
+            try { cfg.features = (window.FM_PLANS ? FM_PLANS.applyTierLocked(tn, tier) : (tn.features || {})); } catch (e) { cfg.features = tn.features || {}; }
             const batch = db.batch();
             batch.set(db.collection('tenants_registry').doc(key), { id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             batch.set(db.collection('tenant_ctrl').doc(tn.id), {
-                tier: tier, billingCycle: cycle, priceMonthlyAtPurchase: r.monthly, billedAmount: r.amount,
+                tier: tier, billingCycle: cycle, priceMonthlyAtPurchase: r.monthly, billedAmount: r.amount, planUntil: planUntil, planDurasiBulan: tier === 'basic' ? firebase.firestore.FieldValue.delete() : bulan,
                 customPrice: r.custom, yearlyDiscountPct: (disc === '' || disc === undefined || disc === null) ? firebase.firestore.FieldValue.delete() : r.disc, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
             batch.commit().then(function () { planPanelFor = null; tierPanelFor = null; billingSyncTier(tn.id, tier); alert('Paket tersimpan. Fitur baru aktif di toko klien saat halaman toko dibuka kembali.'); })
@@ -2552,6 +2607,7 @@
             logosListen();
             formerListen();
             startPricingListener();
+            startPaketFiturListener();
             startNoticesListener();
             startPresenceListener();
             listNetworkTenants().forEach(startOneTenantListener);
@@ -2614,7 +2670,7 @@
                 getTenantTxList(t.id).forEach(function (x) { if (txDateISO(x) >= first && x.category === 'sales') inc += x.amount; });
                 const on = onlineSessions(t.id).length;
                 return '<div class="flex items-center justify-between gap-3 py-2 border-b border-white/10 cursor-pointer" onclick="openInspectUMKM(\'' + escHtml(t.id) + '\')">' +
-                    '<div class="min-w-0"><div class="text-xs font-black text-white truncate">' + escHtml(t.nama) + ' ' + tierBadgeHtml(t.tier) + '</div>' +
+                    '<div class="min-w-0"><div class="text-xs font-black text-white truncate">' + escHtml(t.nama) + ' ' + tierBadgeHtml(t) + '</div>' +
                     '<div class="text-[10px] text-slate-400 font-mono">' + escHtml(t.id) + ' · ' + (t.deletedByTower ? 'DIHAPUS' : (isTenantSuspended(t.id) ? 'BEKU' : (on ? '● online ' + on : '○ offline'))) + '</div></div>' +
                     '<div class="text-xs font-black text-emerald-400 font-mono shrink-0">' + formatThousand(inc) + '</div></div>';
             }).join('');
@@ -2664,7 +2720,7 @@
                     <td class="py-3.5 px-4">
                         <div class="flex items-center flex-wrap gap-1.5">
                             ${logoMap[tenant.id] ? '<img src="' + escHtml(logoMap[tenant.id]) + '" alt="" class="w-7 h-7 rounded-lg object-contain bg-white/10">' : ''}<span class="font-black text-white">${escHtml(tenant.nama)}</span>
-                            ${tierBadgeHtml(tenant.tier)}
+                            ${tierBadgeHtml(tenant)}
                             ${(Number(getCtrl(tenant.id).demoUntil) > 0) ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-400/30">DEMO</span>' : ''}
                             ${(getCtrl(tenant.id).billingCycle === 'yearly') ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">TAHUNAN</span>' : ''}
                             ${masterTag}
@@ -2774,13 +2830,26 @@
             const c = getCtrl(tenant.id), tier = tenant.tier || 'basic', cycle = c.billingCycle || 'monthly';
             const sel = function (v, cur) { return v === cur ? ' selected' : ''; };
             const cls = 'w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none';
+            let expired = false; try { expired = !!(window.FM_PLANS && FM_PLANS.PAKET && FM_PLANS.PAKET.isExpired(tenant)); } catch (e) {}
+            const until = tenant.planUntil ? new Date(Number(tenant.planUntil)) : null;
+            const statusHtml = expired
+                ? '<p class="text-rose-300 font-bold">Sudah HABIS sejak ' + until.toLocaleDateString('id-ID') + ' — fitur premium toko ini sudah mati (tombolnya gelap, bukan hilang). Pilih paket & durasi baru untuk memperpanjang.</p>'
+                : until ? '<p class="text-emerald-300">Berlaku sampai ' + until.toLocaleDateString('id-ID') + '.</p>' : '';
             box.classList.remove('hidden');
             box.innerHTML = '<span class="font-black text-sm text-white block">Paket Toko</span>' +
-                '<p class="text-slate-400">Paket saat ini: <b class="text-white">' + (tier === 'basic' ? 'BASIC' : '+') + '</b></p>' +
-                '<div><label class="font-bold text-slate-300 block mb-1">Paket</label><select id="ip-tier" class="' + cls + '"><option value="basic"' + sel('basic', tier) + '>BASIC</option><option value="plus"' + sel('plus', tier === 'pro' ? 'plus' : tier) + '>+</option></select></div>' +
-                '<p class="text-[11px] text-slate-500 mt-2">Harga diatur manual di luar aplikasi. Mengubah paket akan mengatur ulang fitur tambahan ke bawaan paket; fitur yang digembok (🔒) tetap ada.</p>' +
-                '<button id="ip-save" class="w-full mt-3 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs transition">Simpan Paket</button>';
-            document.getElementById('ip-save').onclick = function () { setTenantPlan(tenant.id, document.getElementById('ip-tier').value, 'monthly', '', ''); };
+                '<p class="text-slate-400">Paket saat ini: <b class="text-white">' + TIER_LABEL[tier].toUpperCase() + (expired ? ' (HABIS → berjalan sebagai BASIC)' : '') + '</b></p>' + statusHtml +
+                '<div><label class="font-bold text-slate-300 block mb-1">Paket</label><select id="ip-tier" class="' + cls + '"><option value="basic"' + sel('basic', tier) + '>Basic</option><option value="plus"' + sel('plus', tier) + '>Plus</option><option value="pro"' + sel('pro', tier) + '>Pro</option></select></div>' +
+                '<div class="mt-2" id="ip-dur-wrap"><label class="font-bold text-slate-300 block mb-1">Durasi</label><select id="ip-dur" class="' + cls + '">' + Array.from({ length: 12 }, (_, i) => i + 1).map(n => '<option value="' + n + '">' + n + ' bulan</option>').join('') + '</select></div>' +
+                '<p class="text-[11px] text-slate-500 mt-2">Menerapkan paket akan menyalakan fitur bawaan paket itu (isi dari "Isi Paket Plus/Pro"); fitur yang digembok (🔒) tetap dipertahankan. Setelah durasi habis, toko otomatis kembali ke Basic — fitur premiumnya tidak hilang dari tampilan, hanya mati (gelap) sampai diperpanjang.</p>' +
+                '<button id="ip-save" class="w-full mt-3 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs transition">Terapkan Paket</button>';
+            const durWrap = document.getElementById('ip-dur-wrap');
+            const syncDur = function () { durWrap.style.display = document.getElementById('ip-tier').value === 'basic' ? 'none' : ''; };
+            document.getElementById('ip-tier').onchange = syncDur; syncDur();
+            document.getElementById('ip-save').onclick = function () {
+                const t = document.getElementById('ip-tier').value;
+                const dur = t === 'basic' ? 0 : parseInt(document.getElementById('ip-dur').value) || 1;
+                setTenantPlan(tenant.id, t, 'monthly', '', '', dur);
+            };
         }
 
         function renderInspect(tenantId) {
@@ -3392,7 +3461,7 @@
 
         window.openModal = function(type) {
             if (type !== 'tenant_settings' && tsStore) { tsStore.stop(); tsStore = null; }
-            ['akun_login', 'billing_net', 'tax_net', 'provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
+            ['akun_login', 'billing_net', 'tax_net', 'provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'paket_fitur', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
                 if (el) el.classList.add('hidden');
             });
@@ -3431,6 +3500,11 @@
                 document.getElementById('modal-subtitle').innerText = "Atur harga bulanan dan diskon tahunan";
                 fillPricingForm();
                 document.getElementById('popup-content-pricing').classList.remove('hidden');
+            } else if (type === 'paket_fitur') {
+                document.getElementById('modal-title').innerText = "Isi Paket Plus & Pro";
+                document.getElementById('modal-subtitle').innerText = "Tentukan sendiri fitur apa saja yang masuk tiap paket";
+                pfSwitchTab('plus');
+                document.getElementById('popup-content-paket_fitur').classList.remove('hidden');
             } else if (type === 'akun_login') {
                 document.getElementById('modal-title').innerText = "Akun Login Toko";
                 document.getElementById('modal-subtitle').innerText = "Buat atau atur ulang PIN login aman per toko dan peran";

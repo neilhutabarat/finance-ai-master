@@ -28,7 +28,11 @@
       '[Perbaikan] Pulau satelit menyesuaikan halaman: Manager dan Owner yang tidak punya Absen dan Stok memakai menu halamannya sendiri, dan tombol Tema selalu tersedia',
       '[Perbaikan] Mode offline: nomor versi penyimpanan dinaikkan, jadi salinan halaman lama di browser tidak lagi menimpa tampilan baru saat jaringan lambat (penyebab tampilan sempat balik ke versi lama)',
       '[Perbaikan] Mode offline: salinan kini dicocokkan menurut nomor versi berkas, dan dua berkas tampilan yang belum pernah ikut tersimpan (ui110.js, kasir-fit.js) kini disimpan juga',
-      '[Keamanan] Halaman toko tidak bisa lagi dimuat di dalam bingkai situs lain, mencegah tombol aplikasi ditimpa halaman palsu (clickjacking)'
+      '[Keamanan] Halaman toko tidak bisa lagi dimuat di dalam bingkai situs lain, mencegah tombol aplikasi ditimpa halaman palsu (clickjacking)',
+      '[Baru] Paket Basic, Plus, dan Pro: Control Tower kini bisa menentukan sendiri fitur apa saja yang masuk paket Plus dan Pro (kosong sampai diisi), lalu menerapkan paket ke tiap toko dengan durasi 1-12 bulan dan harga yang bisa diubah sendiri',
+      '[Baru] Saat paket toko habis waktunya, toko otomatis kembali ke Basic; fitur yang sebelumnya aktif tidak langsung menghilang, tombolnya hanya menjadi gelap sampai paket diperpanjang',
+      '[Baru] Lencana PRO di ujung nama Oneilverse (hitam, huruf emas pudar) untuk membedakan dari Plus yang memakai tanda "+"',
+      '[Keamanan] Perpanjangan atau penurunan paket toko kini menyalakan ulang fitur sesuai paket yang berlaku, sehingga toko yang paketnya sudah habis tidak bisa lagi memakai fitur premium tanpa sepengetahuan Tower'
     ]],
     ['v1.0.26', '18 Nov 2026', [
       '[Perbaikan] Daftar akun (COA) di Kasir dan Manager sempat hanya menampilkan 9 akun bawaan; sekarang selalu dimuat langsung dari server',
