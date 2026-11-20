@@ -2,12 +2,16 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.0.0';
-  var BETA = 'v1.1.0';
+  var APP_VERSION = '1.1.0';
+  var BETA = 'BETA 1';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['BETA 1', '21 Nov 2026', [
+      '[Perbaikan] Logo Oneilverse di dock pulau bawah kini terkunci diam tepat di tengah layar saat kapsul menu mengembang maupun menutup',
+      '[Keamanan] Pengujian versi BETA 1 terisolasi khusus untuk akun uji coba tanpa mengubah versi pelanggan aktif'
+    ]],
     ['v1.1.0', '18 Nov 2026', [
       '[Perbaikan] Header toko dibuat lebih tipis supaya isi halaman lebih lega',
       '[Perbaikan] Dock bawah jadi pulau: logo Oneilverse di tengah, menu terkuak saat kursor menyentuh logo, dan Chat, Tema, Absen, Stok menjadi pulau terpisah yang menggeser ke tepi',
@@ -77,116 +81,6 @@
     ['v1.0.19', '15 Nov 2026', [
       '[Perbaikan] Buku Besar kini punya akun bawaan Kas/Tunai, memisahkan mutasi penjualan, HPP, operasional, dan prive yang dibayar tunai dari yang dibayar lewat bank',
       '[Keamanan] Pemisahan Kas/Tunai dan Bank di Buku Besar hanya membaca data yang sudah tercatat, tidak mengubah angka transaksi mana pun'
-    ]],
-    ['v1.0.18', '15 Nov 2026', [
-      '[Perbaikan] Kelola Akun (COA) kini punya kategori Aset, Hutang, dan Modal, terpisah dari akun Income/Outcome/Prive yang masuk Laba Rugi',
-      '[Keamanan] Akun Aset/Hutang/Modal tidak ikut muncul di pilihan akun transaksi kasir, sehingga tidak bisa salah tercatat sebagai pemasukan atau pengeluaran'
-    ]],
-    ['v1.0.17', '15 Nov 2026', [
-      '[Perbaikan] Metode Bayar/Terima di kasir kini Tunai atau Bank, dan pembayaran Bank bisa dihubungkan ke akun bank yang didaftarkan di COA (kategori Bank/Rekening)',
-      '[Perbaikan] Buku Besar menampilkan mutasi tiap akun bank secara terpisah seperti rekening koran, selain akun pemasukan/pengeluaran biasa',
-      '[Keamanan] Transaksi tetap tercatat walau akun bank belum didaftarkan, dengan peringatan agar Admin segera melengkapi COA'
-    ]],
-    ['v1.0.16', '15 Nov 2026', [
-      '[Perbaikan] Store kini menampilkan fitur satu per satu per kategori, dan penyedia bisa menyusun bundel fitur sendiri dengan harga khusus',
-      '[Perbaikan] Coba gratis 7 hari bisa dimatikan oleh penyedia, dan tampilan Store disamakan di semua halaman',
-      '[Keamanan] Bundel yang sedang disewa tidak bisa dihapus, dan isi bundel dicatat saat diaktifkan sehingga fitur tidak berubah di tengah masa sewa'
-    ]],
-    ['v1.0.15', '15 Nov 2026', [
-      '[Perbaikan] OneilStore berganti nama menjadi Store',
-      '[Perbaikan] Lima laporan baru yang bisa disewa di Store: Penjelasan Laporan Keuangan, Perubahan Modal, Penyusutan Aset Tetap, Perkiraan Stok Habis, dan Laporan Harian WhatsApp',
-      '[Keamanan] Laporan hanya membaca data transaksi, dan Perubahan Modal dicocokkan dengan ekuitas di Neraca AI sehingga selisih data terlihat'
-    ]],
-    ['v1.0.14', '15 Nov 2026', [
-      '[Perbaikan] Store kini tampil kosong sampai penyedia mengisi katalog, dan fitur bisa berstatus Gratis: pilih sesuai kebutuhan lalu diaktifkan setelah disetujui',
-      '[Perbaikan] Fitur gratis dan berbayar dipisah saat memilih beberapa fitur sekaligus',
-      '[Keamanan] Status Gratis diperiksa terhadap katalog saat penyedia mengaktifkan permintaan, sehingga permintaan gratis untuk fitur yang berbayar ditandai'
-    ]],
-    ['v1.0.13', '15 Nov 2026', [
-      '[Perbaikan] Store: fitur bisa disewa harian, mingguan, bulanan, tahunan, atau permanen, dan beberapa fitur bisa dipilih sekaligus dengan diskon kombinasi',
-      '[Perbaikan] Fitur baru Grafik Keuangan, dan Analisa Keuangan kini memuat margin kotor, titik impas, serta perbandingan laba bulan lalu',
-      '[Perbaikan] Neraca AI, Analisa Keuangan, dan Grafik kini bisa disewa di Store',
-      '[Keamanan] Harga sewa diperiksa terhadap katalog sebelum fitur diaktifkan, dan sewa yang sudah berjalan tidak berubah'
-    ]],
-    ['v1.0.12', '15 Nov 2026', [
-      '[Perbaikan] Halaman Manager dan Owner dipadatkan otomatis sesuai tinggi layar sehingga tidak perlu digulir; bar usaha menjadi satu baris',
-      '[Perbaikan] Layar memuat menampilkan nama dan versi Oneilverse',
-      '[Perbaikan] Neraca AI (uji coba) kini hanya menampilkan Neraca berformat baku, disusun otomatis dari data yang diinput admin, tanpa input Debit/Kredit',
-      '[Keamanan] Selisih neraca ditampilkan apa adanya dan tidak ditutup angka penyeimbang, sehingga kesalahan data tidak tersembunyi'
-    ]],
-    ['v1.0.11', '15 Nov 2026', [
-      '[Perbaikan] Kartu Ringkasan di Manager dan Owner tidak lagi terpotong di layar pendek, halaman bisa digulir',
-      '[Perbaikan] Animasi Memuat dan Memperbarui kini berupa tiga bola yang melompat',
-      '[Perbaikan] Saat ada versi baru, tombol merah Perbarui Aplikasi berdenyut dan bergoyang, menggantikan popup melayang',
-      '[Keamanan] Pemberitahuan versi baru lebih sulit terlewat, sehingga toko tidak bertahan di versi lama yang belum diperbaiki'
-    ]],
-    ['v1.0.10', '15 Nov 2026', [
-      '[Perbaikan] Neraca AI (uji coba) kini membentuk jurnal otomatis dari transaksi toko, ditambah jurnal manual untuk modal, peralatan, dan penyusutan',
-      '[Perbaikan] Neraca AI menampilkan peringatan bila piutang, utang, atau stok di modul lain berbeda dari jurnal, tanpa angka penyeimbang tersembunyi',
-      '[Keamanan] Periode yang sudah dikunci memberi peringatan bila transaksi di dalamnya berubah setelah dikunci'
-    ]],
-    ['v1.0.9', '15 Nov 2026', [
-      '[Perbaikan] Tombol merah "Perbarui Aplikasi" di samping Role: memuat versi terbaru dengan animasi dan bilah progres, login dan data toko tidak hilang',
-      '[Perbaikan] Layar "Memuat..." saat membuka atau berpindah halaman, sehingga tidak ada kedip susunan setengah jadi',
-      '[Keamanan] Cache lama dibersihkan lewat tombol Perbarui, supaya toko tidak memakai skrip usang yang sudah diperbaiki'
-    ]],
-    ['v1.0.8', '15 Nov 2026', [
-      '[Perbaikan] Menu baru "Neraca AI (uji coba)" di Manager dan Owner: jurnal debit-kredit, neraca saldo, dan kunci periode. Hanya tampil di toko yang fiturnya diaktifkan',
-      '[Keamanan] Periode yang sudah dikunci tidak bisa lagi ditambah atau dihapus jurnalnya'
-    ]],
-    ['v1.0.7', '14 Nov 2026', [
-      '[Perbaikan] Form Input Transaksi di Kasir menyesuaikan diri otomatis dengan tinggi layar, Keterangan dan Petugas tidak lagi tertutup tombol Simpan',
-      '[Perbaikan] Laba Rugi: pilihan "Umum" hanya muncul bila memang ada transaksi tanpa usaha',
-      '[Perbaikan] Logo toko berwarna putih atau transparan kini diberi alas gelap agar terlihat di header terang',
-      '[Keamanan] Kolom Keterangan dan Petugas tidak lagi tertutup tombol, sehingga transaksi tidak tersimpan tanpa pencatat tanpa disadari'
-    ]],
-    ['v1.0.6', '14 Nov 2026', [
-      '[Perbaikan] Popup konfirmasi (mis. Hapus Admin) kini tampil di paling depan, tidak lagi tertutup jendela lain',
-      '[Perbaikan] Admin tambahan: nama Admin bisa diubah, dan daftar pilihan usaha terbaca jelas',
-      '[Perbaikan] Form Input Transaksi di Kasir muat utuh di layar pendek, kolom Keterangan dan Petugas tidak tertutup tombol',
-      '[Perbaikan] Logo toko tidak hilang lagi saat header digambar ulang, dan kembali ke logo bawaan bila gambarnya gagal dimuat',
-      '[Perbaikan] Mutasi Kas dan Buku Besar menampilkan label usaha pada tiap transaksi',
-      '[Keamanan] Konfirmasi hapus Admin selalu terlihat, sehingga akun tidak terhapus tanpa disadari'
-    ]],
-    ['v1.0.5', '14 Nov 2026', [
-      '[Perbaikan] Toko banyak usaha: Admin utama bisa dinonaktifkan, sehingga yang bisa masuk Kasir hanya Admin per usaha (mis. 3 Admin untuk 3 toko)',
-      '[Perbaikan] Akun Login memberi label jelas "Admin utama (melihat semua usaha)", dan halaman masuk menyembunyikannya bila dinonaktifkan',
-      '[Perbaikan] Header Kasir menampilkan nama Admin dan usahanya, jadi jelas siapa yang sedang masuk',
-      '[Keamanan] Admin utama yang dinonaktifkan ditolak saat login, dan tiap Admin per usaha hanya melihat transaksinya sendiri'
-    ]],
-    ['v1.0.4', '14 Nov 2026', [
-      '[Perbaikan] Toko banyak usaha: Neraca kini ikut pilihan "Tampilkan usaha", lengkap dengan saldo awal, aset, utang, piutang, dan persediaan per usaha',
-      '[Perbaikan] Laporan Pajak dan Analisa Toko juga mengikuti usaha yang dipilih, jadi tiap usaha punya pembukuan sendiri di Manager dan Owner',
-      '[Keamanan] Data tiap usaha dipisah pada tampilan, dan Admin yang terikat satu usaha hanya melihat usahanya sendiri'
-    ]],
-    ['v1.0.3', '14 Nov 2026', [
-      '[Perbaikan] Kartu dan pop-up di Manager dan Owner kini sama dengan tampilan Kasir (putih bersih, tepi dan bayangan sama)',
-      '[Perbaikan] Pop-up Kurs & Emas: angka kurs terlihat jelas dan muat tanpa scroll di desktop',
-      '[Perbaikan] Tombol Kamera pada Bukti Struk di komputer kini membuka kamera, bukan pemilih berkas',
-      '[Perbaikan] Tombol Simpan ke Antrean Draft selalu terlihat walau layar pendek',
-      '[Keamanan] Foto dari kamera hanya diproses di perangkat ini dan tidak dikirim ke mana pun'
-    ]],
-    ['v1.0.2', '14 Nov 2026', [
-      '[Perbaikan] Pop-up Cuaca dan Kurs & Emas memakai kaca terang yang sama dengan pop-up lain, tidak lagi hitam',
-      '[Perbaikan] Pop-up Cuaca di desktop tampil dalam 4 kolom sehingga muat tanpa scroll',
-      '[Perbaikan] Pemberitahuan versi baru dan "Yang baru" ikut tampil terang dan mudah dibaca',
-      '[Keamanan] Perubahan hanya pada tampilan; tidak ada data yang dikirim atau diubah'
-    ]],
-    ['v1.0.1', '14 Nov 2026', [
-      '[Perbaikan] Tulisan pada dock bawah tidak lagi bertumpuk (termasuk saat bahasa English)',
-      '[Perbaikan] Tema Original/Base kini sama untuk Admin, Kasir, Manager, dan Owner; bawaan Base putih gading',
-      '[Perbaikan] Layar tidak lagi menampilkan wallpaper sesaat saat memuat atau menyegarkan halaman',
-      '[Perbaikan] Logo toko tampil lebih besar dan memenuhi kotaknya',
-      '[Perbaikan] Riwayat Closing ikut bersih pada reset yang sudah dilakukan sebelumnya',
-      '[Keamanan] Pembersihan riwayat closing hanya untuk toko yang direset; data toko lain tidak tersentuh'
-    ]],
-    ['v1.0.0', '14 Nov 2026', [
-      '[Baru] Tema bawaan Base putih gading yang bersih dan tetap berkaca; tema Original tetap tersedia di Pengaturan',
-      '[Baru] Wallpaper dan tampilan kaca (kejelasan 1-8, hujan, rasio wallpaper) diatur dari pusat; logo toko tampil di header dan struk',
-      '[Baru] Buku Besar per kode akun seperti rekening koran, dan akun demo tanpa batas login selama tanda DEMO aktif',
-      '[Perbaikan] Riwayat Closing ikut bersih setelah data toko direset, dan tidak lagi terbawa ke toko lain pada browser yang sama',
-      '[Perbaikan] Tombol "Muat ulang" pada pemberitahuan versi baru kini benar-benar memuat versi terbaru',
-      '[Keamanan] Data tiap toko tetap terpisah penuh; pilihan tampilan hanya tersimpan di perangkat ini dan tidak ada data yang dikirim keluar'
     ]]
   ];
   var SHOW_LAST = 10;
@@ -199,14 +93,13 @@
   var path = (location.pathname || '').toLowerCase();
   var ROLE = path.indexOf('kasir') >= 0 ? 'kasir' : path.indexOf('manager') >= 0 ? 'manager' : path.indexOf('dashboard') >= 0 ? 'owner' : path.indexOf('provider') >= 0 ? 'tower' : path.indexOf('partner') >= 0 ? 'partner' : (path.indexOf('index') >= 0 || /\/$/.test(path)) ? 'login' : 'lain';
   var NATIVE = (ROLE === 'kasir' || ROLE === 'login') ? 'light' : 'dark';
-  var DEFAULT_MODE = 'light';   // tampilan bawaan: terang untuk semua toko; Tower tetap gelap
+  var DEFAULT_MODE = 'light';
   var TOKO = ''; try { TOKO = (new URLSearchParams(location.search).get('toko') || '').toLowerCase().trim(); } catch (e) {}
   var KEY = 'fm_theme2_' + (TOKO || 'master') + '_' + ROLE;
 
   function loadPref() { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } }
   function savePref(p) { try { localStorage.setItem(KEY, JSON.stringify(p)); localStorage.setItem(LOOK_KEY, p.look === 'original' ? 'original' : 'base'); } catch (e) {} }
   var pref = loadPref();
-  /* tema Original/Base satu untuk seluruh toko (Admin, Kasir, Manager, Owner); bawaan: Base putih gading */
   var LOOK_KEY = 'fm_look_' + (TOKO || 'master');
   try { pref.look = localStorage.getItem(LOOK_KEY) === 'original' ? 'original' : 'base'; } catch (e) { pref.look = 'base'; }
 
@@ -216,24 +109,18 @@
     'html{-webkit-text-size-adjust:100%}',
     '@media(max-width:640px){input,select,textarea{font-size:16px!important}button,select,input:not([type=checkbox]):not([type=radio]):not([type=color]){min-height:40px}body{padding-bottom:env(safe-area-inset-bottom)}table{font-size:12px}}',
     'body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:-.011em}',
-    // gerakan halus
     'button,[onclick],a,select,input,.ios-glass,.white-ice-glass-card{transition:transform .18s cubic-bezier(.2,.8,.2,1),background-color .22s ease,border-color .22s ease,box-shadow .22s ease,opacity .22s ease,color .22s ease}',
     'button:active,[role=button]:active{transform:scale(.97)}',
     '@keyframes fmFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}',
     '@keyframes fmSheet{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:none}}',
     '@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}',
-    // keterbacaan: teks sangat kecil dinaikkan sedikit
     '.text-\\[9px\\]{font-size:10.5px!important}.text-\\[10px\\]{font-size:11.5px!important}.text-\\[11px\\]{font-size:12px!important}',
-    // ===== MODE GELAP =====
-    // Palet gelap yang dirancang khusus (bukan efek balik warna), jadi kontras tulisan tetap nyaman dibaca.
     'html[data-fm-black="1"]{color-scheme:dark;--d-bg:#080b11;--d-surf:rgba(21,26,36,.9);--d-surf2:rgba(30,36,48,.92);--d-line:rgba(255,255,255,.1);--d-line2:rgba(255,255,255,.17);--d-t1:#eef1f7;--d-t2:#c2cad9;--d-t3:#939db1}',
     'html[data-fm-black="1"] body{background:var(--d-bg)!important;background-image:none!important;color:var(--d-t1)}',
     'html[data-fm-black="1"] .ios-glass{background:var(--d-surf)!important;border-color:var(--d-line)!important;box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 10px 30px -18px rgba(0,0,0,.9)!important}',
     'html[data-fm-black="1"] .glass-capsule,html[data-fm-black="1"] .glass-capsule-dark{background:rgba(12,15,21,.92)!important;border-color:var(--d-line2)!important}',
     'html[data-fm-black="1"] .bg-slate-900,html[data-fm-black="1"] .bg-slate-950{background-color:#05070b!important}',
     'html[data-fm-black="1"] .text-slate-400{color:var(--d-t2)!important}html[data-fm-black="1"] .text-slate-500{color:var(--d-t3)!important}html[data-fm-black="1"] .text-slate-600{color:var(--d-t3)!important}',
-    // Halaman yang markup aslinya terang (kasir & halaman masuk): warnanya diganti satu per satu,
-    // supaya tidak lagi terlihat seperti kerusakan sistem saat mode gelap dinyalakan.
     'html[data-fm-black="1"][data-fm-native="light"]{--s-surf:var(--d-surf)!important;--s-line:var(--d-line)!important;--s-tint:rgba(255,255,255,.07)!important;--s-hi:rgba(255,255,255,.07)!important;--s-shadow:rgba(0,0,0,.7)!important;--s-gloss:rgba(255,255,255,.04)!important;--s-bg:var(--d-bg)!important;--s-b2:var(--d-surf)!important;--s-b2l:var(--d-line2)!important;--s-b2t:var(--d-t1)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] body{background-color:var(--d-bg)!important;background-image:linear-gradient(rgba(8,11,17,.86),rgba(8,11,17,.94)),var(--fm-wp,url("/img/wp/1.jpg"))!important;background-size:cover!important;background-position:center bottom!important;background-repeat:no-repeat!important;background-attachment:fixed!important;color:var(--d-t1)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] .bg-white,html[data-fm-black="1"][data-fm-native="light"] [class*="bg-white/"]{background-color:var(--d-surf)!important}',
@@ -245,39 +132,32 @@
     'html[data-fm-black="1"][data-fm-native="light"] input::placeholder,html[data-fm-black="1"][data-fm-native="light"] textarea::placeholder,html[data-fm-black="1"][data-fm-native="light"] [class*="placeholder-slate-"]::placeholder{color:#7f899d!important}',
     'html[data-fm-black="1"][data-fm-native="light"] table thead th{background-color:rgba(12,15,21,.9)!important;color:var(--d-t2)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] tbody tr:nth-child(even){background-color:rgba(255,255,255,.025)!important}',
-    // Warna penanda (merah/hijau/kuning/biru) dinaikkan terangnya agar tetap terbaca di atas gelap.
     'html[data-fm-black="1"][data-fm-native="light"] [class*="text-rose-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-red-"]{color:#fb8a9c!important}',
     'html[data-fm-black="1"][data-fm-native="light"] [class*="text-emerald-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-green-"]{color:#45dba6!important}',
     'html[data-fm-black="1"][data-fm-native="light"] [class*="text-amber-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-yellow-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-orange-"]{color:#fbc02d!important}',
     'html[data-fm-black="1"][data-fm-native="light"] [class*="text-indigo-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-blue-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-violet-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-purple-"]{color:#a3b0fc!important}',
     'html[data-fm-black="1"][data-fm-native="light"] [class*="text-cyan-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-sky-"],html[data-fm-black="1"][data-fm-native="light"] [class*="text-teal-"]{color:#5fd8f0!important}',
-    // Kotak peringatan/info berwarna muda: dasarnya dijadikan gelap bernuansa, bukan putih menyilaukan.
     'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-amber-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-amber-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-yellow-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-yellow-50"]{background-color:rgba(120,78,8,.52)!important;border-color:rgba(251,192,45,.34)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-rose-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-rose-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-red-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-red-50"]{background-color:rgba(118,29,45,.52)!important;border-color:rgba(251,138,156,.32)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-emerald-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-emerald-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-green-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-green-50"]{background-color:rgba(10,85,62,.52)!important;border-color:rgba(69,219,166,.3)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-cyan-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-cyan-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-sky-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-sky-50"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-indigo-1"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-indigo-50"]{background-color:rgba(18,62,106,.52)!important;border-color:rgba(95,216,240,.26)!important}',
     'html[data-fm-black="1"][data-fm-native="light"] [class*="bg-amber-1"] [class*="text-amber-9"],html[data-fm-black="1"][data-fm-native="light"] [class*="bg-amber-1"] [class*="text-amber-8"]{color:#ffd978!important}',
     'html[data-fm-black="1"] .fixed button[class*="bg-white/10"]{color:#e2e8f0!important}',
-    // ikon ubin & tombol aksi: sedikit lebih terang agar jelas di atas latar gelap
     'html[data-fm-black="1"] .fm-actions .fm-act i{color:#b4c0ff!important}',
-    // Jendela/panel bawaan aplikasi (konfirmasi, stok, laporan) ikut digelapkan supaya tidak menyilaukan.
     'html[data-fm-black="1"] #fm-dlg .fm-dlg-box,html[data-fm-black="1"] #fm-lap .lp,html[data-fm-black="1"] #fm-stok .sk-box,html[data-fm-black="1"] #fm-stok .sk-ed>div,html[data-fm-black="1"] #fm-stokadm-modal .sa-box{background:rgba(21,26,36,.95)!important;border-color:rgba(255,255,255,.12)!important;color:#eef1f7!important}',
     'html[data-fm-black="1"] #fm-dlg .fm-dlg-box h3,html[data-fm-black="1"] #fm-dlg .fm-dlg-box p,html[data-fm-black="1"] #fm-lap .lp h3,html[data-fm-black="1"] #fm-lap .lp p,html[data-fm-black="1"] #fm-stok .sk-box h3,html[data-fm-black="1"] #fm-stokadm-modal .sa-box h3{color:#eef1f7!important}',
     'html[data-fm-black="1"] #fm-dlg .fm-dlg-no{background:rgba(148,163,184,.26)!important;color:#e7ebf3!important}',
     'html[data-fm-black="1"] #fm-stok .sk-chip:not(.on){background:rgba(148,163,184,.22)!important;color:#c7cfdd!important}',
     'html[data-fm-black="1"] #fm-stok .sk-box table th{background:rgba(12,15,21,.9)!important;color:#c2cad9!important}',
-    // mode kebalikan (terang pada halaman gelap / gelap pada halaman terang)
     'html[data-fm-invert="1"]{filter:invert(1) hue-rotate(180deg);background:#fff}',
     'html[data-fm-invert="1"] body{background-color:#fff!important;background-image:none!important}',
     'html[data-fm-invert="1"] img,html[data-fm-invert="1"] video,html[data-fm-invert="1"] canvas,html[data-fm-invert="1"] .oneui-hero,html[data-fm-invert="1"] header.bg-gradient-to-r,html[data-fm-invert="1"] .fm-keep{filter:invert(1) hue-rotate(180deg)}',
     '@media print{html[data-fm-invert="1"]{filter:none!important;background:#fff!important}html[data-fm-invert="1"] img,html[data-fm-invert="1"] .oneui-hero,html[data-fm-invert="1"] header.bg-gradient-to-r{filter:none!important}}',
-    // warna pilihan pengguna
     'html[data-fm-accent] .oneui-hero{background:linear-gradient(160deg,#0b0e13 0%,color-mix(in srgb,var(--fm-accent) 30%,#0b0e13) 100%)!important}',
     'html[data-fm-accent] header.bg-gradient-to-r{background:linear-gradient(90deg,#000 0%,color-mix(in srgb,var(--fm-accent) 45%,#000) 55%,#000 100%)!important}',
     'html[data-fm-accent]:not([data-fm-black]):not([data-fm-invert]) body{background-image:radial-gradient(at 8% 8%,color-mix(in srgb,var(--fm-accent) 9%,transparent) 0,transparent 45%),radial-gradient(at 92% 92%,color-mix(in srgb,var(--fm-accent) 6%,transparent) 0,transparent 50%)!important}',
     'html[data-fm-accent] input:focus,html[data-fm-accent] select:focus,html[data-fm-accent] textarea:focus{border-color:var(--fm-accent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--fm-accent) 25%,transparent)!important}',
     'html[data-fm-accent] ::selection{background:var(--fm-accent);color:#fff}',
-    // tombol & panel pengaturan
     '#fm-gear{position:fixed;left:14px;bottom:14px;z-index:2147480000;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(18,18,22,.92);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.45);}',
     '#fm-gear:hover{transform:rotate(30deg)}',
     '#fm-set{display:none;position:fixed;inset:0;z-index:2147481000;background:rgba(0,0,0,.66);align-items:flex-end;justify-content:center}',
@@ -307,20 +187,16 @@
   styleEl.textContent = CSS;
   (document.head || document.documentElement).appendChild(styleEl);
 
-  /* warna teks di atas warna aksen: putih atau hampir-hitam, mana yang kontrasnya lebih tinggi */
   function onColor(hex) {
     var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '')); if (!m) return '#fff';
     var v = [0, 2, 4].map(function (i) { var c = parseInt(m[1].substr(i, 2), 16) / 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); });
     var L = 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
     return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.0543) ? '#fff' : '#0b0d12';
   }
-  /* Latar belakang: 4 gambar bergaya lukisan. Gambar yang tampil diatur dari Tower (app_meta/wallpaper):
-     otomatis bergilir tiap minggu, atau dikunci satu gambar. Kaca dan pembaruan otomatis di js/langit.js. */
   var WP_FILES = ['img/wp/1.jpg', 'img/wp/2.jpg', 'img/wp/3.jpg', 'img/wp/4.jpg'];
-  var WP_TZ = 7 * 3600000; /* WIB: pergantian mingguan mengikuti jam Indonesia barat */
+  var WP_TZ = 7 * 3600000;
   var WP_PID = 'finance-ai-master-byneilverse', WP_AK = 'AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI';
   function wpCfg() { try { return JSON.parse(localStorage.getItem('fm_wp_cfg') || 'null') || {}; } catch (e) { return {}; } }
-  /* daftar gambar: 'b1'..'b4' = bawaan, 'u_xxx' = diunggah dari Tower (disimpan di app_meta/wpimg_xxx) */
   function wpItems(cfg) {
     var it = cfg && cfg.items, out = [];
     if (Array.isArray(it)) it.forEach(function (k) { if (typeof k === 'string' && /^(b[1-4]|u_[a-z0-9]{3,16})$/.test(k) && out.indexOf(k) < 0 && out.length < 12) out.push(k); });
@@ -334,7 +210,6 @@
     if (o.length) return o;
     o = []; for (var i = 1; i <= n; i++) o.push(i); return o;
   }
-  /* indeks gambar (0..n-1) yang berlaku pada waktu now */
   function wpPick(cfg, now) {
     cfg = cfg || wpCfg(); now = now || Date.now();
     var n = wpItems(cfg).length;
@@ -343,15 +218,12 @@
     var wk = Math.floor((days - 4 - wpShift(cfg)) / 7), m = o.length, k = (((wk + (parseInt(cfg.start, 10) || 0)) % m) + m) % m;
     return o[k] - 1;
   }
-  /* kapan gambar berikutnya berganti (ms epoch); null bila dikunci */
   function wpNext(cfg, now) {
     cfg = cfg || wpCfg(); now = now || Date.now();
     if (cfg.mode === 'fixed') return null;
     var w = wpDays(now, cfg), days = Math.floor(w.t / 86400000), wk = Math.floor((days - 4 - wpShift(cfg)) / 7);
     return (4 + wpShift(cfg) + (wk + 1) * 7) * 86400000 + w.hr * 3600000 - WP_TZ;
   }
-  /* tirai muat: halaman disembunyikan sampai kaca + wallpaper siap, supaya tidak berkedip tampilan/gambar lama */
-  /* Control Tower: pilihan mode Terang (bawaan) atau Gelap, tersimpan per perangkat. Gelap = tampilan terang dibalik warnanya. */
   function ctMode() { try { return localStorage.getItem('fm_ct_mode') === 'gelap' ? 'gelap' : 'terang'; } catch (e) { return 'terang'; } }
   function applyCtMode() {
     if (ROLE !== 'tower') return;
@@ -415,7 +287,6 @@
         var c = null; try { c = localStorage.getItem('fm_wpi_' + key); } catch (e) {}
         if (c) setBg(c); else { fetchUpload(key); }
       }
-      /* bersihkan gambar unggahan lama yang sudah tidak dipakai */
       try { for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (k && k.indexOf('fm_wpi_') === 0 && items.indexOf(k.slice(7)) < 0) localStorage.removeItem(k); } } catch (e) {}
     } catch (e) {}
   }
@@ -423,12 +294,10 @@
   function apply() {
     var h = document.documentElement;
     updateWp();
-    var mode = 'light';     /* mode gelap dihapus (Beta 12): hanya Original (kaca) dan Base (putih polos) */
+    var mode = 'light';
     h.setAttribute('data-fm-native', NATIVE);
     ['data-fm-black', 'data-fm-invert', 'data-fm-accent'].forEach(function (a) { h.removeAttribute(a); });
     if (!LITE && ROLE !== 'lain') {
-      /* gelap = tema gelap sungguhan (tidak lagi memakai efek balik warna yang bikin tampilan rusak);
-         terang di halaman yang markup-nya memang gelap (manager/owner) tetap memakai pembalik seperti semula */
       if (mode === 'dark') h.setAttribute('data-fm-black', '1');
       else if (mode !== NATIVE && !/provider\.html/.test(location.pathname)) h.setAttribute('data-fm-invert', '1');
       if (pref.accent) { h.setAttribute('data-fm-accent', '1'); h.style.setProperty('--fm-accent', pref.accent); }
@@ -439,11 +308,9 @@
   }
   apply();
   if (LITE || ROLE === 'lain') return;
-  if (ROLE === 'login' || ROLE === 'partner') { /* tema & gerigi tersedia; logo/pengaturan toko tidak */ }
 
-  // ---------- menu Pengaturan ----------
   var TENANT_ID = (TOKO && TOKO !== 'oneilverse') ? TOKO.toUpperCase() : 'ID26110901';
-  var CAN_LOGO = false; /* foto/logo toko dihapus: logo Oneilverse dipakai di semua toko */
+  var CAN_LOGO = false;
   var logoData = null;
 
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
@@ -476,27 +343,15 @@
       '<button class="fm-mode ' + (ctMode() === 'terang' ? 'on' : '') + '" data-ctm="terang"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#f3efe0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (ctMode() === 'gelap' ? 'on' : '') + '" data-ctm="gelap"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#0b1220,#1e293b)"></div>Gelap</button></div></div>';
     if (ROLE === 'tower') { var _tg = parseInt(localStorage.getItem('fm_glass_tw'), 10) || 4; h += '<div class="fm-sec"><div class="fm-lab">Kaca Control Tower (1 buram, 8 bening)</div><div class="fm-modes">' + [1,2,3,4,5,6,8,7].sort().map(function (n) { return '<button class="fm-mode ' + (_tg === n ? 'on' : '') + '" data-twg="' + n + '">' + n + '</button>'; }).join('') + '</div></div>'; }
-    if (false) h += '<div class="fm-sec"><div class="fm-lab">Atur Warna Halaman</div><div class="fm-card"><div class="fm-sw">' +
-      ACCENTS.map(function (c) { return '<span class="fm-dot ' + (pref.accent === c ? 'on' : '') + '" data-acc="' + c + '" style="background:' + c + '"></span>'; }).join('') +
-      '</div><div style="display:flex;gap:10px;align-items:center;margin-top:12px"><label style="font-size:12px;color:#c7cbd6">Warna bebas</label><input type="color" id="fm-acc-custom" value="' + esc(pick) + '" style="width:44px;height:30px;border:0;background:none;padding:0"><button class="fm-btn" data-accreset style="margin-left:auto">Kembali ke Bawaan</button></div></div></div>';
-    if (CAN_LOGO && THEME_ON) {
-      h += '<div class="fm-sec"><div class="fm-lab">Logo Usaha</div><div class="fm-card">' +
-        '<div style="display:flex;gap:12px;align-items:center"><div id="fm-logo-prev" style="width:64px;height:64px;border-radius:16px;background:#22222b;display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:800;color:#aab2c5;font-size:12px">' + (logoData ? '<img src="' + esc(logoData) + '" style="width:100%;height:100%;object-fit:contain">' : 'Inisial') + '</div>' +
-        '<div style="flex:1;font-size:12px;line-height:1.55;color:#c7cbd6">Unggah logo (JPG, PNG, atau WebP). <b style="color:#fff">Ukuran logo dibatasi maksimal 100 KB.</b> Gambar yang lebih besar akan diperkecil otomatis; disarankan bentuk persegi. Jika tidak ada logo, tampil inisial nama usaha.</div></div>' +
-        '<div style="display:flex;gap:8px;margin-top:10px"><label class="fm-btn pri" style="cursor:pointer">Pilih Gambar<input type="file" id="fm-logo-file" accept="image/*" style="display:none"></label>' + (logoData ? '<button class="fm-btn" data-logodel>Hapus Logo</button>' : '') + '</div>' +
-        '<p id="fm-logo-msg" style="font-size:12px;margin:8px 0 0;color:#fca5a5"></p></div></div>';
-    }
     if (window.FM_I18N && FM_I18N.has && FM_I18N.has()) { var _ln = FM_I18N.lang(); h += '<div class="fm-sec"><div class="fm-lab">Bahasa / Language</div><div class="fm-modes"><button class="fm-mode ' + (_ln === 'id' ? 'on' : '') + '" data-lang="id">Indonesia</button><button class="fm-mode ' + (_ln === 'en' ? 'on' : '') + '" data-lang="en">English</button></div></div>'; }
     if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur Toko</button></div>';
     if (window.FM_SHIELD) h += '<div class="fm-sec"><button class="fm-btn" data-shield style="width:100%;padding:13px">🛡️ Oneil Shield v' + FM_SHIELD.ver + ' — Keamanan</button></div>';
-    if (false) h += '<div class="fm-sec"><button class="fm-btn" data-logout style="width:100%;padding:13px;color:#fda4af">Keluar dari Akun</button></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>' + BETA + '</b></div></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.slice(0, SHOW_LAST).map(function (n, i) {
-      return '<details ' + (i === 0 ? 'open' : '') + '><summary>v' + n[0] + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { var m = /^\[(\w+)\]\s*/.exec(t); var tag = m ? m[1] : ''; return '<li>' + (tag ? '<i class="fm-tag fm-tag-' + tag.toLowerCase() + '">' + esc(tag) + '</i>' : '') + esc(t.replace(/^\[\w+\]\s*/, '')) + '</li>'; }).join('') + '</ul></details>';
+      return '<details ' + (i === 0 ? 'open' : '') + '><summary>' + (/^BETA/.test(n[0]) ? n[0] : 'v' + n[0]) + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { var m = /^\[(\w+)\]\s*/.exec(t); var tag = m ? m[1] : ''; return '<li>' + (tag ? '<i class="fm-tag fm-tag-' + tag.toLowerCase() + '">' + esc(tag) + '</i>' : '') + esc(t.replace(/^\[\w+\]\s*/, '')) + '</li>'; }).join('') + '</ul></details>';
     }).join('') + '</div>';
     box.innerHTML = h;
 
-    var lo = box.querySelector('[data-logout]'); if (lo) lo.onclick = function () { document.getElementById('fm-set').style.display = 'none'; window.FM_LOGOUT(); };
     var pb = box.querySelector('[data-plans]'); if (pb) pb.onclick = function () { document.getElementById('fm-set').style.display = 'none'; if (window.FM_PLANS) FM_PLANS.openModal(); };
     var sh = box.querySelector('[data-shield]'); if (sh) sh.onclick = function () {
       document.getElementById('fm-set').style.display = 'none';
@@ -513,16 +368,8 @@
     box.querySelectorAll('[data-twg]').forEach(function (b) { b.onclick = function () { try { localStorage.setItem('fm_glass_tw', b.getAttribute('data-twg')); } catch (e) {} window.dispatchEvent(new Event('fm:glass')); render(); }; });
     box.querySelectorAll('[data-look]').forEach(function (b) { b.onclick = function () { pref.look = b.getAttribute('data-look'); savePref(pref); apply(); render(); }; });
     box.querySelectorAll('[data-lang]').forEach(function (b) { b.onclick = function () { if (window.FM_I18N) FM_I18N.set(b.getAttribute('data-lang')); }; });
-    box.querySelectorAll('[data-acc]').forEach(function (b) { b.onclick = function () { pref.accent = b.getAttribute('data-acc'); savePref(pref); apply(); render(); }; });
-    var ac = box.querySelector('#fm-acc-custom');
-    if (ac) { ac.oninput = function (e) { pref.accent = e.target.value; savePref(pref); apply(); }; ac.onchange = function () { render(); }; }
-    var ar = box.querySelector('[data-accreset]'); if (ar) ar.onclick = function () { delete pref.accent; savePref(pref); apply(); render(); };
-    var lf = box.querySelector('#fm-logo-file'); if (lf) lf.onchange = function () { if (lf.files && lf.files[0]) uploadLogo(lf.files[0]); };
-    var ld = box.querySelector('[data-logodel]'); if (ld) ld.onclick = function () { saveLogo(''); };
   }
 
-  // ---------- logo usaha ----------
-  function logoMsg(t, ok) { var m = document.getElementById('fm-logo-msg'); if (m) { m.style.color = ok ? '#86efac' : '#fca5a5'; m.textContent = t; } }
   function compress(file) {
     return new Promise(function (res, rej) {
       if (!/^image\//.test(file.type)) return rej(new Error('File harus berupa gambar.'));
@@ -543,9 +390,9 @@
             var qs = [0.92, 0.8, 0.65, 0.5];
             for (var q = 0; q < qs.length; q++) {
               var u = c.toDataURL('image/webp', qs[q]);
-              if (u.indexOf('data:image/webp') !== 0) u = c.toDataURL('image/png');   // peramban tanpa WebP
+              if (u.indexOf('data:image/webp') !== 0) u = c.toDataURL('image/png');
               if ((u.length - u.indexOf(',') - 1) * 0.75 <= MAX) return res(u);
-              if (u.indexOf('data:image/png') === 0) break;                           // PNG tidak punya kualitas: perkecil dimensi
+              if (u.indexOf('data:image/png') === 0) break;
             }
           }
           rej(new Error('Gambar tidak bisa diperkecil hingga 100 KB. Coba gambar yang lebih sederhana.'));
@@ -555,7 +402,6 @@
       fr.readAsDataURL(file);
     });
   }
-  // gambar mini (untuk daftar klien di Tower) disimpan terpisah agar Tower tidak perlu mengunduh logo penuh
   function makeThumb(dataUrl) {
     return new Promise(function (res) {
       var im = new Image();
@@ -570,22 +416,6 @@
       im.src = dataUrl;
     });
   }
-  function uploadLogo(file) {
-    logoMsg('Memproses...', true);
-    compress(file).then(saveLogo).catch(function (e) { logoMsg(e.message, false); });
-  }
-  function saveLogo(data) {
-    if (!(typeof db !== 'undefined' && db)) { logoMsg('Belum terhubung ke server. Coba lagi sebentar.', false); return; }
-    var upd = data ? { logo: data, logoUpdatedAt: Date.now() } : { logo: firebase.firestore.FieldValue.delete(), logoUpdatedAt: Date.now() };
-    var thumbP = data ? makeThumb(data) : Promise.resolve('');
-    thumbP.then(function (thumb) {
-      var w = db.collection('tenant_logos').doc(TENANT_ID);
-      return Promise.all([db.collection('tenant_settings').doc(TENANT_ID).set(upd, { merge: true }), data ? w.set({ thumb: thumb, updatedAt: Date.now() }) : w.delete()]);
-    }).then(function () {
-      logoData = data || null; applyLogo(); render();
-      logoMsg(data ? 'Logo tersimpan (' + Math.round((data.length - data.indexOf(',') - 1) * 0.75 / 1024) + ' KB).' : 'Logo dihapus.', true);
-    }).catch(function (e) { logoMsg('Gagal menyimpan: ' + e.message, false); });
-  }
   function applyLogo() {
     try {
       var nameEl = document.getElementById('topbar-store-name');
@@ -597,9 +427,8 @@
       if (logoData) {
         if (!img) { img = document.createElement('img'); img.id = 'fm-logo-img'; img.alt = 'Logo'; img.style.cssText = 'height:clamp(56px,8vw,76px);width:clamp(56px,8vw,76px);flex:0 0 auto;object-fit:cover;border-radius:16px;background:transparent;padding:0;margin-right:12px'; row.insertBefore(img, block); }
         if (img.getAttribute('data-src-len') !== String(logoData.length)) { img.setAttribute('data-src-len', String(logoData.length)); img.__failed = false; img.src = logoData; }
-        img.onerror = function () { /* gambar gagal dimuat: kembali ke logo bawaan supaya header tidak kosong */ try { img.__failed = true; img.style.display = 'none'; olds.forEach(function (o) { o.style.display = ''; }); } catch (e) {} };
+        img.onerror = function () { try { img.__failed = true; img.style.display = 'none'; olds.forEach(function (o) { o.style.display = ''; }); } catch (e) {} };
         img.style.display = '';
-        /* logo putih / transparan tidak terlihat di header terang: beri alas gelap */
         img.onload = function () {
           try {
             var c = document.createElement('canvas'); c.width = c.height = 24; var x = c.getContext('2d'); x.drawImage(img, 0, 0, 24, 24);
@@ -607,7 +436,7 @@
             for (i = 0; i < d.length; i += 4) { var a = d[i + 3] / 255; if (a < .05) continue; sum += a * (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]); w += a; }
             var opaque = w / 576, lum = w ? sum / w : 255;
             img.style.setProperty('background', (opaque < .08 || lum > 205) ? '#0f172a' : 'transparent', 'important');
-          } catch (e) { /* gambar lintas-asal: biarkan apa adanya */ }
+          } catch (e) {}
         };
         if (img.complete && img.naturalWidth) img.onload();
         olds.forEach(function (o) { o.style.display = 'none'; });
@@ -630,7 +459,6 @@
           var d = snap.exists ? snap.data() : null;
           logoData = (d && d.logo) || null;
           applyLogo(); setTimeout(applyLogo, 600); setTimeout(applyLogo, 2500);
-          /* header bisa digambar ulang oleh modul lain (nama toko, peran): pasang lagi logo toko bila terhapus */
           if (!window.__fmLogoObs && window.MutationObserver && document.body) {
             var tmr = null; window.__fmLogoObs = new MutationObserver(function () {
               if (!logoData) return; clearTimeout(tmr);
@@ -646,20 +474,6 @@
         }, function () {});
       } else if (tries > 100) clearInterval(t);
     }, 100);
-  }
-
-  // logo di halaman login (belum ada koneksi Firebase di sana: baca lewat REST)
-  function loginLogo() {
-    if (ROLE !== 'login' || !TOKO || TOKO === 'oneilverse') return;
-    try {
-      var x = new XMLHttpRequest();
-      x.open('GET', 'https://firestore.googleapis.com/v1/projects/finance-ai-master-byneilverse/databases/(default)/documents/tenant_settings/' + encodeURIComponent(TENANT_ID) + '?key=AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI', true);
-      x.onload = function () {
-        if (x.status !== 200) return;
-        try { var f = JSON.parse(x.responseText).fields || {}; logoData = (f.logo && f.logo.stringValue) || null; applyLoginLogo(); } catch (e) {}
-      };
-      x.send();
-    } catch (e) {}
   }
   function applyLoginLogo() {
     var trig = document.getElementById('login-logo-trigger'); if (!trig) return;

@@ -398,8 +398,16 @@
       pil.addEventListener('mouseleave', function () { buka(false); });
       var nT = 0, tT = setInterval(function () {
         nT++; try { bangun(); } catch (e) {}
-        if (nT > 80) clearInterval(tT);
+        if (nT > 120) clearInterval(tT);
       }, 250);
+      if (window.MutationObserver && document.body) {
+        var obsTmr = null;
+        var dockObs = new MutationObserver(function () {
+          clearTimeout(obsTmr);
+          obsTmr = setTimeout(function () { try { bangun(); } catch (e) {} }, 120);
+        });
+        dockObs.observe(document.body, { childList: true, subtree: true });
+      }
       window.addEventListener('fm:gelap', function () {
         try {
           var t = rail.querySelector('.fm-s2[data-tema]');
