@@ -1,4 +1,4 @@
-/* ui110.js — dock pulau v1.1.0 (BETA 1).
+/* ui110.js — dock pulau v1.1.0 (BETA-1).
    Cara kerja: dock bawaan (#fm-dock) TIDAK dibongkar, hanya disembunyikan,
    lalu dock pulau digambar sendiri dengan gayanya sendiri. Setiap tombol
    meneruskan klik ke tombol aslinya, jadi fungsinya persis sama.

@@ -3,12 +3,12 @@
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
   var APP_VERSION = '1.1.0';
-  var BETA = 'BETA 1';
+  var BETA = 'BETA-1';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
-    ['BETA 1', '21 Nov 2026', [
+    ['BETA-1', '21 Nov 2026', [
       '[Perbaikan] Logo Oneilverse di dock pulau bawah kini terkunci diam tepat di tengah layar saat kapsul menu mengembang maupun menutup',
       '[Keamanan] Pengujian versi BETA 1 terisolasi khusus untuk akun uji coba tanpa mengubah versi pelanggan aktif'
     ]],
