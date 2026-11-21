@@ -665,11 +665,19 @@
             const picker = document.getElementById('tenant-picker');
             const lockedInput = document.getElementById('input-tenant-id');
 
-            if (paramToko && !['id26110901', 'id261110b', 'id261110a', 'oneilverse'].includes(paramToko.toLowerCase())) {
+            if (!paramToko) {
+                if (picker) picker.classList.add('hidden');
+                if (lockedInput) {
+                    lockedInput.classList.remove('hidden');
+                    lockedInput.readOnly = false;
+                    lockedInput.value = '';
+                    lockedInput.placeholder = 'Masukkan ID Toko Anda...';
+                }
+            } else if (!['id26110901', 'id261110b', 'id261110a', 'oneilverse'].includes(paramToko.toLowerCase())) {
                 picker.classList.add('hidden');
                 lockedInput.classList.remove('hidden');
                 lockedInput.value = activeTenant.id;
-            } else if (paramToko) {
+            } else {
                 if (picker) picker.value = paramToko.toLowerCase();
             }
 

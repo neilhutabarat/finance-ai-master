@@ -233,7 +233,7 @@
     R + '#fm-rail>*{pointer-events:auto}' +
     R + '#fm-pil{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;height:52px;padding:0;' +
       'background:var(--o-pil,#fff);border-radius:999px;box-shadow:0 2px 6px var(--o-sh,rgba(15,23,42,.07)),0 16px 36px -14px var(--o-sh2,rgba(15,23,42,.38));' +
-      'overflow:hidden;width:60px;transition:width .55s cubic-bezier(.16,1,.3,1);box-sizing:border-box}' +
+      'overflow:hidden;width:60px;will-change:width;transition:width .55s cubic-bezier(.16,1,.3,1);box-sizing:border-box}' +
     R + '#fm-rail.fm-open #fm-pil{width:var(--fmw,420px)}' +
     R + '#fm-pil .fm-lg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px;display:grid;place-items:center;' +
       'color:var(--o-ink,#0f172a);cursor:pointer;z-index:5;background:var(--o-pil,#fff);border-radius:50%}' +
@@ -384,7 +384,7 @@
           var wR = pil.querySelector('.fm-wing-r');
           var lebarL = wL ? wL.offsetWidth : 0;
           var lebarR = wR ? wR.offsetWidth : 0;
-          var setengah = 26 + Math.max(lebarL, lebarR) + 12;
+          var setengah = Math.ceil(26 + Math.max(lebarL, lebarR) + 12);
           var totalW = Math.max(60, setengah * 2);
           rail.style.setProperty('--fmw', totalW + 'px');
           rail.style.setProperty('--pl', setengah + 'px');
