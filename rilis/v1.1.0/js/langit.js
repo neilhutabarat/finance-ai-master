@@ -48,17 +48,17 @@
     function shine(T) { var t = 'rgba(' + T + ',' + T + ',' + T + ','; return 'linear-gradient(112deg,transparent 14%,' + t + (.62 - lv * .06).toFixed(2) + ') 20%,transparent 26%),linear-gradient(112deg,transparent 30%,' + t + (.34 - lv * .03).toFixed(2) + ') 32%,transparent 34%)'; }
     function edge(T, sh) { var t = 'rgba(' + T + ',' + T + ',' + T + ','; return 'inset 0 0 0 1px ' + t + '.32),inset 0 3px 2px -1px ' + t + '.95),inset 0 -3px 3px -1px ' + t + '.4),inset 5px 0 7px -4px ' + t + '.85),inset -5px 0 7px -4px ' + t + '.55),inset 0 0 26px ' + t + '.26),0 18px 34px -16px ' + sh; }
     function printed(T) { var t = 'rgba(' + T + ',' + T + ',' + T + ','; return 'text-shadow:0 0 3px ' + t + (.5 + lv * .03).toFixed(2) + ')!important;'; }
-    var bf = 'blur(' + Math.min(p.b, 14) + 'px) saturate(' + Math.min(p.s, 1.25) + ')', bfInv = 'invert(1) hue-rotate(180deg) ' + bf;
+    var bf = 'none', bfInv = 'invert(1) hue-rotate(180deg)';
     var SH = 'rgba(4,22,48,.5)', SHI = 'rgba(235,225,205,.5)';
     var o = '';
     /* halaman biasa (Kasir) : semuanya kaca terang */
     var all = MIRR.concat(AUTH);
-    o += sel(all, P + ':not([data-fm-invert])') + '{background:' + shine(255) + ',' + grad(255) + '!important;backdrop-filter:' + bf + '!important;-webkit-backdrop-filter:' + bf + '!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:' + edge(255, SH) + '!important;' + printed(255) + '}';
-    o += sel(PLUG, P + ':not([data-fm-invert])') + '{filter:invert(1) hue-rotate(180deg);background:' + shine(0) + ',' + grad(0) + '!important;backdrop-filter:' + bfInv + '!important;-webkit-backdrop-filter:' + bfInv + '!important;border:1px solid rgba(0,0,0,.55)!important;box-shadow:' + edge(0, SHI) + '!important;' + printed(0) + '}';
+    o += sel(all, P + ':not([data-fm-invert])') + '{background:' + shine(255) + ',' + grad(255) + '!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:' + edge(255, SH) + '!important;' + printed(255) + '}';
+    o += sel(PLUG, P + ':not([data-fm-invert])') + '{filter:invert(1) hue-rotate(180deg);background:' + shine(0) + ',' + grad(0) + '!important;border:1px solid rgba(0,0,0,.55)!important;box-shadow:' + edge(0, SHI) + '!important;' + printed(0) + '}';
     o += P + ':not([data-fm-invert]) ' + PLUGOV + '{background:rgba(15,23,42,.36)!important}' + P + '[data-fm-invert="1"] ' + PLUGOV + '{background:rgba(242,246,252,.4)!important}';
     /* halaman yang memakai pembalik warna (Manager, Owner): kartu = cermin; elemen yang dibalik lagi = kaca biasa dengan latar dikembalikan */
-    o += sel(MIRR.concat(PLUG), P + '[data-fm-invert="1"]') + '{background:' + shine(0) + ',' + grad(0) + '!important;backdrop-filter:' + bf + '!important;-webkit-backdrop-filter:' + bf + '!important;border:1px solid rgba(0,0,0,.55)!important;box-shadow:' + edge(0, SHI) + '!important;' + printed(0) + '}';
-    o += sel(AUTH, P + '[data-fm-invert="1"]') + '{filter:invert(1) hue-rotate(180deg);background:' + shine(255) + ',' + grad(255) + '!important;backdrop-filter:' + bfInv + '!important;-webkit-backdrop-filter:' + bfInv + '!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:' + edge(255, SH) + '!important;' + printed(255) + '}';
+    o += sel(MIRR.concat(PLUG), P + '[data-fm-invert="1"]') + '{background:' + shine(0) + ',' + grad(0) + '!important;border:1px solid rgba(0,0,0,.55)!important;box-shadow:' + edge(0, SHI) + '!important;' + printed(0) + '}';
+    o += sel(AUTH, P + '[data-fm-invert="1"]') + '{filter:invert(1) hue-rotate(180deg);background:' + shine(255) + ',' + grad(255) + '!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:' + edge(255, SH) + '!important;' + printed(255) + '}';
     var pa = [Math.max(a[0], .66), Math.max(a[1], .52), Math.max(a[2], .6)];
     function gradP(T) { var t = 'rgba(' + T + ',' + T + ',' + T + ','; return 'linear-gradient(160deg,' + t + pa[0] + '),' + t + pa[1] + ') 55%,' + t + pa[2] + '))'; }
     var POPM = ['.fixed.inset-0[id*="modal"]>div'], POPA = ['#fm-dlg .fm-dlg-box'];
@@ -67,9 +67,8 @@
     o += sel(POPM.concat(PLUG), P + '[data-fm-invert="1"]') + '{background:' + shine(0) + ',' + gradP(0) + '!important}';
     o += sel(POPA, P + '[data-fm-invert="1"]') + '{background:' + shine(255) + ',' + gradP(255) + '!important}';
     o += 'html[data-fm-page][data-fm-glass] .font-black,html[data-fm-page][data-fm-glass] .font-extrabold{font-weight:700!important}html[data-fm-page][data-fm-glass] .font-bold{font-weight:600!important}html[data-fm-page="tower"][data-fm-glass] .font-black,html[data-fm-page="tower"][data-fm-glass] .font-extrabold{font-weight:800!important}';
-    var sm = 'blur(5px)', smI = 'invert(1) hue-rotate(180deg) blur(5px)', SMS = ['.fm-act', '.fm-fab', '#fm-dock'];
-    o += sel(SMS, P + ':not([data-fm-invert])') + '{backdrop-filter:' + sm + '!important;-webkit-backdrop-filter:' + sm + '!important}';
-    o += sel(SMS, P + '[data-fm-invert="1"]') + '{backdrop-filter:' + smI + '!important;-webkit-backdrop-filter:' + smI + '!important}';
+    var sm = 'none', smI = 'invert(1) hue-rotate(180deg)', SMS = ['.fm-act', '.fm-fab', '#fm-dock'];
+    o += sel(SMS, P + '[data-fm-invert="1"]') + '{filter:' + smI + '!important}';
     o += sel(['.ios-glass', '.white-ice-glass-card', 'header.oneui-hero'], P) + '{border-radius:24px!important}';
     /* selubung latar tipis: gambar tetap terlihat, kartu yang menjaga keterbacaan */
     o += P + ':not([data-fm-invert]) body[class]{background-image:linear-gradient(rgba(255,255,255,.04),rgba(255,255,255,.02)),var(--fm-wp)!important}';

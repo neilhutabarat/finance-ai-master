@@ -36,7 +36,13 @@
     'html body #fm-refresh:hover{background:#b91c1c!important}#fm-refresh:active{transform:scale(.97)}html body #fm-refresh.fm-rf-fix{position:fixed!important;right:8px!important;top:5px!important;bottom:auto!important;margin:0!important;min-height:0!important;height:auto!important;padding:5px 10px!important;font-size:11px!important;z-index:2147483000}';
   var st = document.createElement('style'); st.id = 'fm-ld-css'; st.textContent = CSS; (document.head || root).appendChild(st);
 
-  function verText() { var v = (window.FM_RELEASES && FM_RELEASES.version) ? 'v' + FM_RELEASES.version : ''; if (!v) { var pm = /\/rilis\/(v[\d.]+)\//.exec(location.pathname); v = pm ? pm[1] : 'v1.1.0'; } if (v) { try { localStorage.setItem('fm_ld_ver', v); } catch (e) {} } else { try { v = localStorage.getItem('fm_ld_ver') || ''; } catch (e) {} } return v; }
+  function verText() {
+    var v = (window.FM_RELEASES && FM_RELEASES.version) ? 'v' + FM_RELEASES.version : '';
+    if (!v || /^v1\.0\./.test(v)) { var pm = /\/rilis\/(v[\d.]+)\//.exec(location.pathname); v = pm ? pm[1] : 'v1.1.0'; }
+    if (v) { try { localStorage.setItem('fm_ld_ver', v); } catch (e) {} }
+    else { try { v = localStorage.getItem('fm_ld_ver') || 'v1.1.0'; if (/^v1\.0\.|BETA/i.test(v)) v = 'v1.1.0'; } catch (e) { v = 'v1.1.0'; } }
+    return v;
+  }
 
   function build(text) {
     if (ld && ld.parentNode) { ld.classList.remove('fm-ld-out'); ld.querySelector('.fm-ld-t').textContent = text; return ld; }
@@ -61,10 +67,12 @@
     var elapsed = Date.now() - t0;
     var isTowerDesk = /provider/.test(location.pathname) && window.innerWidth >= 1024;
     var isAppPage = /kasir|manager|dashboard/.test(location.pathname);
-    var uiReady = isTowerDesk ? (root.hasAttribute('data-tw-ck') || elapsed > 3800)
-      : isAppPage ? (!!document.getElementById('fm-rail') || elapsed > 2200)
+    var isLoginPage = /index\.html$|\/$/.test(location.pathname);
+    var uiReady = isTowerDesk ? (root.hasAttribute('data-tw-ck') || elapsed > 4000)
+      : isAppPage ? (!!document.getElementById('fm-rail') || elapsed > 2600)
+      : isLoginPage ? (!!document.querySelector('[data-fm-logo-done]') || elapsed > 2000)
       : true;
-    var ready = (root.classList.contains('fm-ready') && uiReady) || (document.readyState === 'complete' && elapsed > 3800);
+    var ready = (root.classList.contains('fm-ready') && uiReady) || (document.readyState === 'complete' && elapsed > 4000);
     if (document.readyState === 'complete' && ready) { setTimeout(finish, 80); return; }
     setTimeout(check, 60);
   }

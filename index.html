@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Oneilverse - Otorisasi Sistem Enterprise</title>
+    <style id="fm-boot">html:not(.fm-ready) body{visibility:hidden}@keyframes fmboot{to{visibility:visible}}html:not(.fm-ready) body{animation:fmboot 0s linear 3s forwards}</style>
     <script src="/js/loader.js?v=ld110"></script>
     <script>try{localStorage.removeItem("fm_dev")}catch(e){}</script>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -684,6 +685,8 @@
             const selectedKey = resolveTenantKey(picker);
             onTenantPickerChange(selectedKey);
             if (!paramToko && lockedInput) lockedInput.value = '';
+            try { if (window.FM_LOGO) FM_LOGO.apply(); } catch (e) {}
+            document.documentElement.classList.add('fm-ready');
 
             setupEasterEgg();
             refreshSecState();
