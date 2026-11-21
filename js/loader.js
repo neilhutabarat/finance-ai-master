@@ -36,7 +36,7 @@
     'html body #fm-refresh:hover{background:#b91c1c!important}#fm-refresh:active{transform:scale(.97)}html body #fm-refresh.fm-rf-fix{position:fixed!important;right:8px!important;top:5px!important;bottom:auto!important;margin:0!important;min-height:0!important;height:auto!important;padding:5px 10px!important;font-size:11px!important;z-index:2147483000}';
   var st = document.createElement('style'); st.id = 'fm-ld-css'; st.textContent = CSS; (document.head || root).appendChild(st);
 
-  function verText() { var v = (window.FM_RELEASES && FM_RELEASES.beta) || ''; if (!v) { var pm = /\/rilis\/(v[\d.]+)\//.exec(location.pathname); v = pm ? pm[1] : 'v1.0.26'; } if (v) { try { localStorage.setItem('fm_ld_ver', v); } catch (e) {} } else { try { v = localStorage.getItem('fm_ld_ver') || ''; } catch (e) {} } return v; }
+  function verText() { var v = (window.FM_RELEASES && FM_RELEASES.version) ? 'v' + FM_RELEASES.version : ''; if (!v) { var pm = /\/rilis\/(v[\d.]+)\//.exec(location.pathname); v = pm ? pm[1] : 'v1.1.0'; } if (v) { try { localStorage.setItem('fm_ld_ver', v); } catch (e) {} } else { try { v = localStorage.getItem('fm_ld_ver') || ''; } catch (e) {} } return v; }
 
   function build(text) {
     if (ld && ld.parentNode) { ld.classList.remove('fm-ld-out'); ld.querySelector('.fm-ld-t').textContent = text; return ld; }
