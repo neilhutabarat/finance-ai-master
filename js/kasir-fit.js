@@ -26,7 +26,7 @@
     C + '>#tx-qty2-wrap{grid-column:span 2!important}' +
     C + '>div:has(>#tx-amount){grid-column:span 2!important}' +
     C + '>div:has(>#tx-desc){grid-column:span 3!important}' +
-    C + '>div:has(>#pay-method){grid-column:span 2!important}' +
+    C + '>div:has(>#pay-method){grid-column:1/-1!important}' +
     C + ' #tx-cat-badge{margin-top:2px!important;padding:1px 6px!important;font-size:10px!important;border-radius:8px!important}' +
     C + ' #tx-qty-wrap>.flex:first-child,' + C + ' #tx-qty2-wrap>label{margin-bottom:1px!important}' +
     C + ' #tx-qty-wrap button[onclick^="changeQty"],' + C + ' #tx-qty2-wrap button[onclick^="changeQty2"]{width:26px!important;height:26px!important;font-size:15px!important;border-radius:9px!important;padding:0!important;flex:none!important}' +
@@ -54,7 +54,8 @@
     /* kolom kiri sempit -> 4 kolom berpasangan, tidak ada yang bertabrakan */
     '@container kform (max-width:700px){' +
       C + '{grid-template-columns:repeat(4,minmax(0,1fr))!important}' +
-      C + '>div:has(>#tx-account),' + C + '>#tx-qty-wrap,' + C + '>#tx-qty2-wrap,' + C + '>div:has(>#tx-amount),' + C + '>div:has(>#tx-desc),' + C + '>div:has(>#pay-method),' + C + '>div:has(>#tx-staff){grid-column:span 2!important}' +
+      C + '>div:has(>#tx-account),' + C + '>#tx-qty-wrap,' + C + '>#tx-qty2-wrap,' + C + '>div:has(>#tx-amount),' + C + '>div:has(>#tx-desc),' + C + '>div:has(>#tx-staff){grid-column:span 2!important}' +
+      C + '>div:has(>#pay-method){grid-column:1/-1!important}' +
       C + ' #product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}' +
     '}' +
 

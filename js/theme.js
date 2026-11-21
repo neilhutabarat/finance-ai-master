@@ -2,12 +2,16 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.2';
-  var BETA = 'v1.1.2';
+  var APP_VERSION = '1.1.3';
+  var BETA = 'v1.1.3';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.1.3', '22 Nov 2026', [
+      '[Perbaikan] Formulir Kasir kini terbentang penuh tanpa ruang kosong di kanan bawah, serta opsi Bank tidak lagi menduplikasi pilihan QRIS dan Petty Cash',
+      '[Keamanan] Pencatatan metode bayar tetap terhubung rapi ke akun COA masing-masing'
+    ]],
     ['v1.1.2', '22 Nov 2026', [
       '[Perbaikan] Tampilan pop-up Piutang & Utang serta Bantuan diseragamkan menjadi kartu putih bersih dan tajam seperti Mutasi Kas Sah dan Stok',
       '[Keamanan] Kontras dan keterbacaan seluruh pop-up tetap terjaga di mode terang maupun gelap'
