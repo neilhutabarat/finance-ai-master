@@ -683,6 +683,7 @@
 
             const selectedKey = resolveTenantKey(picker);
             onTenantPickerChange(selectedKey);
+            if (!paramToko && lockedInput) lockedInput.value = '';
 
             setupEasterEgg();
             refreshSecState();
