@@ -90,7 +90,7 @@
     /* tombol melayang Absen / Stok / Piutang */
     o += '.fm-fab{border-radius:999px!important;font-weight:800!important;font-size:12.5px!important;padding:0 16px!important;height:38px!important;line-height:36px!important;cursor:pointer;background:rgba(255,255,255,.88)!important;border:1px solid rgba(255,255,255,.9)!important;box-shadow:0 6px 16px -6px rgba(15,23,42,.35)!important}';
     o += '.fm-fab[data-fc="piu"]{color:#2f55d4!important}.fm-fab[data-fc="stk"]{color:#047857!important}.fm-fab[data-fc="abs"]{color:#0e7490!important}';
-    o += '#fm-help-fab{right:46px!important;bottom:60px!important;background:rgba(255,255,255,.85)!important;color:#1e293b!important;border:1px solid rgba(255,255,255,.9)!important;box-shadow:0 6px 16px -6px rgba(15,23,42,.35)!important}';
+    o += '#fm-help-fab{right:108px!important;bottom:14px!important;width:38px!important;height:38px!important;background:rgba(255,255,255,.92)!important;color:#1e293b!important;border:1px solid rgba(15,23,42,.15)!important;box-shadow:0 6px 16px -6px rgba(15,23,42,.35)!important}';
     o += 'html[data-fm-invert="1"] .fm-act,html[data-fm-invert="1"] .fm-fab,html[data-fm-invert="1"] #fm-help-fab{filter:invert(1) hue-rotate(180deg)}';
     /* Manager/Owner: isi halaman berhenti di atas dock (tidak tertimpa), bagian tengah mengecil bila layar pendek */
     o += 'html[data-fm-page="manager"] main,html[data-fm-page="owner"] main{padding-bottom:96px!important;box-sizing:border-box!important}';

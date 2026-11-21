@@ -326,10 +326,10 @@
         </div>
 
         <!-- GRID 2 KOLOM: FORM INPUT TRANSAKSI (KIRI) + DRAFT ANTREAN & DATA SAH (KANAN) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
 
             <!-- FORMULIR INPUT TRANSAKSI (5 Kolom di PC) -->
-            <section class="lg:col-span-5 white-ice-glass-card p-5 sm:p-6 space-y-4">
+            <section class="lg:col-span-5 white-ice-glass-card p-5 sm:p-6 flex flex-col gap-4">
                 <div class="border-b border-slate-200/80 pb-3 flex justify-between items-center relative z-10">
                     <div>
                         <h2 id="form-title" class="text-base font-extrabold text-slate-900 flex items-center space-x-2">
@@ -375,7 +375,7 @@
                 <input type="hidden" id="edit-draft-id" value="">
 
                 <!-- PILIHAN AKUN MUTASI (COA + PRODUK SINKRON OTOMATIS) -->
-                <div class="space-y-3.5 relative z-10">
+                <div class="flex-1 flex flex-col gap-3.5 relative z-10">
                     <!-- SCAN BARCODE (fitur per toko, diatur dari Tower Kontrol) -->
                     <div id="barcode-block" class="hidden">
                         <label class="text-xs font-black text-slate-700 block mb-1">Scan Barcode Produk <span id="bc-ready" class="ml-1 text-[10px] font-bold text-slate-400">• scanner siap</span></label>
@@ -467,27 +467,31 @@
                         <input type="text" id="tx-staff" placeholder="Nama petugas" class="w-full glass-input rounded-2xl p-3 text-xs font-bold outline-none">
                     </div>
 
-                    <div>
-                        <label class="text-[10px] text-slate-500 block font-bold mb-1">Metode Bayar / Terima</label>
-                        <select id="pay-method" onchange="onPayMethodChange()" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold bg-white text-slate-800">
-                            <option value="tunai">Tunai</option>
-                            <option value="bank">Bank</option>
-                        </select>
-                        <div id="pay-bank-extra" class="hidden mt-2 space-y-1.5 w-full">
-                            <select id="pay-sub" onchange="onPayMethodChange()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold bg-white text-slate-800">
-                                <option value="qris">QRIS</option>
-                                <option value="transfer">Transfer</option>
+                    <div class="mt-auto pt-2 space-y-3">
+                        <div>
+                            <label class="text-[10px] text-slate-500 block font-bold mb-1">Metode Bayar / Terima</label>
+                            <select id="pay-method" onchange="onPayMethodChange()" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold bg-white text-slate-800">
+                                <option value="tunai">Tunai</option>
                                 <option value="petty">Petty Cash</option>
+                                <option value="qris">QRIS</option>
+                                <option value="bank">Bank</option>
                             </select>
-                            <select id="pay-bank-acc" class="hidden w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold bg-white text-slate-800"></select>
-                            <p id="pay-bank-warn" class="hidden text-[10px] leading-snug text-amber-600 font-bold">Belum ada akun bank di COA. Transaksi tetap tercatat, tapi belum terhubung ke bank manapun — tambahkan akun bank di Kelola Akun (COA).</p>
+                            <div id="pay-bank-extra" class="hidden mt-2 space-y-1.5 w-full">
+                                <select id="pay-sub" onchange="onPayMethodChange()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold bg-white text-slate-800">
+                                    <option value="transfer">Transfer</option>
+                                    <option value="qris">QRIS</option>
+                                    <option value="petty">Petty Cash</option>
+                                </select>
+                                <select id="pay-bank-acc" class="hidden w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold bg-white text-slate-800"></select>
+                                <p id="pay-bank-warn" class="hidden text-[10px] leading-snug text-amber-600 font-bold">Belum ada akun bank di COA. Transaksi tetap tercatat, tapi belum terhubung ke bank manapun — tambahkan akun bank di Kelola Akun (COA).</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <button id="btn-save-draft" onclick="saveToDraftKasir()" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border-2 border-blue-200 font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-sm flex items-center justify-center space-x-2 transition active:scale-98">
-                        <i data-lucide="shopping-cart" class="w-4 h-4"></i>
-                        <span id="btn-save-text">Simpan ke Antrean Draft</span>
-                    </button>
+                        <button id="btn-save-draft" onclick="saveToDraftKasir()" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border-2 border-blue-200 font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-sm flex items-center justify-center space-x-2 transition active:scale-98">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                            <span id="btn-save-text">Simpan ke Antrean Draft</span>
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -536,8 +540,8 @@
                     </div>
                 </div>
 
-                <!-- MENU TOMBOL POP-UP RINGKAS (dipindah ke dock bawah) -->
-                <div class="hidden grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                <!-- MENU TOMBOL POP-UP RINGKAS (dipindah ke dock bawah, tetap terdeteksi dock) -->
+                <div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                     <button onclick="openModal('mutasi')" class="p-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-left transition active:scale-95 shadow-md">
                         <i data-lucide="arrow-left-right" class="w-4 h-4 text-cyan-400 mb-1"></i>
                         <h4 class="font-black text-xs">Mutasi Sah</h4>
@@ -1311,13 +1315,15 @@
         let lastReceipt = null;
         function currentPay() {
             const el = document.getElementById('pay-method');
-            if (!el || el.value !== 'bank') return 'tunai';
+            const v = el ? el.value : 'tunai';
+            if (v === 'tunai' || v === 'petty' || v === 'qris') return v;
             const sub = document.getElementById('pay-sub');
-            return sub ? sub.value : 'qris';
+            return sub ? sub.value : 'transfer';
         }
         function currentBankAcc() {
             const el = document.getElementById('pay-method');
-            if (!el || el.value !== 'bank') return null;
+            const v = el ? el.value : 'tunai';
+            if (v !== 'bank' && v !== 'petty' && v !== 'qris') return null;
             const sel = document.getElementById('pay-bank-acc');
             if (!sel || sel.classList.contains('hidden') || !sel.value) return null;
             const coa = (typeof STORE !== 'undefined' && STORE.getCOA) ? STORE.getCOA() : [];
@@ -1326,8 +1332,9 @@
         function fillBankAccOptions() {
             const sel = document.getElementById('pay-bank-acc'), warn = document.getElementById('pay-bank-warn');
             if (!sel) return;
+            const pm = (document.getElementById('pay-method') || {}).value;
             const sub = (document.getElementById('pay-sub') || {}).value;
-            const isPetty = sub === 'petty';
+            const isPetty = pm === 'petty' || (pm === 'bank' && sub === 'petty');
             const wantCat = isPetty ? 'petty' : 'bank';
             const accs = ((typeof STORE !== 'undefined' && STORE.getCOA) ? STORE.getCOA() : []).filter(c => c.category === wantCat);
             if (!accs.length) {
@@ -1349,8 +1356,11 @@
         function onPayMethodChange() {
             const v = (document.getElementById('pay-method') || {}).value;
             const extra = document.getElementById('pay-bank-extra');
-            if (extra) extra.classList.toggle('hidden', v !== 'bank');
-            if (v === 'bank') fillBankAccOptions();
+            const sub = document.getElementById('pay-sub');
+            const needExtra = (v === 'bank' || v === 'petty' || v === 'qris');
+            if (extra) extra.classList.toggle('hidden', !needExtra);
+            if (sub) sub.classList.toggle('hidden', v !== 'bank');
+            if (needExtra) fillBankAccOptions();
         }
 
         function resetDraftForm() {

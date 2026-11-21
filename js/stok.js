@@ -41,16 +41,16 @@
 
   var css = document.createElement('style');
   css.textContent =
-    '#fm-stok{position:fixed;inset:0;z-index:2147482000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.4);font-family:Inter,system-ui,sans-serif}' +
+    '#fm-stok{position:fixed;inset:0;z-index:2147482000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.45);font-family:"Plus Jakarta Sans",Inter,system-ui,sans-serif}' +
     'html[data-fm-invert="1"] #fm-stok{filter:invert(1) hue-rotate(180deg)}' +
-    '#fm-stok .sk-box{width:min(820px,100%);max-height:92vh;display:flex;flex-direction:column;border-radius:22px;background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.7);box-shadow:0 24px 60px rgba(15,23,42,.35);color:#0f172a;overflow:hidden}' +
-    '#fm-stok .sk-h{display:flex;align-items:center;gap:10px;padding:16px 20px 6px}#fm-stok .sk-h h3{margin:0;font-size:17px;font-weight:800;flex:1}' +
-    '#fm-stok .sk-x{all:unset;cursor:pointer;width:32px;height:32px;border-radius:99px;background:rgba(148,163,184,.25);text-align:center;line-height:32px;font-size:15px}' +
-    '#fm-stok .sk-tabs{display:flex;gap:8px;padding:6px 20px 10px;flex-wrap:wrap}' +
-    '#fm-stok .sk-chip{all:unset;cursor:pointer;padding:7px 14px;border-radius:99px;font-size:12.5px;font-weight:700;background:rgba(148,163,184,.22);color:#334155}#fm-stok .sk-chip.on{background:#2f55d4;color:#fff}' +
-    '#fm-stok .sk-body{overflow:auto;padding:0 20px 8px;flex:1;min-height:140px}' +
+    '#fm-stok .sk-box{width:min(820px,100%);max-height:92vh;display:flex;flex-direction:column;border-radius:22px;background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 24px 60px rgba(15,23,42,.28);color:#0f172a;overflow:hidden}' +
+    '#fm-stok .sk-h{display:flex;align-items:center;gap:10px;padding:16px 20px 10px;border-bottom:1px solid #f1f5f9}#fm-stok .sk-h h3{margin:0;font-size:17px;font-weight:800;color:#0f172a;flex:1}' +
+    '#fm-stok .sk-x{all:unset;cursor:pointer;width:32px;height:32px;border-radius:99px;background:#f1f5f9;color:#334155;text-align:center;line-height:32px;font-size:15px}' +
+    '#fm-stok .sk-tabs{display:flex;gap:8px;padding:10px 20px;flex-wrap:wrap}' +
+    '#fm-stok .sk-chip{all:unset;cursor:pointer;padding:7px 14px;border-radius:99px;font-size:12.5px;font-weight:700;background:#f1f5f9;color:#334155}#fm-stok .sk-chip.on{background:#2563eb;color:#fff}' +
+    '#fm-stok .sk-body{overflow:auto;padding:0 20px 8px;flex:1;min-height:140px;color:#0f172a}' +
     '#fm-stok label{display:block;font-size:11.5px;font-weight:800;color:#334155;margin:0 0 4px}' +
-    '#fm-stok input,#fm-stok select{box-sizing:border-box;width:100%;border:1px solid rgba(71,85,105,.3);background:rgba(255,255,255,.9);border-radius:12px;padding:9px 12px;font:600 13px Inter,system-ui,sans-serif;color:#0f172a;outline:none}#fm-stok input:focus,#fm-stok select:focus{border-color:#2f55d4}' +
+    '#fm-stok input,#fm-stok select{box-sizing:border-box;width:100%;border:1px solid #cbd5e1;background:#f8fafc;border-radius:12px;padding:9px 12px;font:600 13px "Plus Jakarta Sans",Inter,system-ui,sans-serif;color:#0f172a;outline:none}#fm-stok input:focus,#fm-stok select:focus{border-color:#2563eb;background:#fff}' +
     '#fm-stok .sk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px}' +
     '#fm-stok .sk-go{all:unset;cursor:pointer;display:inline-block;padding:10px 18px;border-radius:12px;background:#2f55d4;color:#fff;font-size:13px;font-weight:800;text-align:center}#fm-stok .sk-go:active{transform:scale(.97)}' +
     '#fm-stok .sk-del{all:unset;cursor:pointer;padding:6px 10px;border-radius:10px;background:rgba(225,29,72,.12);color:#be123c;font-size:12px;font-weight:800}' +

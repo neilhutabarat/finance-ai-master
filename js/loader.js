@@ -101,7 +101,7 @@
     var chain = Promise.resolve();
     chain = chain.then(function () { return (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) ? navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }) : null; }).catch(function () {});
     chain = chain.then(function () { return window.caches ? caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }) : null; }).catch(function () {});
-    chain = chain.then(function () { try { localStorage.removeItem('fm_rollout_cfg_v1'); sessionStorage.removeItem('fm_rollout_redirect_count'); } catch (e) {} step(0.1, 'Mengunduh versi terbaru'); });
+    chain = chain.then(function () { try { localStorage.removeItem('fm_rollout_cfg_v1'); localStorage.removeItem('fm_ld_ver'); sessionStorage.removeItem('fm_rollout_redirect_count'); } catch (e) {} step(0.1, 'Mengunduh versi terbaru'); });
     chain = chain.then(function () {
       var list = urls(), n = 0, i = 0, total = list.length;
       function worker() {
