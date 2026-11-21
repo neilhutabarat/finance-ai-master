@@ -58,8 +58,14 @@
   function check() {
     if (done) return;
     if (ld && !window.__fmUpdating) { var s0 = ld.querySelector('.fm-ld-s'), vt = verText(); if (s0 && vt && s0.textContent !== vt) s0.textContent = vt; }
-    var ready = root.classList.contains('fm-ready') || (document.readyState === 'complete' && Date.now() - t0 > 1500);
-    if (document.readyState === 'complete' && ready) { setTimeout(finish, 120); return; }
+    var elapsed = Date.now() - t0;
+    var isTowerDesk = /provider/.test(location.pathname) && window.innerWidth >= 1024;
+    var isAppPage = /kasir|manager|dashboard/.test(location.pathname);
+    var uiReady = isTowerDesk ? (root.hasAttribute('data-tw-ck') || elapsed > 3800)
+      : isAppPage ? (!!document.getElementById('fm-rail') || elapsed > 2200)
+      : true;
+    var ready = (root.classList.contains('fm-ready') && uiReady) || (document.readyState === 'complete' && elapsed > 3800);
+    if (document.readyState === 'complete' && ready) { setTimeout(finish, 80); return; }
     setTimeout(check, 60);
   }
   check();
