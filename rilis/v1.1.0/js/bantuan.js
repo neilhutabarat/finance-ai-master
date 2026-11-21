@@ -52,20 +52,20 @@
   }
   function badge() { var b = document.getElementById('fm-help-fab'), n = unread(); if (!b) return; var d = b.querySelector('i'); if (d) d.style.display = n ? 'block' : 'none'; }
 
-  var S = 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
-  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:13px;outline:none';
-  var btn = 'padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font-size:12px;font-weight:700;cursor:pointer';
-  var green = ';background:#22c55e;color:#04210f;border-color:#22c55e';
-  function lab(t, el) { return '<div style="margin-top:10px"><label style="display:block;font-size:11.5px;font-weight:700;margin:0 0 4px;opacity:.8">' + t + '</label>' + el + '</div>'; }
-  var ST = { BARU: ['Menunggu', '#fbbf24'], DIJAWAB: ['Sudah dijawab', '#4ade80'], SELESAI: ['Selesai', '#94a3b8'] };
+  var S = 'font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
+  var inp = 'width:100%;box-sizing:border-box;padding:9px 12px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:13px;font-weight:600;outline:none';
+  var btn = 'padding:7px 14px;border-radius:999px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer';
+  var green = ';background:#2563eb;color:#ffffff;border-color:#2563eb';
+  function lab(t, el) { return '<div style="margin-top:10px"><label style="display:block;font-size:11.5px;font-weight:700;color:#334155;margin:0 0 4px">' + t + '</label>' + el + '</div>'; }
+  var ST = { BARU: ['Menunggu', '#d97706'], DIJAWAB: ['Sudah dijawab', '#059669'], SELESAI: ['Selesai', '#64748b'] };
   function viewPanduan() {
     var ql = q.trim().toLowerCase(), L = topics().filter(function (t) { return !ql || (t[2] + ' ' + t[3].join(' ')).toLowerCase().indexOf(ql) >= 0; });
     var h = '<input id="hp-q" value="' + esc(q) + '" placeholder="Cari bantuan, mis. stok, diskon, absen" style="' + inp + ';margin:12px 0">';
-    if (!L.length) return h + '<p style="opacity:.7;font-size:13px;text-align:center;padding:14px">Tidak ketemu. Coba kata lain, atau tanyakan ke tim lewat tab Tanya Tim.</p>';
+    if (!L.length) return h + '<p style="color:#64748b;font-size:13px;text-align:center;padding:14px">Tidak ketemu. Coba kata lain, atau tanyakan ke tim lewat tab Tanya Tim.</p>';
     return h + L.map(function (t, i) {
       var o = openIdx === i || !!ql;
-      return '<div style="border-top:1px solid rgba(255,255,255,.08)"><button data-op="' + i + '" style="all:unset;display:flex;justify-content:space-between;width:100%;box-sizing:border-box;padding:11px 2px;cursor:pointer;font-weight:700;font-size:13px"><span>' + esc(t[2]) + '</span><span style="opacity:.5">' + (o ? '−' : '+') + '</span></button>' +
-        (o ? '<ol style="margin:0 0 12px;padding-left:20px;font-size:12.5px;line-height:1.55;opacity:.9">' + t[3].map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ol>' : '') + '</div>';
+      return '<div style="border-top:1px solid #e2e8f0"><button data-op="' + i + '" style="all:unset;display:flex;justify-content:space-between;width:100%;box-sizing:border-box;padding:11px 2px;cursor:pointer;font-weight:700;font-size:13px;color:#0f172a"><span>' + esc(t[2]) + '</span><span style="color:#64748b">' + (o ? '−' : '+') + '</span></button>' +
+        (o ? '<ol style="margin:0 0 12px;padding-left:20px;font-size:12.5px;line-height:1.55;color:#334155">' + t[3].map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ol>' : '') + '</div>';
     }).join('');
   }
   function viewTanya() {
@@ -85,10 +85,11 @@
     if (!ov || ov.style.display === 'none') return;
     var keep = document.activeElement && document.activeElement.id, selS = 0;
     var sub = (document.getElementById('hp-sub') || {}).value, msg = (document.getElementById('hp-msg') || {}).value;
-    var h = '<div style="width:100%;max-width:560px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
-      '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Bantuan</div><div style="font-size:12px;opacity:.65">Panduan singkat dan tanya langsung ke tim.</div></div><button data-x style="' + btn + '">Tutup</button></div>' +
+    var inv = document.documentElement.getAttribute('data-fm-invert') === '1' ? 'filter:invert(1) hue-rotate(180deg);' : '';
+    var h = '<div style="width:100%;max-width:560px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28);padding:20px;' + inv + '">' +
+      '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Bantuan</div><div style="font-size:12px;color:#64748b">Panduan singkat dan tanya langsung ke tim.</div></div><button data-x style="' + btn + '">Tutup</button></div>' +
       '<div style="display:flex;gap:6px;margin-top:12px"><button data-tab="panduan" style="' + btn + (tab === 'panduan' ? green : '') + '">Panduan</button><button data-tab="tanya" style="' + btn + (tab === 'tanya' ? green : '') + '">Tanya Tim' + (unread() ? ' •' : '') + '</button></div>' +
-      (note ? '<p style="margin:10px 0 0;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.14);color:#86efac;font-size:12px">' + esc(note) + '</p>' : '') + (tab === 'panduan' ? viewPanduan() : viewTanya()) + '</div>';
+      (note ? '<p style="margin:10px 0 0;padding:10px 12px;border-radius:12px;background:#ecfdf5;color:#047857;font-size:12px;font-weight:600">' + esc(note) + '</p>' : '') + (tab === 'panduan' ? viewPanduan() : viewTanya()) + '</div>';
     ov.innerHTML = h;
     if (tab === 'tanya') { var a = document.getElementById('hp-sub'), b = document.getElementById('hp-msg'); if (a && sub) a.value = sub; if (b && msg) b.value = msg; }
     if (keep) { var el = document.getElementById(keep); if (el && el.focus) { try { el.focus(); if (el.setSelectionRange && el.value) el.setSelectionRange(el.value.length, el.value.length); } catch (e) {} } }
@@ -105,7 +106,7 @@
   function ensure() {
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-help';
-    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482700;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px;' + S;
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482700;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:14px;' + S;
     ov.addEventListener('click', function (e) {
       if (e.target === ov || e.target.hasAttribute('data-x')) { ov.style.display = 'none'; return; }
       var t = e.target.closest('[data-tab]'); if (t) { tab = t.getAttribute('data-tab'); note = ''; if (tab === 'tanya') { try { localStorage.setItem(seenKey(), String(Date.now())); } catch (x) {} badge(); } return render(); }

@@ -78,14 +78,14 @@
     [].forEach.call(document.querySelectorAll('[data-piu-badge]'), function (b) { b.textContent = n ? ' · ' + n + ' jatuh tempo' : ''; });
   }
 
-  var S = 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
-  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:13px;outline:none';
-  var btn = 'padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font-size:12px;font-weight:700;cursor:pointer';
-  var green = ';background:#22c55e;color:#04210f;border-color:#22c55e';
+  var S = 'font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
+  var inp = 'width:100%;box-sizing:border-box;padding:9px 12px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:13px;font-weight:600;outline:none';
+  var btn = 'padding:7px 14px;border-radius:999px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer';
+  var green = ';background:#2563eb;color:#ffffff;border-color:#2563eb';
   function ensure() {
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-piu';
-    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px;' + S;
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:14px;' + S;
     ov.addEventListener('click', function (e) {
       if (e.target === ov || e.target.hasAttribute('data-x')) { ov.style.display = 'none'; return; }
       var b = e.target.closest('[data-a]'); if (b) act(b.getAttribute('data-a'), b.getAttribute('data-id'));
@@ -93,10 +93,11 @@
     ov.addEventListener('input', function (e) { if (e.target.hasAttribute('data-money')) { var d = num(e.target.value); e.target.value = d ? new Intl.NumberFormat('id-ID').format(d) : ''; } });
     document.body.appendChild(ov);
   }
-  function lab(t, el) { return '<div><label style="display:block;font-size:11.5px;font-weight:700;margin:0 0 4px;opacity:.8">' + t + '</label>' + el + '</div>'; }
+  function lab(t, el) { return '<div><label style="display:block;font-size:11.5px;font-weight:700;color:#334155;margin:0 0 4px">' + t + '</label>' + el + '</div>'; }
   function field(id, t, v, extra) { return lab(t, '<input id="' + id + '" value="' + esc(v == null ? '' : v) + '" style="' + inp + '" ' + (extra || '') + '>'); }
   function shell(inner) {
-    return '<div style="width:100%;max-width:880px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' + inner + '</div>';
+    var inv = document.documentElement.getAttribute('data-fm-invert') === '1' ? 'filter:invert(1) hue-rotate(180deg);' : '';
+    return '<div style="width:100%;max-width:880px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28);padding:20px;' + inv + '">' + inner + '</div>';
   }
   function head(sub) { return '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div><div style="font-weight:800;font-size:17px">Piutang &amp; Utang</div><div style="font-size:12px;opacity:.65">' + sub + '</div></div><button data-x style="' + btn + '">Tutup</button></div>'; }
 
