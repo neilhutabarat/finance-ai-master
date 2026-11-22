@@ -72,8 +72,8 @@
   }
   function warnings(c, day) {
     var w = [];
-    if (!NL.start && txs().length) w.push('Tanggal mulai belum diisi di menu Neraca, jadi semua transaksi lama ikut dihitung.');
-    if (!NL.kasAwal && !NL.modalAwal) w.push('Saldo awal Kas dan Modal belum diisi di menu Neraca.');
+    if (!NL.start && txs().length) w.push('Tanggal mulai belum diisi di Saldo Awal Neraca AI, jadi semua transaksi lama ikut dihitung.');
+    if (!NL.kasAwal && !NL.modalAwal) w.push('Saldo awal Kas dan Modal belum diisi di Saldo Awal Neraca AI.');
     else if (Math.round(NL.kasAwal) !== Math.round(NL.modalAwal)) w.push('Saldo awal tidak sama: Kas awal ' + rp(NL.kasAwal) + ', Modal awal ' + rp(NL.modalAwal) + '. Selisihnya ikut menjadi selisih neraca.');
     if (c.t.kas < 0) w.push('Kas bernilai minus (' + rp(c.t.kas) + '). Periksa saldo awal Kas atau pengeluaran yang salah input.');
     if (c.t.bank < 0) w.push('Bank bernilai minus (' + rp(c.t.bank) + '). Ada pengeluaran QRIS atau transfer tanpa pemasukan.');
@@ -100,12 +100,12 @@
     var ed = canEdit(), c = calc(asof), w = warnings(c, asof), tk = tn(), nama = (tk && (tk.nama || tk.name)) || 'Toko', m = ym(asof);
     var locked = D.lock && m <= D.lock, seimbang = c.selisih === 0;
     var h = '<div style="width:100%;max-width:760px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
-      '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Neraca AI <span style="font-size:10.5px;padding:2px 8px;border-radius:99px;background:rgba(245,158,11,.18);color:#fbbf24;vertical-align:middle">uji coba</span></div><div style="font-size:12px;opacity:.65">Disusun otomatis dari data yang sudah diinput admin. Semua usaha digabung.' + (ed ? '' : ' Tampilan baca saja.') + '</div></div><button data-x style="' + btn + ';align-self:flex-start">Tutup</button></div>';
+      '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Neraca AI</div><div style="font-size:12px;opacity:.65">Disusun otomatis dari data yang sudah diinput admin. Semua usaha digabung.' + (ed ? '' : ' Tampilan baca saja.') + '</div></div><button data-x style="' + btn + ';align-self:flex-start">Tutup</button></div>';
     if (note) h += box(noteCls, note);
     h += '<div style="display:flex;gap:8px;align-items:end;margin:12px 0;flex-wrap:wrap"><div style="flex:1;min-width:170px">' + lab('Per tanggal', '<input id="na-asof" type="date" value="' + esc(asof) + '" style="' + inp + '">') + '</div>' +
       '<button data-a="copy" style="' + btn + '">Salin teks</button>' +
       (ed ? '<button data-a="lock" ' + ((locked || !seimbang) ? 'disabled style="opacity:.4;cursor:not-allowed;' : 'style="') + btn + green + '">' + (locked ? 'Periode terkunci' : 'Kunci periode ' + esc(m)) + '</button>' : '') + '</div>';
-    h += box(seimbang ? 'ok' : 'err', seimbang ? 'Neraca seimbang.' : 'Neraca belum seimbang: selisih ' + rp(c.selisih) + '. Selisih ini tidak ditutup otomatis. Periksa saldo awal dan akun di menu Neraca.');
+    h += box(seimbang ? 'ok' : 'err', seimbang ? 'Neraca seimbang.' : 'Neraca belum seimbang: selisih ' + rp(c.selisih) + '. Selisih ini tidak ditutup otomatis. Periksa saldo awal di bawah.');
     w.forEach(function (x) { h += box('warn', x); });
     h += '<div style="text-align:center;margin:14px 0 4px"><div style="font-weight:800;font-size:15px">NERACA</div><div style="font-size:12.5px;opacity:.85">' + esc(nama) + '</div><div style="font-size:12px;opacity:.65">Per ' + esc(tglPanjang(asof)) + '</div></div>';
     h += head('ASET') + sub('Aset Lancar') + line('Kas', rp(c.t.kas), { ind: 10 }) + line('Bank (QRIS dan transfer)', rp(c.t.bank), { ind: 10 });
@@ -124,7 +124,15 @@
       line('JUMLAH EKUITAS', rp(c.ek), { b: 1 });
     h += line('JUMLAH LIABILITAS DAN EKUITAS', rp(c.liab + c.ek), { b: 1 });
     if (!seimbang) h += line('Selisih belum terjelaskan', rp(c.selisih), { b: 1, c: '#fca5a5' });
-    h += '<div style="font-size:11px;opacity:.55;margin-top:12px">Sumber: ' + c.t.n + ' transaksi Kasir sejak ' + esc(NL.start ? tglPanjang(NL.start) : 'awal') + ', saldo awal dan akun tambahan dari menu Neraca' + (has('piutang') ? ', modul Piutang dan Utang' : '') + (has('stok') ? ', nilai stok (stok x HPP)' : '') + '.</div>';
+    h += '<div style="font-size:11px;opacity:.55;margin-top:12px">Sumber: ' + c.t.n + ' transaksi Kasir sejak ' + esc(NL.start ? tglPanjang(NL.start) : 'awal') + ', saldo awal dan akun tambahan' + (has('piutang') ? ', modul Piutang dan Utang' : '') + (has('stok') ? ', nilai stok (stok x HPP)' : '') + '.</div>';
+    if (ed) {
+      h += '<details style="margin-top:14px;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 12px"><summary style="cursor:pointer;font-weight:800;font-size:12.5px">Atur Saldo Awal</summary>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:10px">' +
+        lab('Tanggal mulai pencatatan', '<input id="na-start" type="date" value="' + esc(NL.start) + '" style="' + inp + '">') +
+        lab('Kas &amp; rekening saat mulai (Rp)', '<input id="na-kas" type="number" min="0" value="' + (NL.kasAwal || '') + '" style="' + inp + '">') +
+        lab('Modal awal pemilik (Rp)', '<input id="na-mod" type="number" min="0" value="' + (NL.modalAwal || '') + '" style="' + inp + '">') +
+        '</div><div style="margin-top:10px"><button data-a="saveopen" style="' + btn + green + '">Simpan saldo awal</button></div></details>';
+    }
     ov.innerHTML = h + '</div>';
   }
   function textOut() {
@@ -142,7 +150,14 @@
   async function act(a) {
     note = ''; noteCls = 'ok';
     if (a === 'copy') { try { await navigator.clipboard.writeText(textOut()); note = 'Neraca disalin, tinggal ditempel ke WhatsApp atau catatan.'; } catch (e) { note = 'Gagal menyalin.'; noteCls = 'err'; } render(); }
-    else if (a === 'lock') {
+    else if (a === 'saveopen') {
+      var gv = function (id) { var e = document.getElementById(id); return e ? e.value : ''; };
+      NL.start = gv('na-start'); NL.kasAwal = Math.max(0, Number(gv('na-kas')) || 0); NL.modalAwal = Math.max(0, Number(gv('na-mod')) || 0);
+      var obj = { start: NL.start, kasAwal: NL.kasAwal, modalAwal: NL.modalAwal, items: NL.items || [] };
+      if (hasDb()) db.collection('tenant_settings').doc(tid()).set({ neraca: obj, updatedAt: Date.now() }, { merge: true }).catch(function () {});
+      else try { localStorage.setItem('fm_neraca_' + tid(), JSON.stringify(obj)); } catch (e) {}
+      note = 'Saldo awal disimpan.'; render();
+    } else if (a === 'lock') {
       var m = ym(asof), c = calc(asof); if (c.selisih !== 0) return;
       if (await (window.fmAsk ? fmAsk('Kunci periode sampai ' + m + '? Bila nanti ada transaksi di bulan itu berubah, akan muncul peringatan.') : confirm('Kunci periode sampai ' + m + '?'))) {
         var f = fromTx(endOfMonth(m)); D.lock = m; D.snap = { kas: Math.round(f.kas), bank: Math.round(f.bank), laba: Math.round(f.laba), prive: Math.round(f.prive), tx: f.n };

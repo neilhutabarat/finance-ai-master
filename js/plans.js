@@ -27,8 +27,7 @@
     { key: 'arus_kas', label: 'Arus Kas: uang masuk dan keluar per bulan, minggu, dan cara bayar', r: { manager: 'o', owner: 'o' } },
     { key: 'anggaran', label: 'Anggaran Bulanan: batas pengeluaran per akun dan target pemasukan', r: { manager: 'o', owner: 'o' } },
     { key: 'rekon', label: 'Rekonsiliasi Kas: cocokkan uang tunai di laci dengan catatan', r: { manager: 'o', owner: 'o' } },
-    { key: 'neraca', label: 'Neraca: harta, utang, dan modal toko (Paket Plus)', r: { manager: 'o', owner: 'o' } },
-    { key: 'neraca_ai', label: 'Neraca AI (uji coba): neraca dari transaksi, kunci periode', r: { manager: 'o', owner: 'o' } },
+    { key: 'neraca_ai', label: 'Neraca AI: neraca dari transaksi, kunci periode', r: { manager: 'o', owner: 'o' } },
     { key: 'penjelasan', label: 'Penjelasan Laporan Keuangan: angka laporan dijelaskan dengan kalimat sederhana', r: { manager: 'o', owner: 'o' } },
     { key: 'perubahan_modal', label: 'Perubahan Modal: modal awal sampai modal akhir', r: { manager: 'o', owner: 'o' } },
     { key: 'penyusutan', label: 'Penyusutan Aset Tetap: daftar aset dan nilai buku', r: { manager: 'o', owner: 'o' } },
@@ -47,8 +46,7 @@
     { key: 'banyak_usaha', label: 'Banyak Usaha (mis. Jahit, Karung, Kelontong)', r: { manager: 'o', owner: 'o' } },
     { key: 'stok_admin', label: 'Stok untuk Admin: lihat stok usaha sendiri (tombol Stok di Kasir)', r: { kasir: 'o' } },
     { key: 'stok_scan', label: 'Scan Stok Masuk: Admin scan barcode untuk menambah stok, tercatat nama dan waktunya', r: { kasir: 'o' } },
-    { key: 'properti', label: 'Modul Properti: unit sewa, penyewa, tagihan bulanan, dan pengingat WhatsApp', r: { manager: 'o', owner: 'o' } },
-    { key: 'bahasa', label: 'Banyak Bahasa: tombol ID | EN untuk mengganti tampilan ke English', r: { kasir: 'o', manager: 'o', owner: 'o' } },
+    { key: 'bahasa', label: 'Banyak Bahasa: pilihan Indonesia, English, dan Bahasa Melayu', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'stok_closing', label: 'Stok & Closing: isi sisa stok dan Closing Mingguan', r: { manager: 'o', owner: 'o' } },
     { key: 'bukti', label: 'Foto Bukti Struk (Kamera / Berkas)', r: { kasir: 'o' } },
     { key: 'wa_receipt', label: 'Kirim Struk lewat WhatsApp', r: { kasir: 'o' } },
@@ -89,7 +87,7 @@
     return p === 'kasir.html' ? 'kasir' : p === 'manager.html' ? 'manager' : p === 'dashboard.html' ? 'owner' : 'kasir';
   }
   /* Default per paket: Basic = hanya fitur inti (merah). Plus = fitur tambahan berikut sudah tercentang (hijau, boleh dicabut). */
-  var PLUS_KEYS = ['neraca', 'dashboard', 'analisa', 'audit', 'export_csv', 'ledger', 'stok', 'stok_input:manager', 'stok_closing:manager', 'gaji', 'mutasi_wa', 'wa_receipt', 'bukti'];
+  var PLUS_KEYS = ['neraca_ai', 'dashboard', 'analisa', 'audit', 'export_csv', 'ledger', 'stok', 'stok_input:manager', 'stok_closing:manager', 'gaji', 'mutasi_wa', 'wa_receipt', 'bukti'];
 
   /* ===== Paket Basic/Plus/Pro (dirakit Tower, isinya kosong sampai diisi manual) =====
      Disimpan di app_meta/paket_catalog = { json } (dibaca klien tanpa login, seperti wallpaper/rollout/store_catalog).
@@ -125,7 +123,7 @@
   }
   var ALWAYS_ON = ['wallpaper', 'theme']; /* tampilan dasar: menyala di semua paket */
   /* Penanda tingkat untuk tampilan Tower: PLUS = fitur premium (pantas bayar), sisanya BASIC. Hanya label + urutan, tidak mengubah hak akses. */
-  var PLUS_FEATURES = ['import_tx', 'barcode', 'stok_scan', 'banyak_usaha', 'admin_usaha', 'properti', 'dashboard', 'analisa', 'audit', 'export_csv', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'backup', 'laporan_bulanan', 'gaji', 'gaji_auto', 'ledger', 'instruksi', 'billing_card'];
+  var PLUS_FEATURES = ['import_tx', 'barcode', 'stok_scan', 'banyak_usaha', 'admin_usaha', 'dashboard', 'analisa', 'audit', 'export_csv', 'arus_kas', 'anggaran', 'rekon', 'neraca_ai', 'pajak_bulanan', 'backup', 'laporan_bulanan', 'gaji', 'gaji_auto', 'ledger', 'instruksi', 'billing_card'];
   function featTier(f) { return PLUS_FEATURES.indexOf(f.key) >= 0 ? 'plus' : 'basic'; }
   var _lockCol = false; /* tampilkan kolom gembok (hanya di layar ubah fitur toko) */
   /* Oneilverse 2: isi pulau kiri/kanan, diatur per toko dari Control Tower (semua menyala bawaan) */
@@ -204,9 +202,8 @@
     { id: 'struk', name: 'Struk & Bukti', grp: 'Transaksi', price: 10000, d: 'Kirim struk lewat WhatsApp dan foto bukti', keys: ['wa_receipt', 'bukti'] },
     { id: 'ppn', name: 'PPN 12%', grp: 'Transaksi', price: 10000, d: 'Hitung pajak langsung di nota', keys: ['tax'] },
     { id: 'piutang', name: 'Piutang & Utang', grp: 'Keuangan', price: 20000, d: 'DP, bayar sebagian, jatuh tempo, daftar pelanggan dan pemasok', keys: ['piutang'] },
-    { id: 'neraca', name: 'Neraca', grp: 'Keuangan', price: 10000, d: 'Harta, utang, dan modal toko', keys: ['neraca'] },
     { id: 'kontrol', name: 'Kontrol Keuangan', grp: 'Keuangan', price: 20000, d: 'Arus kas, anggaran bulanan, rekonsiliasi kas', keys: ['arus_kas', 'anggaran', 'rekon'] },
-    { id: 'neraca_ai', name: 'Neraca AI', grp: 'Keuangan', price: 15000, perm: 750000, d: 'Neraca otomatis dari transaksi, bisa dikunci per periode (uji coba)', keys: ['neraca_ai'] },
+    { id: 'neraca_ai', name: 'Neraca AI', grp: 'Keuangan', price: 15000, perm: 750000, d: 'Neraca otomatis dari transaksi, bisa dikunci per periode', keys: ['neraca_ai'] },
     { id: 'analisa', name: 'Analisa Keuangan', grp: 'Keuangan', price: 20000, perm: 1000000, d: 'Temuan, saran, margin, dan titik impas dari transaksi toko', keys: ['analisa'] },
     { id: 'grafik', name: 'Grafik Keuangan', grp: 'Keuangan', price: 15000, perm: 750000, d: 'Grafik penjualan, laba, kas, beban, aset dan liabilitas', keys: ['grafik'] },
     { id: 'penjelasan', name: 'Penjelasan Laporan Keuangan', grp: 'Keuangan', price: 15000, perm: 750000, d: 'Angka laporan dijelaskan dengan kalimat sederhana, bisa disalin', keys: ['penjelasan'] },
@@ -218,15 +215,13 @@
     { id: 'lapbul', name: 'Laporan Bulanan', grp: 'Laporan', price: 10000, d: 'Ringkasan tiap bulan untuk Owner, kirim lewat WhatsApp', keys: ['laporan_bulanan'] },
     { id: 'backup', name: 'Backup & Ekspor', grp: 'Laporan', price: 10000, d: 'Unduh data toko ke Excel dan arsip', keys: ['backup'] },
     { id: 'absensi', name: 'Absensi', grp: 'Operasional', price: 15000, d: 'Catat masuk dan pulang, rekap kehadiran bulanan', keys: ['absensi'] },
-    { id: 'properti', name: 'Properti & Kost', grp: 'Operasional', price: 30000, d: 'Unit sewa, penyewa, tagihan bulanan, pengingat WhatsApp', keys: ['properti'] },
     { id: 'usaha', name: 'Banyak Usaha', grp: 'Toko & Akun', price: 20000, d: 'Beberapa usaha dalam satu toko', keys: ['banyak_usaha'] },
     { id: 'admin', name: 'Admin Tambahan', grp: 'Toko & Akun', price: 10000, d: 'Banyak akun Admin dengan PIN sendiri-sendiri', keys: ['admin_usaha'] },
     { id: 'instruksi', name: 'Instruksi & Pengawasan', grp: 'Toko & Akun', price: 10000, d: 'Manager mengawasi dan memberi instruksi ke Admin', keys: ['instruksi'] }
   ];
   var SPACKS = [
     { id: 'pk_laundry', name: 'Paket Laundry', price: 39000, items: ['piutang', 'struk', 'lapbul', 'backup'] },
-    { id: 'pk_kos', name: 'Paket Kos & Kontrakan', price: 55000, items: ['properti', 'piutang', 'lapbul', 'backup'] },
-    { id: 'pk_klinik', name: 'Paket Klinik & Jasa', price: 59000, items: ['piutang', 'neraca', 'pajak', 'lapbul', 'backup', 'absensi'] },
+    { id: 'pk_klinik', name: 'Paket Klinik & Jasa', price: 59000, items: ['piutang', 'neraca_ai', 'pajak', 'lapbul', 'backup', 'absensi'] },
     { id: 'pk_konveksi', name: 'Paket Konveksi', price: 69000, items: ['stok', 'satuan', 'piutang', 'usaha', 'lapbul', 'backup'] },
     { id: 'pk_minimarket', name: 'Paket Minimarket', price: 79000, items: ['stok', 'barcode', 'satuan', 'diskon', 'struk', 'ppn', 'pajak', 'absensi'] }
   ];
@@ -361,9 +356,9 @@
   var CATS = [
     { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
     { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'stok_habis'] },
-    { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
+    { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
     { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup', 'import_tx'] },
-    { id: 'ops', label: 'Operasional', keys: ['absensi', 'properti', 'offline_penuh'] },
+    { id: 'ops', label: 'Operasional', keys: ['absensi', 'offline_penuh'] },
     { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'billing_card', 'chat'] },
     { id: 'akun', label: 'Toko & Akun (Beli Khusus / Add-on per Toko)', addon: true, keys: ['admin_usaha', 'banyak_usaha', 'instruksi'] },
     { id: 'on2', label: 'Oneilverse 2 · Kartu, Denyut & AI (Belum Rilis)', on2: true, keys: ['ai_asisten', 'card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'denyut', 'tutup_hari'] },
@@ -373,7 +368,7 @@
 
   /* Penempatan fitur untuk tampilan Tower (hanya label + pengelompokan, tidak mengubah hak akses):
      INTI = terkunci merah; TAMBAHAN = fitur standar yang diberikan; STORE = layak disewa satuan di OneilStore. */
-  var STORE_KEYS = ['wa_receipt', 'bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'analisa', 'grafik', 'penjelasan', 'perubahan_modal', 'penyusutan', 'stok_habis', 'harian_wa', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi', 'properti'];
+  var STORE_KEYS = ['wa_receipt', 'bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca_ai', 'analisa', 'grafik', 'penjelasan', 'perubahan_modal', 'penyusutan', 'stok_habis', 'harian_wa', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi'];
   function isStore(f) { return STORE_KEYS.indexOf(f.key) >= 0; }
   function isCore(f) { return Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); }
   function catOf(f) { for (var i = 0; i < CATS.length; i++) if (CATS[i].keys.indexOf(f.key) >= 0) return CATS[i].id; return 'lain'; }
@@ -464,15 +459,15 @@
     plus: { label: 'Paket Plus', keys: PLUS_KEYS },
     warung: { label: 'Warung / Kafe', keys: ['laporan_bulanan', 'backup', 'stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'clock'] },
     toko: { label: 'Toko Retail', keys: ['laporan_bulanan', 'backup', 'stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
-    properti: { label: 'Properti / Kost / Sewa', keys: ['properti', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca', 'arus_kas', 'anggaran', 'rekon', 'piutang', 'gaji', 'ledger', 'coa', 'dashboard', 'bukti', 'wa_receipt', 'mutasi_wa', 'export_csv', 'audit'] },
-    jasa: { label: 'Jasa / Klinik', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca', 'arus_kas', 'anggaran', 'rekon',  'piutang','stok', 'stok_input:manager', 'stok_closing:manager', 'ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
+    properti: { label: 'Properti / Kost / Sewa', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'piutang', 'gaji', 'ledger', 'coa', 'dashboard', 'bukti', 'wa_receipt', 'mutasi_wa', 'export_csv', 'audit'] },
+    jasa: { label: 'Jasa / Klinik', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon',  'piutang','stok', 'stok_input:manager', 'stok_closing:manager', 'ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
     umum: { label: 'Usaha Umum', keys: ['laporan_bulanan', 'backup', 'ledger', 'coa', 'dashboard', 'mutasi_wa', 'export_csv', 'clock', 'bukti'] },
-    minimarket: { label: 'Minimarket', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca', 'arus_kas', 'anggaran', 'rekon', 'diskon', 'satuan_ganda', 'barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'tax', 'dashboard', 'analisa', 'audit', 'export_csv', 'gaji', 'gaji_auto', 'instruksi', 'clock'] },
-    konveksi: { label: 'Konveksi / Jahit', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca', 'arus_kas', 'anggaran', 'rekon', 'satuan_ganda', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'banyak_usaha', 'gaji', 'gaji_auto', 'ledger', 'coa', 'dashboard', 'analisa', 'audit', 'export_csv', 'mutasi_wa', 'bukti', 'instruksi'] },
-    kafe: { label: 'Kafe & Resto', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca', 'arus_kas', 'anggaran', 'rekon', 'diskon', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'dashboard', 'tax', 'gaji', 'clock', 'ledger'] },
+    minimarket: { label: 'Minimarket', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'diskon', 'satuan_ganda', 'barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'tax', 'dashboard', 'analisa', 'audit', 'export_csv', 'gaji', 'gaji_auto', 'instruksi', 'clock'] },
+    konveksi: { label: 'Konveksi / Jahit', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'satuan_ganda', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'banyak_usaha', 'gaji', 'gaji_auto', 'ledger', 'coa', 'dashboard', 'analisa', 'audit', 'export_csv', 'mutasi_wa', 'bukti', 'instruksi'] },
+    kafe: { label: 'Kafe & Resto', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'diskon', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'dashboard', 'tax', 'gaji', 'clock', 'ledger'] },
     laundry: { label: 'Laundry', keys: ['jual_produk', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'stok', 'stok_input:manager', 'ledger', 'gaji', 'wa_receipt', 'mutasi_wa', 'bukti', 'dashboard', 'export_csv'] },
     salon: { label: 'Salon & Barbershop', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'diskon', 'jual_produk', 'stok', 'stok_input:manager', 'gaji', 'gaji_auto', 'wa_receipt', 'dashboard', 'mutasi_wa', 'ledger'] },
-    bengkel: { label: 'Bengkel', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca', 'arus_kas', 'anggaran', 'rekon', 'barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'gaji', 'wa_receipt', 'ledger', 'coa', 'dashboard', 'bukti', 'mutasi_wa', 'export_csv'] },
+    bengkel: { label: 'Bengkel', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'gaji', 'wa_receipt', 'ledger', 'coa', 'dashboard', 'bukti', 'mutasi_wa', 'export_csv'] },
     lengkap: { label: 'Lengkap', keys: null }
   };
   /* paket buatan sendiri (disimpan di browser Tower dan, bila ada, di provider_settings/plan_presets) */
@@ -593,9 +588,7 @@
     if (!has('laporan_bulanan', role)) dropOrLock('button[onclick*="FM_LAPBUL"]', 'laporan_bulanan', role);
     if (!has('backup', role)) dropOrLock('button[onclick*="FM_BACKUP"]', 'backup', role);
     if (!has('absensi', role)) dropOrLock('button[onclick*="FM_ABS"]', 'absensi', role);
-    if (!has('properti', role)) dropOrLock('button[onclick*="FM_PROP"]', 'properti', role);
     if (!has('pajak_bulanan', role)) dropOrLock('button[onclick*="FM_PAJAK"]', 'pajak_bulanan', role);
-    if (!has('neraca', role)) dropOrLock('button[onclick*="FM_NERACA."]', 'neraca', role);
     if (!has('neraca_ai', role)) dropOrLock('button[onclick*="FM_NAI"]', 'neraca_ai', role);
     if (!has('grafik', role)) dropOrLock('button[onclick*="FM_GRAFIK"]', 'grafik', role);
     if (!has('penjelasan', role)) dropOrLock('button[onclick*="FM_PENJ"]', 'penjelasan', role);

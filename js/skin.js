@@ -665,10 +665,11 @@
     if (custom && custom.length) {
       tiles = []; 
     } else if (!tiles.length) return;
-    var items = custom && custom.length ? custom.map(function (c) { return { label: c.label, icon: c.icon, fn: function () { new Function(c.run)(); } }; }) : tiles.map(function (b) {
+    var items = custom && custom.length ? custom.map(function (c) { return { id: c.id || (c.label || '').toLowerCase(), label: c.label, icon: c.icon, fn: function () { new Function(c.run)(); } }; }) : tiles.map(function (b) {
       var m = /openModal\('([^']+)'/.exec(b.getAttribute('onclick') || '');
-      var map = MAP[m ? m[1] : ''] || [(b.querySelector('h4').textContent || '').trim(), 'grid'];
-      return { label: map[0], icon: map[1], el: b };
+      var key = m ? m[1] : '';
+      var map = MAP[key] || [(b.querySelector('h4').textContent || '').trim(), 'grid'];
+      return { id: key || map[0].toLowerCase(), label: map[0], icon: map[1], el: b };
     });
     tiles.forEach(function (b) {
       b.classList.add('fm-tile');
@@ -678,27 +679,28 @@
     var wide = window.innerWidth >= 480;
     var tail = [];
     var storeBtn = document.querySelector('script[src*="oneilstore.js"]') || window.FM_OSTORE;
-    var storeItem = storeBtn ? { label: 'Store', icon: 'store', fn: function () { if (window.FM_OSTORE) FM_OSTORE.open(); } } : null;
+    var storeItem = storeBtn ? { id: 'store', label: 'Store', icon: 'store', fn: function () { if (window.FM_OSTORE) FM_OSTORE.open(); } } : null;
     /* OneilStore selalu tampil di dock; tombol Tema pindah ke Pengaturan agar muat */
     if (storeItem) document.documentElement.setAttribute('data-fm-theme-in-set', '1');
-    if (!storeItem && window.FM_THEME && FM_THEME.toggle) tail.push({ label: 'Tema', icon: 'spark', fn: function () { FM_THEME.toggle(); } });
-    tail.push({ label: 'Pengaturan', icon: 'gear', fn: function () { var g = document.getElementById('fm-gear'); if (g) g.click(); }, settings: true });
-    if (findLogout()) tail.push({ label: 'Keluar', icon: 'out', fn: window.FM_LOGOUT, danger: true });
+    if (!storeItem && window.FM_THEME && FM_THEME.toggle) tail.push({ id: 'tema', label: 'Tema', icon: 'spark', fn: function () { FM_THEME.toggle(); } });
+    tail.push({ id: 'pengaturan', label: 'Pengaturan', icon: 'gear', fn: function () { var g = document.getElementById('fm-gear'); if (g) g.click(); }, settings: true });
+    if (findLogout()) tail.push({ id: 'keluar', label: 'Keluar', icon: 'out', fn: window.FM_LOGOUT, danger: true });
     var maxShown = wide ? 9 : 5;
     var shown = items, extra = [];
-    var devItem = (storeItem && window.FM_DEVMODE && FM_DEVMODE.canSwitch()) ? { label: FM_DEVMODE.inFrame ? 'Desktop' : 'Ponsel', icon: FM_DEVMODE.inFrame ? 'desk' : 'phone', fn: function () { FM_DEVMODE.toggle(); } } : null;
+    var devItem = (storeItem && window.FM_DEVMODE && FM_DEVMODE.canSwitch()) ? { id: FM_DEVMODE.inFrame ? 'desktop' : 'ponsel', label: FM_DEVMODE.inFrame ? 'Desktop' : 'Ponsel', icon: FM_DEVMODE.inFrame ? 'desk' : 'phone', fn: function () { FM_DEVMODE.toggle(); } } : null;
     var pin = (storeItem ? 1 : 0) + (devItem ? 1 : 0);
     if (items.length + pin + tail.length > maxShown) { var keep = maxShown - tail.length - 1 - pin; shown = items.slice(0, keep); extra = items.slice(keep); }
     if (storeItem) shown = shown.concat(devItem ? [storeItem, devItem] : [storeItem]);
     function act(it) { return function () { if (it.fn) it.fn(); else it.el.click(); }; }
     function btn(it) {
       var b = document.createElement('button'); b.className = 'fm-dk' + (it.danger ? ' danger' : ''); b.type = 'button';
+      if (it.id) b.setAttribute('data-dk-id', it.id);
       b.innerHTML = svg(it.icon) + '<span>' + esc(it.label) + '</span>'; b.onclick = act(it); return b;
     }
     var dock = document.createElement('div'); dock.id = 'fm-dock'; dock.setAttribute('role', 'toolbar');
     shown.forEach(function (it) { dock.appendChild(btn(it)); });
     if (extra.length) {
-      var mb = document.createElement('button'); mb.className = 'fm-dk'; mb.type = 'button'; mb.innerHTML = svg('more') + '<span>Lainnya</span>';
+      var mb = document.createElement('button'); mb.className = 'fm-dk'; mb.type = 'button'; mb.setAttribute('data-dk-id', 'lainnya'); mb.innerHTML = svg('more') + '<span>Lainnya</span>';
       mb.onclick = function () { showMore(extra, act); }; dock.appendChild(mb);
     }
     var sp = document.createElement('div'); sp.className = 'fm-sep'; dock.appendChild(sp);

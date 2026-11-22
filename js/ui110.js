@@ -293,17 +293,20 @@
       dock.classList.add('fm-hid'); sembunyi.push(dock);
 
       function teks(b) { var q = b.querySelector('span'); return ((q ? q.textContent : b.textContent) || '').trim(); }
+      function dkId(b) { return (b && b.getAttribute && b.getAttribute('data-dk-id')) || ''; }
+      function trTxt(s) { try { return (window.FM_I18N && FM_I18N.active && FM_I18N.active() && FM_I18N.tr) ? FM_I18N.tr(s) : s; } catch (e) { return s; } }
       function logoEl() { var lg = document.createElement('span'); lg.className = 'fm-lg'; lg.innerHTML = LOGO; return lg; }
-      var EKOR = /^(pengaturan|keluar|store|lainnya|desktop|ponsel)$/i;
+      var EKOR = /^(pengaturan|settings|tetapan|keluar|sign out|log keluar|store|kedai|lainnya|more|lagi|desktop|ponsel|mobile|telefon)$/i;
+      var EKOR_ID = /^(pengaturan|keluar|store|lainnya|desktop|ponsel)$/;
       var kiri1 = null, kiri2 = null, kanan1 = null, kanan2 = null, sidik = '';
 
       function kumpulkan() {
         var dkk = [].slice.call(dock.querySelectorAll('.fm-dk'));
         var tema = null, ekor = [], hal = [];
         dkk.forEach(function (x) {
-          var t = teks(x);
-          if (/^tema$/i.test(t)) { tema = x; return; }
-          (EKOR.test(t) ? ekor : hal).push(x);
+          var id = dkId(x), t = teks(x);
+          if (id === 'tema' || /^tema|theme$/i.test(t)) { tema = x; return; }
+          (EKOR_ID.test(id) || EKOR.test(t) ? ekor : hal).push(x);
         });
         var L = [], R = [];
         var chat = document.getElementById('fmc-tab');
@@ -333,13 +336,13 @@
         }
         if (piu) {
           [].forEach.call(document.querySelectorAll('#fm-actions .fm-act'), function (a) {
-            if (/piutang/i.test(a.textContent || '')) a.style.display = 'none';
+            if (/piutang|receivable|penghutang/i.test(a.textContent || '')) a.style.display = 'none';
           });
         }
         var isi = hal.filter(function (x) { return naik.indexOf(x) < 0; }).concat(ekor);
         return {
           L: L.slice(0, 3), R: R.slice(0, 3), isi: isi,
-          sidik: dkk.map(teks).join('|') + '#' + [chat, abs, stk, piu].map(function (x) { return x ? 1 : 0; }).join('')
+          sidik: dkk.map(function (x) { return dkId(x) || teks(x); }).join('|') + '#' + [chat, abs, stk, piu].map(function (x) { return x ? 1 : 0; }).join('') + '#' + (window.FM_I18N && FM_I18N.lang ? FM_I18N.lang() : 'id')
         };
       }
 
@@ -375,7 +378,7 @@
 
         function sat(x, kls) {
           var b = document.createElement('button'); b.type = 'button';
-          b.className = 'fm-s2 ' + kls; b.innerHTML = sv(x.ik) + x.nama;
+          b.className = 'fm-s2 ' + kls; b.innerHTML = sv(x.ik) + '<span>' + trTxt(x.nama) + '</span>';
           if (x.tema) b.setAttribute('data-tema', '1');
           b.addEventListener('click', function () {
             if (x.tema) {
@@ -427,7 +430,7 @@
       window.addEventListener('fm:gelap', function () {
         try {
           var t = rail.querySelector('.fm-s2[data-tema]');
-          if (t) t.innerHTML = sv(gelapAktif() ? IC.tema : IC.gelap) + 'Tema';
+          if (t) t.innerHTML = sv(gelapAktif() ? IC.tema : IC.gelap) + '<span>' + trTxt('Tema') + '</span>';
         } catch (e) {}
       });
       function cekTutup() {

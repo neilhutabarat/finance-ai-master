@@ -2,13 +2,14 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.18';
-  var BETA = 'v1.1.18';
+  var APP_VERSION = '1.1.19';
+  var BETA = 'v1.1.19';
   /* Catatan rilis ringkas per versi utama (v1.0, v1.1, v1.2, dst). Terbaru di atas. */
   var RELEASE_NOTES = [
     ['v1.1', '22 Nov 2026', [
       '[Baru] Tampilan One UI lebih bersih dengan mode terang dan mode gelap pekat di Kasir, Manager, Owner, dan Partner',
       '[Baru] Dock bawah bergaya pulau yang simetris serta sistem Paket Basic, Plus, dan Pro dengan lencana khusus',
+      '[Baru] Fitur Banyak Bahasa lengkap (Indonesia, English, dan Bahasa Melayu) termasuk terjemahan otomatis daftar akun COA serta posisi dock yang konsisten',
       '[Baru] Fitur Impor Akun (COA) dan Impor Riwayat Transaksi dari file Excel / CSV (khusus Plus ke atas)',
       '[Perbaikan] Penyeragaman seluruh jendela pop-up, formulir Kasir penuh, serta tombol Perbarui Aplikasi hanya muncul saat ada pembaruan',
       '[Keamanan] Perlindungan halaman dari clickjacking serta penerapan hak akses paket dan peran secara konsisten'
@@ -279,7 +280,7 @@
       '<button class="fm-mode ' + (ctMode() === 'terang' ? 'on' : '') + '" data-ctm="terang"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#f3efe0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (ctMode() === 'gelap' ? 'on' : '') + '" data-ctm="gelap"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#0b1220,#1e293b)"></div>Gelap</button></div></div>';
     if (ROLE === 'tower') { var _tg = parseInt(localStorage.getItem('fm_glass_tw'), 10) || 4; h += '<div class="fm-sec"><div class="fm-lab">Kaca Control Tower (1 buram, 8 bening)</div><div class="fm-modes">' + [1,2,3,4,5,6,8,7].sort().map(function (n) { return '<button class="fm-mode ' + (_tg === n ? 'on' : '') + '" data-twg="' + n + '">' + n + '</button>'; }).join('') + '</div></div>'; }
-    if (window.FM_I18N && FM_I18N.has && FM_I18N.has()) { var _ln = FM_I18N.lang(); h += '<div class="fm-sec"><div class="fm-lab">Bahasa / Language</div><div class="fm-modes"><button class="fm-mode ' + (_ln === 'id' ? 'on' : '') + '" data-lang="id">Indonesia</button><button class="fm-mode ' + (_ln === 'en' ? 'on' : '') + '" data-lang="en">English</button></div></div>'; }
+    if (window.FM_I18N && FM_I18N.has && FM_I18N.has()) { var _ln = FM_I18N.lang(); h += '<div class="fm-sec"><div class="fm-lab">Bahasa / Language</div><div class="fm-modes"><button class="fm-mode ' + (_ln === 'id' ? 'on' : '') + '" data-lang="id">Indonesia</button><button class="fm-mode ' + (_ln === 'en' ? 'on' : '') + '" data-lang="en">English</button><button class="fm-mode ' + (_ln === 'my' ? 'on' : '') + '" data-lang="my">Melayu</button></div></div>'; }
     if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur Toko</button></div>';
     if (window.FM_SHIELD) h += '<div class="fm-sec"><button class="fm-btn" data-shield style="width:100%;padding:13px">🛡️ Oneil Shield v' + FM_SHIELD.ver + ' — Keamanan</button></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>' + BETA + '</b></div></div>';

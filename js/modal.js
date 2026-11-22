@@ -7,16 +7,16 @@
   var per = 'bulan', note = '', last = null;
   function build() {
     var P = L.period(per), nai = window.FM_NAI, rp = L.rp;
-    if (!nai || !nai._nl) return { err: 'Modul Neraca belum dimuat. Muat ulang halaman.', P: P };
+    if (!nai || !nai._nl) return { err: 'Modul Neraca AI belum dimuat. Muat ulang halaman.', P: P };
     try { nai._start && nai._start(); } catch (e) {}
     var nl = nai._nl(), st = nl.start || '', warn = [];
-    if (!st) warn.push('Tanggal mulai belum diisi di menu Neraca, jadi semua transaksi lama dihitung dari awal.');
+    if (!st) warn.push('Tanggal mulai belum diisi di Saldo Awal Neraca AI, jadi semua transaksi lama dihitung dari awal.');
     if (st && st > P.b) return { P: P, before: true, st: st };
     var inc = !st || st >= P.a, effA = st ? (st > P.a ? st : P.a) : '0000-00-00', awal, tambah = 0;
     if (inc) { awal = nl.modalAwal || 0; tambah = (nl.items || []).filter(function (i) { return i.type === 'modal'; }).reduce(function (s, i) { return s + (Number(i.amount) || 0); }, 0); }
     else awal = nai._calc(L.addDays(P.a, -1)).ek;
     var c = L.sum(effA, P.b, true), akhir = awal + tambah + c.laba - c.prive, chk = nai._calc(P.b).ek, beda = Math.round(akhir - chk);
-    if (!(nl.modalAwal || tambah) && inc) warn.push('Modal awal belum diisi di menu Neraca.');
+    if (!(nl.modalAwal || tambah) && inc) warn.push('Modal awal belum diisi di Saldo Awal Neraca AI.');
     var rows = [['Modal awal periode', awal, ''], ['Tambahan modal', tambah, '+'], ['Laba bersih periode', c.laba, '+'], ['Prive (pengambilan pribadi)', -c.prive, '-']];
     var text = 'LAPORAN PERUBAHAN MODAL\n' + P.label + '\n\n' + rows.map(function (r) { return r[0] + ': ' + rp(r[1]); }).join('\n') + '\nModal akhir periode: ' + rp(akhir) + '\n\n' + (beda === 0 ? 'Sama dengan ekuitas di Neraca AI.' : 'Berbeda ' + rp(beda) + ' dari ekuitas di Neraca AI.');
     return { P: P, rows: rows, akhir: akhir, beda: beda, warn: warn, text: text, inc: inc, effA: effA };
