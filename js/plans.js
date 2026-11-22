@@ -629,12 +629,23 @@
       m.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482500;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:14px;font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif';
       var useDarkBase = document.documentElement.getAttribute('data-fm-native') === 'dark';
       var inv = useDarkBase ? 'filter:invert(1) hue-rotate(180deg);' : '';
-      m.innerHTML = '<div style="width:100%;max-width:560px;max-height:90vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28);padding:20px;' + inv + '"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding-bottom:10px;border-bottom:1px solid #e2e8f0"><div><div style="font-size:18px;font-weight:800">Fitur toko ini</div><div data-sum style="font-size:12px;color:#64748b;margin-top:2px"></div></div><button data-x type="button" style="border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;border-radius:99px;width:32px;height:32px;cursor:pointer;font-weight:700">✕</button></div><div data-body style="margin-top:8px"></div></div>';
+      m.innerHTML = '<div style="width:100%;max-width:560px;max-height:90vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28);padding:20px;' + inv + '"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding-bottom:10px;border-bottom:1px solid #e2e8f0"><div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px;font-weight:800">Fitur toko ini</span><span data-tier style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;letter-spacing:.05em"></span></div><div data-sum style="font-size:12px;color:#64748b;margin-top:3px"></div></div><button data-x type="button" style="border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;border-radius:99px;width:32px;height:32px;cursor:pointer;font-weight:700">✕</button></div><div data-body style="margin-top:8px"></div></div>';
       m.addEventListener('click', function (e) { if (e.target === m || e.target.hasAttribute('data-x')) m.style.display = 'none'; });
       document.body.appendChild(m);
     }
-    var list = activeList();
-    m.querySelector('[data-sum]').textContent = list.length + ' fitur aktif di mode ' + RLABEL[pageRole()] + '. Untuk menambah fitur, hubungi penyedia aplikasi.';
+    var tn = (typeof getActiveTenant === 'function') ? getActiveTenant() : null;
+    var tier = String(tierOf(tn) || 'basic').toLowerCase();
+    var tierUp = tier.toUpperCase();
+    var tb = m.querySelector('[data-tier]');
+    if (tb) {
+      tb.textContent = tierUp;
+      tb.style.cssText = 'font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;letter-spacing:.05em;' +
+        (tier === 'pro' ? 'background:#17140c;color:#e5b95c;border:1px solid rgba(205,167,92,.45)'
+          : tier === 'plus' ? 'background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe'
+          : 'background:#f1f5f9;color:#334155;border:1px solid #cbd5e1');
+    }
+    var list = activeList().filter(function (f) { return !/^Oneilverse 2\s*·/i.test(f.label || '') && !/^sat_|^pk[rn]/.test(f.key || ''); });
+    m.querySelector('[data-sum]').textContent = 'Paket ' + tierUp + ' · ' + list.length + ' fitur aktif di mode ' + RLABEL[pageRole()] + '.';
     m.querySelector('[data-body]').innerHTML = list.map(function (f) { return '<div style="padding:9px 4px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#0f172a"><span style="color:#059669;font-weight:800;margin-right:6px">✓</span><b>' + f.label + '</b></div>'; }).join('');
     m.style.display = 'flex';
   }
