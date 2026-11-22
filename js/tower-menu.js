@@ -5,61 +5,61 @@
   if (!/provider/.test(location.pathname)) return;
 
   var DEFAULT_GROUPS = [
-    { id: 'klien', title: '1. Toko & Klien', hint: 'Buka toko baru, profil, akun & lokasi live', c: '#2563eb', items: [
+    { id: 'klien', title: '1. Toko & Klien', hint: 'Toko baru, profil, akun & lokasi', c: '#2563eb', items: [
       { key: 'klien_baru', t: 'Tambah Toko Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko & jenis usaha' },
-      { key: 'profil_toko', t: 'Profil & Logo Toko', ic: 'store', run: "towerPick('profil')", d: 'Ubah nama, slogan, warna, logo' },
-      { key: 'coa_toko', t: 'Daftar Akun (COA) Toko', ic: 'list', run: "towerPick('coa')", d: 'Atur akun pemasukan/pengeluaran' },
-      { key: 'stok_katalog', t: 'Template Katalog & Stok', ic: 'box', run: "FM_LAB.open('template')", d: 'Salin katalog awal ke toko baru' },
+      { key: 'profil_toko', t: 'Profil & Logo', ic: 'store', run: "towerPick('profil')", d: 'Ubah nama, slogan, warna, logo' },
+      { key: 'coa_toko', t: 'Daftar Akun (COA)', ic: 'list', run: "towerPick('coa')", d: 'Atur akun pemasukan/keluar' },
+      { key: 'stok_katalog', t: 'Template Katalog', ic: 'box', run: "FM_LAB.open('template')", d: 'Salin katalog awal ke toko baru' },
       { key: 'link_toko', t: 'Salin Link Login', ic: 'send', run: "towerPick('link')", d: 'Bagikan link masuk ke klien' },
       { key: 'akun_login', t: 'PIN & Akun Login', ic: 'key', find: 'Akun Login', d: 'Cek PIN Admin, Manager, Owner' },
-      { key: 'lokasi_aktivitas', t: 'Lokasi & Aktivitas Live', ic: 'shield', run: "towerPick('lokasi')", d: 'Pantau GPS & transaksi toko' },
-      { key: 'permohonan_kasir', t: 'Permohonan Kasir Baru', ic: 'users', run: "openModal('tickets')", badge: 'stat-pending-tickets', d: 'Setujui/tolak perangkat kasir' }
+      { key: 'lokasi_aktivitas', t: 'Lokasi & Aktivitas', ic: 'shield', run: "towerPick('lokasi')", d: 'Pantau GPS & transaksi toko' },
+      { key: 'permohonan_kasir', t: 'Permohonan Kasir', ic: 'users', run: "openModal('tickets')", badge: 'stat-pending-tickets', d: 'Setujui/tolak perangkat kasir' }
     ] },
-    { id: 'bangun', title: '2. Fitur, Kuota & Status', hint: 'Atur hak akses, batas terminal & bekukan toko', c: '#0d9488', items: [
-      { key: 'fitur_toko', t: 'Atur Fitur per Toko', ic: 'grid', run: "towerPick('fitur')", d: 'Centang fitur Admin/Manager/Owner' },
-      { key: 'salin_fitur', t: 'Salin Fitur Toko Lain', ic: 'grid', run: "towerPick('salin')", d: 'Tiru susunan fitur toko lain' },
-      { key: 'kuota_terminal', t: 'Batas Jumlah Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Atur jatah Kasir, Manager, Owner' },
-      { key: 'bekukan_aktifkan', t: 'Bekukan / Aktifkan Toko', ic: 'moon', run: "towerPick('freeze')", d: 'Hentikan sementara akses toko' },
-      { key: 'kendali_massal', t: 'Aksi Massal Banyak Toko', ic: 'users', run: "towerMass()", d: 'Bekukan/kirim pesan sekaligus' },
+    { id: 'bangun', title: '2. Fitur, Kuota & Status', hint: 'Hak akses, terminal & status toko', c: '#0d9488', items: [
+      { key: 'fitur_toko', t: 'Atur Fitur Toko', ic: 'grid', run: "towerPick('fitur')", d: 'Centang fitur Admin/Manager/Owner' },
+      { key: 'salin_fitur', t: 'Salin Fitur Toko', ic: 'grid', run: "towerPick('salin')", d: 'Tiru susunan fitur toko lain' },
+      { key: 'kuota_terminal', t: 'Batas Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Jatah Kasir, Manager, Owner' },
+      { key: 'bekukan_aktifkan', t: 'Bekukan / Aktifkan', ic: 'moon', run: "towerPick('freeze')", d: 'Hentikan sementara akses toko' },
+      { key: 'kendali_massal', t: 'Aksi Massal Toko', ic: 'users', run: "towerMass()", d: 'Bekukan/kirim pesan sekaligus' },
       { key: 'toko_berhenti', t: 'Arsip Toko Berhenti', ic: 'archive', find: 'Toko Berhenti', d: 'Daftar toko yang nonaktif' },
-      { key: 'hapus_pulihkan', t: 'Hapus / Pulihkan Toko', ic: 'trash', run: "towerPick('hapus')", d: 'Hapus klien atau kembalikan' }
+      { key: 'hapus_pulihkan', t: 'Hapus / Pulihkan', ic: 'trash', run: "towerPick('hapus')", d: 'Hapus klien atau kembalikan' }
     ] },
-    { id: 'layanan', title: '3. Paket, Tagihan & Store', hint: 'Langganan Basic/Plus/Pro, tagihan & sewa fitur', c: '#ea580c', items: [
+    { id: 'layanan', title: '3. Paket, Tagihan & Store', hint: 'Langganan, tagihan & sewa fitur', c: '#ea580c', items: [
       { key: 'paket_billing', t: 'Ubah Paket Toko', ic: 'tag', run: "towerPick('paket')", d: 'Setel Basic, Plus, Pro & durasi' },
       { key: 'isi_paket_fitur', t: 'Isi Paket Plus & Pro', ic: 'list', run: "openModal('paket_fitur')", d: 'Atur daftar fitur bawaan paket' },
       { key: 'billing_toko', t: 'Tagihan per Toko', ic: 'chart', run: "towerPick('billing')", d: 'Biaya & pembayaran satu toko' },
       { key: 'billing_jaringan', t: 'Tagihan Semua Toko', ic: 'chart', find: 'Billing Jaringan', d: 'Rekap tagihan & jatuh tempo' },
-      { key: 'pengingat_jatuh_tempo', t: 'Pengingat Jatuh Tempo', ic: 'bell', run: "towerDue()", d: 'Cek toko yang hampir habis masa' },
-      { key: 'store', t: 'OneilStore (Sewa Fitur)', ic: 'tag', run: "FM_TSTORE.open()", d: 'Atur harga & sewa fitur satuan' },
+      { key: 'pengingat_jatuh_tempo', t: 'Pengingat Tempo', ic: 'bell', run: "towerDue()", d: 'Cek toko yang hampir habis masa' },
+      { key: 'store', t: 'OneilStore', ic: 'tag', run: "FM_TSTORE.open()", d: 'Atur harga & sewa fitur satuan' },
       { key: 'demo_toko', t: 'Atur Toko Demo', ic: 'moon', run: "FM_TSTORE.openDemo()", d: 'Ubah jadi toko demo atau asli' }
     ] },
-    { id: 'pantau', title: '4. Pantau, Error & Kas Tower', hint: 'Bantuan klien, error sistem & kas internal', c: '#6366f1', items: [
-      { key: 'tiket_bantuan', t: 'Tiket Bantuan Klien', ic: 'bell', run: "FM_HELPDESK.open()", d: 'Balas pertanyaan dari toko' },
-      { key: 'pemantauan_error', t: 'Laporan Error Aplikasi', ic: 'bell', run: "FM_MON.open('error')", d: 'Lacak error dari perangkat toko' },
-      { key: 'log_login', t: 'Riwayat Login Perangkat', ic: 'users', run: "FM_MON.open('login')", d: 'Siapa masuk, kapan & di mana' },
-      { key: 'kesehatan_sistem', t: 'Pindai & Perbaiki Data', ic: 'shield', run: "FM_HEALTH.open()", d: 'Cek kesehatan server & data' },
+    { id: 'pantau', title: '4. Pantau, Error & Kas Tower', hint: 'Bantuan klien, error & kas internal', c: '#6366f1', items: [
+      { key: 'tiket_bantuan', t: 'Tiket Bantuan', ic: 'bell', run: "FM_HELPDESK.open()", d: 'Balas pertanyaan dari toko' },
+      { key: 'pemantauan_error', t: 'Laporan Error', ic: 'bell', run: "FM_MON.open('error')", d: 'Lacak error dari perangkat toko' },
+      { key: 'log_login', t: 'Riwayat Login', ic: 'users', run: "FM_MON.open('login')", d: 'Siapa masuk, kapan & di mana' },
+      { key: 'kesehatan_sistem', t: 'Pindai & Perbaiki', ic: 'shield', run: "FM_HEALTH.open()", d: 'Cek kesehatan server & data' },
       { key: 'pajak_jaringan', t: 'Pajak Semua Toko', ic: 'tax', run: "openModal('tax_net')", d: 'Total pajak dari tiap toko' },
       { key: 'catat_pembukuan', t: 'Catat Kas Provider', dup: true, ic: 'swap', run: "openModal('provider_input_tx')", d: 'Pemasukan & pengeluaran Tower' },
-      { key: 'coa_provider', t: 'Daftar Akun Provider', ic: 'list', find: 'COA Provider', d: 'Akun kas internal Provider' },
+      { key: 'coa_provider', t: 'Akun (COA) Provider', ic: 'list', find: 'COA Provider', d: 'Akun kas internal Provider' },
       { key: 'kurs_emas', t: 'Kurs & Harga Emas', ic: 'coins', find: 'Kurs', d: 'Perbarui kurs & harga emas' }
     ] },
-    { id: 'versi', title: '5. Versi, Uji & Serah Terima', hint: 'Kunci versi rilis, uji coba & serah terima', c: '#9333ea', items: [
+    { id: 'versi', title: '5. Versi, Uji & Serah Terima', hint: 'Versi rilis, uji coba & serah terima', c: '#9333ea', items: [
       { key: 'versi_toko', t: 'Kunci Versi Toko', ic: 'swap', run: "towerPick('versi')", d: 'Kunci toko ke versi tertentu' },
       { key: 'rollout_versi', t: 'Atur Rollout Versi', ic: 'box', run: "if(window.openRolloutModal)openRolloutModal()", d: 'Titik beku rilis & Oneil Shield' },
-      { key: 'rakit_uji', t: 'Uji Fitur Satu per Satu', ic: 'grid', run: "FM_LAB.open('rakit')", d: 'Catat hasil uji fitur toko' },
+      { key: 'rakit_uji', t: 'Uji Fitur Toko', ic: 'grid', run: "FM_LAB.open('rakit')", d: 'Catat hasil uji fitur satu per satu' },
       { key: 'ubah_id', t: 'Ganti ID Toko', ic: 'key', run: "FM_LAB.open('rename')", d: 'Ubah ID toko sebelum diserahkan' },
-      { key: 'published', t: 'Tandai Sudah Diserahkan', ic: 'send', run: "FM_LAB.open('publish')", d: 'Tandai toko siap pakai klien' },
-      { key: 'data_demo', t: 'Isi Data Transaksi Demo', ic: 'grid', run: "FM_DEMO.open()", d: 'Isi toko uji dengan contoh' },
-      { key: 'uji_mandiri', t: 'Cek Kelayakan Aplikasi', ic: 'shield', run: "FM_QA.open()", d: 'Verifikasi file & data toko' },
-      { key: 'reset_statistik', t: 'Reset Data Uji ke 0', warn: true, ic: 'trash', run: "FM_LAB.open('reset')", d: 'Hapus data uji coba toko' }
+      { key: 'published', t: 'Tandai Diserahkan', ic: 'send', run: "FM_LAB.open('publish')", d: 'Tandai toko siap pakai klien' },
+      { key: 'data_demo', t: 'Isi Data Demo', ic: 'grid', run: "FM_DEMO.open()", d: 'Isi toko uji dengan contoh' },
+      { key: 'uji_mandiri', t: 'Cek Kelayakan', ic: 'shield', run: "FM_QA.open()", d: 'Verifikasi file & data toko' },
+      { key: 'reset_statistik', t: 'Reset Data Uji', warn: true, ic: 'trash', run: "FM_LAB.open('reset')", d: 'Hapus data uji coba ke 0' }
     ] },
-    { id: 'tampil', title: '6. Tampilan, Chat & ON2', hint: 'Wallpaper, pengumuman, chat & Oneilverse 2', c: '#059669', items: [
-      { key: 'wallpaper', t: 'Wallpaper & Efek Kaca', ic: 'spark', run: "FM_TWALL.open()", d: 'Atur latar & kaca aplikasi' },
+    { id: 'tampil', title: '6. Tampilan, Chat & ON2', hint: 'Wallpaper, pengumuman, chat & ON2', c: '#059669', items: [
+      { key: 'wallpaper', t: 'Wallpaper & Kaca', ic: 'spark', run: "FM_TWALL.open()", d: 'Atur latar & efek kaca aplikasi' },
       { key: 'pesan_siaran', t: 'Kirim Pengumuman', dup: true, ic: 'send', run: "openModal('broadcast_modal')", d: 'Kirim pesan siaran ke semua toko' },
       { key: 'catatan_rilis', t: 'Catatan Rilis Klien', ic: 'book', find: 'Catatan Rilis', d: 'Riwayat pembaruan aplikasi' },
-      { key: 'chat_global', t: 'Moderasi Chat Global', ic: 'bell', run: "if(window.FM_CHAT)FM_CHAT.openModeration()", d: 'Bisukan atau atur Chat Global' },
-      { key: 'hapus_semua_chat', t: 'Kosongkan Semua Chat', ic: 'trash', run: "if(window.FM_CHAT)FM_CHAT.clearAll()", d: 'Hapus seluruh isi Chat Universe' },
-      { key: 'susun_pulau', t: 'Susun Menu Pulau (ON2)', ic: 'grid', run: "towerPick('susun')", d: 'Urutan pulau kiri/kanan Gen 2' },
+      { key: 'chat_global', t: 'Moderasi Chat', ic: 'bell', run: "if(window.FM_CHAT)FM_CHAT.openModeration()", d: 'Bisukan atau atur Chat Global' },
+      { key: 'hapus_semua_chat', t: 'Kosongkan Chat', ic: 'trash', run: "if(window.FM_CHAT)FM_CHAT.clearAll()", d: 'Hapus seluruh isi Chat Universe' },
+      { key: 'susun_pulau', t: 'Susun Pulau ON2', ic: 'grid', run: "towerPick('susun')", d: 'Urutan pulau kiri/kanan Gen 2' },
       { key: 'pulau_on2', t: 'Kartu & Fitur ON2', ic: 'spark', run: "towerPick('pulau')", d: 'Atur kartu & denyut Gen 2' }
     ] }
   ];
@@ -80,13 +80,14 @@
   }
   function effectiveGroups() {
     var meta = defaultGroupMeta();
-    var base = (CUSTOM && CUSTOM.groups && CUSTOM.groups.length) ? CUSTOM.groups.slice() : DEFAULT_GROUPS.map(function (g) { return { id: g.id, title: g.title }; });
+    var useCustom = CUSTOM && CUSTOM.v === 2 && CUSTOM.groups && CUSTOM.groups.length;
+    var base = useCustom ? CUSTOM.groups.slice() : DEFAULT_GROUPS.map(function (g) { return { id: g.id, title: g.title }; });
     var groups = base.map(function (g, i) {
       var m = meta[g.id] || {};
       return { id: g.id, title: g.title || m.title || 'Kategori', hint: m.hint || '', c: m.c || PALETTE[i % PALETTE.length], items: [] };
     });
     var byId = {}; groups.forEach(function (g) { byId[g.id] = g; });
-    var itemGroupMap = (CUSTOM && CUSTOM.itemGroup) || {};
+    var itemGroupMap = (useCustom && CUSTOM.itemGroup) || {};
     var defMap = defaultItemGroupMap();
     allItemsFlat().forEach(function (it) {
       var gid = itemGroupMap[it.key] || defMap[it.key];
@@ -105,7 +106,7 @@
   }
   function saveCustomConfig(groups, itemGroup, cb) {
     var d = fsdb(); if (!d) { cb && cb(false); return; }
-    d.collection('app_meta').doc('tower_menu').set({ json: JSON.stringify({ groups: groups, itemGroup: itemGroup }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+    d.collection('app_meta').doc('tower_menu').set({ json: JSON.stringify({ v: 2, groups: groups, itemGroup: itemGroup }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
       .then(function () { cb && cb(true); }).catch(function () { cb && cb(false); });
   }
   function resetCustomConfig(cb) {

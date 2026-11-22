@@ -2,145 +2,21 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.16';
-  var BETA = 'v1.1.16';
-  /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
-     Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
-     Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
+  var APP_VERSION = '1.1.17';
+  var BETA = 'v1.1.17';
+  /* Catatan rilis ringkas per versi utama (v1.0, v1.1, v1.2, dst). Terbaru di atas. */
   var RELEASE_NOTES = [
-    ['v1.1.16', '22 Nov 2026', [
-      '[Perbaikan] Merapikan tata letak papan kendali menjadi 6 kategori yang lebih mudah dipahami dalam satu layar penuh tanpa perlu digulir',
-      '[Keamanan] Seluruh hak akses dan fungsi pengelolaan toko tetap berjalan normal'
+    ['v1.1', '22 Nov 2026', [
+      '[Baru] Tampilan One UI lebih bersih dengan mode terang dan mode gelap pekat di Kasir, Manager, Owner, dan Partner',
+      '[Baru] Dock bawah bergaya pulau yang simetris serta sistem Paket Basic, Plus, dan Pro dengan lencana khusus',
+      '[Baru] Fitur Impor Akun (COA) dan Impor Riwayat Transaksi dari file Excel / CSV (khusus Plus ke atas)',
+      '[Perbaikan] Penyeragaman seluruh jendela pop-up, formulir Kasir penuh, serta tombol Perbarui Aplikasi hanya muncul saat ada pembaruan',
+      '[Keamanan] Perlindungan halaman dari clickjacking serta penerapan hak akses paket dan peran secara konsisten'
     ]],
-    ['v1.1.15', '22 Nov 2026', [
-      '[Perbaikan] Merapikan pengelompokan daftar fitur paket dan menyederhanakan tampilan menu agar lebih ringkas tanpa fitur duplikat',
-      '[Keamanan] Seluruh pengaturan fitur toko dan paket klien yang sudah berjalan tetap terjaga'
-    ]],
-    ['v1.1.14', '22 Nov 2026', [
-      '[Perbaikan] Menambahkan fitur Impor Riwayat Transaksi (Excel / CSV) khusus paket Plus ke atas di menu Backup & Ekspor agar klien bisa memindahkan riwayat transaksi lama langsung ke Oneilverse',
-      '[Keamanan] Impor transaksi menampilkan pratinjau nominal serta konfirmasi sebelum ditulis ke database toko'
-    ]],
-    ['v1.1.13', '22 Nov 2026', [
-      '[Perbaikan] Menambahkan fitur Import Excel (.xls/.xlsx) dan CSV di menu Kelola Akun (COA) untuk Manager dan Owner agar daftar akun bisa disesuaikan per jenis usaha dengan cepat',
-      '[Keamanan] Impor COA tetap meminta konfirmasi dan hanya berlaku pada toko yang sedang dibuka'
-    ]],
-    ['v1.1.12', '22 Nov 2026', [
-      '[Perbaikan] Menyeimbangkan jumlah pulau di kiri dan kanan dock bawah agar selalu simetris (2-2 atau 3-3) di semua akun',
-      '[Keamanan] Penyesuaian tata letak dock tanpa mengubah hak akses maupun data'
-    ]],
-    ['v1.1.11', '22 Nov 2026', [
-      '[Perbaikan] Jendela Fitur Toko kini menampilkan lencana paket aktif (BASIC / PLUS / PRO) sesuai pengaturan Control Tower dan menyaring label internal agar hanya menampilkan fitur nyata yang aktif',
-      '[Keamanan] Hak akses fitur di halaman Manager dan Owner tetap mengacu pada konfigurasi Control Tower'
-    ]],
-    ['v1.1.10', '22 Nov 2026', [
-      '[Perbaikan] Menyamakan warna putih murni (#ffffff) seluruh kartu Manager & Owner dengan header di mode terang, serta meluruskan lebar header (1448px / calc(100% - 32px)) agar presisi sejajar dengan kartu di bawahnya',
-      '[Keamanan] Penyesuaian visual murni tanpa mengubah data maupun hak akses'
-    ]],
-    ['v1.1.9', '22 Nov 2026', [
-      '[Perbaikan] Menyamakan lebar, warna putih solid, dan bayangan header Manager & Owner agar sejajar presisi dengan kartu di bawahnya',
-      '[Keamanan] Penyesuaian visual tanpa memengaruhi fungsi maupun hak akses'
-    ]],
-    ['v1.1.8', '22 Nov 2026', [
-      '[Perbaikan] Menyeragamkan pop-up Stok dan Fitur Toko agar selalu tampil putih bersih di mode terang dan gelap pekat di mode gelap, serta merapikan header Manager & Owner agar berbentuk kartu senada dengan Admin',
-      '[Keamanan] Seluruh penyesuaian tampilan menjaga integritas data dan izin peran'
-    ]],
-    ['v1.1.7', '22 Nov 2026', [
-      '[Perbaikan] Memuat skrip Chat global di halaman Manager dan mengembalikan warna putih bersih pada header Manager & Owner',
-      '[Keamanan] Seluruh perbaikan UI menjaga hak akses masing-masing peran'
-    ]],
-    ['v1.1.6', '22 Nov 2026', [
-      '[Perbaikan] Mengaktifkan Chat global di akun Manager, mendukung hingga 3 pulau di kiri & kanan dock bawah, menyelaraskan warna header Manager/Owner dengan badan kartu, dan memperbaiki warna pop-up Bantuan & Piutang di semua halaman',
-      '[Keamanan] Pengaturan fitur dan izin peran tetap dikontrol dari Control Tower'
-    ]],
-    ['v1.1.5', '22 Nov 2026', [
-      '[Perbaikan] Halaman Manager & Owner kini memakai kartu menu grid yang rapi (tanpa ruang kosong tengah), menyembunyikan duplikasi tombol Piutang, dan menyeimbangkan posisi tombol di dock bawah',
-      '[Keamanan] Seluruh perbaikan UI diterapkan tanpa mengubah hak akses maupun data transaksi'
-    ]],
-    ['v1.1.4', '22 Nov 2026', [
-      '[Perbaikan] Menghentikan reload berulang dari rollout versi, menyelaraskan warna tombol Piutang & Bantuan dengan dock di mode terang maupun gelap, serta memastikan seluruh pop-up ikut gelap di mode gelap',
-      '[Keamanan] Service Worker selalu mengambil berkas terbaru saat online sehingga tombol Perbarui Aplikasi langsung memuat versi terakhir'
-    ]],
-    ['v1.1.3', '22 Nov 2026', [
-      '[Perbaikan] Formulir Kasir kini terbentang penuh tanpa ruang kosong di kanan bawah, serta opsi Bank tidak lagi menduplikasi pilihan QRIS dan Petty Cash',
-      '[Keamanan] Pencatatan metode bayar tetap terhubung rapi ke akun COA masing-masing'
-    ]],
-    ['v1.1.2', '22 Nov 2026', [
-      '[Perbaikan] Tampilan pop-up Piutang & Utang serta Bantuan diseragamkan menjadi kartu putih bersih dan tajam seperti Mutasi Kas Sah dan Stok',
-      '[Keamanan] Kontras dan keterbacaan seluruh pop-up tetap terjaga di mode terang maupun gelap'
-    ]],
-    ['v1.1.1', '22 Nov 2026', [
-      '[Perbaikan] Mode gelap pekat dengan teks kontras tinggi, lencana PRO emas tampil jelas, tombol bantuan sejajar dengan Piutang, pilihan Petty Cash & QRIS langsung tersedia di metode bayar, dan menu Buku Besar kembali tampil di dock Admin',
-      '[Keamanan] Halaman depan portal tidak lagi menampilkan pilihan akun Master Template tanpa tautan toko'
-    ]],
-    ['v1.1.0', '18 Nov 2026', [
-      '[Perbaikan] Header toko dibuat lebih tipis supaya isi halaman lebih lega',
-      '[Perbaikan] Dock bawah jadi pulau: logo Oneilverse di tengah, menu terkuak saat kursor menyentuh logo, dan Chat, Tema, Absen, Stok menjadi pulau terpisah yang menggeser ke tepi',
-      '[Perbaikan] Layar muat baru: tiga titik saling berpapasan dan tulisan Oneilverse disapu kilau halus; nomor versi kembali tampil sebagai teks biasa',
-      '[Perbaikan] Layar muat tidak lagi menahan halaman, jadi aplikasi terbuka begitu siap',
-      '[Perbaikan] Tampilan baru bergaya One UI di Kasir, Manager, dan Owner: latar abu kebiruan, kartu putih tanpa garis, kotak isian abu lembut, tombol utama berbentuk kapsul satu warna, ikon di depan label, dan huruf Plus Jakarta Sans',
-      '[Perbaikan] Kartu Owner dan Manager lebih bersih: tanpa garis abu, bayangan halus, sudut lebih bulat, dan angka rupiah memakai huruf yang rapi; letak dan ukuran kartu tidak berubah',
-      '[Perbaikan] Setiap kartu Owner dan Manager diberi ikon kecil (ringkasan, metode bayar, target, stok, laba per produk) supaya lebih cepat dikenali',
-      '[Perbaikan] Tema Original (kaca) tetap tersedia, kini dengan tepi kartu tipis yang terang',
-      '[Perbaikan] Dock pulau di halaman Owner dan Manager tidak lagi tampil hitam saat tema Base',
-      '[Perbaikan] Kartu Kasir (saldo, formulir, draft, total) lebih bersih dengan angka rupiah yang rapi; letak dan ukuran tidak berubah',
-      '[Perbaikan] Dock pulau tidak lagi terpotong oleh lapisan halaman, dan tombol Chat yang muncul belakangan ikut menjadi pulau',
-      '[Perbaikan] Header Kasir, Manager, dan Owner lebih tipis: jam, cuaca, kurs, peran, dan tombol tersusun 2 baris, bukan 3',
-      '[Perbaikan] Halaman Partner ikut tampilan baru; hiasan bayangan buram di kartu angka dihilangkan pada tema Base',
-      '[Perbaikan] Logo Oneilverse di dock selalu tepat di tengah, juga saat jumlah menu ganjil',
-      '[Baru] Mode gelap pekat: tombol Tema di toko kini berpindah antara One UI terang dan gelap pekat, lengkap di Kasir, Manager, Owner, dan Partner; semua tulisan diperiksa agar tetap terbaca',
-      '[Perbaikan] Pilihan tema kaca tidak lagi ada di toko; One UI atau Kaca kini hanya ditentukan dari Control Tower',
-      '[Perbaikan] Pulau satelit menyesuaikan halaman: Manager dan Owner yang tidak punya Absen dan Stok memakai menu halamannya sendiri, dan tombol Tema selalu tersedia',
-      '[Perbaikan] Mode offline: nomor versi penyimpanan dinaikkan, jadi salinan halaman lama di browser tidak lagi menimpa tampilan baru saat jaringan lambat (penyebab tampilan sempat balik ke versi lama)',
-      '[Perbaikan] Mode offline: salinan kini dicocokkan menurut nomor versi berkas, dan dua berkas tampilan yang belum pernah ikut tersimpan (ui110.js, kasir-fit.js) kini disimpan juga',
-      '[Keamanan] Halaman toko tidak bisa lagi dimuat di dalam bingkai situs lain, mencegah tombol aplikasi ditimpa halaman palsu (clickjacking)',
-      '[Baru] Paket Basic, Plus, dan Pro: Control Tower kini bisa menentukan sendiri fitur apa saja yang masuk paket Plus dan Pro (kosong sampai diisi), lalu menerapkan paket ke tiap toko dengan durasi 1-12 bulan dan harga yang bisa diubah sendiri',
-      '[Baru] Saat paket toko habis waktunya, toko otomatis kembali ke Basic; fitur yang sebelumnya aktif tidak langsung menghilang, tombolnya hanya menjadi gelap sampai paket diperpanjang',
-      '[Baru] Lencana PRO di ujung nama Oneilverse (hitam, huruf emas pudar) untuk membedakan dari Plus yang memakai tanda "+"',
-      '[Keamanan] Perpanjangan atau penurunan paket toko kini menyalakan ulang fitur sesuai paket yang berlaku, sehingga toko yang paketnya sudah habis tidak bisa lagi memakai fitur premium tanpa sepengetahuan Tower'
-    ]],
-    ['v1.0.26', '18 Nov 2026', [
-      '[Perbaikan] Daftar akun (COA) di Kasir dan Manager sempat hanya menampilkan 9 akun bawaan; sekarang selalu dimuat langsung dari server',
-      '[Perbaikan] Tombol Simpan ke Antrean Draft sempat gagal tanpa pesan apa pun; sudah diperbaiki',
-      '[Perbaikan] Pilihan akun transaksi dikelompokkan mengikuti urutan PSAK dengan induk Laba Rugi dan Neraca, memakai bahasa sehari-hari',
-      '[Perbaikan] Setoran Modal pemilik kini dihitung sebagai kas masuk dan tidak lagi dihitung sebagai biaya, sehingga laba dan Neraca benar',
-      '[Keamanan] Pilihan versi Oneil Shield dari Tower kini benar-benar diterapkan ke toko; sebelumnya semua toko tetap memakai v2.0 apa pun pilihannya',
-      '[Perbaikan] Form Input Transaksi di kasir (layar komputer) kini muat dalam satu layar, tidak perlu digulir lagi',
-      '[Perbaikan] Pilihan akun transaksi kini menampilkan juga akun Aset (beli mesin, kendaraan, tanah, persediaan) dan Bayar/Cicil Hutang, sehingga Neraca bisa tersusun lengkap',
-      '[Perbaikan] Transaksi akun non-produk kini punya kolom Jumlah dan Harga Satuan; nominal dihitung otomatis (jumlah x harga satuan) dan masih bisa diubah',
-      '[Perbaikan] Neraca memperhitungkan pembelian aset dan pembayaran hutang dari transaksi kasir',
-      '[Keamanan] Dukungan Oneil Shield v2.1 (peringatan login dari perangkat baru, skor keamanan lebih rinci)'
-    ]],
-    ['v1.0.25', '16 Nov 2026', [
-      '[Perbaikan] Metode Bayar / Terima kini punya pilihan baru "Petty Cash" (di bawah Bank, sejajar QRIS & Transfer), terhubung ke akun Kas Kecil/Petty Cash yang ditambahkan di Kelola Akun (COA)',
-      '[Perbaikan] Owner/Manager sekarang bisa menambah akun COA berkategori "Kas Kecil / Petty Cash" di menu Kelola Akun',
-      '[Keamanan] Transaksi Petty Cash dihitung sebagai bagian dari Kas di Neraca AI dan Laporan Harian, namun TIDAK ikut dicocokkan ke uang laci fisik (baris Tunai), karena dananya memang dana terpisah'
-    ]],
-    ['v1.0.24', '16 Nov 2026', [
-      '[Perbaikan] Daftar Mutasi Kas (kasir & manager) sekarang bisa diurutkan terbaru-dulu atau terlama-dulu lewat tombol di pojok kanan atas, defaultnya terbaru di atas',
-      '[Perbaikan] Pilihan Metode Bayar / Terima dipindahkan ke area input barang (sebelumnya di bawah dekat tombol cetak struk), supaya kelihatan saat menginput barang',
-      '[Keamanan] Kedua perubahan ini hanya tampilan/urutan, tidak mengubah data transaksi, saldo, atau proses pencatatan pembukuan'
-    ]],
-    ['v1.0.23', '16 Nov 2026', [
-      '[Perbaikan] Toko yang sedang masa DEMO kini menampilkan watermark besar "DEMO VERSION" di layar selama masa demo aktif, selain label kecil yang sudah ada, supaya lebih jelas membedakan toko uji coba dari toko sungguhan',
-      '[Keamanan] Watermark hanya tampilan, tidak mengubah data atau proses apa pun, dan otomatis hilang begitu toko bukan lagi status demo'
-    ]],
-    ['v1.0.22', '16 Nov 2026', [
-      '[Keamanan] Kunci PIN salah (3x = 5 menit, 5x = 10 menit, 10x = diblokir) sekarang dicek di server (Oneil Shield v2.0), bukan cuma di penyimpanan browser, jadi tidak bisa dilewati dengan hapus data browser atau pindah perangkat',
-      '[Keamanan] Setiap login berhasil kini tercatat (waktu & perangkat), dan login dari perangkat baru ditandai serta dilaporkan ke Tower',
-      '[Keamanan] Skor keamanan toko kini tampil di panel Oneil Shield, beserta ringkasan keamanan bulanan untuk Owner',
-      '[Perbaikan] Lencana "Dilindungi Oneil Shield" kini tampil di portal login, dalam aplikasi, struk, dan laporan PDF'
-    ]],
-    ['v1.0.21', '16 Nov 2026', [
-      '[Perbaikan] Transaksi dengan Tanggal Transaksi yang diset ke tanggal lampau kini benar-benar tercatat di tanggal tersebut di struk, Mutasi, dan Buku Besar, tidak lagi otomatis memakai tanggal hari ini',
-      '[Keamanan] Perubahan hanya memperbaiki tanggal yang ditampilkan/tercatat, tidak mengubah nominal atau akun transaksi mana pun'
-    ]],
-    ['v1.0.20', '16 Nov 2026', [
-      '[Perbaikan] Struk transaksi di kasir kini bisa digulir (scroll) saat isinya banyak baris, sehingga seluruh daftar dan tombol cetak tetap bisa dijangkau',
-      '[Keamanan] Perubahan hanya pada tampilan struk, tidak mengubah data transaksi atau proses cetak'
-    ]],
-    ['v1.0.19', '15 Nov 2026', [
-      '[Perbaikan] Buku Besar kini punya akun bawaan Kas/Tunai, memisahkan mutasi penjualan, HPP, operasional, dan prive yang dibayar tunai dari yang dibayar lewat bank',
-      '[Keamanan] Pemisahan Kas/Tunai dan Bank di Buku Besar hanya membaca data yang sudah tercatat, tidak mengubah angka transaksi mana pun'
+    ['v1.0', '18 Nov 2026', [
+      '[Baru] Sistem kasir dan pembukuan UMKM lengkap: Mutasi, Buku Besar, Laba Rugi, Neraca AI, Stok, Piutang & Utang, dan Payroll',
+      '[Baru] Dukungan banyak usaha/cabang, Petty Cash, QRIS, cetak struk & kirim WhatsApp, serta pengelompokan akun standar PSAK',
+      '[Keamanan] Perlindungan keamanan Oneil Shield (pembatasan salah PIN di server, log perangkat baru, dan skor keamanan toko)'
     ]]
   ];
   var SHOW_LAST = 10;

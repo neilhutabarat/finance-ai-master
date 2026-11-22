@@ -130,18 +130,19 @@
     var b = document.getElementById('fm-refresh'); if (!b || b.classList.contains('fm-rf-fix')) return;
     if (!b.offsetParent || b.getBoundingClientRect().width === 0) { b.classList.add('fm-rf-fix'); document.body.appendChild(b); }
   }
-  function init() { try { mountBtn(); [400, 1500, 3500].forEach(function (ms) { setTimeout(floatIfHidden, ms); }); window.addEventListener('resize', function () { setTimeout(floatIfHidden, 200); }); } catch (e) {} }
+  function init() { /* tombol hanya muncul saat ada pembaruan aplikasi (dipanggil oleh flagNew) */ }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
   var pendingNew = '';
   function flagNew(ver) {
     pendingNew = ver || 'baru';
+    mountBtn();
     var b = document.getElementById('fm-refresh');
     if (!b) return;
     b.classList.add('fm-rf-new'); b.textContent = 'Ada versi baru! Perbarui';
     b.title = 'Versi ' + (ver || 'terbaru') + ' tersedia. Tekan untuk memperbarui (login dan data tidak hilang).';
-    setTimeout(floatIfHidden, 50);
+    [50, 400, 1500].forEach(function (ms) { setTimeout(floatIfHidden, ms); });
   }
   var _mount = mountBtn;
-  mountBtn = function () { _mount(); if (pendingNew) flagNew(pendingNew); };
+  mountBtn = function () { _mount(); };
   window.FM_REFRESH = { run: run, flagNew: flagNew };
 })();
