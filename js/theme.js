@@ -2,12 +2,16 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.5';
-  var BETA = 'v1.1.5';
+  var APP_VERSION = '1.1.6';
+  var BETA = 'v1.1.6';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.1.6', '22 Nov 2026', [
+      '[Perbaikan] Mengaktifkan Chat global di akun Manager, mendukung hingga 3 pulau di kiri & kanan dock bawah, menyelaraskan warna header Manager/Owner dengan badan kartu, dan memperbaiki warna pop-up Bantuan & Piutang di semua halaman',
+      '[Keamanan] Pengaturan fitur dan izin peran tetap dikontrol dari Control Tower'
+    ]],
     ['v1.1.5', '22 Nov 2026', [
       '[Perbaikan] Halaman Manager & Owner kini memakai kartu menu grid yang rapi (tanpa ruang kosong tengah), menyembunyikan duplikasi tombol Piutang, dan menyeimbangkan posisi tombol di dock bawah',
       '[Keamanan] Seluruh perbaikan UI diterapkan tanpa mengubah hak akses maupun data transaksi'

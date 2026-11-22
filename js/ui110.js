@@ -254,12 +254,16 @@
     R + '#fm-rail .fm-s2.fmL{right:50%}' + R + '#fm-rail .fm-s2.fmR{left:50%}' +
     R + '#fm-rail .fm-s2.fmL1{transform:translateY(-50%) translateX(calc(var(--h0,30px) * -1 - 8px))}' +
     R + '#fm-rail .fm-s2.fmL2{transform:translateY(-50%) translateX(calc(var(--h0,30px) * -1 - 8px - var(--w1,96px)))}' +
+    R + '#fm-rail .fm-s2.fmL3{transform:translateY(-50%) translateX(calc(var(--h0,30px) * -1 - 8px - var(--w1,96px) - var(--w2,96px)))}' +
     R + '#fm-rail .fm-s2.fmR1{transform:translateY(-50%) translateX(calc(var(--h0,30px) + 8px))}' +
     R + '#fm-rail .fm-s2.fmR2{transform:translateY(-50%) translateX(calc(var(--h0,30px) + 8px + var(--w3,96px)))}' +
+    R + '#fm-rail .fm-s2.fmR3{transform:translateY(-50%) translateX(calc(var(--h0,30px) + 8px + var(--w3,96px) + var(--w4,96px)))}' +
     R + '#fm-rail.fm-open .fm-s2.fmL1{transform:translateY(-50%) translateX(calc(var(--pl,210px) * -1 - 8px))}' +
     R + '#fm-rail.fm-open .fm-s2.fmL2{transform:translateY(-50%) translateX(calc(var(--pl,210px) * -1 - 8px - var(--w1,96px)))}' +
+    R + '#fm-rail.fm-open .fm-s2.fmL3{transform:translateY(-50%) translateX(calc(var(--pl,210px) * -1 - 8px - var(--w1,96px) - var(--w2,96px)))}' +
     R + '#fm-rail.fm-open .fm-s2.fmR1{transform:translateY(-50%) translateX(calc(var(--pr,210px) + 8px))}' +
     R + '#fm-rail.fm-open .fm-s2.fmR2{transform:translateY(-50%) translateX(calc(var(--pr,210px) + 8px + var(--w3,96px)))}' +
+    R + '#fm-rail.fm-open .fm-s2.fmR3{transform:translateY(-50%) translateX(calc(var(--pr,210px) + 8px + var(--w3,96px) + var(--w4,96px)))}' +
     '@media(prefers-reduced-motion:reduce){' + R + '#fm-pil,' + R + '#fm-rail .fm-s2{transition:none!important}}';
 
   function sv(d) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + d + '</svg>'; }
@@ -290,7 +294,7 @@
       function teks(b) { var q = b.querySelector('span'); return ((q ? q.textContent : b.textContent) || '').trim(); }
       function logoEl() { var lg = document.createElement('span'); lg.className = 'fm-lg'; lg.innerHTML = LOGO; return lg; }
       var EKOR = /^(pengaturan|keluar|store|lainnya|desktop|ponsel)$/i;
-      var kiri1 = null, kanan1 = null, sidik = '';
+      var kiri1 = null, kiri2 = null, kanan1 = null, kanan2 = null, sidik = '';
 
       function kumpulkan() {
         var dkk = [].slice.call(dock.querySelectorAll('.fm-dk'));
@@ -310,9 +314,13 @@
         if (stk) R.push({ el: stk, nama: 'Stok', ik: IC.stok, sem: true });
         var piu = document.querySelector('.fm-fab[data-fc="piu"],[onclick*="FM_PIU.open"]');
         if (piu && R.length < 2) R.push({ el: piu, nama: 'Piutang', ik: IC.piutang, sem: true });
-        var naik = [], sisa = Math.max(0, L.length - R.length);
+        var naik = [], sisa = Math.max(0, 3 - R.length);
         while (sisa > 0 && hal.length - naik.length > 1) { naik.unshift(hal[hal.length - 1 - naik.length]); sisa--; }
         naik.forEach(function (x) { R.push({ dk: x, nama: teks(x), ik: IC.menu }); });
+        if (L.length < 3 && hal.length - naik.length > 1) {
+          var lExtra = hal.filter(function (x) { return naik.indexOf(x) < 0; })[0];
+          if (lExtra) { L.push({ dk: lExtra, nama: teks(lExtra), ik: IC.menu }); naik.push(lExtra); }
+        }
         if (piu) {
           [].forEach.call(document.querySelectorAll('#fm-actions .fm-act'), function (a) {
             if (/piutang/i.test(a.textContent || '')) a.style.display = 'none';
@@ -320,7 +328,7 @@
         }
         var isi = hal.filter(function (x) { return naik.indexOf(x) < 0; }).concat(ekor);
         return {
-          L: L.slice(0, 2), R: R.slice(0, 2), isi: isi,
+          L: L.slice(0, 3), R: R.slice(0, 3), isi: isi,
           sidik: dkk.map(teks).join('|') + '#' + [chat, abs, stk, piu].map(function (x) { return x ? 1 : 0; }).join('')
         };
       }
@@ -340,7 +348,7 @@
         [].slice.call(rail.querySelectorAll('.fm-s2')).forEach(function (x) { rail.removeChild(x); });
         sembunyi.forEach(function (el) { if (el !== dock) el.classList.remove('fm-hid'); });
         sembunyi = [dock];
-        pil.innerHTML = ''; kiri1 = kanan1 = null;
+        pil.innerHTML = ''; kiri1 = kiri2 = kanan1 = kanan2 = null;
 
         var tengah = Math.ceil(c.isi.length / 2);
         var wingL = document.createElement('div'); wingL.className = 'fm-wing fm-wing-l';
@@ -371,8 +379,8 @@
           if (x.sem && x.el) { x.el.classList.add('fm-hid'); sembunyi.push(x.el); }
           return b;
         }
-        c.L.forEach(function (x, i) { var b = sat(x, 'fmL fmL' + (i + 1)); if (i === 0) kiri1 = b; });
-        c.R.forEach(function (x, i) { var b = sat(x, 'fmR fmR' + (i + 1)); if (i === 0) kanan1 = b; });
+        c.L.forEach(function (x, i) { var b = sat(x, 'fmL fmL' + (i + 1)); if (i === 0) kiri1 = b; if (i === 1) kiri2 = b; });
+        c.R.forEach(function (x, i) { var b = sat(x, 'fmR fmR' + (i + 1)); if (i === 0) kanan1 = b; if (i === 1) kanan2 = b; });
 
         var lg3 = pil.querySelector('.fm-lg');
         if (lg3) {
@@ -395,7 +403,9 @@
           rail.style.setProperty('--pr', setengah + 'px');
           rail.style.setProperty('--h0', '30px');
           if (kiri1) rail.style.setProperty('--w1', (kiri1.offsetWidth + 8) + 'px');
+          if (kiri2) rail.style.setProperty('--w2', (kiri2.offsetWidth + 8) + 'px');
           if (kanan1) rail.style.setProperty('--w3', (kanan1.offsetWidth + 8) + 'px');
+          if (kanan2) rail.style.setProperty('--w4', (kanan2.offsetWidth + 8) + 'px');
         } catch (e) {}
       }
       function buka(v) { ukur(); rail.classList.toggle('fm-open', !!v); }

@@ -7,7 +7,7 @@
   var PATH = (location.pathname || '').toLowerCase();
   var IS_TOWER = /provider/.test(PATH);
   var ROLE = IS_TOWER ? 'dev' : /kasir/.test(PATH) ? 'staff' : /manager/.test(PATH) ? 'manager' : /dashboard/.test(PATH) ? 'owner' : '';
-  if (!ROLE || ROLE === 'manager') { window.FM_CHAT = null; return; }
+  if (!ROLE) { window.FM_CHAT = null; return; }
 
   var COL = 'global_chat', CFG = 'global_chat_cfg', MAXLEN = 140, COOLDOWN = 5000;
   var S = { msgs: [], cfg: { enabled: true, muted: [] }, err: false, open: false, kasirOk: true, last: 0, seen: 0, first: true, towerEl: null };
@@ -22,7 +22,7 @@
   function me() {
     if (IS_TOWER) return { tid: 'DEV', role: 'dev', label: 'DEV' };
     var t = g(function () { return getActiveTenant(); }, null), tid = t && t.id ? String(t.id).toUpperCase() : '';
-    return { tid: tid, role: ROLE, label: tid + (ROLE === 'staff' ? '-K' : '-O') };
+    return { tid: tid, role: ROLE, label: tid + (ROLE === 'staff' ? '-K' : ROLE === 'manager' ? '-M' : '-O') };
   }
   function ready() { return typeof db !== 'undefined' && db && g(function () { return window.FM_AUTH ? FM_AUTH.curUser() : firebase.auth().currentUser; }, null); }
 

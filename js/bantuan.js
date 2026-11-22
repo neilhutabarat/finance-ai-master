@@ -85,9 +85,9 @@
     if (!ov || ov.style.display === 'none') return;
     var keep = document.activeElement && document.activeElement.id, selS = 0;
     var sub = (document.getElementById('hp-sub') || {}).value, msg = (document.getElementById('hp-msg') || {}).value;
-    var dk = document.documentElement.getAttribute('data-fm-native') === 'dark' && document.documentElement.getAttribute('data-fm-invert') !== '1';
-    var bg = dk ? 'background:#0b0c10;color:#f8fafc;border:1px solid #1e222d;' : 'background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;';
-    var h = '<div style="width:100%;max-width:560px;max-height:92vh;overflow:auto;' + bg + 'border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28);padding:20px">' +
+    var useDarkBase = document.documentElement.getAttribute('data-fm-native') === 'dark';
+    var inv = useDarkBase ? 'filter:invert(1) hue-rotate(180deg);' : '';
+    var h = '<div style="width:100%;max-width:560px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28);padding:20px;' + inv + '">' +
       '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Bantuan</div><div style="font-size:12px;color:#64748b">Panduan singkat dan tanya langsung ke tim.</div></div><button data-x style="' + btn + '">Tutup</button></div>' +
       '<div style="display:flex;gap:6px;margin-top:12px"><button data-tab="panduan" style="' + btn + (tab === 'panduan' ? green : '') + '">Panduan</button><button data-tab="tanya" style="' + btn + (tab === 'tanya' ? green : '') + '">Tanya Tim' + (unread() ? ' •' : '') + '</button></div>' +
       (note ? '<p style="margin:10px 0 0;padding:10px 12px;border-radius:12px;background:#ecfdf5;color:#047857;font-size:12px;font-weight:600">' + esc(note) + '</p>' : '') + (tab === 'panduan' ? viewPanduan() : viewTanya()) + '</div>';
