@@ -110,6 +110,7 @@
     /* latar dedaunan diredam sedikit di belakang kartu: tetap terlihat, tapi tidak lagi mengganggu bacaan */
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit]:not([data-fm-black]) body[class]{background-image:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,.34)),var(--fm-wp,url("/img/wp/1.jpg"))!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit]:not([data-fm-black]) body header.oneui-hero,html[data-fm-page="manager"][data-fm-native][data-fm-fit]:not([data-fm-black]) body header.oneui-hero,html[data-fm-page="owner"][data-fm-native][data-fm-fit]:not([data-fm-black]) body header.oneui-hero{background:rgba(255,255,255,.92)!important;border:0!important;box-shadow:0 1px 2px rgba(15,23,42,.07),0 10px 26px -14px rgba(15,23,42,.18)!important}',
+    'html[data-fm-page="manager"][data-fm-fit] body header.oneui-hero,html[data-fm-page="owner"][data-fm-fit] body header.oneui-hero{max-width:78rem!important;width:calc(100% - 2rem)!important;margin:14px auto 12px!important;border-radius:20px!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit]:not([data-fm-black]) #fm-dock,html[data-fm-page="manager"][data-fm-native][data-fm-fit]:not([data-fm-black]) #fm-dock,html[data-fm-page="owner"][data-fm-native][data-fm-fit]:not([data-fm-black]) #fm-dock{background:rgba(255,255,255,.86)!important;border-color:rgba(51,65,85,.28)!important}',
 
     /* ---- MODE GELAP di halaman kasir: menimpa warna terang di atas dengan palet gelap yang dirancang. ---- */

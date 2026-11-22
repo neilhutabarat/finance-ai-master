@@ -626,14 +626,16 @@
     var m = document.getElementById('fm-plans-modal');
     if (!m) {
       m = document.createElement('div'); m.id = 'fm-plans-modal';
-      m.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482500;background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:14px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif';
-      m.innerHTML = '<div style="width:100%;max-width:520px;max-height:90vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:18px;font-weight:800">Fitur toko ini</div><div data-sum style="font-size:12px;opacity:.7;margin-top:2px"></div></div><button data-x type="button" style="border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:99px;width:32px;height:32px;cursor:pointer">✕</button></div><div data-body style="margin-top:12px"></div></div>';
+      m.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482500;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:14px;font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif';
+      var useDarkBase = document.documentElement.getAttribute('data-fm-native') === 'dark';
+      var inv = useDarkBase ? 'filter:invert(1) hue-rotate(180deg);' : '';
+      m.innerHTML = '<div style="width:100%;max-width:560px;max-height:90vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28);padding:20px;' + inv + '"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding-bottom:10px;border-bottom:1px solid #e2e8f0"><div><div style="font-size:18px;font-weight:800">Fitur toko ini</div><div data-sum style="font-size:12px;color:#64748b;margin-top:2px"></div></div><button data-x type="button" style="border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;border-radius:99px;width:32px;height:32px;cursor:pointer;font-weight:700">✕</button></div><div data-body style="margin-top:8px"></div></div>';
       m.addEventListener('click', function (e) { if (e.target === m || e.target.hasAttribute('data-x')) m.style.display = 'none'; });
       document.body.appendChild(m);
     }
     var list = activeList();
     m.querySelector('[data-sum]').textContent = list.length + ' fitur aktif di mode ' + RLABEL[pageRole()] + '. Untuk menambah fitur, hubungi penyedia aplikasi.';
-    m.querySelector('[data-body]').innerHTML = list.map(function (f) { return '<div style="padding:9px 2px;border-top:1px solid rgba(255,255,255,.08);font-size:13px"><b>✓ ' + f.label + '</b></div>'; }).join('');
+    m.querySelector('[data-body]').innerHTML = list.map(function (f) { return '<div style="padding:9px 4px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#0f172a"><span style="color:#059669;font-weight:800;margin-right:6px">✓</span><b>' + f.label + '</b></div>'; }).join('');
     m.style.display = 'flex';
   }
 
