@@ -227,7 +227,7 @@
   var CSS =
     S + 'header.oneui-hero{padding-top:6px!important;padding-bottom:6px!important}' +
     S + 'header.oneui-hero h1,' + S + 'header.oneui-hero .text-3xl{font-size:19px!important;line-height:1.15!important}' +
-    S + '#fm-dock.fm-hid,' + S + '#fmc-tab.fm-hid,' + S + '#fm-absen-fab.fm-hid,' + S + '#fm-stokadm-fab.fm-hid{visibility:hidden!important;pointer-events:none!important}' +
+    S + '#fm-dock.fm-hid,' + S + '#fmc-tab.fm-hid,' + S + '#fm-absen-fab.fm-hid,' + S + '#fm-stokadm-fab.fm-hid,' + S + '.fm-fab.fm-hid{visibility:hidden!important;pointer-events:none!important}' +
     R + '#fm-rail{position:fixed;left:0;right:0;display:flex;align-items:center;justify-content:center;pointer-events:none;height:56px}' +
     R + '#fm-rail>*{pointer-events:auto}' +
     R + '#fm-pil{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;height:52px;padding:0;' +
@@ -310,9 +310,14 @@
         if (stk) R.push({ el: stk, nama: 'Stok', ik: IC.stok, sem: true });
         var piu = document.querySelector('.fm-fab[data-fc="piu"],[onclick*="FM_PIU.open"]');
         if (piu && R.length < 2) R.push({ el: piu, nama: 'Piutang', ik: IC.piutang, sem: true });
-        var naik = [], sisa = 2 - R.length;
+        var naik = [], sisa = Math.max(0, L.length - R.length);
         while (sisa > 0 && hal.length - naik.length > 1) { naik.unshift(hal[hal.length - 1 - naik.length]); sisa--; }
         naik.forEach(function (x) { R.push({ dk: x, nama: teks(x), ik: IC.menu }); });
+        if (piu) {
+          [].forEach.call(document.querySelectorAll('#fm-actions .fm-act'), function (a) {
+            if (/piutang/i.test(a.textContent || '')) a.style.display = 'none';
+          });
+        }
         var isi = hal.filter(function (x) { return naik.indexOf(x) < 0; }).concat(ekor);
         return {
           L: L.slice(0, 2), R: R.slice(0, 2), isi: isi,

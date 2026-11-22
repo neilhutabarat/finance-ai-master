@@ -2,12 +2,16 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.4';
-  var BETA = 'v1.1.4';
+  var APP_VERSION = '1.1.5';
+  var BETA = 'v1.1.5';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.1.5', '22 Nov 2026', [
+      '[Perbaikan] Halaman Manager & Owner kini memakai kartu menu grid yang rapi (tanpa ruang kosong tengah), menyembunyikan duplikasi tombol Piutang, dan menyeimbangkan posisi tombol di dock bawah',
+      '[Keamanan] Seluruh perbaikan UI diterapkan tanpa mengubah hak akses maupun data transaksi'
+    ]],
     ['v1.1.4', '22 Nov 2026', [
       '[Perbaikan] Menghentikan reload berulang dari rollout versi, menyelaraskan warna tombol Piutang & Bantuan dengan dock di mode terang maupun gelap, serta memastikan seluruh pop-up ikut gelap di mode gelap',
       '[Keamanan] Service Worker selalu mengambil berkas terbaru saat online sehingga tombol Perbarui Aplikasi langsung memuat versi terakhir'
