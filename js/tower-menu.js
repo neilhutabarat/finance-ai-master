@@ -26,7 +26,7 @@
     ] },
     { id: 'layanan', title: '3. Paket, Tagihan & Store', hint: 'Langganan, tagihan & sewa fitur', c: '#ea580c', items: [
       { key: 'paket_billing', t: 'Ubah Paket Toko', ic: 'tag', run: "towerPick('paket')", d: 'Setel Basic, Plus, Pro & durasi' },
-      { key: 'isi_paket_fitur', t: 'Isi Paket Plus & Pro', ic: 'list', run: "openModal('paket_fitur')", d: 'Atur daftar fitur bawaan paket' },
+      { key: 'isi_paket_fitur', t: 'Isi Paket Basic/Plus/Pro', ic: 'list', run: "openModal('paket_fitur')", d: 'Atur daftar fitur bawaan paket' },
       { key: 'billing_toko', t: 'Tagihan per Toko', ic: 'chart', run: "towerPick('billing')", d: 'Biaya & pembayaran satu toko' },
       { key: 'billing_jaringan', t: 'Tagihan Semua Toko', ic: 'chart', find: 'Billing Jaringan', d: 'Rekap tagihan & jatuh tempo' },
       { key: 'pengingat_jatuh_tempo', t: 'Pengingat Tempo', ic: 'bell', run: "towerDue()", d: 'Cek toko yang hampir habis masa' },

@@ -145,9 +145,9 @@
   function defaultFor(key, role, tier) {
     if (DEFAULT_ON.indexOf(key) >= 0) return true;
     if (ALWAYS_ON.indexOf(key) >= 0) return true;
-    if (tier === 'basic' || !tier) return false;
-    if (tier === 'plus') return PLUS_KEYS.indexOf(key) >= 0 || PLUS_KEYS.indexOf(key + ':' + role) >= 0 || paketHas('plus', key, role);
-    if (tier === 'pro') return PLUS_KEYS.indexOf(key) >= 0 || PLUS_KEYS.indexOf(key + ':' + role) >= 0 || paketHas('plus', key, role) || paketHas('pro', key, role);
+    if (tier === 'basic' || !tier) return paketHas('basic', key, role);
+    if (tier === 'plus') return PLUS_KEYS.indexOf(key) >= 0 || PLUS_KEYS.indexOf(key + ':' + role) >= 0 || paketHas('basic', key, role) || paketHas('plus', key, role);
+    if (tier === 'pro') return PLUS_KEYS.indexOf(key) >= 0 || PLUS_KEYS.indexOf(key + ':' + role) >= 0 || paketHas('basic', key, role) || paketHas('plus', key, role) || paketHas('pro', key, role);
     return false;
   }
   /* dipakai untuk tombol "terkunci" (gelap, bukan hilang) saat paket sudah habis: apa yang SEHARUSNYA menyala

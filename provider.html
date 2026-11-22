@@ -94,11 +94,11 @@
     </script>
     <script src="js/billing.js?v=proto"></script>
     <script src="js/dialog.js?v=proto"></script>
-    <script src="js/theme.js?v=1117"></script>
+    <script src="js/theme.js?v=1118"></script>
     <script src="js/langit.js?v=proto" defer></script>
     <script src="js/logo.js?v=paket1"></script>
     <script src="js/skin.js?v=proto"></script>
-    <script src="js/tower-menu.js?v=1117"></script>
+    <script src="js/tower-menu.js?v=1118"></script>
     <script src="js/tower-lab.js?v=proto"></script>
     <script src="js/admins.js?v=proto"></script>
     <script src="js/tower-monitor.js?v=proto"></script>
@@ -612,14 +612,15 @@
 
                 <div id="popup-content-paket_fitur" class="space-y-4 hidden">
                     <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-400/30 space-y-3 text-xs">
-                        <span class="font-black text-sm text-white block">Isi Paket Plus &amp; Pro</span>
-                        <p class="text-slate-400">Centang fitur yang masuk paket Plus dan paket Pro. Kosong = belum ditentukan. Paket Pro otomatis mewarisi semua centangan Plus, jadi cukup centang tambahannya saja di kolom Pro. Basic selalu hanya fitur inti (tidak diatur di sini).</p>
+                        <span class="font-black text-sm text-white block">Isi Paket Basic, Plus &amp; Pro</span>
+                        <p class="text-slate-400">Centang fitur yang masuk paket Basic, Plus, dan Pro. Paket Plus otomatis mewarisi isi Basic, dan Pro otomatis mewarisi isi Basic + Plus (jadi cukup centang tambahannya saja).</p>
                         <div class="flex gap-2 border-b border-white/10 pb-2">
-                            <button id="pf-tab-plus" onclick="pfSwitchTab('plus')" class="flex-1 py-2 rounded-xl bg-sky-600 text-white font-black text-xs">Paket Plus</button>
-                            <button id="pf-tab-pro" onclick="pfSwitchTab('pro')" class="flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 font-black text-xs">Paket Pro</button>
+                            <button id="pf-tab-basic" onclick="pfSwitchTab('basic')" class="flex-1 py-2 rounded-xl font-black text-xs transition">Paket Basic</button>
+                            <button id="pf-tab-plus" onclick="pfSwitchTab('plus')" class="flex-1 py-2 rounded-xl font-black text-xs transition">Paket Plus</button>
+                            <button id="pf-tab-pro" onclick="pfSwitchTab('pro')" class="flex-1 py-2 rounded-xl font-black text-xs transition">Paket Pro</button>
                         </div>
                         <div id="pf-body" class="max-h-[50vh] overflow-y-auto space-y-1"></div>
-                        <button onclick="savePaketFitur()" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition">Simpan Isi Paket</button>
+                        <button id="pf-save-btn" onclick="savePaketFitur()" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition">Simpan Isi Paket</button>
                     </div>
                 </div>
 
@@ -794,7 +795,7 @@
 
     <script src="js/tenants.js"></script>
     <script src="js/auth.js?v=proto"></script>
-    <script src="js/plans.js?v=1115"></script>
+    <script src="js/plans.js?v=1118"></script>
     <script src="js/templates.js?v=proto"></script>
     <script src="js/widgets.js?v=proto"></script>
     <script>window.NO_AUTO_STORE = true;</script>
@@ -1408,30 +1409,38 @@
             }, function (e) { console.error('Provider: gagal membaca harga', e); });
         }
 
-        // ===== ISI PAKET PLUS & PRO (fitur yang masuk tiap paket, dirakit sendiri Tower) =====
-        let paketCat = { plus: {}, pro: {} }, pfTab = 'plus';
+        // ===== ISI PAKET BASIC, PLUS & PRO (fitur yang masuk tiap paket, dirakit sendiri Tower) =====
+        let paketCat = { basic: {}, plus: {}, pro: {} }, pfTab = 'basic';
         function startPaketFiturListener() {
             if (!(typeof db !== 'undefined' && db)) return;
             db.collection('app_meta').doc('paket_catalog').onSnapshot(function (doc) {
                 var j = null;
                 if (doc.exists) { try { j = JSON.parse(doc.data().json || '{}'); } catch (e) { j = null; } }
-                paketCat = { plus: (j && j.plus) || {}, pro: (j && j.pro) || {} };
+                paketCat = { basic: (j && j.basic) || {}, plus: (j && j.plus) || {}, pro: (j && j.pro) || {} };
                 if (window.FM_PLANS && FM_PLANS.PAKET) FM_PLANS.PAKET.setCat(paketCat);
                 if (document.getElementById('popup-content-paket_fitur') && !document.getElementById('popup-content-paket_fitur').classList.contains('hidden')) pfSwitchTab(pfTab);
             }, function (e) { console.error('Provider: gagal membaca paket', e); });
         }
         function pfSwitchTab(tab) {
             pfTab = tab;
-            document.getElementById('pf-tab-plus').className = 'flex-1 py-2 rounded-xl font-black text-xs ' + (tab === 'plus' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300');
-            document.getElementById('pf-tab-pro').className = 'flex-1 py-2 rounded-xl font-black text-xs ' + (tab === 'pro' ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-300');
+            ['basic', 'plus', 'pro'].forEach(function (t) {
+                var btn = document.getElementById('pf-tab-' + t);
+                if (!btn) return;
+                var on = (t === tab);
+                btn.style.cssText = on
+                    ? 'background:#0284c7;color:#ffffff;border:1px solid #38bdf8;box-shadow:0 4px 12px rgba(2,132,199,.35)'
+                    : 'background:rgba(15,23,42,.55);color:#cbd5e1;border:1px solid rgba(255,255,255,.12);box-shadow:none';
+            });
+            var sb = document.getElementById('pf-save-btn');
+            if (sb) sb.textContent = 'Simpan Isi Paket ' + (tab === 'basic' ? 'Basic' : tab === 'plus' ? 'Plus' : 'Pro');
             document.getElementById('pf-body').innerHTML = FM_PLANS.checklistHtml('pf-' + tab, paketCat[tab] || {}, true);
         }
         function savePaketFitur() {
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             paketCat[pfTab] = FM_PLANS.readChecklist('pf-' + pfTab);
-            const data = { json: JSON.stringify({ plus: paketCat.plus, pro: paketCat.pro }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+            const data = { json: JSON.stringify({ basic: paketCat.basic, plus: paketCat.plus, pro: paketCat.pro }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
             db.collection('app_meta').doc('paket_catalog').set(data).then(function () {
-                alert('Isi paket ' + (pfTab === 'plus' ? 'Plus' : 'Pro') + ' tersimpan. Toko yang sedang memakai paket ini akan menerima fiturnya saat halaman dibuka kembali.');
+                alert('Isi paket ' + (pfTab === 'basic' ? 'Basic' : pfTab === 'plus' ? 'Plus' : 'Pro') + ' tersimpan. Toko yang sedang memakai paket ini akan menerima fiturnya saat halaman dibuka kembali.');
             }).catch(function (e) { alert('Gagal menyimpan: ' + e.message); });
         }
 
@@ -2863,7 +2872,7 @@
                 '<p class="text-slate-400">Paket saat ini: <b class="text-white">' + TIER_LABEL[tier].toUpperCase() + (expired ? ' (HABIS → berjalan sebagai BASIC)' : '') + '</b></p>' + statusHtml +
                 '<div><label class="font-bold text-slate-300 block mb-1">Paket</label><select id="ip-tier" class="' + cls + '"><option value="basic"' + sel('basic', tier) + '>Basic</option><option value="plus"' + sel('plus', tier) + '>Plus</option><option value="pro"' + sel('pro', tier) + '>Pro</option></select></div>' +
                 '<div class="mt-2" id="ip-dur-wrap"><label class="font-bold text-slate-300 block mb-1">Durasi</label><select id="ip-dur" class="' + cls + '">' + Array.from({ length: 12 }, (_, i) => i + 1).map(n => '<option value="' + n + '">' + n + ' bulan</option>').join('') + '</select></div>' +
-                '<p class="text-[11px] text-slate-500 mt-2">Menerapkan paket akan menyalakan fitur bawaan paket itu (isi dari "Isi Paket Plus/Pro"); fitur yang digembok (🔒) tetap dipertahankan. Setelah durasi habis, toko otomatis kembali ke Basic — fitur premiumnya tidak hilang dari tampilan, hanya mati (gelap) sampai diperpanjang.</p>' +
+                '<p class="text-[11px] text-slate-500 mt-2">Menerapkan paket (Basic, Plus, atau Pro) akan menyalakan fitur bawaan paket sesuai pengaturan di "Isi Paket Basic, Plus &amp; Pro"; fitur yang digembok (🔒) tetap dipertahankan. Setelah durasi habis, toko otomatis kembali ke Basic.</p>' +
                 '<button id="ip-save" class="w-full mt-3 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs transition">Terapkan Paket</button>';
             const durWrap = document.getElementById('ip-dur-wrap');
             const syncDur = function () { durWrap.style.display = document.getElementById('ip-tier').value === 'basic' ? 'none' : ''; };
@@ -3524,9 +3533,9 @@
                 fillPricingForm();
                 document.getElementById('popup-content-pricing').classList.remove('hidden');
             } else if (type === 'paket_fitur') {
-                document.getElementById('modal-title').innerText = "Isi Paket Plus & Pro";
+                document.getElementById('modal-title').innerText = "Isi Paket Basic, Plus & Pro";
                 document.getElementById('modal-subtitle').innerText = "Tentukan sendiri fitur apa saja yang masuk tiap paket";
-                pfSwitchTab('plus');
+                pfSwitchTab('basic');
                 document.getElementById('popup-content-paket_fitur').classList.remove('hidden');
             } else if (type === 'akun_login') {
                 document.getElementById('modal-title').innerText = "Akun Login Toko";
