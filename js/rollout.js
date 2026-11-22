@@ -93,8 +93,10 @@
         else if (!cfg || !cfg.generations) { if (gen === '1') target = slug(FALLBACK_GEN1_PIN); }
         // kalau titik beku generasi ini memang sengaja dikosongkan Tower, toko ikut kode terbaru di akar
       }
+      var inRilisM = /^\/rilis\/([^\/]+)\//.exec(location.pathname);
+      var curFolder = inRilisM ? slug(inRilisM[1]) : '';
       var running = slug((window.FM_RELEASES && FM_RELEASES.beta) || '');
-      if (target && running && target === running) { pinUpdateCheck(); return; }
+      if (target && ((running && target === running) || (curFolder && curFolder === target))) { pinUpdateCheck(); return; }
       if (!target || !running) return;
 
       var n = 0; try { n = parseInt(sessionStorage.getItem(SKIP_FLAG) || '0', 10) || 0; } catch (e) {}

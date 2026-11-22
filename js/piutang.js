@@ -96,8 +96,9 @@
   function lab(t, el) { return '<div><label style="display:block;font-size:11.5px;font-weight:700;color:#334155;margin:0 0 4px">' + t + '</label>' + el + '</div>'; }
   function field(id, t, v, extra) { return lab(t, '<input id="' + id + '" value="' + esc(v == null ? '' : v) + '" style="' + inp + '" ' + (extra || '') + '>'); }
   function shell(inner) {
-    var inv = document.documentElement.getAttribute('data-fm-invert') === '1' ? 'filter:invert(1) hue-rotate(180deg);' : '';
-    return '<div style="width:100%;max-width:880px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28);padding:20px;' + inv + '">' + inner + '</div>';
+    var dk = document.documentElement.getAttribute('data-fm-native') === 'dark' && document.documentElement.getAttribute('data-fm-invert') !== '1';
+    var bg = dk ? 'background:#0b0c10;color:#f8fafc;border:1px solid #1e222d;' : 'background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;';
+    return '<div style="width:100%;max-width:880px;max-height:92vh;overflow:auto;' + bg + 'border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28);padding:20px">' + inner + '</div>';
   }
   function head(sub) { return '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div><div style="font-weight:800;font-size:17px">Piutang &amp; Utang</div><div style="font-size:12px;opacity:.65">' + sub + '</div></div><button data-x style="' + btn + '">Tutup</button></div>'; }
 

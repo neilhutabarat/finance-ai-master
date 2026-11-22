@@ -110,12 +110,10 @@
       try { localStorage.setItem('fm_look_' + TOKO0, lookCt); } catch (e) {}
       try { localStorage.setItem('fm_look_master', lookCt); } catch (e) {}
       var kini = document.documentElement.getAttribute('data-fm-look');
-      if (kini && kini !== lookCt && !sessionStorage.getItem('fm_ct_look_rl')) {
-        sessionStorage.setItem('fm_ct_look_rl', '1');
-        location.reload();
-        return;
+      if (kini && kini !== lookCt) {
+        document.documentElement.setAttribute('data-fm-look', lookCt);
       }
-      if (kini === lookCt) { try { sessionStorage.removeItem('fm_ct_look_rl'); } catch (e) {} }
+      try { sessionStorage.removeItem('fm_ct_look_rl'); } catch (e) {}
     }
   } catch (e) {}
 
