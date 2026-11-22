@@ -106,6 +106,8 @@
       <h1 id="hdr-title">ON Operator</h1>
       <small id="hdr-sub">CS Live (Ony)</small>
     </div>
+    <button class="btn-icon" id="btn-addc" style="display:none;background:#2563eb;color:#fff;font-size:12px;font-weight:700;padding:6px 10px;border-radius:99px">+ Kontak</button>
+    <button class="btn-icon" id="btn-clear" style="display:none;font-size:12px;color:#fca5a5" title="Bersihkan chat">Clear</button>
     <button class="btn-icon" id="btn-logout" style="display:none" title="Keluar">Keluar</button>
   </header>
 
@@ -138,7 +140,10 @@
     projectId: 'finance-ai-master-byneilverse'
   });
   var auth = firebase.auth(), db = firebase.firestore();
-  var state = { tab: 'inbox', activeTid: null, rooms: [], msgs: [], worldMsgs: [], unsubRooms: null, unsubChat: null, unsubWorld: null };
+  var state = { tab: 'inbox', activeTid: null, rooms: [], msgs: [], worldMsgs: [], contacts: [], unsubRooms: null, unsubChat: null, unsubWorld: null };
+  try { state.contacts = JSON.parse(localStorage.getItem('on_op_contacts') || '[]') || []; } catch (e) {}
+  function saveContacts() { try { localStorage.setItem('on_op_contacts', JSON.stringify(state.contacts)); } catch (e) {} }
+  function aliasFor(tid) { var c = state.contacts.find(function (x) { return x.tid === tid; }); return c ? c.name : tid; }
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -154,16 +159,25 @@
     $('feed').style.display = (mode === 'room' || (mode === 'list' && state.tab === 'world')) ? 'flex' : 'none';
     $('composer').style.display = (mode === 'room' || (mode === 'list' && state.tab === 'world')) ? 'flex' : 'none';
     $('btn-back').style.display = mode === 'room' ? 'inline-block' : 'none';
-    $('btn-logout').style.display = mode !== 'login' ? 'inline-block' : 'none';
+    $('btn-addc').style.display = (mode === 'list' && state.tab === 'inbox') ? 'inline-block' : 'none';
+    $('btn-clear').style.display = mode === 'room' ? 'inline-block' : 'none';
+    $('btn-logout').style.display = mode === 'list' ? 'inline-block' : 'none';
   }
 
   function renderRooms() {
     var el = $('list');
-    if (!state.rooms.length) { el.innerHTML = '<div class="empty">Belum ada pesan masuk dari toko.</div>'; return; }
-    el.innerHTML = state.rooms.map(function (r) {
+    var map = {};
+    state.rooms.forEach(function (r) { map[r.tid] = r; });
+    state.contacts.forEach(function (c) {
+      if (!map[c.tid]) map[c.tid] = { tid: c.tid, lastText: 'Kontak tersimpan', lastMs: 0 };
+    });
+    var merged = Object.keys(map).map(function (k) { return map[k]; }).sort(function (a, b) { return (b.lastMs || 0) - (a.lastMs || 0); });
+    if (!merged.length) { el.innerHTML = '<div class="empty">Belum ada pesan masuk dari toko.</div>'; return; }
+    el.innerHTML = merged.map(function (r) {
+      var nm = aliasFor(r.tid);
       return '<div class="item" data-tid="' + esc(r.tid) + '">' +
-        '<div class="av">' + esc(r.tid.slice(0, 2)) + '</div>' +
-        '<div class="info"><div class="name"><span>' + esc(r.tid) + '</span><span class="time">' + hm(r.lastMs) + '</span></div>' +
+        '<div class="av">' + esc(nm.slice(0, 2).toUpperCase()) + '</div>' +
+        '<div class="info"><div class="name"><span>' + esc(nm) + (nm !== r.tid ? ' <small style="color:#64748b">(' + esc(r.tid) + ')</small>' : '') + '</span><span class="time">' + hm(r.lastMs) + '</span></div>' +
         '<div class="prev">' + esc(r.lastText || '') + '</div></div></div>';
     }).join('');
     el.querySelectorAll('.item').forEach(function (it) {
@@ -177,11 +191,23 @@
     el.innerHTML = list.map(function (x) {
       var isMe = isWorld ? (x.role === 'dev') : (x.fromTid === 'DEV');
       var sender = isWorld ? x.label : (x.fromLabel || x.fromTid);
-      return '<div class="bwrap' + (isMe ? ' me' : '') + '"><div class="bubble">' +
+      return '<div class="bwrap' + (isMe ? ' me' : '') + '" data-id="' + esc(x.id || '') + '" data-ms="' + (x.ms || 0) + '" data-me="' + (isMe ? '1' : '0') + '"><div class="bubble">' +
         (!isMe ? '<div class="sender">' + esc(sender) + '</div>' : '') +
         '<div>' + esc(x.text) + '</div>' +
         '<div class="meta">' + hm(x.ms) + (isMe ? ' ✓✓' : '') + '</div></div></div>';
     }).join('');
+    if (!isWorld) {
+      el.querySelectorAll('.bwrap').forEach(function (bw) {
+        bw.onclick = function () {
+          var id = bw.getAttribute('data-id'), ms = +bw.getAttribute('data-ms'), isMe = bw.getAttribute('data-me') === '1';
+          if (!id || !isMe) return;
+          var canUnsend = (Date.now() - ms) <= 30 * 60 * 1000;
+          var msg = canUnsend ? 'Batal kirim pesan ini (maks 30 menit)?' : 'Hapus pesan ini?';
+          if (!confirm(msg)) return;
+          db.collection('on_dm').doc(pairId(state.activeTid)).collection('messages').doc(id).delete().catch(function () {});
+        };
+      });
+    }
     el.scrollTop = el.scrollHeight;
   }
 
@@ -194,7 +220,7 @@
     if (state.unsubChat) state.unsubChat();
     state.unsubChat = db.collection('on_dm').doc(pairId(tid)).collection('messages')
       .orderBy('ms', 'desc').limit(80).onSnapshot(function (snap) {
-        var a = []; snap.forEach(function (d) { a.push(d.data()); });
+        var a = []; snap.forEach(function (d) { var x = d.data(); x.id = d.id; a.push(x); });
         a.reverse(); state.msgs = a; renderFeed(a, false);
       });
   }
@@ -241,6 +267,25 @@
   $('msg-send').onclick = sendMessage;
   $('msg-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') sendMessage(); });
 
+  $('btn-addc').onclick = function () {
+    var tid = prompt('Masukkan ID Toko (contoh: ID260220017):');
+    if (!tid) return;
+    tid = tid.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+    if (!tid) return;
+    var nm = prompt('Nama kontak untuk ' + tid + ':') || tid;
+    var ex = state.contacts.find(function (c) { return c.tid === tid; });
+    if (ex) ex.name = nm.trim(); else state.contacts.unshift({ tid: tid, name: nm.trim() });
+    saveContacts(); renderRooms();
+  };
+  $('btn-clear').onclick = function () {
+    if (!state.activeTid || !confirm('Bersihkan semua chat dengan ' + state.activeTid + '?')) return;
+    var pair = pairId(state.activeTid);
+    db.collection('on_dm').doc(pair).collection('messages').get().then(function (snap) {
+      var b = db.batch(); snap.forEach(function (d) { b.delete(d.ref); }); return b.commit();
+    }).then(function () {
+      db.collection('on_dm').doc(pair).set({ lastText: '', lastMs: Date.now() }, { merge: true });
+    }).catch(function () {});
+  };
   $('btn-login').onclick = function () {
     $('login-err').textContent = '';
     auth.signInWithEmailAndPassword($('in-email').value.trim(), $('in-pass').value)

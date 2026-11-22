@@ -174,7 +174,7 @@
     var myTid = me().tid;
     return S.dmMsgs.map(function (x) {
       var isMe = x.fromTid === myTid;
-      return '<div class="on-bwrap' + (isMe ? ' me' : '') + '">' +
+      return '<div class="on-bwrap' + (isMe ? ' me' : '') + '" data-id="' + esc(x.id || '') + '" data-ms="' + (x.ms || 0) + '" data-me="' + (isMe ? '1' : '0') + '">' +
         '<div class="on-bubble">' +
         (!isMe ? '<div class="on-sender">' + esc(x.fromLabel || x.fromTid) + '</div>' : '') +
         '<div class="on-text">' + esc(x.text) + '</div>' +
@@ -225,6 +225,7 @@
     '#fmc-in{flex:none;display:flex;gap:8px;padding:10px 12px;background:#1e293b;border-top:1px solid rgba(255,255,255,.1)}',
     '#fmc-in input{flex:1;min-width:0;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:9px 14px;color:#f8fafc;font-size:13px;outline:none}',
     '#fmc-in button{all:unset;cursor:pointer;padding:8px 16px;border-radius:99px;background:#2563eb;color:#fff;font:700 12.5px system-ui}',
+    'html[data-fm-invert="1"] #fmc-panel,html[data-fm-invert="1"] #fmc-tab{filter:invert(1) hue-rotate(180deg)}',
     '@media(max-width:1023px){#fmc-tab{bottom:88px;padding:11px 16px}#fmc-tab.kasir{left:auto;right:12px}#fmc-panel,#fmc-panel.kasir,#fmc-panel.owner{inset:0;bottom:0;left:0;right:0;width:auto;height:auto;max-height:none;border-radius:0;z-index:2147482000;transform:none}}'
   ].join('\n');
 
@@ -315,7 +316,9 @@
     } else if (S.view === 'room' && S.activeRoom) {
       var rm = S.activeRoom;
       var sub = rm.type === 'world' ? 'Semua jaringan ON' : (rm.type === 'cs' ? 'CS Live Oneilverse' : 'ID Toko: ' + rm.tid);
-      pn.innerHTML = '<div id="fmc-hd"><button type="button" id="on-back">←</button><div>' + esc(rm.name) + '<span class="on-sub">' + esc(sub) + '</span></div><span class="sp"></span><button type="button" id="fmc-x">×</button></div>' +
+      pn.innerHTML = '<div id="fmc-hd"><button type="button" id="on-back">←</button><div>' + esc(rm.name) + '<span class="on-sub">' + esc(sub) + '</span></div><span class="sp"></span>' +
+        (rm.type !== 'world' ? '<button type="button" id="on-clr" style="font-size:11.5px;color:#fca5a5" title="Bersihkan chat">Clear</button>' : '') +
+        '<button type="button" id="fmc-x">×</button></div>' +
         (rm.type === 'world' && ROLE === 'owner' ? '<label id="fmc-opt" class="on"><input type="checkbox" id="fmc-ko"> Kasir toko saya boleh ikut chat</label>' : '') +
         '<div id="fmc-feed"></div><div id="fmc-note"></div>' +
         '<div id="fmc-in"><input id="fmc-txt" maxlength="' + (rm.type === 'world' ? MAXLEN : 300) + '" placeholder="Tulis pesan..." autocomplete="off"><button type="button" id="fmc-go">Kirim</button></div>';
@@ -332,6 +335,27 @@
       var feed = $('fmc-feed');
       feed.innerHTML = rm.type === 'world' ? feedHtml(60) : dmFeedHtml();
       stickScroll(feed);
+      if (rm.type !== 'world') {
+        var clr = $('on-clr');
+        if (clr) clr.onclick = function () {
+          if (!confirm('Bersihkan semua chat di room ini?')) return;
+          var pair = dmPairId(me().tid, rm.tid);
+          db.collection(DM_COL).doc(pair).collection('messages').get().then(function (snap) {
+            var b = db.batch(); snap.forEach(function (d) { b.delete(d.ref); }); return b.commit();
+          }).then(function () {
+            db.collection(DM_COL).doc(pair).set({ lastText: '', lastMs: Date.now() }, { merge: true });
+          }).catch(function () {});
+        };
+        feed.querySelectorAll('.on-bwrap').forEach(function (bw) {
+          bw.onclick = function () {
+            var id = bw.getAttribute('data-id'), ms = +bw.getAttribute('data-ms'), isMe = bw.getAttribute('data-me') === '1';
+            if (!id || !isMe) return;
+            var canUnsend = (Date.now() - ms) <= 30 * 60 * 1000;
+            if (!confirm(canUnsend ? 'Batal kirim pesan ini (maks 30 menit)?' : 'Hapus pesan ini?')) return;
+            db.collection(DM_COL).doc(dmPairId(me().tid, rm.tid)).collection('messages').doc(id).delete().catch(function () {});
+          };
+        });
+      }
       var txt = $('fmc-txt');
       function go() {
         var v = txt.value; $('fmc-note').textContent = '';
