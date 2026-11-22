@@ -90,7 +90,8 @@
     /* tombol melayang Absen / Stok / Piutang + Bantuan (?) — selaras warna dock di mode terang & gelap */
     o += '.fm-fab{border-radius:999px!important;font-weight:700!important;font-size:12px!important;padding:0 15px!important;height:42px!important;line-height:42px!important;cursor:pointer;background:var(--o-pil,#ffffff)!important;color:var(--o-ink,#0f172a)!important;border:0!important;box-shadow:0 2px 6px var(--o-sh,rgba(15,23,42,.07)),0 16px 36px -14px var(--o-sh2,rgba(15,23,42,.38))!important}';
     o += '.fm-fab[data-fc="piu"]{color:var(--o-ink,#0f172a)!important}.fm-fab[data-fc="stk"]{color:#047857!important}.fm-fab[data-fc="abs"]{color:#0e7490!important}';
-    o += '#fm-help-fab{right:104px!important;bottom:14px!important;width:42px!important;height:42px!important;background:var(--o-pil,#ffffff)!important;color:var(--o-ink,#0f172a)!important;border:0!important;box-shadow:0 2px 6px var(--o-sh,rgba(15,23,42,.07)),0 16px 36px -14px var(--o-sh2,rgba(15,23,42,.38))!important}';
+    o += '#fm-help-fab{right:14px!important;bottom:14px!important;width:42px!important;height:42px!important;background:var(--o-pil,#ffffff)!important;color:var(--o-ink,#0f172a)!important;border:0!important;box-shadow:0 2px 6px var(--o-sh,rgba(15,23,42,.07)),0 16px 36px -14px var(--o-sh2,rgba(15,23,42,.38))!important}';
+    o += 'body:has(#fm-help-fab) .fm-fab[data-fc="piu"]{right:64px!important}';
     o += 'html[data-fm-invert="1"] .fm-act{filter:invert(1) hue-rotate(180deg)}';
     /* Manager/Owner: isi halaman berhenti di atas dock (tidak tertimpa), bagian tengah mengecil bila layar pendek */
     o += 'html[data-fm-page="manager"] main,html[data-fm-page="owner"] main{padding-bottom:96px!important;box-sizing:border-box!important}';
