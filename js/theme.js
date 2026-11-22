@@ -2,12 +2,16 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.15';
-  var BETA = 'v1.1.15';
+  var APP_VERSION = '1.1.16';
+  var BETA = 'v1.1.16';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.1.16', '22 Nov 2026', [
+      '[Perbaikan] Merapikan tata letak papan kendali menjadi 6 kategori yang lebih mudah dipahami dalam satu layar penuh tanpa perlu digulir',
+      '[Keamanan] Seluruh hak akses dan fungsi pengelolaan toko tetap berjalan normal'
+    ]],
     ['v1.1.15', '22 Nov 2026', [
       '[Perbaikan] Merapikan pengelompokan daftar fitur paket dan menyederhanakan tampilan menu agar lebih ringkas tanpa fitur duplikat',
       '[Keamanan] Seluruh pengaturan fitur toko dan paket klien yang sudah berjalan tetap terjaga'
