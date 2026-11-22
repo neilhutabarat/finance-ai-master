@@ -5,10 +5,9 @@
   if (!/provider/.test(location.pathname)) return;
 
   var DEFAULT_GROUPS = [
-    { id: 'klien', title: 'Kelola Toko Klien', hint: 'Toko yang sudah berjalan', c: '#8fb8e8', items: [
+    { id: 'klien', title: 'Kelola Toko Klien', hint: 'Toko yang sudah berjalan', c: '#3b82f6', items: [
       { key: 'permohonan_kasir', t: 'Permohonan Kasir', ic: 'users', run: "openModal('tickets')", badge: 'stat-pending-tickets', d: 'Setujui atau tolak terminal baru' },
       { key: 'lokasi_aktivitas', t: 'Lokasi & Aktivitas', ic: 'shield', run: "towerPick('lokasi')", d: 'GPS, online, mutasi live' },
-      { key: 'jaringan_mitra', t: 'Jaringan Mitra', ic: 'building', find: 'Jaringan Mitra', d: 'Pantau daftar toko (hanya lihat)' },
       { key: 'link_toko', t: 'Link Toko', ic: 'send', run: "towerPick('link')", d: 'Salin link login' },
       { key: 'akun_login', t: 'Akun Login', ic: 'key', find: 'Akun Login', d: 'PIN Admin, Manager, Owner toko' },
       { key: 'bekukan_aktifkan', t: 'Bekukan / Aktifkan', ic: 'moon', run: "towerPick('freeze')", d: 'Bekukan atau aktifkan toko' },
@@ -16,58 +15,56 @@
       { key: 'toko_berhenti', t: 'Toko Berhenti', ic: 'archive', find: 'Toko Berhenti', d: 'Toko yang dibekukan atau berhenti' },
       { key: 'hapus_pulihkan', t: 'Hapus / Pulihkan Klien', ic: 'trash', run: "towerPick('hapus')", d: 'Hapus klien atau pulihkan' }
     ] },
-    { id: 'pantau', title: 'Pemantauan & Bantuan', hint: 'Tiket klien, error, dan kesehatan sistem', c: '#9fa8e6', items: [
-      { key: 'tiket_bantuan', t: 'Tiket Bantuan', ic: 'bell', run: "FM_HELPDESK.open()", d: 'Pertanyaan dari klien, balas di sini' },
-      { key: 'pemantauan_error', t: 'Pemantauan Error', ic: 'bell', run: "FM_MON.open('error')", d: 'Error aplikasi dari toko, kapan dan di mana' },
-      { key: 'log_login', t: 'Log Login', ic: 'users', run: "FM_MON.open('login')", d: 'Siapa masuk, kapan, perangkat apa' },
-      { key: 'kesehatan_sistem', t: 'Kesehatan Sistem', ic: 'shield', run: "FM_HEALTH.open()", d: 'Pindai, bersihkan server, perbaiki bug data' }
-    ] },
-    { id: 'uang', title: 'Pembukuan & Pajak', hint: 'Pajak dan pembukuan jaringan', c: '#d9b872', items: [
-      { key: 'pajak_jaringan', t: 'Pajak Jaringan', ic: 'tax', run: "openModal('tax_net')", d: 'Pajak yang disumbangkan tiap toko' },
-      { key: 'catat_pembukuan', t: 'Catat Pembukuan', dup: true, ic: 'swap', run: "openModal('provider_input_tx')", d: 'Pemasukan dan pengeluaran Tower' },
-      { key: 'coa_provider', t: 'COA Provider', ic: 'list', find: 'COA Provider', d: 'Daftar akun, bisa diseret untuk urutan' },
-      { key: 'kurs_emas', t: 'Kurs & Emas', ic: 'coins', find: 'Kurs', d: 'Kurs dan harga emas terkini' }
-    ] },
-    { id: 'layanan', title: 'Layanan & Langganan', hint: 'Paket, sewa fitur, dan tagihan toko', c: '#e0a47a', items: [
-      { key: 'billing_toko', t: 'Billing Toko', ic: 'chart', run: "towerPick('billing')", d: 'Biaya dan pembayaran toko' },
-      { key: 'billing_jaringan', t: 'Billing Jaringan', ic: 'chart', find: 'Billing Jaringan', d: 'Tagihan, jatuh tempo, cicilan, uji coba' },
-      { key: 'pengingat_jatuh_tempo', t: 'Pengingat Jatuh Tempo', ic: 'bell', run: "towerDue()", d: 'Toko yang tagihannya dekat' },
-      { key: 'paket_billing', t: 'Paket & Billing', ic: 'tag', run: "towerPick('paket')", d: 'Basic atau Plus, lalu tagihan' },
-      { key: 'isi_paket_fitur', t: 'Isi Paket Plus/Pro', ic: 'list', run: "openModal('paket_fitur')", d: 'Isi fitur Plus & Pro, atur harga, lalu terapkan ke toko' },
-      { key: 'store', t: 'Store', ic: 'tag', run: "FM_TSTORE.open()", d: 'Permintaan sewa, sewa aktif, beri sewa, dan katalog harga fitur' }
-    ] },
-    { id: 'bangun', title: 'Siapkan Toko Baru', hint: 'Untuk klien baru', c: '#6fc7c0', items: [
+    { id: 'bangun', title: 'Siapkan & Atur Toko', hint: 'Buka toko baru atau ubah profil, fitur & COA toko', c: '#0d9488', items: [
       { key: 'klien_baru', t: 'Klien Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko, pilih jenis usaha' },
       { key: 'profil_toko', t: 'Profil Toko', ic: 'store', run: "towerPick('profil')", d: 'Nama, slogan, warna, logo' },
       { key: 'fitur_toko', t: 'Fitur Toko', ic: 'grid', run: "towerPick('fitur')", d: 'Centang fitur per peran' },
-      { key: 'susun_pulau', t: 'Susunan Pulau ON2', ic: 'grid', run: "towerPick('susun')", d: 'Atur urutan dan tampil isi pulau kiri/kanan: nomor 1 di atas apa, nomor 2 apa' },
-      { key: 'pulau_on2', t: 'Pulau & Kartu ON2', ic: 'spark', run: "towerPick('pulau')", d: 'Atur pulau kiri/kanan, kartu, denyut, dan tutup hari per toko' },
       { key: 'coa_toko', t: 'COA Toko', ic: 'list', run: "towerPick('coa')", d: 'Daftar akun toko' },
       { key: 'stok_katalog', t: 'Stok & Katalog', ic: 'box', run: "FM_LAB.open('template')", d: 'Isi katalog awal, simpan & salin template toko' },
       { key: 'kuota_terminal', t: 'Kuota Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Kasir, Manager, Owner' },
       { key: 'salin_fitur', t: 'Salin Fitur', ic: 'grid', run: "towerPick('salin')", d: 'Salin fitur dari toko lain' },
       { key: 'demo_toko', t: 'Demo Toko', ic: 'moon', run: "FM_TSTORE.openDemo()", d: 'Jadikan toko demo dengan batas hari, atau jadikan toko asli' }
     ] },
-    { id: 'versi', title: 'Kendali Versi', hint: 'Kunci dan rollout versi aplikasi', c: '#c9a8e0', items: [
-      { key: 'versi_toko', t: 'Versi Toko', ic: 'swap', run: "towerPick('versi')", d: 'Kunci versi aplikasi' },
-      { key: 'rollout_versi', t: 'Rollout Versi', ic: 'box', run: "if(window.openRolloutModal)openRolloutModal()", d: 'Titik beku tiap generasi, aplikasi + Oneil Shield' }
+    { id: 'layanan', title: 'Layanan & Langganan', hint: 'Paket, sewa fitur, dan tagihan toko', c: '#ea580c', items: [
+      { key: 'paket_billing', t: 'Paket Toko', ic: 'tag', run: "towerPick('paket')", d: 'Ubah paket Basic / Plus / Pro & durasi toko' },
+      { key: 'isi_paket_fitur', t: 'Isi Paket Plus & Pro', ic: 'list', run: "openModal('paket_fitur')", d: 'Atur daftar fitur bawaan paket Plus & Pro' },
+      { key: 'billing_toko', t: 'Billing Toko', ic: 'chart', run: "towerPick('billing')", d: 'Biaya dan pembayaran per toko' },
+      { key: 'billing_jaringan', t: 'Billing Jaringan', ic: 'chart', find: 'Billing Jaringan', d: 'Tagihan semua toko, jatuh tempo, cicilan' },
+      { key: 'pengingat_jatuh_tempo', t: 'Pengingat Jatuh Tempo', ic: 'bell', run: "towerDue()", d: 'Toko yang tagihannya dekat' },
+      { key: 'store', t: 'OneilStore', ic: 'tag', run: "FM_TSTORE.open()", d: 'Permintaan sewa, sewa aktif, beri sewa, dan katalog harga fitur' }
     ] },
-    { id: 'serah', title: 'Persiapan & Serah Terima', hint: 'Menuju toko siap diserahkan', c: '#f0a8c0', items: [
+    { id: 'pantau', title: 'Pemantauan & Bantuan', hint: 'Tiket klien, error, dan kesehatan sistem', c: '#6366f1', items: [
+      { key: 'tiket_bantuan', t: 'Tiket Bantuan', ic: 'bell', run: "FM_HELPDESK.open()", d: 'Pertanyaan dari klien, balas di sini' },
+      { key: 'pemantauan_error', t: 'Pemantauan Error', ic: 'bell', run: "FM_MON.open('error')", d: 'Error aplikasi dari toko, kapan dan di mana' },
+      { key: 'log_login', t: 'Log Login', ic: 'users', run: "FM_MON.open('login')", d: 'Siapa masuk, kapan, perangkat apa' },
+      { key: 'kesehatan_sistem', t: 'Kesehatan Sistem', ic: 'shield', run: "FM_HEALTH.open()", d: 'Pindai, bersihkan server, perbaiki bug data' }
+    ] },
+    { id: 'uang', title: 'Pembukuan & Pajak Provider', hint: 'Pajak jaringan dan kas internal Tower', c: '#d97706', items: [
+      { key: 'pajak_jaringan', t: 'Pajak Jaringan', ic: 'tax', run: "openModal('tax_net')", d: 'Pajak yang disumbangkan tiap toko' },
+      { key: 'catat_pembukuan', t: 'Catat Pembukuan', dup: true, ic: 'swap', run: "openModal('provider_input_tx')", d: 'Pemasukan dan pengeluaran Tower' },
+      { key: 'coa_provider', t: 'COA Provider', ic: 'list', find: 'COA Provider', d: 'Daftar akun internal Provider' },
+      { key: 'kurs_emas', t: 'Kurs & Emas', ic: 'coins', find: 'Kurs', d: 'Kurs dan harga emas terkini' }
+    ] },
+    { id: 'versi', title: 'Kendali Versi & Serah Terima', hint: 'Kunci versi rilis, uji fitur, dan serah terima toko', c: '#9333ea', items: [
+      { key: 'versi_toko', t: 'Versi Toko', ic: 'swap', run: "towerPick('versi')", d: 'Kunci toko ke versi aplikasi tertentu' },
+      { key: 'rollout_versi', t: 'Rollout Versi', ic: 'box', run: "if(window.openRolloutModal)openRolloutModal()", d: 'Titik beku tiap generasi, aplikasi + Oneil Shield' },
       { key: 'rakit_uji', t: 'Rakit & Uji', ic: 'grid', run: "FM_LAB.open('rakit')", d: 'Aktifkan fitur satu per satu, catat hasil uji' },
       { key: 'ubah_id', t: 'Ubah ID', ic: 'key', run: "FM_LAB.open('rename')", d: 'Ganti ID toko yang belum Published' },
       { key: 'published', t: 'Published', ic: 'send', run: "FM_LAB.open('publish')", d: 'Tandai toko yang sudah diserahkan' }
     ] },
-    { id: 'uji', title: 'Data Uji & Demo', hint: 'Hati-hati: mengubah atau menghapus data uji', c: '#e29a9a', items: [
-      { key: 'reset_statistik', t: 'Reset Statistik', warn: true, ic: 'trash', run: "FM_LAB.open('reset')", d: 'Hapus data uji coba toko, kembali ke 0' },
-      { key: 'data_demo', t: 'Data Demo', ic: 'grid', run: "FM_DEMO.open()", d: 'Isi toko uji dengan transaksi contoh' },
-      { key: 'uji_mandiri', t: 'Uji Mandiri', ic: 'shield', run: "FM_QA.open()", d: 'Cek file, versi, dan kecocokan data toko (baca-saja)' }
-    ] },
-    { id: 'tampil', title: 'Tampilan & Komunikasi', hint: 'Wallpaper, pengumuman, dan chat', c: '#8fd0b0', items: [
-      { key: 'wallpaper', t: 'Wallpaper', ic: 'spark', run: "FM_TWALL.open()", d: 'Atur tampilan toko: wallpaper (unggah sendiri), kejelasan kaca, hujan di kaca, wallpaper portal. Berganti tanpa muat ulang' },
+    { id: 'tampil', title: 'Tampilan, Komunikasi & Data Uji', hint: 'Wallpaper, pengumuman, chat, dan reset data uji', c: '#059669', items: [
+      { key: 'wallpaper', t: 'Wallpaper', ic: 'spark', run: "FM_TWALL.open()", d: 'Atur wallpaper toko, kejelasan kaca & hujan' },
       { key: 'pesan_siaran', t: 'Pesan Siaran', dup: true, ic: 'send', run: "openModal('broadcast_modal')", d: 'Kirim pengumuman ke semua toko' },
       { key: 'catatan_rilis', t: 'Catatan Rilis', ic: 'book', find: 'Catatan Rilis', d: 'Riwayat pembaruan untuk klien' },
       { key: 'chat_global', t: 'Chat Global', ic: 'bell', run: "if(window.FM_CHAT)FM_CHAT.openModeration()", d: 'Moderasi, bisukan, nyala atau mati' },
-      { key: 'hapus_semua_chat', t: 'Hapus Semua Chat', ic: 'trash', run: "if(window.FM_CHAT)FM_CHAT.clearAll()", d: 'Kosongkan Chat Universe (permanen)' }
+      { key: 'hapus_semua_chat', t: 'Hapus Semua Chat', ic: 'trash', run: "if(window.FM_CHAT)FM_CHAT.clearAll()", d: 'Kosongkan Chat Universe (permanen)' },
+      { key: 'reset_statistik', t: 'Reset Statistik', warn: true, ic: 'trash', run: "FM_LAB.open('reset')", d: 'Hapus data uji coba toko, kembali ke 0' },
+      { key: 'data_demo', t: 'Data Demo', ic: 'grid', run: "FM_DEMO.open()", d: 'Isi toko uji dengan transaksi contoh' },
+      { key: 'uji_mandiri', t: 'Uji Mandiri', ic: 'shield', run: "FM_QA.open()", d: 'Cek file, versi, dan kecocokan data toko' }
+    ] },
+    { id: 'on2', title: 'Oneilverse 2 (Belum Rilis)', hint: 'Pengaturan khusus tampilan pulau & kartu generasi 2', c: '#7c3aed', items: [
+      { key: 'susun_pulau', t: 'Susunan Pulau ON2', ic: 'grid', run: "towerPick('susun')", d: 'Atur urutan dan tampil isi pulau kiri/kanan' },
+      { key: 'pulau_on2', t: 'Pulau & Kartu ON2', ic: 'spark', run: "towerPick('pulau')", d: 'Atur pulau kiri/kanan, kartu, denyut, dan tutup hari' }
     ] }
   ];
 
@@ -87,7 +84,11 @@
   }
   function effectiveGroups() {
     var meta = defaultGroupMeta();
-    var base = (CUSTOM && CUSTOM.groups && CUSTOM.groups.length) ? CUSTOM.groups : DEFAULT_GROUPS.map(function (g) { return { id: g.id, title: g.title }; });
+    var hasCustomOn2 = CUSTOM && CUSTOM.groups && CUSTOM.groups.some(function (g) { return g.id === 'on2'; });
+    var base = (CUSTOM && CUSTOM.groups && CUSTOM.groups.length) ? CUSTOM.groups.slice() : DEFAULT_GROUPS.map(function (g) { return { id: g.id, title: g.title }; });
+    if (!hasCustomOn2 && !base.some(function (g) { return g.id === 'on2'; })) {
+      base.push({ id: 'on2', title: meta.on2.title });
+    }
     var groups = base.map(function (g, i) {
       var m = meta[g.id] || {};
       return { id: g.id, title: g.title || m.title || 'Kategori', hint: m.hint || '', c: m.c || PALETTE[i % PALETTE.length], items: [] };
@@ -96,11 +97,11 @@
     var itemGroupMap = (CUSTOM && CUSTOM.itemGroup) || {};
     var defMap = defaultItemGroupMap();
     allItemsFlat().forEach(function (it) {
-      var gid = itemGroupMap[it.key] || defMap[it.key];
-      var g = byId[gid] || groups[0];
+      var gid = (!hasCustomOn2 && defMap[it.key] === 'on2') ? 'on2' : (itemGroupMap[it.key] || defMap[it.key]);
+      var g = byId[gid] || byId[defMap[it.key]] || groups[0];
       g.items.push(it);
     });
-    return groups;
+    return groups.filter(function (g) { return g.items.length > 0; });
   }
   function fsdb() { try { return (typeof db !== 'undefined' && db) ? db : null; } catch (e) { return null; } }
   function loadCustomConfig(done) {
@@ -284,25 +285,27 @@
       frag.appendChild(sec);
     });
     host.innerHTML = '';
-    var nav = document.createElement('div'); nav.className = 'tw-tabs'; nav.setAttribute('role', 'tablist');
-    GROUPS.forEach(function (g) { var t = document.createElement('button'); t.type = 'button'; t.className = 'tw-tab'; t.setAttribute('data-tab', g.id); t.style.setProperty('--g', g.c); t.textContent = g.title; nav.appendChild(t); });
+    var nav = document.createElement('div'); nav.className = 'tw-tabs';
+    var qIn = document.createElement('input'); qIn.type = 'search'; qIn.className = 'tw-ken-q'; qIn.placeholder = '🔍 Cari menu kendali (mis. paket, fitur, versi, coa, klien)...';
+    qIn.oninput = function () {
+      var q = (qIn.value || '').toLowerCase().trim();
+      [].slice.call(host.querySelectorAll('.tw-group')).forEach(function (sec) {
+        var any = 0;
+        [].slice.call(sec.querySelectorAll('.fm-act')).forEach(function (btn) {
+          var txt = ((btn.getAttribute('data-tw') || '') + ' ' + (btn.textContent || '')).toLowerCase();
+          var ok = !q || txt.indexOf(q) >= 0;
+          btn.style.setProperty('display', ok ? '' : 'none', ok ? '' : 'important');
+          if (ok) any++;
+        });
+        sec.style.setProperty('display', (!q || any) ? 'flex' : 'none', 'important');
+      });
+    };
+    nav.appendChild(qIn);
     var editBtn = document.createElement('button'); editBtn.type = 'button'; editBtn.className = 'tw-tab tw-tab-edit'; editBtn.textContent = '✏️ Atur Menu';
     editBtn.onclick = function (e) { e.stopPropagation(); openMenuEditor(); };
     nav.appendChild(editBtn);
     host.appendChild(nav); host.appendChild(frag);
     host.classList.add('tw-grouped');
-    function setTab(id) {
-      var g = GROUPS.filter(function (x) { return x.id === id; })[0] || GROUPS[0];
-      [].slice.call(host.querySelectorAll('.tw-group')).forEach(function (sx) { sx.classList.toggle('on', sx.getAttribute('data-g') === g.id); });
-      [].slice.call(host.querySelectorAll('.tw-tab')).forEach(function (tx) { tx.classList.toggle('on', tx.getAttribute('data-tab') === g.id); });
-      var rows = Math.max(1, Math.ceil(g.items.length / 5));
-      host.style.setProperty('--tw-rows', rows);
-      host.style.setProperty('--tw-fixed', ((rows - 1) * 10 + 58) + 'px');
-      try { localStorage.setItem('fm_tw_tab', g.id); } catch (e) {}
-    }
-    nav.onclick = function (e) { var b = e.target.closest ? e.target.closest('.tw-tab') : null; if (b && b.hasAttribute('data-tab')) setTab(b.getAttribute('data-tab')); };
-    var last = ''; try { last = localStorage.getItem('fm_tw_tab') || ''; } catch (e) {}
-    setTab(last || GROUPS[0].id);
   }
 
   function badges() {
@@ -314,16 +317,20 @@
   }
 
   var CSS2 = [
-    '.tw-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:2px 4px 6px}',
-    '.tw-tab{all:unset;box-sizing:border-box;cursor:pointer;padding:8px 14px;border-radius:999px;font-size:12.5px;font-weight:700;color:#0f172a;background:rgba(255,255,255,.6);border:1px solid rgba(15,23,42,.16)}',
-    '.tw-tab:hover{background:rgba(255,255,255,.9)}',
-    '.tw-tab.on{background:var(--g);border-color:rgba(15,23,42,.3);box-shadow:0 2px 8px -3px rgba(15,23,42,.4)}',
-    '.tw-group{display:none!important}.tw-group.on{display:flex!important}',
-    'html[data-tw-ck] #tw-ken .tw-group .tw-head{display:none!important}',
-    'html[data-fm-page="tower"] #tw-ken #fm-actions .tw-group .fm-act.tw-warn{border-color:rgba(220,38,38,.5)!important}',
-    'html[data-fm-page="tower"] #tw-ken #fm-actions .tw-group .fm-act.tw-warn i{background:rgba(220,38,38,.16)!important;color:#b91c1c!important}',
-    'html[data-tw-ck] #tw-ken #fm-actions .tw-group .tw-grid{grid-auto-rows:min(76px,calc((100cqh - var(--tw-fixed,172px)) / var(--tw-rows,2)))!important;align-content:start}',
-    '.tw-tab-edit{background:rgba(255,255,255,.1)!important;border-style:dashed!important;color:#cbd5e1!important;margin-left:auto}'
+    '.tw-tabs{display:flex;align-items:center;gap:10px;padding:2px 2px 6px;flex:none}',
+    '.tw-ken-q{flex:1;max-width:420px;padding:8px 14px;border-radius:12px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:12.5px;font-weight:600;outline:none;box-shadow:0 2px 6px -2px rgba(15,23,42,.05)}',
+    '.tw-ken-q:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}',
+    '.tw-tab{all:unset;box-sizing:border-box;cursor:pointer;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;color:#334155;background:#ffffff;border:1px solid #cbd5e1}',
+    '.tw-tab:hover{background:#f8fafc;color:#0f172a}',
+    '.tw-group{display:flex!important;flex-direction:column;gap:6px;padding-bottom:6px}',
+    'html[data-tw-ck] #tw-ken .tw-group .tw-head{display:flex!important;align-items:baseline;gap:10px;padding:2px 4px}',
+    'html[data-tw-ck] #tw-ken .tw-group .tw-head:before{display:block!important;content:"";align-self:center;width:4px;height:14px;border-radius:3px;background:var(--g,#2563eb)}',
+    'html[data-tw-ck] #tw-ken .tw-group .tw-head b{font-size:13.5px!important;font-weight:800!important;color:#0f172a!important;letter-spacing:.01em}',
+    'html[data-tw-ck] #tw-ken .tw-group .tw-head span{display:inline!important;font-size:11.5px!important;color:#64748b!important;opacity:1!important}',
+    'html[data-fm-page="tower"] #tw-ken #fm-actions .tw-group .fm-act.tw-warn{border-color:rgba(220,38,38,.45)!important}',
+    'html[data-fm-page="tower"] #tw-ken #fm-actions .tw-group .fm-act.tw-warn i{background:rgba(220,38,38,.12)!important;color:#dc2626!important}',
+    'html[data-tw-ck] #tw-ken #fm-actions .tw-group .tw-grid{grid-auto-rows:64px!important;align-content:start}',
+    '.tw-tab-edit{background:#ffffff!important;border:1px dashed #94a3b8!important;color:#334155!important;margin-left:auto}'
   ].join('\n');
   var st = document.createElement('style'); st.id = 'tw-menu-css'; st.textContent = CSS + '\n' + CSS2; document.head.appendChild(st);
   function start() {

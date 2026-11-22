@@ -77,8 +77,7 @@
     { key: 'theme', label: 'Tema Warna (di Pengaturan)', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'mutasi_wa', label: 'Mutasi: Kirim WhatsApp dan Cetak', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'gaji', label: 'Laporan Gaji', r: { manager: 'o', owner: 'o' } },
-    { key: 'gaji_auto', label: 'Gaji otomatis tercatat sebagai pengeluaran', r: { manager: 'o' } },
-    { key: 'paket', label: 'Paket Basic, Plus, dan Pro', soon: true, r: { manager: 'o', owner: 'o' } }
+    { key: 'gaji_auto', label: 'Gaji otomatis tercatat sebagai pengeluaran', r: { manager: 'o' } }
   ];
   // nilai untuk toko lama yang belum punya pilihan tersimpan
   var LEGACY = { wa_receipt: 'plus', analisa: { owner: true }, coa: {}, ledger: { kasir: true }, mutasi_wa: {}, gaji: {}, gaji_auto: {}, stok_input: { manager: true }, stok_closing: { manager: true } };
@@ -358,17 +357,18 @@
 
   function activeList(role, tn) { role = role || pageRole(); return FEATURES.filter(function (f) { return f.r[role] && !f.soon && has(f.key, role, tn); }); }
 
-  /* ---- tabel centang untuk Tower: prefix 'nt' (toko baru) atau 'ts' (ubah toko) ---- */
+  /* ---- tabel centang untuk Tower: prefix 'nt' (toko baru), 'ts' (ubah toko), atau 'pf-plus'/'pf-pro' (isi paket) ---- */
   var CATS = [
-    { id: 'akun', label: 'Toko & Akun', keys: ['admin_usaha', 'banyak_usaha', 'instruksi'] },
     { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
     { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'stok_habis'] },
     { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
-    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'ai_asisten', 'card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'denyut', 'tutup_hari', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup', 'import_tx'] },
+    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup', 'import_tx'] },
     { id: 'ops', label: 'Operasional', keys: ['absensi', 'properti', 'offline_penuh'] },
     { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'billing_card', 'chat'] },
-    { id: 'pkr', label: 'Oneilverse 2 · Pulau KIRI (menu & satelit)', keys: ISL_LK },
-    { id: 'pkn', label: 'Oneilverse 2 · Pulau KANAN (aksi cepat & satelit)', keys: ISL_RK }
+    { id: 'akun', label: 'Toko & Akun (Beli Khusus / Add-on per Toko)', addon: true, keys: ['admin_usaha', 'banyak_usaha', 'instruksi'] },
+    { id: 'on2', label: 'Oneilverse 2 · Kartu, Denyut & AI (Belum Rilis)', on2: true, keys: ['ai_asisten', 'card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'denyut', 'tutup_hari'] },
+    { id: 'pkr', label: 'Oneilverse 2 · Pulau KIRI (menu & satelit)', on2: true, keys: ISL_LK },
+    { id: 'pkn', label: 'Oneilverse 2 · Pulau KANAN (aksi cepat & satelit)', on2: true, keys: ISL_RK }
   ];
 
   /* Penempatan fitur untuk tampilan Tower (hanya label + pengelompokan, tidak mengubah hak akses):
@@ -413,8 +413,9 @@
       ? ' <span style="font-size:9px;font-weight:900;padding:1px 6px;border-radius:99px;background:rgba(245,158,11,.18);color:#fbbf24;vertical-align:middle">PLUS</span>'
       : ' <span style="font-size:9px;font-weight:900;padding:1px 6px;border-radius:99px;background:rgba(34,197,94,.16);color:#4ade80;vertical-align:middle">BASIC</span>';
   }
-  function rowHtml(prefix, f, isNew, editable, tn, cat) {
-    var h = '<tr data-q="' + String(f.label || '').toLowerCase().replace(/"/g, '') + '" style="border-top:1px solid rgba(255,255,255,.08);' + (f.soon ? 'opacity:.5' : '') + '"><td style="padding:5px 6px">' + f.label + tierTag(f) + (f.soon ? ' <i>(segera)</i>' : '') + '</td>';
+  function rowHtml(prefix, f, isNew, editable, tn, cat, isOn2) {
+    var qStr = ((isOn2 ? 'oneilverse 2 ' : '') + String(f.label || '')).toLowerCase().replace(/"/g, '');
+    var h = '<tr data-q="' + qStr + '" style="border-top:1px solid rgba(255,255,255,.08);' + (f.soon ? 'opacity:.5' : '') + '"><td style="padding:5px 6px">' + f.label + tierTag(f) + '</td>';
     ROLES.forEach(function (r) {
       var m = f.r[r], cell;
       if (m === 'c') cell = '<span title="Fitur inti: terkunci, tidak bisa dicabut" style="display:inline-flex;width:18px;height:18px;border-radius:5px;background:#ef4444;color:#fff;font-weight:900;font-size:13px;line-height:18px;align-items:center;justify-content:center">✓</span>';
@@ -433,7 +434,7 @@
     return '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:3px 6px;opacity:.6;font-weight:700">Fitur</th>' + ROLES.map(function (r) { return '<th style="' + th + '">' + RLABEL[r] + '</th>'; }).join('') + (_lockCol ? '<th style="' + th + '" title="Gembok: fitur tetap ada walau balik ke Basic">🔒</th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table>';
   }
   function checklistHtml(prefix, features, editable, tnFull) {
-    var tn = tnFull || { features: features || null }, isNew = !features;
+    var tn = tnFull || { features: features || null }, isNew = !features, isPaketCat = prefix.indexOf('pf-') === 0;
     _lockCol = (prefix === 'ts'); /* kolom gembok hanya saat mengubah fitur toko yang sudah ada */
     var box = 'border:1px solid rgba(255,255,255,.1);border-radius:12px;margin-bottom:8px;overflow:hidden';
     var sm = 'padding:8px 10px;cursor:pointer;font-weight:800;font-size:12.5px;display:flex;align-items:center;gap:8px;list-style:none';
@@ -446,14 +447,15 @@
     h += '<div style="margin:2px 0 10px"><input id="' + prefix + '-q" type="search" placeholder="Cari fitur (mis. usaha, neraca, stok)" oninput="FM_PLANS.cariFitur(\'' + prefix + '\',this.value)" style="width:100%;box-sizing:border-box;padding:8px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:inherit;font-size:12.5px;outline:none"><div id="' + prefix + '-qn" style="font-size:11px;opacity:.65;margin-top:4px;display:none"></div></div>';
     var cats = CATS.concat([{ id: 'lain', label: 'Lainnya', keys: [] }]);
     cats.forEach(function (c) {
+      if (isPaketCat && c.on2) return; /* Oneilverse 2 punya menu tersendiri & belum rilis, tidak ditumpuk di Isi Paket Plus/Pro */
       var fs = FEATURES.filter(function (f) { return !f.soon && !isCore(f) && catOf(f) === c.id; });
       if (!fs.length) return;
       fs.sort(function (a, b) { return (featTier(a) === 'plus' ? 1 : 0) - (featTier(b) === 'plus' ? 1 : 0); }); /* BASIC dulu, PLUS belakangan */
-      h += '<details open data-fmq="' + prefix + '" style="' + box + '"><summary style="' + sm + '"><span>' + c.label + '</span><span id="' + prefix + '-cnt-' + c.id + '" style="opacity:.7;font-weight:700;font-size:11px"></span><span style="flex:1"></span>' + (editable === false ? '' : '<button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',true)" style="' + BSM + '">Centang</button><button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',false)" style="' + BSM + '">Kosongkan</button>') + '</summary><div style="padding:2px 8px 8px">' + tableHtml(fs.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, c.id); }).join('')) + '<div id="' + prefix + '-x-' + c.id + '"></div></div></details>';
+      var openAttr = (c.on2 || (isPaketCat && c.addon)) ? '' : 'open ';
+      var extraBorder = c.on2 ? ';border-color:rgba(168,85,247,.35);background:rgba(168,85,247,.04)' : c.addon ? ';border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.04)' : '';
+      h += '<details ' + openAttr + 'data-fmq="' + prefix + '" style="' + box + extraBorder + '"><summary style="' + sm + '"><span>' + c.label + '</span><span id="' + prefix + '-cnt-' + c.id + '" style="opacity:.7;font-weight:700;font-size:11px"></span><span style="flex:1"></span>' + (editable === false ? '' : '<button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',true)" style="' + BSM + '">Centang</button><button type="button" onclick="event.preventDefault();FM_PLANS.setCat(\'' + prefix + '\',\'' + c.id + '\',false)" style="' + BSM + '">Kosongkan</button>') + '</summary><div style="padding:2px 8px 8px">' + tableHtml(fs.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, c.id, !!c.on2); }).join('')) + '<div id="' + prefix + '-x-' + c.id + '"></div></div></details>';
     });
-    h += '<details data-fmq="' + prefix + '" style="' + box + ';border-color:rgba(239,68,68,.45)"><summary style="' + sm + '"><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:#ef4444"></span>Fitur Inti <span style="opacity:.6;font-weight:600">· terkunci · ' + core.length + ' fitur</span></summary><div style="padding:2px 8px 8px">' + tableHtml(core.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, 'inti'); }).join('')) + '</div></details>';
-    var soon = FEATURES.filter(function (f) { return f.soon; });
-    if (soon.length) h += '<details style="' + box + ';opacity:.7"><summary style="' + sm + '">Segera hadir <span style="opacity:.6;font-weight:600">· ' + soon.length + ' fitur</span></summary><div style="padding:2px 8px 8px">' + tableHtml(soon.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, 'soon'); }).join('')) + '</div></details>';
+    h += '<details data-fmq="' + prefix + '" style="' + box + ';border-color:rgba(239,68,68,.45)"><summary style="' + sm + '"><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:#ef4444"></span>Fitur Inti <span style="opacity:.6;font-weight:600">· terkunci · ' + core.length + ' fitur</span></summary><div style="padding:2px 8px 8px">' + tableHtml(core.map(function (f) { return rowHtml(prefix, f, isNew, editable, tn, 'inti', false); }).join('')) + '</div></details>';
     setTimeout(function () { cnt(prefix); }, 0);
     return h;
   }
