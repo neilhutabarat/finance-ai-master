@@ -52,9 +52,9 @@
     return { t: t, n: n };
   }
   var S = 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
-  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:13px;outline:none';
-  var btn = 'padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font-size:12px;font-weight:700;cursor:pointer';
-  var green = ';background:#22c55e;color:#04210f;border-color:#22c55e';
+  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:13px;outline:none';
+  var btn = 'padding:7px 12px;border-radius:999px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer';
+  var green = ';background:#16a34a;color:#ffffff;border-color:#16a34a';
   function prods() { try { return STORE.getProducts(); } catch (e) { return []; } }
   function groups() { var s = {}, o = []; prods().forEach(function (p) { if (p.group && !s[p.group.toLowerCase()]) { s[p.group.toLowerCase()] = 1; o.push(p.group); } }); return o; }
   function lab(t, el) { return '<div><label style="display:block;font-size:11.5px;font-weight:700;margin:0 0 4px;opacity:.8">' + t + '</label>' + el + '</div>'; }
@@ -65,18 +65,18 @@
   function render() {
     if (!ov || ov.style.display === 'none') return;
     var ed = canEdit(), md = monthDisc();
-    var h = '<div style="width:100%;max-width:760px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
+    var h = '<div style="width:100%;max-width:760px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;box-shadow:0 24px 60px rgba(15,23,42,.25);border-radius:24px;padding:18px;' + (document.documentElement.getAttribute('data-fm-native') === 'dark' ? 'filter:invert(1) hue-rotate(180deg);' : '') + '">' +
       '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Diskon &amp; Promo</div><div style="font-size:12px;opacity:.65">' + (ed ? 'Promo berlaku otomatis di Kasir untuk barang yang cocok.' : 'Tampilan baca saja.') + '</div></div><button data-x style="' + btn + '">Tutup</button></div>';
-    if (note) h += '<p style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(245,158,11,.14);color:#fbbf24;font-size:12px">' + esc(note) + '</p>';
+    if (note) h += '<p style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(245,158,11,.14);color:#b45309;font-size:12px">' + esc(note) + '</p>';
     if (form) { ov.innerHTML = h + formHtml() + '</div>'; return; }
-    h += '<div style="margin:12px 0;padding:10px;border-radius:14px;background:rgba(255,255,255,.07);font-size:12.5px">Diskon yang diberikan bulan ini: <b>' + rp(md.t) + '</b> dalam ' + md.n + ' transaksi</div>';
+    h += '<div style="margin:12px 0;padding:10px;border-radius:14px;background:#f1f5f9;font-size:12.5px">Diskon yang diberikan bulan ini: <b>' + rp(md.t) + '</b> dalam ' + md.n + ' transaksi</div>';
     h += '<div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:12px"><div style="flex:1;min-width:210px">' + lab('Diskon manual Admin maksimal (% dari harga, 0 = tidak boleh)', '<input id="pm-max" type="number" min="0" max="100" value="' + (Number(cfg.maxManualPct) || 0) + '" style="' + inp + '"' + (ed ? '' : ' disabled') + '>') + '</div>' + (ed ? '<button data-a="savemax" style="' + btn + '">Simpan batas</button><button data-a="new" style="' + btn + green + '">+ Promo baru</button>' : '') + '</div>';
     if (!promos.length) h += '<p style="opacity:.7;text-align:center;padding:16px;font-size:13px">Belum ada promo.</p>';
     var day = iso();
     promos.forEach(function (p) {
       var live = activeNow(p, day), st = p.active === false ? 'Mati' : (p.to && day > p.to ? 'Berakhir' : (p.from && day < p.from ? 'Belum mulai' : 'Aktif'));
-      h += '<div style="padding:10px;margin-bottom:6px;border-radius:12px;background:rgba(255,255,255,.05);display:flex;gap:10px;align-items:center"><div style="flex:1"><b>' + esc(p.name) + '</b> <span style="padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:800;background:' + (live ? 'rgba(34,197,94,.2);color:#4ade80' : 'rgba(148,163,184,.2);color:#cbd5e1') + '">' + st + '</span><div style="font-size:11.5px;opacity:.7;margin-top:2px">' + esc(describe(p)) + '</div></div>' +
-        (ed ? '<button data-a="tog" data-id="' + esc(p.id) + '" style="' + btn + ';padding:5px 10px">' + (p.active === false ? 'Nyalakan' : 'Matikan') + '</button><button data-a="edit" data-id="' + esc(p.id) + '" style="' + btn + ';padding:5px 10px">Ubah</button><button data-a="del" data-id="' + esc(p.id) + '" style="' + btn + ';padding:5px 10px;color:#fb7185">Hapus</button>' : '') + '</div>';
+      h += '<div style="padding:10px;margin-bottom:6px;border-radius:12px;background:#f8fafc;display:flex;gap:10px;align-items:center"><div style="flex:1"><b>' + esc(p.name) + '</b> <span style="padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:800;background:' + (live ? 'rgba(34,197,94,.2);color:#15803d' : 'rgba(148,163,184,.2);color:#475569') + '">' + st + '</span><div style="font-size:11.5px;opacity:.7;margin-top:2px">' + esc(describe(p)) + '</div></div>' +
+        (ed ? '<button data-a="tog" data-id="' + esc(p.id) + '" style="' + btn + ';padding:5px 10px">' + (p.active === false ? 'Nyalakan' : 'Matikan') + '</button><button data-a="edit" data-id="' + esc(p.id) + '" style="' + btn + ';padding:5px 10px">Ubah</button><button data-a="del" data-id="' + esc(p.id) + '" style="' + btn + ';padding:5px 10px;color:#be123c">Hapus</button>' : '') + '</div>';
     });
     ov.innerHTML = h + '</div>';
   }
@@ -121,7 +121,7 @@
   function ensure() {
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-promo';
-    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px;' + S;
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:12px;' + S;
     ov.addEventListener('click', function (e) {
       if (e.target === ov || e.target.hasAttribute('data-x')) { ov.style.display = 'none'; return; }
       var b = e.target.closest('[data-a]'); if (b) act(b.getAttribute('data-a'), b.getAttribute('data-id'));

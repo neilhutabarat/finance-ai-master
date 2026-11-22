@@ -18,7 +18,7 @@
     rows.sort(function (a, b) { return a.days - b.days; });
     return { rows: rows, idle: idle, span: span };
   }
-  function lvl(d) { return d <= 3 ? ['Segera habis', '#fb7185'] : d <= 7 ? ['Minggu ini', '#fbbf24'] : d <= 14 ? ['Dua minggu', '#60a5fa'] : ['Aman', '#34d399']; }
+  function lvl(d) { return d <= 3 ? ['Segera habis', '#be123c'] : d <= 7 ? ['Minggu ini', '#b45309'] : d <= 14 ? ['Dua minggu', '#2563eb'] : ['Aman', '#15803d']; }
   function body() {
     var r = last = compute(), h = '<div style="font-size:12px;opacity:.7;margin-top:8px;line-height:1.5">Dihitung dari penjualan produk ' + r.span + ' hari terakhir. Perkiraan kasar: tidak memperhitungkan musim atau promo.</div>';
     if (!r.rows.length) return h + '<div style="padding:24px 6px;text-align:center;opacity:.75;font-size:13px">Belum ada penjualan produk bertanda stok dalam 30 hari terakhir, jadi belum ada yang bisa diperkirakan.</div>';
@@ -26,12 +26,12 @@
     h += '<div style="margin-top:10px;font-size:13px"><b>' + urgent + ' produk</b> diperkirakan habis dalam 7 hari.</div>';
     r.rows.slice(0, 40).forEach(function (x) {
       var l = lvl(x.days);
-      h += '<div style="padding:10px 0;border-top:1px solid rgba(255,255,255,.08)"><div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:13px">' + L.esc(x.name) + '</b><span style="font-size:11px;font-weight:800;color:' + l[1] + '">' + l[0] + '</span></div>' +
-        '<div style="font-size:12px;opacity:.8;margin-top:3px;line-height:1.55">Stok ' + x.stock + ' · terjual ±' + (x.rate >= 10 ? Math.round(x.rate) : x.rate.toFixed(1)) + ' per hari · habis sekitar ' + (x.stock === 0 ? '<b style="color:#fb7185">sekarang</b>' : Math.max(1, Math.round(x.days)) + ' hari lagi') + (x.need > 0 ? ' · saran beli <b>' + x.need + '</b> untuk 14 hari' : '') + '</div></div>';
+      h += '<div style="padding:10px 0;border-top:1px solid #e2e8f0"><div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:13px">' + L.esc(x.name) + '</b><span style="font-size:11px;font-weight:800;color:' + l[1] + '">' + l[0] + '</span></div>' +
+        '<div style="font-size:12px;opacity:.8;margin-top:3px;line-height:1.55">Stok ' + x.stock + ' · terjual ±' + (x.rate >= 10 ? Math.round(x.rate) : x.rate.toFixed(1)) + ' per hari · habis sekitar ' + (x.stock === 0 ? '<b style="color:#be123c">sekarang</b>' : Math.max(1, Math.round(x.days)) + ' hari lagi') + (x.need > 0 ? ' · saran beli <b>' + x.need + '</b> untuk 14 hari' : '') + '</div></div>';
     });
     if (r.rows.length > 40) h += '<div style="font-size:11.5px;opacity:.65;padding-top:8px">Menampilkan 40 produk yang paling cepat habis.</div>';
     if (r.idle) h += '<div style="font-size:11.5px;opacity:.65;margin-top:10px">' + r.idle + ' produk punya stok tapi tidak terjual 30 hari terakhir (tidak masuk daftar).</div>';
-    h += '<div style="display:flex;gap:8px;margin-top:12px;align-items:center"><button data-lx="copy" style="' + L.BTN + L.VIO + '">Salin daftar belanja</button><span style="font-size:12px;color:#4ade80">' + L.esc(note) + '</span></div>';
+    h += '<div style="display:flex;gap:8px;margin-top:12px;align-items:center"><button data-lx="copy" style="' + L.BTN + L.VIO + '">Salin daftar belanja</button><span style="font-size:12px;color:#15803d">' + L.esc(note) + '</span></div>';
     return h;
   }
   function act(a) {

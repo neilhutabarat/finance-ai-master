@@ -85,21 +85,21 @@
 
   /* ---------- tampilan ---------- */
   var S = 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
-  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:13px;outline:none;color-scheme:dark';
-  var btn = 'padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font-size:12px;font-weight:700;cursor:pointer';
-  var green = ';background:#22c55e;color:#04210f;border-color:#22c55e';
+  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:13px;outline:none';
+  var btn = 'padding:7px 12px;border-radius:999px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer';
+  var green = ';background:#16a34a;color:#ffffff;border-color:#16a34a';
   function lab(t, el) { return '<div><label style="display:block;font-size:11.5px;font-weight:700;margin:0 0 4px;opacity:.8">' + t + '</label>' + el + '</div>'; }
-  function line(n, v, o) { o = o || {}; return '<div style="display:flex;justify-content:space-between;gap:10px;padding:5px 0 5px ' + (o.ind ? o.ind : 0) + 'px;border-top:1px solid rgba(255,255,255,.07);font-size:12.5px' + (o.b ? ';font-weight:800' : '') + (o.c ? ';color:' + o.c : '') + '"><span>' + n + '</span><span style="white-space:nowrap">' + v + '</span></div>'; }
+  function line(n, v, o) { o = o || {}; return '<div style="display:flex;justify-content:space-between;gap:10px;padding:5px 0 5px ' + (o.ind ? o.ind : 0) + 'px;border-top:1px solid #e2e8f0;font-size:12.5px' + (o.b ? ';font-weight:800' : '') + (o.c ? ';color:' + o.c : '') + '"><span>' + n + '</span><span style="white-space:nowrap">' + v + '</span></div>'; }
   function head(t) { return '<div style="font-weight:800;margin:16px 0 2px;letter-spacing:.02em">' + t + '</div>'; }
   function sub(t) { return '<div style="font-weight:700;margin:8px 0 0;opacity:.8;font-size:12px">' + t + '</div>'; }
-  function box(cls, t) { var c = cls === 'err' ? 'rgba(239,68,68,.15);color:#fca5a5' : cls === 'warn' ? 'rgba(245,158,11,.14);color:#fbbf24' : 'rgba(34,197,94,.14);color:#86efac'; return '<p style="margin:6px 0;padding:8px 12px;border-radius:12px;background:' + c + ';font-size:12px">' + esc(t) + '</p>'; }
+  function box(cls, t) { var c = cls === 'err' ? 'rgba(239,68,68,.15);color:#be123c' : cls === 'warn' ? 'rgba(245,158,11,.14);color:#b45309' : 'rgba(34,197,94,.14);color:#166534'; return '<p style="margin:6px 0;padding:8px 12px;border-radius:12px;background:' + c + ';font-size:12px">' + esc(t) + '</p>'; }
   function neg(v) { return '(' + rp(v) + ')'; }
 
   function render() {
     if (!ov || ov.style.display === 'none') return;
     var ed = canEdit(), c = calc(asof), w = warnings(c, asof), tk = tn(), nama = (tk && (tk.nama || tk.name)) || 'Toko', m = ym(asof);
     var locked = D.lock && m <= D.lock, seimbang = c.selisih === 0;
-    var h = '<div style="width:100%;max-width:760px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
+    var h = '<div style="width:100%;max-width:760px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;box-shadow:0 24px 60px rgba(15,23,42,.25);border-radius:24px;padding:18px;' + (document.documentElement.getAttribute('data-fm-native') === 'dark' ? 'filter:invert(1) hue-rotate(180deg);' : '') + '">' +
       '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Neraca AI</div><div style="font-size:12px;opacity:.65">Disusun otomatis dari data yang sudah diinput admin. Semua usaha digabung.' + (ed ? '' : ' Tampilan baca saja.') + '</div></div><button data-x style="' + btn + ';align-self:flex-start">Tutup</button></div>';
     if (note) h += box(noteCls, note);
     h += '<div style="display:flex;gap:8px;align-items:end;margin:12px 0;flex-wrap:wrap"><div style="flex:1;min-width:170px">' + lab('Per tanggal', '<input id="na-asof" type="date" value="' + esc(asof) + '" style="' + inp + '">') + '</div>' +
@@ -123,10 +123,10 @@
       line('Laba Berjalan', rp(c.t.laba), { ind: 10 }) + line('Prive (pengambilan pribadi)', c.t.prive ? neg(c.t.prive) : rp(0), { ind: 10 }) +
       line('JUMLAH EKUITAS', rp(c.ek), { b: 1 });
     h += line('JUMLAH LIABILITAS DAN EKUITAS', rp(c.liab + c.ek), { b: 1 });
-    if (!seimbang) h += line('Selisih belum terjelaskan', rp(c.selisih), { b: 1, c: '#fca5a5' });
+    if (!seimbang) h += line('Selisih belum terjelaskan', rp(c.selisih), { b: 1, c: '#be123c' });
     h += '<div style="font-size:11px;opacity:.55;margin-top:12px">Sumber: ' + c.t.n + ' transaksi Kasir sejak ' + esc(NL.start ? tglPanjang(NL.start) : 'awal') + ', saldo awal dan akun tambahan' + (has('piutang') ? ', modul Piutang dan Utang' : '') + (has('stok') ? ', nilai stok (stok x HPP)' : '') + '.</div>';
     if (ed) {
-      h += '<details style="margin-top:14px;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 12px"><summary style="cursor:pointer;font-weight:800;font-size:12.5px">Atur Saldo Awal</summary>' +
+      h += '<details style="margin-top:14px;border:1px solid #e2e8f0;border-radius:14px;padding:10px 12px"><summary style="cursor:pointer;font-weight:800;font-size:12.5px">Atur Saldo Awal</summary>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:10px">' +
         lab('Tanggal mulai pencatatan', '<input id="na-start" type="date" value="' + esc(NL.start) + '" style="' + inp + '">') +
         lab('Kas &amp; rekening saat mulai (Rp)', '<input id="na-kas" type="number" min="0" value="' + (NL.kasAwal || '') + '" style="' + inp + '">') +
@@ -168,7 +168,7 @@
   function ensure() {
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-neraca-ai';
-    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px;' + S;
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:12px;' + S;
     ov.addEventListener('click', function (e) {
       if (e.target === ov || e.target.hasAttribute('data-x')) { ov.style.display = 'none'; return; }
       var b = e.target.closest('[data-a]'); if (b && !b.disabled) act(b.getAttribute('data-a'));

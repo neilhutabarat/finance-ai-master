@@ -7,9 +7,9 @@
   if (!/^(manager|dashboard)\.html$/.test(PAGE)) return;
   var MON = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
   var S = 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
-  var BTN = 'padding:7px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font-size:12px;font-weight:800;cursor:pointer';
-  var VIO = ';background:#a855f7;color:#fff;border-color:#a855f7';
-  var INP = 'box-sizing:border-box;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:12.5px;outline:none';
+  var BTN = 'padding:7px 13px;border-radius:999px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:800;cursor:pointer';
+  var VIO = ';background:#7c3aed;color:#ffffff;border-color:#7c3aed';
+  var INP = 'box-sizing:border-box;padding:8px 10px;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:12.5px;outline:none';
 
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
   function rp(n) { return (n < 0 ? '-' : '') + 'Rp' + Math.abs(Math.round(n || 0)).toLocaleString('id-ID'); }
@@ -68,7 +68,7 @@
     var w = wins[id];
     if (!w) {
       var el = document.createElement('div'); el.id = 'fm-lx-' + id;
-      el.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px;' + S;
+      el.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:12px;' + S;
       w = wins[id] = { el: el, o: o };
       el.addEventListener('click', function (e) {
         if (e.target === el || e.target.hasAttribute('data-x')) { el.style.display = 'none'; return; }
@@ -84,7 +84,7 @@
     var w = wins[id]; if (!w || w.el.style.display === 'none') return;
     var o = w.o, top = w.el.firstChild && w.el.firstChild.scrollTop || 0, html;
     try { html = o.body(); } catch (e) { html = '<p style="opacity:.75;font-size:13px">Laporan belum bisa dihitung. Muat ulang halaman.</p>'; if (window.console) console.warn('lapx', id, e); }
-    w.el.innerHTML = '<div style="width:100%;max-width:' + (o.width || 640) + 'px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
+    w.el.innerHTML = '<div style="width:100%;max-width:' + (o.width || 640) + 'px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;box-shadow:0 24px 60px rgba(15,23,42,.25);border-radius:24px;padding:18px;' + (document.documentElement.getAttribute('data-fm-native') === 'dark' ? 'filter:invert(1) hue-rotate(180deg);' : '') + '">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-weight:900;font-size:18px">' + esc(o.title) + '</div>' + (o.sub ? '<div style="font-size:12px;opacity:.6">' + esc(o.sub) + '</div>' : '') + '</div><button data-x style="' + BTN + '">Tutup</button></div>' + html + '</div>';
     if (top && w.el.firstChild) w.el.firstChild.scrollTop = top;
   }
@@ -94,7 +94,7 @@
     fallback();
     function fallback() { try { var t = document.createElement('textarea'); t.value = text; t.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); ok(); } catch (e) { if (done) done(false); } }
   }
-  function card(title, inner, sub) { return '<div style="padding:12px 14px;margin-top:12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)"><div style="font-weight:800;font-size:13.5px">' + esc(title) + '</div>' + (sub ? '<div style="font-size:11.5px;opacity:.7;margin:2px 0 6px;line-height:1.5">' + sub + '</div>' : '') + inner + '</div>'; }
+  function card(title, inner, sub) { return '<div style="padding:12px 14px;margin-top:12px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0"><div style="font-weight:800;font-size:13.5px">' + esc(title) + '</div>' + (sub ? '<div style="font-size:11.5px;opacity:.7;margin:2px 0 6px;line-height:1.5">' + sub + '</div>' : '') + inner + '</div>'; }
 
   window.FM_LAPX = { esc: esc, rp: rp, iso: iso, pad: pad, parse: parse, addDays: addDays, pct: pct, role: role, has: has, tid: tid, txs: txs, sum: sum, period: period, periodTabs: periodTabs,
     open: open, render: render, copy: copy, card: card, MON: MON, BTN: BTN, VIO: VIO, INP: INP, S: S };

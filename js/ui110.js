@@ -328,7 +328,7 @@
           var lPick = avail()[0]; naik.push(lPick);
           L.push({ dk: lPick, nama: teks(lPick), ik: IC.menu });
         }
-        while (L.length < 3 && R.length < 3 && avail().length > 2) {
+        while (L.length < 3 && R.length < 3 && avail().length > 3) {
           var a = avail(), lP = a[0], rP = a[a.length - 1];
           naik.push(lP, rP);
           L.push({ dk: lP, nama: teks(lP), ik: IC.menu });
@@ -339,10 +339,14 @@
             if (/piutang|receivable|penghutang/i.test(a.textContent || '')) a.style.display = 'none';
           });
         }
-        var isi = hal.filter(function (x) { return naik.indexOf(x) < 0; }).concat(ekor);
+        var halRest = hal.filter(function (x) { return naik.indexOf(x) < 0; });
+        var wL = halRest.slice(), wR = ekor.slice();
+        if (wL.length + 1 <= wR.length && wR.length && (dkId(wR[0]) === 'store' || /^store|kedai$/i.test(teks(wR[0])))) {
+          wL.push(wR.shift());
+        }
         return {
-          L: L.slice(0, 3), R: R.slice(0, 3), isi: isi,
-          sidik: dkk.map(function (x) { return dkId(x) || teks(x); }).join('|') + '#' + [chat, abs, stk, piu].map(function (x) { return x ? 1 : 0; }).join('') + '#' + (window.FM_I18N && FM_I18N.lang ? FM_I18N.lang() : 'id')
+          L: L.slice(0, 3), R: R.slice(0, 3), wL: wL, wR: wR,
+          sidik: dkk.map(function (x) { return dkId(x) || teks(x); }).join('|') + '#' + [chat, abs, stk, piu].map(function (x) { return x ? 1 : 0; }).join('') + '#' + (window.FM_I18N && FM_I18N.lang ? FM_I18N.lang() : 'id') + '#' + (window.FM_I18N && FM_I18N.active && FM_I18N.active() ? '1' : '0')
         };
       }
 
@@ -363,14 +367,11 @@
         sembunyi = [dock];
         pil.innerHTML = ''; kiri1 = kiri2 = kanan1 = kanan2 = null;
 
-        var tengah = Math.ceil(c.isi.length / 2);
         var wingL = document.createElement('div'); wingL.className = 'fm-wing fm-wing-l';
         var wingR = document.createElement('div'); wingR.className = 'fm-wing fm-wing-r';
 
-        c.isi.forEach(function (x, i) {
-          if (i < tengah) wingL.appendChild(buatItemPil(x));
-          else wingR.appendChild(buatItemPil(x));
-        });
+        c.wL.forEach(function (x) { wingL.appendChild(buatItemPil(x)); });
+        c.wR.forEach(function (x) { wingR.appendChild(buatItemPil(x)); });
 
         pil.appendChild(wingL);
         pil.appendChild(logoEl());

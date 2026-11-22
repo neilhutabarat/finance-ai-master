@@ -24,9 +24,9 @@
     var r = last = build(), h = '<div style="display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap"><label style="font-size:12px;opacity:.8">Tanggal</label><input id="hr-day" type="date" value="' + L.esc(r.d) + '" style="' + L.INP + '"></div>';
     h += '<div style="font-size:11.5px;opacity:.65;margin-top:6px">Mengikuti pilihan usaha di layar utama.</div>';
     if (r.empty) return h + '<div style="padding:24px 6px;text-align:center;opacity:.75;font-size:13px">Belum ada transaksi pada tanggal ini.</div>';
-    h += '<pre style="white-space:pre-wrap;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(255,255,255,.05);border-radius:14px;padding:12px 14px;margin:12px 0 0">' + L.esc(r.text) + '</pre>';
+    h += '<pre style="white-space:pre-wrap;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:#f8fafc;border-radius:14px;padding:12px 14px;margin:12px 0 0">' + L.esc(r.text) + '</pre>';
     h += '<label style="display:block;font-size:11.5px;opacity:.8;margin-top:12px">Nomor WhatsApp tujuan (mis. 0812xxxxxxx)<input id="hr-num" inputmode="numeric" value="' + L.esc(getNum()) + '" placeholder="08xxxxxxxxxx" style="' + L.INP + ';width:100%;margin-top:3px"></label>' +
-      '<div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap"><button data-lx="wa" style="' + L.BTN + ';background:#22c55e;color:#04210f;border-color:#22c55e">Kirim lewat WhatsApp</button><button data-lx="copy" style="' + L.BTN + '">Salin teks</button><span style="font-size:12px;color:#fbbf24">' + L.esc(note) + '</span></div>' +
+      '<div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap"><button data-lx="wa" style="' + L.BTN + ';background:#16a34a;color:#ffffff;border-color:#16a34a">Kirim lewat WhatsApp</button><button data-lx="copy" style="' + L.BTN + '">Salin teks</button><span style="font-size:12px;color:#b45309">' + L.esc(note) + '</span></div>' +
       '<div style="font-size:11px;opacity:.55;margin-top:10px;line-height:1.5">Nomor hanya disimpan di perangkat ini. Tombol WhatsApp membuka aplikasi WhatsApp dengan teks siap kirim; pengiriman tetap kamu tekan sendiri.</div>';
     return h;
   }

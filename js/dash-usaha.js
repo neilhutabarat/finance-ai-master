@@ -27,22 +27,22 @@
     return Object.keys(by).map(function (k) { return by[k]; }).sort(function (a, b) { return b.in - a.in; });
   }
   var S = 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
-  var btn = 'padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font-size:12px;font-weight:700;cursor:pointer';
+  var btn = 'padding:6px 12px;border-radius:999px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer';
   function render() {
     if (!ov || ov.style.display === 'none') return;
     var rows = data(), ti = 0, to = 0;
     rows.forEach(function (r) { ti += r.in; to += r.out; });
-    var h = '<div style="width:100%;max-width:820px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
+    var h = '<div style="width:100%;max-width:820px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;box-shadow:0 24px 60px rgba(15,23,42,.25);border-radius:24px;padding:18px;' + (document.documentElement.getAttribute('data-fm-native') === 'dark' ? 'filter:invert(1) hue-rotate(180deg);' : '') + '">' +
       '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Ringkasan per Usaha</div><div style="font-size:12px;opacity:.65">Pemasukan dan pengeluaran tiap usaha, ketuk baris untuk melihat per Admin. Prive tidak dihitung.</div></div><button data-x style="' + btn + '">Tutup</button></div>' +
-      '<div style="display:flex;gap:6px;margin:14px 0;flex-wrap:wrap">' + [['hari', 'Hari ini'], ['minggu', '7 hari'], ['bulan', 'Bulan ini'], ['semua', 'Semua']].map(function (p) { return '<button data-p="' + p[0] + '" style="' + btn + (per === p[0] ? ';background:#22c55e;color:#04210f;border-color:#22c55e' : '') + '">' + p[1] + '</button>'; }).join('') + '</div>' +
+      '<div style="display:flex;gap:6px;margin:14px 0;flex-wrap:wrap">' + [['hari', 'Hari ini'], ['minggu', '7 hari'], ['bulan', 'Bulan ini'], ['semua', 'Semua']].map(function (p) { return '<button data-p="' + p[0] + '" style="' + btn + (per === p[0] ? ';background:#16a34a;color:#ffffff;border-color:#16a34a' : '') + '">' + p[1] + '</button>'; }).join('') + '</div>' +
       '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px">' +
-      [['Pemasukan', ti, 'rgba(34,197,94,.12)'], ['Pengeluaran', to, 'rgba(251,113,133,.12)'], ['Selisih', ti - to, 'rgba(255,255,255,.07)']].map(function (x) { return '<div style="padding:10px;border-radius:14px;background:' + x[2] + '"><div style="font-size:10.5px;opacity:.7">' + x[0] + '</div><div style="font-weight:800;font-size:14px">' + rp(x[1]) + '</div></div>'; }).join('') + '</div>';
+      [['Pemasukan', ti, 'rgba(34,197,94,.12)'], ['Pengeluaran', to, 'rgba(251,113,133,.12)'], ['Selisih', ti - to, '#e2e8f0']].map(function (x) { return '<div style="padding:10px;border-radius:14px;background:' + x[2] + '"><div style="font-size:10.5px;opacity:.7">' + x[0] + '</div><div style="font-weight:800;font-size:14px">' + rp(x[1]) + '</div></div>'; }).join('') + '</div>';
     if (!rows.length) h += '<p style="opacity:.7;text-align:center;padding:18px;font-size:13px">Belum ada transaksi pada periode ini.</p>';
     else {
       h += '<table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="text-align:left;opacity:.7"><th style="padding:6px">Usaha</th><th style="text-align:right">Masuk</th><th style="text-align:right">Keluar</th><th style="text-align:right">Selisih</th><th style="text-align:right">Transaksi</th></tr></thead><tbody>';
       rows.forEach(function (r) {
-        h += '<tr data-b="' + esc(r.name) + '" style="border-top:1px solid rgba(255,255,255,.08);cursor:pointer"><td style="padding:9px 6px;font-weight:800">' + esc(r.name) + '</td><td style="text-align:right;color:#4ade80">' + rp(r.in) + '</td><td style="text-align:right;color:#fb7185">' + rp(r.out) + '</td><td style="text-align:right;font-weight:800">' + rp(r.in - r.out) + '</td><td style="text-align:right">' + r.n + '</td></tr>';
-        if (openBiz === r.name) Object.keys(r.staff).forEach(function (s) { var x = r.staff[s]; h += '<tr style="background:rgba(255,255,255,.04);font-size:12px"><td style="padding:6px 6px 6px 22px;opacity:.85">↳ ' + esc(s) + '</td><td style="text-align:right">' + rp(x.in) + '</td><td style="text-align:right">' + rp(x.out) + '</td><td style="text-align:right">' + rp(x.in - x.out) + '</td><td style="text-align:right">' + x.n + '</td></tr>'; });
+        h += '<tr data-b="' + esc(r.name) + '" style="border-top:1px solid #e2e8f0;cursor:pointer"><td style="padding:9px 6px;font-weight:800">' + esc(r.name) + '</td><td style="text-align:right;color:#15803d">' + rp(r.in) + '</td><td style="text-align:right;color:#be123c">' + rp(r.out) + '</td><td style="text-align:right;font-weight:800">' + rp(r.in - r.out) + '</td><td style="text-align:right">' + r.n + '</td></tr>';
+        if (openBiz === r.name) Object.keys(r.staff).forEach(function (s) { var x = r.staff[s]; h += '<tr style="background:#f8fafc;font-size:12px"><td style="padding:6px 6px 6px 22px;opacity:.85">↳ ' + esc(s) + '</td><td style="text-align:right">' + rp(x.in) + '</td><td style="text-align:right">' + rp(x.out) + '</td><td style="text-align:right">' + rp(x.in - x.out) + '</td><td style="text-align:right">' + x.n + '</td></tr>'; });
       });
       h += '</tbody></table>';
     }
@@ -51,7 +51,7 @@
   function ensure() {
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-usaha-sum';
-    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px;' + S;
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:12px;' + S;
     ov.addEventListener('click', function (e) {
       if (e.target === ov || e.target.hasAttribute('data-x')) { ov.style.display = 'none'; return; }
       var p = e.target.closest('[data-p]'); if (p) { per = p.getAttribute('data-p'); render(); return; }

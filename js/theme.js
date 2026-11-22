@@ -2,8 +2,8 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.19';
-  var BETA = 'v1.1.19';
+  var APP_VERSION = '1.1.20';
+  var BETA = 'v1.1.20';
   /* Catatan rilis ringkas per versi utama (v1.0, v1.1, v1.2, dst). Terbaru di atas. */
   var RELEASE_NOTES = [
     ['v1.1', '22 Nov 2026', [
@@ -285,7 +285,7 @@
     if (window.FM_SHIELD) h += '<div class="fm-sec"><button class="fm-btn" data-shield style="width:100%;padding:13px">🛡️ Oneil Shield v' + FM_SHIELD.ver + ' — Keamanan</button></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Versi Aplikasi</div><div class="fm-card" style="display:flex;justify-content:space-between;font-size:13px"><span>Oneilverse POS</span><b>' + BETA + '</b></div></div>';
     h += '<div class="fm-sec"><div class="fm-lab">Catatan Rilis</div>' + RELEASE_NOTES.slice(0, SHOW_LAST).map(function (n, i) {
-      return '<details ' + (i === 0 ? 'open' : '') + '><summary>' + (/^BETA/.test(n[0]) ? n[0] : 'v' + n[0]) + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { var m = /^\[(\w+)\]\s*/.exec(t); var tag = m ? m[1] : ''; return '<li>' + (tag ? '<i class="fm-tag fm-tag-' + tag.toLowerCase() + '">' + esc(tag) + '</i>' : '') + esc(t.replace(/^\[\w+\]\s*/, '')) + '</li>'; }).join('') + '</ul></details>';
+      return '<details ' + (i === 0 ? 'open' : '') + '><summary>' + (/^(BETA|v)/i.test(n[0]) ? n[0] : 'v' + n[0]) + ' · ' + n[1] + '</summary><ul>' + n[2].map(function (t) { var m = /^\[(\w+)\]\s*/.exec(t); var tag = m ? m[1] : ''; return '<li>' + (tag ? '<i class="fm-tag fm-tag-' + tag.toLowerCase() + '">' + esc(tag) + '</i>' : '') + esc(t.replace(/^\[\w+\]\s*/, '')) + '</li>'; }).join('') + '</ul></details>';
     }).join('') + '</div>';
     box.innerHTML = h;
 

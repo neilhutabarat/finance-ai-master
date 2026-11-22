@@ -50,32 +50,32 @@
 
   /* ---- tampilan ---- */
   var S = 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
-  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:13px;outline:none';
-  var btn = 'padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font-size:12px;font-weight:700;cursor:pointer';
-  var green = ';background:#22c55e;color:#04210f;border-color:#22c55e';
+  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:13px;outline:none';
+  var btn = 'padding:7px 12px;border-radius:999px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer';
+  var green = ';background:#16a34a;color:#ffffff;border-color:#16a34a';
   function lab(t, el) { return '<div><label style="display:block;font-size:11.5px;font-weight:700;margin:0 0 4px;opacity:.8">' + t + '</label>' + el + '</div>'; }
   function chk(id, t, on, ed) { return '<label style="display:flex;gap:8px;align-items:center;font-size:12.5px"><input id="' + id + '" type="checkbox"' + (on ? ' checked' : '') + (ed ? '' : ' disabled') + '> ' + t + '</label>'; }
-  function box(t, v) { return '<div style="padding:10px;border-radius:14px;background:rgba(255,255,255,.07)"><div style="font-size:11px;opacity:.7">' + t + '</div><div style="font-weight:800;font-size:14px;margin-top:2px">' + v + '</div></div>'; }
+  function box(t, v) { return '<div style="padding:10px;border-radius:14px;background:#f1f5f9"><div style="font-size:11px;opacity:.7">' + t + '</div><div style="font-weight:800;font-size:14px;margin-top:2px">' + v + '</div></div>'; }
   function render() {
     if (!ov || ov.style.display === 'none') return;
     var ed = canEdit(), m = calc(year), nowYm = (function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); })(new Date());
     var tO = 0, tP = 0, tN = 0; m.forEach(function (r) { tO += r.omzet; tP += r.pph; tN += Math.max(0, r.ppn); });
-    var h = '<div style="width:100%;max-width:820px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
+    var h = '<div style="width:100%;max-width:820px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;box-shadow:0 24px 60px rgba(15,23,42,.25);border-radius:24px;padding:18px;' + (document.documentElement.getAttribute('data-fm-native') === 'dark' ? 'filter:invert(1) hue-rotate(180deg);' : '') + '">' +
       '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Laporan Pajak Bulanan' + ((window.FM_BIZ && FM_BIZ.enabled() && FM_BIZ.view()) ? ' - ' + esc(FM_BIZ.view()) : '') + '</div><div style="font-size:12px;opacity:.65">Perkiraan pajak dari omzet toko. Konfirmasi ke konsultan atau kantor pajak sebelum menyetor.</div></div><button data-x style="' + btn + '">Tutup</button></div>';
-    if (note) h += '<p style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.14);color:#86efac;font-size:12px">' + esc(note) + '</p>';
+    if (note) h += '<p style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.14);color:#166534;font-size:12px">' + esc(note) + '</p>';
     h += '<div style="display:flex;gap:8px;align-items:end;margin:12px 0;flex-wrap:wrap"><div style="width:130px">' + lab('Tahun', '<input id="pj-year" type="number" min="2020" max="2100" value="' + year + '" style="' + inp + '">') + '</div><button data-a="copy" style="' + btn + '">Salin teks</button><button data-a="csv" style="' + btn + '">Unduh CSV</button></div>';
     h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px">' + box('Omzet ' + year, rp(tO)) + box('PPh Final', rp(tP)) + (C.ppnOn ? box('PPN kurang bayar', rp(tN)) : '') + box('Total perkiraan', rp(tP + tN)) + '</div>';
     h += '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px"><thead><tr style="text-align:left;opacity:.65"><th style="padding:6px 4px">Bulan</th><th style="text-align:right">Omzet</th><th style="text-align:right">PPh Final</th>' + (C.ppnOn ? '<th style="text-align:right">PPN</th>' : '') + '<th style="text-align:right">Total</th><th style="text-align:right">Setor</th></tr></thead><tbody>';
     m.forEach(function (r, i) {
       if (!r.omzet && !r.masukan && r.ym > nowYm) return;
       var pd = C.paid[r.ym];
-      h += '<tr style="border-top:1px solid rgba(255,255,255,.07)"><td style="padding:7px 4px">' + MON[i] + '</td><td style="text-align:right">' + rp(r.omzet) + '</td><td style="text-align:right">' + rp(r.pph) + '</td>' + (C.ppnOn ? '<td style="text-align:right">' + rp(r.ppn) + '</td>' : '') + '<td style="text-align:right;font-weight:800">' + rp(r.total) + '</td><td style="text-align:right">' +
-        (pd ? '<span style="color:#4ade80;font-size:11.5px">Sudah ' + rp(pd.amount) + '</span>' + (ed ? ' <button data-a="unpay" data-ym="' + r.ym + '" style="' + btn + ';padding:1px 8px;font-size:10.5px">Batal</button>' : '') : (ed && r.total > 0 ? '<button data-a="pay" data-ym="' + r.ym + '" style="' + btn + ';padding:3px 9px;font-size:11px">Tandai sudah disetor</button>' : '<span style="opacity:.5;font-size:11.5px">' + (r.total > 0 ? 'Belum' : '-') + '</span>')) + '</td></tr>';
+      h += '<tr style="border-top:1px solid #e2e8f0"><td style="padding:7px 4px">' + MON[i] + '</td><td style="text-align:right">' + rp(r.omzet) + '</td><td style="text-align:right">' + rp(r.pph) + '</td>' + (C.ppnOn ? '<td style="text-align:right">' + rp(r.ppn) + '</td>' : '') + '<td style="text-align:right;font-weight:800">' + rp(r.total) + '</td><td style="text-align:right">' +
+        (pd ? '<span style="color:#15803d;font-size:11.5px">Sudah ' + rp(pd.amount) + '</span>' + (ed ? ' <button data-a="unpay" data-ym="' + r.ym + '" style="' + btn + ';padding:1px 8px;font-size:10.5px">Batal</button>' : '') : (ed && r.total > 0 ? '<button data-a="pay" data-ym="' + r.ym + '" style="' + btn + ';padding:3px 9px;font-size:11px">Tandai sudah disetor</button>' : '<span style="opacity:.5;font-size:11.5px">' + (r.total > 0 ? 'Belum' : '-') + '</span>')) + '</td></tr>';
     });
     h += '</tbody></table></div>';
     if (C.free500) h += '<p style="font-size:11px;opacity:.65;margin:8px 0 0">Omzet sampai Rp 500 juta per tahun dibebaskan; PPh Final dihitung dari omzet yang melewatinya.</p>';
     if (C.ppnOn) h += '<p style="font-size:11px;opacity:.65;margin:4px 0 0">PPN keluaran dihitung dari omzet (harga sudah termasuk PPN). PPN masukan diambil dari pajak yang tercatat pada transaksi pengeluaran.</p>';
-    h += '<div style="margin-top:16px;padding:12px;border-radius:14px;background:rgba(255,255,255,.05)"><div style="font-weight:800;margin-bottom:8px">Pengaturan pajak</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">' +
+    h += '<div style="margin-top:16px;padding:12px;border-radius:14px;background:#f8fafc"><div style="font-weight:800;margin-bottom:8px">Pengaturan pajak</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">' +
       chk('pj-pph', 'Hitung PPh Final atas omzet', C.pphOn, ed) + lab('Tarif PPh Final (%)', '<input id="pj-rate" type="number" min="0" max="100" step="0.1" value="' + C.pphRate + '" ' + (ed ? '' : 'disabled') + ' style="' + inp + '">') +
       chk('pj-free', 'Bebas pajak untuk omzet sampai Rp 500 juta per tahun (WP orang pribadi)', C.free500, ed) +
       chk('pj-ppn', 'Toko adalah PKP, hitung PPN', C.ppnOn, ed) + lab('Tarif PPN (%)', '<input id="pj-ppnrate" type="number" min="0" max="100" step="0.5" value="' + C.ppnRate + '" ' + (ed ? '' : 'disabled') + ' style="' + inp + '">') + '</div>' +
@@ -110,7 +110,7 @@
   function ensure() {
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-pajak';
-    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px;' + S;
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:12px;' + S;
     ov.addEventListener('click', function (e) {
       if (e.target === ov || e.target.hasAttribute('data-x')) { ov.style.display = 'none'; return; }
       var b = e.target.closest('[data-a]'); if (b) act(b.getAttribute('data-a'), b.getAttribute('data-ym'));

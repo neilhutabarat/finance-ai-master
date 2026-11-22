@@ -59,21 +59,21 @@
 
   /* ---- tampilan ---- */
   var S = 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
-  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:13px;outline:none';
-  var btn = 'padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font-size:12px;font-weight:700;cursor:pointer';
-  var green = ';background:#22c55e;color:#04210f;border-color:#22c55e';
+  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:13px;outline:none';
+  var btn = 'padding:7px 12px;border-radius:999px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer';
+  var green = ';background:#16a34a;color:#ffffff;border-color:#16a34a';
   function lab(t, el) { return '<div><label style="display:block;font-size:11.5px;font-weight:700;margin:0 0 4px;opacity:.8">' + t + '</label>' + el + '</div>'; }
-  function stBadge(r) { var c = { hadir: '#4ade80', izin: '#38bdf8', sakit: '#fbbf24', alpha: '#fb7185' }[r.status || 'hadir'] || '#fff'; return '<span style="color:' + c + ';font-weight:700">' + esc((r.status || 'hadir').replace(/^./, function (x) { return x.toUpperCase(); })) + '</span>' + (late(r) && (r.status || 'hadir') === 'hadir' ? ' <span style="color:#fb7185;font-size:11px">terlambat</span>' : ''); }
+  function stBadge(r) { var c = { hadir: '#15803d', izin: '#38bdf8', sakit: '#b45309', alpha: '#be123c' }[r.status || 'hadir'] || '#fff'; return '<span style="color:' + c + ';font-weight:700">' + esc((r.status || 'hadir').replace(/^./, function (x) { return x.toUpperCase(); })) + '</span>' + (late(r) && (r.status || 'hadir') === 'hadir' ? ' <span style="color:#be123c;font-size:11px">terlambat</span>' : ''); }
   function head() {
     return '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Absensi Karyawan</div><div style="font-size:12px;opacity:.65">' + (role() === 'kasir' ? 'Pilih nama lalu tekan Masuk atau Pulang.' : (isMgr() ? 'Atur karyawan dan lihat rekap kehadiran.' : 'Tampilan baca saja.')) + '</div></div><button data-x style="' + btn + '">Tutup</button></div>' +
-      (note ? '<p style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.14);color:#86efac;font-size:12px">' + esc(note) + '</p>' : '');
+      (note ? '<p style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.14);color:#166534;font-size:12px">' + esc(note) + '</p>' : '');
   }
   function kasirView() {
     var day = iso(), h = head();
     if (!cfg.staff.length) return h + '<p style="opacity:.7;text-align:center;padding:18px;font-size:13px">Belum ada karyawan terdaftar. Minta Manager menambahkannya.</p>';
     h += '<div style="margin-top:12px">' + lab('Nama karyawan', '<select id="ab-who" style="' + inp + '">' + cfg.staff.map(function (s) { return '<option value="' + esc(s.id) + '"' + (who === s.id ? ' selected' : '') + '>' + esc(s.name) + '</option>'; }).join('') + '</select>') + '</div>';
     var sid = who || cfg.staff[0].id, r = find(sid, day);
-    h += '<div style="margin:12px 0;padding:12px;border-radius:14px;background:rgba(255,255,255,.07);font-size:13px">Hari ini: ' + (r ? (r.inAt ? 'masuk <b>' + r.inAt + '</b>' : '') + (r.outAt ? ', pulang <b>' + r.outAt + '</b>' : ', belum pulang') + ' · ' + stBadge(r) : 'belum absen') + '</div>';
+    h += '<div style="margin:12px 0;padding:12px;border-radius:14px;background:#f1f5f9;font-size:13px">Hari ini: ' + (r ? (r.inAt ? 'masuk <b>' + r.inAt + '</b>' : '') + (r.outAt ? ', pulang <b>' + r.outAt + '</b>' : ', belum pulang') + ' · ' + stBadge(r) : 'belum absen') + '</div>';
     h += '<div style="display:flex;gap:10px"><button data-a="in" style="' + btn + green + ';flex:1;padding:12px">Masuk</button><button data-a="out" style="' + btn + ';flex:1;padding:12px">Pulang</button></div>';
     h += '<p style="font-size:11px;opacity:.6;margin-top:10px">Jam kerja ' + esc(cfg.jamMasuk) + ' - ' + esc(cfg.jamPulang) + ', toleransi ' + cfg.toleransi + ' menit.</p>';
     return h;
@@ -81,7 +81,7 @@
   function tabHari() {
     var day = iso(), h = '';
     if (!cfg.staff.length) return '<p style="opacity:.7;font-size:13px">Belum ada karyawan.</p>';
-    cfg.staff.forEach(function (s) { var r = find(s.id, day); h += '<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid rgba(255,255,255,.07);font-size:12.5px"><b>' + esc(s.name) + '</b><span>' + (r ? (r.inAt || '-') + ' - ' + (r.outAt || '...') + ' · ' + stBadge(r) : '<span style="opacity:.55">Belum absen</span>') + '</span></div>'; });
+    cfg.staff.forEach(function (s) { var r = find(s.id, day); h += '<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #e2e8f0;font-size:12.5px"><b>' + esc(s.name) + '</b><span>' + (r ? (r.inAt || '-') + ' - ' + (r.outAt || '...') + ' · ' + stBadge(r) : '<span style="opacity:.55">Belum absen</span>') + '</span></div>'; });
     return h;
   }
   function recap() {
@@ -94,11 +94,11 @@
   function tabRekap() {
     var R = recap(); if (!R.length) return '<p style="opacity:.7;font-size:13px">Belum ada karyawan.</p>';
     return '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:480px"><thead><tr style="text-align:left;opacity:.65"><th style="padding:6px 4px">Karyawan</th><th style="text-align:right">Hadir</th><th style="text-align:right">Terlambat</th><th style="text-align:right">Izin</th><th style="text-align:right">Sakit</th><th style="text-align:right">Alpha</th><th style="text-align:right">Total jam</th></tr></thead><tbody>' +
-      R.map(function (o) { return '<tr style="border-top:1px solid rgba(255,255,255,.07)"><td style="padding:7px 4px;font-weight:700">' + esc(o.s.name) + '</td><td style="text-align:right">' + o.hadir + '</td><td style="text-align:right;color:' + (o.tel ? '#fb7185' : 'inherit') + '">' + o.tel + '</td><td style="text-align:right">' + o.izin + '</td><td style="text-align:right">' + o.sakit + '</td><td style="text-align:right;color:' + (o.alpha ? '#fb7185' : 'inherit') + '">' + o.alpha + '</td><td style="text-align:right">' + fh(o.jam) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+      R.map(function (o) { return '<tr style="border-top:1px solid #e2e8f0"><td style="padding:7px 4px;font-weight:700">' + esc(o.s.name) + '</td><td style="text-align:right">' + o.hadir + '</td><td style="text-align:right;color:' + (o.tel ? '#be123c' : 'inherit') + '">' + o.tel + '</td><td style="text-align:right">' + o.izin + '</td><td style="text-align:right">' + o.sakit + '</td><td style="text-align:right;color:' + (o.alpha ? '#be123c' : 'inherit') + '">' + o.alpha + '</td><td style="text-align:right">' + fh(o.jam) + '</td></tr>'; }).join('') + '</tbody></table></div>';
   }
   function tabKaryawan() {
     var h = '<div style="display:flex;gap:8px;align-items:end;margin-top:4px">' + '<div style="flex:1">' + lab('Nama karyawan baru', '<input id="ab-new" placeholder="mis. Sari" style="' + inp + '">') + '</div><button data-a="addstaff" style="' + btn + green + '">Tambah</button></div>';
-    h += cfg.staff.map(function (s) { return '<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid rgba(255,255,255,.07);font-size:12.5px"><b>' + esc(s.name) + '</b><button data-a="delstaff" data-id="' + esc(s.id) + '" style="' + btn + ';padding:2px 10px;font-size:11px">Hapus</button></div>'; }).join('');
+    h += cfg.staff.map(function (s) { return '<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #e2e8f0;font-size:12.5px"><b>' + esc(s.name) + '</b><button data-a="delstaff" data-id="' + esc(s.id) + '" style="' + btn + ';padding:2px 10px;font-size:11px">Hapus</button></div>'; }).join('');
     h += '<div style="font-weight:800;margin:16px 0 6px">Jam kerja</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">' + lab('Jam masuk', '<input id="ab-jm" type="time" value="' + esc(cfg.jamMasuk) + '" style="' + inp + '">') + lab('Jam pulang', '<input id="ab-jp" type="time" value="' + esc(cfg.jamPulang) + '" style="' + inp + '">') + lab('Toleransi terlambat (menit)', '<input id="ab-tol" type="number" min="0" max="120" value="' + cfg.toleransi + '" style="' + inp + '">') + '</div>' +
       '<div style="margin-top:10px"><button data-a="savejam" style="' + btn + green + '">Simpan jam kerja</button></div>';
     h += '<div style="font-weight:800;margin:16px 0 6px">Koreksi / catat izin, sakit, alpha</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">' +
@@ -116,7 +116,7 @@
       if (!T.some(function (x) { return x[0] === tab; })) tab = 'hari';
       h = head() + '<div style="display:flex;gap:6px;margin:14px 0 8px;flex-wrap:wrap;align-items:center">' + T.map(function (x) { return '<button data-tab="' + x[0] + '" style="' + btn + (tab === x[0] ? green : '') + '">' + x[1] + '</button>'; }).join('') + (tab === 'rekap' ? '<input id="ab-month" type="month" value="' + month + '" style="' + inp + ';width:auto;margin-left:auto">' : '') + '</div>' + (tab === 'hari' ? tabHari() : tab === 'rekap' ? tabRekap() : tabKaryawan());
     }
-    ov.innerHTML = '<div style="width:100%;max-width:640px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' + h + '</div>';
+    ov.innerHTML = '<div style="width:100%;max-width:640px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;box-shadow:0 24px 60px rgba(15,23,42,.25);border-radius:24px;padding:18px;' + (document.documentElement.getAttribute('data-fm-native') === 'dark' ? 'filter:invert(1) hue-rotate(180deg);' : '') + '">' + h + '</div>';
     if (keep) { var el = document.getElementById(keep); if (el && el.focus) try { el.focus(); } catch (e) {} }
   }
   function g(id) { var e = document.getElementById(id); return e ? e.value : ''; }
@@ -140,7 +140,7 @@
   function ensure() {
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-absen';
-    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px;' + S;
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:12px;' + S;
     ov.addEventListener('click', function (e) {
       if (e.target === ov || e.target.hasAttribute('data-x')) { ov.style.display = 'none'; return; }
       var t = e.target.closest('[data-tab]'); if (t) { tab = t.getAttribute('data-tab'); note = ''; return render(); }

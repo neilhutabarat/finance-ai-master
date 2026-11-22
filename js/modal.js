@@ -26,13 +26,13 @@
     if (r.err) return h + '<p style="font-size:13px;opacity:.8;margin-top:14px">' + L.esc(r.err) + '</p>';
     if (r.before) return h + '<div style="padding:24px 6px;text-align:center;opacity:.75;font-size:13px">Neraca baru dimulai pada ' + L.esc(r.st) + ', jadi belum ada perubahan modal di ' + L.esc(r.P.label) + '.</div>';
     h += '<div style="font-size:11.5px;opacity:.65;margin:8px 0 6px">' + L.esc(r.P.label) + '. Semua usaha, tidak mengikuti filter usaha.</div>';
-    h += '<div style="border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:4px 14px">' + r.rows.map(function (x) {
-      return '<div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13px"><span>' + L.esc(x[0]) + '</span><b style="color:' + (x[1] < 0 ? '#fb7185' : '#f5f5f7') + '">' + rp(x[1]) + '</b></div>';
-    }).join('') + '<div style="display:flex;justify-content:space-between;gap:10px;padding:12px 0;font-size:14px"><b>Modal akhir periode</b><b style="color:' + (r.akhir < 0 ? '#fb7185' : '#34d399') + '">' + rp(r.akhir) + '</b></div></div>';
-    h += '<div style="margin-top:10px;font-size:12px;line-height:1.5;color:' + (r.beda === 0 ? '#4ade80' : '#fbbf24') + '">' + (r.beda === 0 ? 'Sama dengan ekuitas di Neraca AI.' : 'Berbeda ' + rp(r.beda) + ' dari ekuitas di Neraca AI. Periksa data di menu Neraca.') + '</div>';
-    r.warn.forEach(function (w) { h += '<div style="margin-top:6px;font-size:12px;color:#fbbf24;line-height:1.5">' + L.esc(w) + '</div>'; });
+    h += '<div style="border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;padding:4px 14px">' + r.rows.map(function (x) {
+      return '<div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #e2e8f0;font-size:13px"><span>' + L.esc(x[0]) + '</span><b style="color:' + (x[1] < 0 ? '#be123c' : '#0f172a') + '">' + rp(x[1]) + '</b></div>';
+    }).join('') + '<div style="display:flex;justify-content:space-between;gap:10px;padding:12px 0;font-size:14px"><b>Modal akhir periode</b><b style="color:' + (r.akhir < 0 ? '#be123c' : '#15803d') + '">' + rp(r.akhir) + '</b></div></div>';
+    h += '<div style="margin-top:10px;font-size:12px;line-height:1.5;color:' + (r.beda === 0 ? '#15803d' : '#b45309') + '">' + (r.beda === 0 ? 'Sama dengan ekuitas di Neraca AI.' : 'Berbeda ' + rp(r.beda) + ' dari ekuitas di Neraca AI. Periksa data di menu Neraca.') + '</div>';
+    r.warn.forEach(function (w) { h += '<div style="margin-top:6px;font-size:12px;color:#b45309;line-height:1.5">' + L.esc(w) + '</div>'; });
     if (!r.inc) h += '<div style="margin-top:6px;font-size:11.5px;opacity:.65;line-height:1.5">Modal awal periode diambil dari ekuitas akhir hari sebelumnya, sudah termasuk tambahan modal yang dicatat di Neraca.</div>';
-    h += '<div style="display:flex;gap:8px;margin-top:14px;align-items:center"><button data-lx="copy" style="' + L.BTN + L.VIO + '">Salin teks</button><span style="font-size:12px;color:#4ade80">' + L.esc(note) + '</span></div>';
+    h += '<div style="display:flex;gap:8px;margin-top:14px;align-items:center"><button data-lx="copy" style="' + L.BTN + L.VIO + '">Salin teks</button><span style="font-size:12px;color:#15803d">' + L.esc(note) + '</span></div>';
     return h;
   }
   function act(a) { if (a === 'copy' && last && last.text) L.copy(last.text, function (ok) { note = ok ? 'Tersalin.' : 'Gagal menyalin.'; L.render('modal'); setTimeout(function () { note = ''; L.render('modal'); }, 2200); }); }

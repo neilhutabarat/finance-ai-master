@@ -62,7 +62,7 @@
   function ensure() {
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-gaji';
-    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px;' + S;
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:12px;' + S;
     ov.addEventListener('click', function (e) {
       if (e.target === ov || e.target.hasAttribute('data-x')) { ov.style.display = 'none'; return; }
       var b = e.target.closest('[data-a]'); if (b) act(b.getAttribute('data-a'), b.getAttribute('data-id'));
@@ -72,31 +72,31 @@
     document.body.appendChild(ov);
   }
   function monthRows() { return rows.filter(function (r) { return r.bulan === month; }).sort(function (a, b) { return String(a.nama).localeCompare(String(b.nama)); }); }
-  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f5f5f7;font-size:13px;outline:none';
-  var btn = 'padding:8px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font-size:12px;font-weight:700;cursor:pointer';
+  var inp = 'width:100%;box-sizing:border-box;padding:9px 11px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:13px;outline:none';
+  var btn = 'padding:8px 13px;border-radius:999px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer';
   function render() {
     if (!ov || ov.style.display === 'none') return;
     var ed = canEdit(), list = monthRows(), tot = 0, paid = 0;
     list.forEach(function (r) { tot += r.total; if (r.status === 'dibayar') paid += r.total; });
-    var h = '<div style="width:100%;max-width:920px;max-height:92vh;overflow:auto;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
+    var h = '<div style="width:100%;max-width:920px;max-height:92vh;overflow:auto;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;box-shadow:0 24px 60px rgba(15,23,42,.25);border-radius:24px;padding:18px;' + (document.documentElement.getAttribute('data-fm-native') === 'dark' ? 'filter:invert(1) hue-rotate(180deg);' : '') + '">' +
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div><div style="font-weight:800;font-size:17px">Laporan Gaji</div><div style="font-size:12px;opacity:.65">' + (ed ? 'Hanya Manager yang bisa mencatat dan mengubah.' : 'Tampilan baca saja.') + '</div></div><button data-x style="' + btn + '">Tutup</button></div>';
-    if (note) h += '<p style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(245,158,11,.14);color:#fbbf24;font-size:12px">' + esc(note) + '</p>';
+    if (note) h += '<p style="margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(245,158,11,.14);color:#b45309;font-size:12px">' + esc(note) + '</p>';
     if (editing) { ov.innerHTML = h + formHtml() + '</div>'; sumForm(); return; }
     h += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0"><input id="gj-month" type="month" value="' + month + '" style="' + inp + ';width:auto">' +
-      (ed ? '<button data-a="add" style="' + btn + ';background:#22c55e;color:#04210f;border-color:#22c55e">+ Tambah karyawan</button>' : '') +
+      (ed ? '<button data-a="add" style="' + btn + ';background:#16a34a;color:#ffffff;border-color:#16a34a">+ Tambah karyawan</button>' : '') +
       '<button data-a="printall" style="' + btn + '">Cetak laporan</button></div>' +
       '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px">' +
-      [['Total gaji ' + monthLabel(month), tot], ['Sudah dibayar', paid], ['Belum dibayar', tot - paid]].map(function (x) { return '<div style="padding:10px;border-radius:14px;background:rgba(255,255,255,.07)"><div style="font-size:10.5px;opacity:.7">' + x[0] + '</div><div style="font-weight:800;font-size:14px;margin-top:2px">' + rp(x[1]) + '</div></div>'; }).join('') + '</div>';
+      [['Total gaji ' + monthLabel(month), tot], ['Sudah dibayar', paid], ['Belum dibayar', tot - paid]].map(function (x) { return '<div style="padding:10px;border-radius:14px;background:#f1f5f9"><div style="font-size:10.5px;opacity:.7">' + x[0] + '</div><div style="font-weight:800;font-size:14px;margin-top:2px">' + rp(x[1]) + '</div></div>'; }).join('') + '</div>';
     if (!list.length) h += '<p style="font-size:13px;opacity:.75;padding:18px 0;text-align:center">Belum ada data gaji untuk ' + monthLabel(month) + '.' + (ed ? ' Tekan "Tambah karyawan".' : '') + '</p>';
     else {
       h += '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px"><thead><tr style="text-align:left;opacity:.7">' + ['Nama', 'Pokok', 'Tunjangan', 'Potongan', 'Total', 'Status', ''].map(function (t, i) { return '<th style="padding:7px 6px;' + (i > 0 && i < 5 ? 'text-align:right' : '') + '">' + t + '</th>'; }).join('') + '</tr></thead><tbody>';
       list.forEach(function (r) {
-        h += '<tr style="border-top:1px solid rgba(255,255,255,.08)"><td style="padding:8px 6px"><b>' + esc(r.nama) + '</b><br><span style="opacity:.6;font-size:11px">' + esc(r.jabatan || '') + '</span></td>' +
+        h += '<tr style="border-top:1px solid #e2e8f0"><td style="padding:8px 6px"><b>' + esc(r.nama) + '</b><br><span style="opacity:.6;font-size:11px">' + esc(r.jabatan || '') + '</span></td>' +
           '<td style="text-align:right;padding:8px 6px">' + rp(r.pokok) + '</td><td style="text-align:right;padding:8px 6px">' + rp(r.tunjangan) + '</td><td style="text-align:right;padding:8px 6px">' + rp(r.potongan) + '</td>' +
           '<td style="text-align:right;padding:8px 6px;font-weight:800">' + rp(r.total) + '</td>' +
-          '<td style="padding:8px 6px"><span style="padding:3px 9px;border-radius:99px;font-size:11px;font-weight:800;background:' + (r.status === 'dibayar' ? 'rgba(34,197,94,.2);color:#4ade80' : 'rgba(245,158,11,.2);color:#fbbf24') + '">' + (r.status === 'dibayar' ? 'Dibayar' : 'Belum') + (r.tglBayar && r.status === 'dibayar' ? ' ' + esc(r.tglBayar) : '') + '</span></td>' +
+          '<td style="padding:8px 6px"><span style="padding:3px 9px;border-radius:99px;font-size:11px;font-weight:800;background:' + (r.status === 'dibayar' ? 'rgba(34,197,94,.2);color:#15803d' : 'rgba(245,158,11,.2);color:#b45309') + '">' + (r.status === 'dibayar' ? 'Dibayar' : 'Belum') + (r.tglBayar && r.status === 'dibayar' ? ' ' + esc(r.tglBayar) : '') + '</span></td>' +
           '<td style="padding:8px 6px;white-space:nowrap;text-align:right"><button data-a="slip" data-id="' + esc(r.id) + '" style="' + btn + ';padding:5px 10px">Slip</button>' +
-          (ed ? ' <button data-a="toggle" data-id="' + esc(r.id) + '" style="' + btn + ';padding:5px 10px">' + (r.status === 'dibayar' ? 'Batalkan' : 'Tandai dibayar') + '</button> <button data-a="edit" data-id="' + esc(r.id) + '" style="' + btn + ';padding:5px 10px">Ubah</button> <button data-a="del" data-id="' + esc(r.id) + '" style="' + btn + ';padding:5px 10px;color:#fb7185">Hapus</button>' : '') + '</td></tr>';
+          (ed ? ' <button data-a="toggle" data-id="' + esc(r.id) + '" style="' + btn + ';padding:5px 10px">' + (r.status === 'dibayar' ? 'Batalkan' : 'Tandai dibayar') + '</button> <button data-a="edit" data-id="' + esc(r.id) + '" style="' + btn + ';padding:5px 10px">Ubah</button> <button data-a="del" data-id="' + esc(r.id) + '" style="' + btn + ';padding:5px 10px;color:#be123c">Hapus</button>' : '') + '</td></tr>';
       });
       h += '</tbody></table></div>';
     }
@@ -111,7 +111,7 @@
       f('gj-pot', 'Potongan (Rp)', r.potongan ? new Intl.NumberFormat('id-ID').format(r.potongan) : '', 'data-money inputmode="numeric"') +
       '<div><label style="display:block;font-size:11.5px;font-weight:700;margin:0 0 4px;opacity:.8">Total diterima</label><div id="gj-total" style="padding:9px 11px;border-radius:12px;background:rgba(34,197,94,.12);font-weight:800;font-size:14px"></div></div>' +
       '<div style="grid-column:1/-1">' + f('gj-cat', 'Catatan (opsional)', r.catatan) + '</div></div>' +
-      '<div style="display:flex;gap:8px;margin-top:14px"><button data-a="save" style="' + btn + ';background:#22c55e;color:#04210f;border-color:#22c55e">Simpan</button><button data-a="cancel" style="' + btn + '">Batal</button></div>';
+      '<div style="display:flex;gap:8px;margin-top:14px"><button data-a="save" style="' + btn + ';background:#16a34a;color:#ffffff;border-color:#16a34a">Simpan</button><button data-a="cancel" style="' + btn + '">Batal</button></div>';
   }
   function sumForm() { var t = document.getElementById('gj-total'); if (!t) return; var v = function (id) { var e = document.getElementById(id); return e ? num(e.value) : 0; }; t.textContent = rp(Math.max(0, v('gj-pokok') + v('gj-tunj') - v('gj-pot'))); }
   async function act(a, id) {
