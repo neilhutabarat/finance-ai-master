@@ -101,13 +101,135 @@
   var green = ';background:#22c55e;color:#04210f;border-color:#22c55e';
   function render() {
     if (!ov || ov.style.display === 'none') return;
-    ov.innerHTML = '<div style="width:100%;max-width:520px;background:#0b0b0f;color:#f5f5f7;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:18px">' +
-      '<div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:800;font-size:17px">Backup &amp; Ekspor Data</div><div style="font-size:12px;opacity:.65">Unduh data toko Anda sendiri kapan saja.</div></div><button data-x style="' + btn + ';padding:7px 12px;font-size:12px">Tutup</button></div>' +
-      (note ? '<p style="margin:12px 0;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.14);color:#86efac;font-size:12px">' + esc(note) + '</p>' : '') +
-      '<div style="display:grid;gap:10px;margin:14px 0"><button data-a="xlsx" style="' + btn + green + '"' + (busy ? ' disabled' : '') + '>Unduh Excel (.xlsx)</button><button data-a="json" style="' + btn + '"' + (busy ? ' disabled' : '') + '>Unduh salinan lengkap (.json)</button></div>' +
-      '<div style="font-size:12px;opacity:.75;line-height:1.5">Excel berisi lembar Transaksi, Produk &amp; Stok, Daftar Akun' + (f('piutang') ? ', Piutang &amp; Utang' : '') + (f('absensi') ? ', Absensi' : '') + '. File .json dipakai untuk arsip utuh.<br>Backup terakhir: <b>' + esc(lastTxt()) + '</b></div></div>';
+    var useDarkBase = document.documentElement.getAttribute('data-fm-native') === 'dark';
+    var inv = useDarkBase ? 'filter:invert(1) hue-rotate(180deg);' : '';
+    var btn2 = 'width:100%;box-sizing:border-box;padding:11px 16px;border-radius:12px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:13px;font-weight:700;cursor:pointer;text-align:center';
+    var blue2 = ';background:#2563eb;color:#ffffff;border-color:#2563eb';
+    var canImp = f('import_tx');
+    ov.innerHTML = '<div style="width:100%;max-width:520px;background:#ffffff;color:#0f172a;border:1px solid #e2e8f0;border-radius:22px;box-shadow:0 24px 60px rgba(15,23,42,.28);padding:20px;' + inv + '">' +
+      '<div style="display:flex;justify-content:space-between;gap:10px;padding-bottom:10px;border-bottom:1px solid #e2e8f0"><div><div style="font-weight:800;font-size:17px">Backup &amp; Ekspor Data</div><div style="font-size:12px;color:#64748b">Unduh data toko Anda sendiri kapan saja.</div></div><button data-x style="padding:6px 14px;border-radius:999px;border:1px solid #cbd5e1;background:#f1f5f9;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer">Tutup</button></div>' +
+      (note ? '<p style="margin:12px 0;padding:10px 12px;border-radius:12px;background:#ecfdf5;color:#047857;font-size:12px;font-weight:600">' + esc(note) + '</p>' : '') +
+      '<div style="display:grid;gap:10px;margin:14px 0"><button data-a="xlsx" style="' + btn2 + blue2 + '"' + (busy ? ' disabled' : '') + '>Unduh Excel (.xlsx)</button><button data-a="json" style="' + btn2 + '"' + (busy ? ' disabled' : '') + '>Unduh salinan lengkap (.json)</button></div>' +
+      (canImp ? '<div style="margin:14px 0;padding-top:12px;border-top:1px solid #e2e8f0"><div style="font-weight:800;font-size:13px;margin-bottom:4px">Impor Riwayat Transaksi <span style="font-size:10px;background:#dbeafe;color:#1d4ed8;padding:1px 7px;border-radius:999px;margin-left:4px">PLUS+</span></div><div style="font-size:11.5px;color:#64748b;margin-bottom:8px">Pindahkan riwayat dari aplikasi lama (Excel .xls/.xlsx atau .csv) ke Oneilverse.</div><div style="display:flex;gap:8px"><button data-a="imp_tx" style="' + btn2 + ';flex:1;background:#ecfdf5;color:#047857;border-color:#a7f3d0"' + (busy ? ' disabled' : '') + '>Import Transaksi (Excel / CSV)</button><button data-a="tpl_tx" style="' + btn2 + ';width:auto;padding:10px 12px;font-size:11.5px">Contoh CSV</button></div></div>' : '') +
+      '<div style="font-size:12px;color:#64748b;line-height:1.5">Excel berisi lembar Transaksi, Produk &amp; Stok, Daftar Akun' + (f('piutang') ? ', Piutang &amp; Utang' : '') + (f('absensi') ? ', Absensi' : '') + '. File .json dipakai untuk arsip utuh.<br>Backup terakhir: <b style="color:#0f172a">' + esc(lastTxt()) + '</b></div></div>';
+  }
+  function parseDateISO(v) {
+    if (typeof v === 'number' && v > 20000 && v < 80000) {
+      var d = new Date(Math.round((v - 25569) * 86400 * 1000));
+      return iso(d);
+    }
+    var s = String(v || '').trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+    var m = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/.exec(s);
+    if (m) return m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0');
+    return iso();
+  }
+  function numVal(v) { return Math.abs(parseInt(String(v == null ? '' : v).replace(/[^0-9\-]/g, ''), 10) || 0); }
+  function mapTxCat(raw, name) {
+    var c = String(raw || '').toLowerCase(), n = String(name || '').toLowerCase();
+    if (/sales|penjualan|masuk|income|omzet|pendapatan/.test(c)) return 'sales';
+    if (/cogs|hpp|produksi|kulak|pembelian/.test(c)) return 'cogs';
+    if (/prive|tarik/.test(c)) return 'prive';
+    if (/modal|setor/.test(c)) return 'modal';
+    if (/expense|keluar|biaya|beban|bop|operasional/.test(c)) return 'expense';
+    if (/jual|terima|pendapatan/.test(n)) return 'sales';
+    return 'expense';
+  }
+  async function doImportRows(rows) {
+    if (!rows || rows.length < 2) { note = 'File kosong atau tidak ada data transaksi.'; render(); return; }
+    var hdr = rows[0].map(function (h) { return String(h || '').toLowerCase().trim(); });
+    var idx = function (re, d) { var i = hdr.findIndex(function (h) { return re.test(h); }); return i >= 0 ? i : d; };
+    var iTgl = idx(/tanggal|tgl|date|waktu/, 0), iAkun = idx(/akun|kategori|uraian|account/, 1), iKet = idx(/ket|uraian|desc|catatan/, 2);
+    var iNom = idx(/nominal|jumlah|total|amount|nilai/, -1), iIn = idx(/masuk|debit|kredit_in|pemasukan/, -1), iOut = idx(/keluar|kredit|pengeluaran/, -1);
+    var iCat = idx(/jenis|tipe|kategori_coa|category/, -1), iPay = idx(/metode|bayar|pay/, -1), iStf = idx(/petugas|staff|kasir/, -1);
+    var coa = (window.STORE && STORE.getCOA) ? STORE.getCOA() : [];
+    var parsed = [], sumIn = 0, sumOut = 0;
+    for (var r = 1; r < rows.length; r++) {
+      var row = rows[r]; if (!row || !row.length) continue;
+      var ak = String(row[iAkun] || '').trim(), ket = String(row[iKet] || '').trim();
+      var amt = iNom >= 0 ? numVal(row[iNom]) : 0, cat = iCat >= 0 ? mapTxCat(row[iCat], ak) : '';
+      if (!amt && (iIn >= 0 || iOut >= 0)) {
+        var vIn = iIn >= 0 ? numVal(row[iIn]) : 0, vOut = iOut >= 0 ? numVal(row[iOut]) : 0;
+        if (vIn > 0) { amt = vIn; cat = cat || 'sales'; }
+        else if (vOut > 0) { amt = vOut; cat = cat || 'expense'; }
+      }
+      if (!amt) continue;
+      if (!cat) cat = mapTxCat('', ak || ket);
+      var match = coa.find(function (c) { return String(c.code) === ak || String(c.name || '').toLowerCase() === ak.toLowerCase(); })
+        || coa.find(function (c) { return c.category === cat; }) || { code: 'IMP', name: ak || (cat === 'sales' ? 'Penjualan Impor' : 'Pengeluaran Impor') };
+      var dISO = parseDateISO(row[iTgl]);
+      var payRaw = String(iPay >= 0 ? row[iPay] : 'tunai').toLowerCase();
+      var pay = /qris/.test(payRaw) ? 'qris' : /petty|kecil/.test(payRaw) ? 'petty' : /transfer|bank/.test(payRaw) ? 'transfer' : 'tunai';
+      var stf = String(iStf >= 0 && row[iStf] ? row[iStf] : 'Impor Excel').trim();
+      var ts = new Date(dISO + 'T12:00:00').getTime() || Date.now();
+      if (cat === 'sales' || cat === 'modal') sumIn += amt; else sumOut += amt;
+      parsed.push({
+        id: 'imp_' + ts + '_' + r + '_' + Math.random().toString(36).slice(2, 6),
+        dateISO: dISO, timestamp: ts, accountCode: String(match.code || 'IMP'), accountName: String(match.name || ak || 'Impor'),
+        category: cat, amount: amt, description: ket || ak || 'Impor riwayat', staff: stf, pay: pay, source: 'import'
+      });
+    }
+    if (!parsed.length) { note = 'Tidak ada baris transaksi valid yang terbaca.'; render(); return; }
+    var ok = confirm('Siap mengimpor ' + parsed.length + ' transaksi?\n• Pemasukan: Rp ' + new Intl.NumberFormat('id-ID').format(sumIn) + '\n• Pengeluaran: Rp ' + new Intl.NumberFormat('id-ID').format(sumOut));
+    if (!ok) return;
+    busy = true; note = 'Mengimpor ' + parsed.length + ' transaksi ke Oneilverse…'; render();
+    try {
+      var hasDb = (typeof db !== 'undefined' && db && tid() !== 'default');
+      if (hasDb) {
+        var colRef = db.collection('transactions_' + tid());
+        for (var i = 0; i < parsed.length; i += 400) {
+          var bt = db.batch();
+          parsed.slice(i, i + 400).forEach(function (t) { bt.set(colRef.doc(t.id), t); });
+          await bt.commit();
+        }
+      }
+      if (typeof txList !== 'undefined' && Array.isArray(txList)) {
+        parsed.forEach(function (t) { txList.push(t); });
+        if (typeof renderUI === 'function') try { renderUI(); } catch (e) {}
+      }
+      note = 'Berhasil mengimpor ' + parsed.length + ' transaksi ke Oneilverse!';
+    } catch (e) { note = 'Gagal impor: ' + (e && e.message || e); }
+    busy = false; render();
+  }
+  function triggerTxImport() {
+    var inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.csv,.tsv,.txt,.xls,.xlsx';
+    inp.onchange = function () {
+      var f0 = inp.files && inp.files[0]; if (!f0) return;
+      if (/\.xlsx?$/i.test(f0.name)) {
+        var go = function () {
+          var fr = new FileReader();
+          fr.onload = function (ev) {
+            var wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
+            var ws = wb.Sheets[wb.SheetNames[0]];
+            doImportRows(XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' }));
+          };
+          fr.readAsArrayBuffer(f0);
+        };
+        if (window.XLSX) return go();
+        var s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+        s.onload = go; s.onerror = function () { alert('Gagal memuat pembaca Excel.'); };
+        document.head.appendChild(s);
+      } else {
+        var fr = new FileReader();
+        fr.onload = function (ev) {
+          var rows = String(ev.target.result || '').split(/\r?\n/).map(function (ln) {
+            var sep = ln.indexOf(';') >= 0 && ln.indexOf(',') < 0 ? ';' : ln.indexOf('\t') >= 0 ? '\t' : ',';
+            return ln.split(sep).map(function (x) { return x.replace(/^["']|["']$/g, '').trim(); });
+          });
+          doImportRows(rows);
+        };
+        fr.readAsText(f0);
+      }
+    };
+    inp.click();
   }
   async function run(kind) {
+    if (kind === 'tpl_tx') {
+      var csv = 'Tanggal,Akun,Keterangan,Nominal,Kategori,Metode Bayar,Petugas\n2026-11-20,Penjualan,Penjualan Harian,500000,sales,Tunai,Admin\n2026-11-20,Biaya Listrik,Bayar Listrik PLN,150000,expense,Transfer,Admin\n';
+      save(new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'template-impor-transaksi-oneilverse.csv');
+      note = 'Contoh file template CSV sudah diunduh.'; render(); return;
+    }
+    if (kind === 'imp_tx') { triggerTxImport(); return; }
     if (busy) return; busy = true; note = 'Menyiapkan data…'; render();
     try {
       try { if (f('piutang') && window.FM_PIU && FM_PIU.start) FM_PIU.start(); if (f('absensi') && window.FM_ABS && FM_ABS.all) FM_ABS.all(); if (f('properti') && window.FM_PROP && FM_PROP.all) FM_PROP.all(); } catch (e) {}
@@ -122,7 +244,7 @@
   function ensure() {
     if (ov) return;
     ov = document.createElement('div'); ov.id = 'fm-backup';
-    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:12px;' + S0;
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:2147482600;background:rgba(15,23,42,.45);align-items:center;justify-content:center;padding:14px;' + S0;
     ov.addEventListener('click', function (e) { if (e.target === ov || e.target.hasAttribute('data-x')) { ov.style.display = 'none'; return; } var b = e.target.closest('[data-a]'); if (b) run(b.getAttribute('data-a')); });
     document.body.appendChild(ov);
   }

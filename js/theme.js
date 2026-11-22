@@ -2,12 +2,16 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.13';
-  var BETA = 'v1.1.13';
+  var APP_VERSION = '1.1.14';
+  var BETA = 'v1.1.14';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.1.14', '22 Nov 2026', [
+      '[Perbaikan] Menambahkan fitur Impor Riwayat Transaksi (Excel / CSV) khusus paket Plus ke atas di menu Backup & Ekspor agar klien bisa memindahkan riwayat transaksi lama langsung ke Oneilverse',
+      '[Keamanan] Impor transaksi menampilkan pratinjau nominal serta konfirmasi sebelum ditulis ke database toko'
+    ]],
     ['v1.1.13', '22 Nov 2026', [
       '[Perbaikan] Menambahkan fitur Import Excel (.xls/.xlsx) dan CSV di menu Kelola Akun (COA) untuk Manager dan Owner agar daftar akun bisa disesuaikan per jenis usaha dengan cepat',
       '[Keamanan] Impor COA tetap meminta konfirmasi dan hanya berlaku pada toko yang sedang dibuka'

@@ -39,6 +39,7 @@
     { key: 'absensi', label: 'Absensi Karyawan: catat masuk dan pulang, rekap kehadiran bulanan', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'offline_penuh', label: 'Mode Offline Penuh: transaksi tetap tersimpan saat internet putus dan terkirim otomatis', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'backup', label: 'Backup & Ekspor Data: unduh data toko ke Excel dan arsip', r: { manager: 'o', owner: 'o' } },
+    { key: 'import_tx', label: 'Impor Riwayat Transaksi (Excel / CSV): pindahkan data dari aplikasi lama', r: { manager: 'o', owner: 'o' } },
     { key: 'laporan_bulanan', label: 'Laporan Bulanan: ringkasan tiap bulan untuk Owner, kirim lewat WhatsApp', r: { manager: 'o', owner: 'o' } },
     { key: 'admin_usaha', label: 'Admin tambahan per usaha: banyak akun Admin, PIN sendiri-sendiri, Owner bisa mengatur', r: { owner: 'o' } },
     { key: 'piutang', label: 'Piutang & Utang: DP, bayar sebagian, jatuh tempo, daftar pelanggan dan pemasok', r: { kasir: 'o', manager: 'o', owner: 'o' } },
@@ -125,7 +126,7 @@
   }
   var ALWAYS_ON = ['wallpaper', 'theme']; /* tampilan dasar: menyala di semua paket */
   /* Penanda tingkat untuk tampilan Tower: PLUS = fitur premium (pantas bayar), sisanya BASIC. Hanya label + urutan, tidak mengubah hak akses. */
-  var PLUS_FEATURES = ['barcode', 'stok_scan', 'banyak_usaha', 'admin_usaha', 'properti', 'dashboard', 'analisa', 'audit', 'export_csv', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'backup', 'laporan_bulanan', 'gaji', 'gaji_auto', 'ledger', 'instruksi', 'billing_card'];
+  var PLUS_FEATURES = ['import_tx', 'barcode', 'stok_scan', 'banyak_usaha', 'admin_usaha', 'properti', 'dashboard', 'analisa', 'audit', 'export_csv', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'pajak_bulanan', 'backup', 'laporan_bulanan', 'gaji', 'gaji_auto', 'ledger', 'instruksi', 'billing_card'];
   function featTier(f) { return PLUS_FEATURES.indexOf(f.key) >= 0 ? 'plus' : 'basic'; }
   var _lockCol = false; /* tampilkan kolom gembok (hanya di layar ubah fitur toko) */
   /* Oneilverse 2: isi pulau kiri/kanan, diatur per toko dari Control Tower (semua menyala bawaan) */
@@ -363,7 +364,7 @@
     { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
     { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'stok_habis'] },
     { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
-    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'ai_asisten', 'card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'denyut', 'tutup_hari', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup'] },
+    { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'ai_asisten', 'card_ringkasan', 'card_metode', 'card_target', 'card_stok', 'card_grafik', 'card_transaksi', 'denyut', 'tutup_hari', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup', 'import_tx'] },
     { id: 'ops', label: 'Operasional', keys: ['absensi', 'properti', 'offline_penuh'] },
     { id: 'tamp', label: 'Tampilan & Pemanis', keys: ['wallpaper', 'theme', 'bahasa', 'billing_card', 'chat'] },
     { id: 'pkr', label: 'Oneilverse 2 · Pulau KIRI (menu & satelit)', keys: ISL_LK },
