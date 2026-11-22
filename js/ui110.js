@@ -315,12 +315,21 @@
         if (stk) R.push({ el: stk, nama: 'Stok', ik: IC.stok, sem: true });
         var piu = document.querySelector('.fm-fab[data-fc="piu"],[onclick*="FM_PIU.open"]');
         if (piu && R.length < 2) R.push({ el: piu, nama: 'Piutang', ik: IC.piutang, sem: true });
-        var naik = [], sisa = Math.max(0, 3 - R.length);
-        while (sisa > 0 && hal.length - naik.length > 1) { naik.unshift(hal[hal.length - 1 - naik.length]); sisa--; }
-        naik.forEach(function (x) { R.push({ dk: x, nama: teks(x), ik: IC.menu }); });
-        if (L.length < 3 && hal.length - naik.length > 1) {
-          var lExtra = hal.filter(function (x) { return naik.indexOf(x) < 0; })[0];
-          if (lExtra) { L.push({ dk: lExtra, nama: teks(lExtra), ik: IC.menu }); naik.push(lExtra); }
+        var naik = [];
+        var avail = function () { return hal.filter(function (x) { return naik.indexOf(x) < 0; }); };
+        while (R.length < L.length && R.length < 3 && avail().length > 1) {
+          var rPick = avail()[avail().length - 1]; naik.push(rPick);
+          R.push({ dk: rPick, nama: teks(rPick), ik: IC.menu });
+        }
+        while (L.length < R.length && L.length < 3 && avail().length > 1) {
+          var lPick = avail()[0]; naik.push(lPick);
+          L.push({ dk: lPick, nama: teks(lPick), ik: IC.menu });
+        }
+        while (L.length < 3 && R.length < 3 && avail().length > 2) {
+          var a = avail(), lP = a[0], rP = a[a.length - 1];
+          naik.push(lP, rP);
+          L.push({ dk: lP, nama: teks(lP), ik: IC.menu });
+          R.push({ dk: rP, nama: teks(rP), ik: IC.menu });
         }
         if (piu) {
           [].forEach.call(document.querySelectorAll('#fm-actions .fm-act'), function (a) {

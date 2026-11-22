@@ -2,12 +2,16 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.11';
-  var BETA = 'v1.1.11';
+  var APP_VERSION = '1.1.12';
+  var BETA = 'v1.1.12';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.1.12', '22 Nov 2026', [
+      '[Perbaikan] Menyeimbangkan jumlah pulau di kiri dan kanan dock bawah agar selalu simetris (2-2 atau 3-3) di semua akun',
+      '[Keamanan] Penyesuaian tata letak dock tanpa mengubah hak akses maupun data'
+    ]],
     ['v1.1.11', '22 Nov 2026', [
       '[Perbaikan] Jendela Fitur Toko kini menampilkan lencana paket aktif (BASIC / PLUS / PRO) sesuai pengaturan Control Tower dan menyaring label internal agar hanya menampilkan fitur nyata yang aktif',
       '[Keamanan] Hak akses fitur di halaman Manager dan Owner tetap mengacu pada konfigurasi Control Tower'
