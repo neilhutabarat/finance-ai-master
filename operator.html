@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ON Operator — CS Live (Ony)</title>
+  <link rel="manifest" href="operator-manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #020617; color: #f1f5f9;
+      height: 100dvh; display: flex; justify-content: center; align-items: center;
+    }
+    #app {
+      width: 100%; max-width: 420px; height: 100dvh; max-height: 820px;
+      background: #0f172a; display: flex; flex-direction: column; overflow: hidden;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    @media (min-width: 500px) {
+      #app { height: 92dvh; border-radius: 26px; box-shadow: 0 24px 60px rgba(0,0,0,.65); }
+    }
+    header {
+      flex: none; display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px; background: #1e293b; border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    header h1 { font-size: 16px; font-weight: 700; flex: 1; }
+    header small { display: block; font-size: 11px; color: #34d399; font-weight: 500; }
+    .btn-icon {
+      all: unset; cursor: pointer; padding: 6px 10px; border-radius: 8px;
+      color: #cbd5e1; font-size: 15px;
+    }
+    .btn-icon:hover { background: rgba(255,255,255,.1); }
+    .tabs {
+      flex: none; display: flex; background: #1e293b; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .tab {
+      flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 600;
+      color: #94a3b8; cursor: pointer; border-bottom: 2px solid transparent;
+    }
+    .tab.active { color: #38bdf8; border-bottom-color: #38bdf8; }
+    #login-box {
+      flex: 1; padding: 28px 20px; display: flex; flex-direction: column; justify-content: center; gap: 14px;
+    }
+    #login-box h2 { font-size: 20px; margin-bottom: 4px; }
+    #login-box p { font-size: 13px; color: #94a3b8; margin-bottom: 8px; }
+    input, button { font-family: inherit; }
+    .inp {
+      width: 100%; padding: 12px 14px; border-radius: 12px; background: #1e293b;
+      border: 1px solid rgba(255,255,255,.18); color: #fff; font-size: 14px; outline: none;
+    }
+    .btn-primary {
+      width: 100%; padding: 12px; border-radius: 12px; border: none;
+      background: #2563eb; color: #fff; font-weight: 700; font-size: 14px; cursor: pointer;
+    }
+    #list { flex: 1; overflow: auto; }
+    .item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.06); cursor: pointer;
+    }
+    .item:hover { background: rgba(255,255,255,.04); }
+    .av {
+      width: 44px; height: 44px; border-radius: 50%; background: #10b981;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex: none;
+    }
+    .info { flex: 1; min-width: 0; }
+    .name { font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; }
+    .time { font-size: 11px; color: #94a3b8; font-weight: 400; }
+    .prev { font-size: 12.5px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    #feed {
+      flex: 1; overflow: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px; background: #0b1120;
+    }
+    .bwrap { display: flex; flex-direction: column; align-items: flex-start; }
+    .bwrap.me { align-items: flex-end; }
+    .bubble {
+      max-width: 82%; padding: 9px 13px; border-radius: 16px 16px 16px 4px;
+      background: #1e293b; color: #f1f5f9; font-size: 13.5px; line-height: 1.4; word-break: break-word;
+    }
+    .bwrap.me .bubble { background: #2563eb; color: #fff; border-radius: 16px 16px 4px 16px; }
+    .sender { font-size: 11px; font-weight: 700; color: #7dd3fc; margin-bottom: 2px; }
+    .meta { font-size: 10px; color: rgba(255,255,255,.6); text-align: right; margin-top: 3px; }
+    #composer {
+      flex: none; display: flex; gap: 8px; padding: 10px 12px;
+      background: #1e293b; border-top: 1px solid rgba(255,255,255,.1);
+    }
+    #composer input {
+      flex: 1; background: #0f172a; border: 1px solid rgba(255,255,255,.2);
+      border-radius: 99px; padding: 10px 14px; color: #fff; font-size: 13.5px; outline: none;
+    }
+    #composer button {
+      border: none; border-radius: 99px; background: #2563eb; color: #fff;
+      padding: 0 18px; font-weight: 700; font-size: 13px; cursor: pointer;
+    }
+    .empty { text-align: center; color: #64748b; font-size: 13px; padding: 30px 16px; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header id="hdr">
+    <button class="btn-icon" id="btn-back" style="display:none">←</button>
+    <div>
+      <h1 id="hdr-title">ON Operator</h1>
+      <small id="hdr-sub">CS Live (Ony)</small>
+    </div>
+    <button class="btn-icon" id="btn-logout" style="display:none" title="Keluar">Keluar</button>
+  </header>
+
+  <div id="login-box">
+    <h2>Login Operator ON</h2>
+    <p>Masuk dengan akun Tower / Operator untuk membalas chat toko sebagai <b>Ony (CS Live)</b>.</p>
+    <input class="inp" id="in-email" type="email" placeholder="Email Operator / Tower">
+    <input class="inp" id="in-pass" type="password" placeholder="Kata Sandi">
+    <div id="login-err" style="font-size:12px;color:#fbbf24;min-height:16px"></div>
+    <button class="btn-primary" id="btn-login">Masuk</button>
+  </div>
+
+  <div class="tabs" id="tabs" style="display:none">
+    <div class="tab active" data-tab="inbox">Inbox Toko</div>
+    <div class="tab" data-tab="world">Chat World</div>
+  </div>
+
+  <div id="list" style="display:none"></div>
+  <div id="feed" style="display:none"></div>
+  <div id="composer" style="display:none">
+    <input id="msg-in" placeholder="Balas sebagai Ony..." autocomplete="off">
+    <button id="msg-send">Kirim</button>
+  </div>
+</div>
+
+<script>
+  firebase.initializeApp({
+    apiKey: 'AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI',
+    authDomain: 'finance-ai-master-byneilverse.firebaseapp.com',
+    projectId: 'finance-ai-master-byneilverse'
+  });
+  var auth = firebase.auth(), db = firebase.firestore();
+  var state = { tab: 'inbox', activeTid: null, rooms: [], msgs: [], worldMsgs: [], unsubRooms: null, unsubChat: null, unsubWorld: null };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function hm(ms) { if (!ms) return ''; var d = new Date(ms + 7 * 3600000); return pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()); }
+
+  function pairId(tid) { return ['DEV', String(tid).toUpperCase()].sort().join('__'); }
+
+  function showView(mode) {
+    $('login-box').style.display = mode === 'login' ? 'flex' : 'none';
+    $('tabs').style.display = mode === 'list' ? 'flex' : 'none';
+    $('list').style.display = (mode === 'list' && state.tab === 'inbox') ? 'block' : 'none';
+    $('feed').style.display = (mode === 'room' || (mode === 'list' && state.tab === 'world')) ? 'flex' : 'none';
+    $('composer').style.display = (mode === 'room' || (mode === 'list' && state.tab === 'world')) ? 'flex' : 'none';
+    $('btn-back').style.display = mode === 'room' ? 'inline-block' : 'none';
+    $('btn-logout').style.display = mode !== 'login' ? 'inline-block' : 'none';
+  }
+
+  function renderRooms() {
+    var el = $('list');
+    if (!state.rooms.length) { el.innerHTML = '<div class="empty">Belum ada pesan masuk dari toko.</div>'; return; }
+    el.innerHTML = state.rooms.map(function (r) {
+      return '<div class="item" data-tid="' + esc(r.tid) + '">' +
+        '<div class="av">' + esc(r.tid.slice(0, 2)) + '</div>' +
+        '<div class="info"><div class="name"><span>' + esc(r.tid) + '</span><span class="time">' + hm(r.lastMs) + '</span></div>' +
+        '<div class="prev">' + esc(r.lastText || '') + '</div></div></div>';
+    }).join('');
+    el.querySelectorAll('.item').forEach(function (it) {
+      it.onclick = function () { openRoom(it.getAttribute('data-tid')); };
+    });
+  }
+
+  function renderFeed(list, isWorld) {
+    var el = $('feed');
+    if (!list.length) { el.innerHTML = '<div class="empty">Belum ada pesan.</div>'; return; }
+    el.innerHTML = list.map(function (x) {
+      var isMe = isWorld ? (x.role === 'dev') : (x.fromTid === 'DEV');
+      var sender = isWorld ? x.label : (x.fromLabel || x.fromTid);
+      return '<div class="bwrap' + (isMe ? ' me' : '') + '"><div class="bubble">' +
+        (!isMe ? '<div class="sender">' + esc(sender) + '</div>' : '') +
+        '<div>' + esc(x.text) + '</div>' +
+        '<div class="meta">' + hm(x.ms) + (isMe ? ' ✓✓' : '') + '</div></div></div>';
+    }).join('');
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function openRoom(tid) {
+    state.activeTid = tid;
+    $('hdr-title').textContent = tid;
+    $('hdr-sub').textContent = 'Balas sebagai Ony (CS Live)';
+    $('msg-in').placeholder = 'Balas ke ' + tid + '...';
+    showView('room');
+    if (state.unsubChat) state.unsubChat();
+    state.unsubChat = db.collection('on_dm').doc(pairId(tid)).collection('messages')
+      .orderBy('ms', 'desc').limit(80).onSnapshot(function (snap) {
+        var a = []; snap.forEach(function (d) { a.push(d.data()); });
+        a.reverse(); state.msgs = a; renderFeed(a, false);
+      });
+  }
+
+  function sendMessage() {
+    var inp = $('msg-in'), text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+    var now = Date.now();
+    if (state.activeTid) {
+      var pair = pairId(state.activeTid);
+      db.collection('on_dm').doc(pair).set({ tid: state.activeTid, lastText: text, lastMs: now, lastFrom: 'Ony (CS)' }, { merge: true }).catch(function () {});
+      db.collection('on_dm').doc(pair).collection('messages').add({
+        fromTid: 'DEV', fromLabel: 'Ony (CS)', toTid: state.activeTid,
+        text: text, ms: now, at: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } else if (state.tab === 'world') {
+      db.collection('global_chat').add({
+        tid: 'DEV', role: 'dev', label: 'DEV', text: text,
+        ms: now, at: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  }
+
+  $('btn-back').onclick = function () {
+    state.activeTid = null;
+    if (state.unsubChat) { state.unsubChat(); state.unsubChat = null; }
+    $('hdr-title').textContent = 'ON Operator';
+    $('hdr-sub').textContent = 'CS Live (Ony)';
+    showView('list');
+  };
+
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.onclick = function () {
+      document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('active'); });
+      t.classList.add('active');
+      state.tab = t.getAttribute('data-tab');
+      $('msg-in').placeholder = state.tab === 'world' ? 'Tulis ke Chat World sebagai DEV...' : 'Balas sebagai Ony...';
+      showView('list');
+      if (state.tab === 'world') renderFeed(state.worldMsgs, true);
+    };
+  });
+
+  $('msg-send').onclick = sendMessage;
+  $('msg-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') sendMessage(); });
+
+  $('btn-login').onclick = function () {
+    $('login-err').textContent = '';
+    auth.signInWithEmailAndPassword($('in-email').value.trim(), $('in-pass').value)
+      .catch(function (e) { $('login-err').textContent = e.message || 'Gagal login.'; });
+  };
+  $('btn-logout').onclick = function () { auth.signOut(); };
+
+  auth.onAuthStateChanged(function (u) {
+    if (!u) { showView('login'); return; }
+    showView('list');
+    if (state.unsubRooms) state.unsubRooms();
+    state.unsubRooms = db.collection('on_dm').orderBy('lastMs', 'desc').limit(50).onSnapshot(function (snap) {
+      var a = []; snap.forEach(function (d) { var x = d.data(); if (x.tid) a.push(x); });
+      state.rooms = a; renderRooms();
+    });
+    if (state.unsubWorld) state.unsubWorld();
+    state.unsubWorld = db.collection('global_chat').orderBy('ms', 'desc').limit(80).onSnapshot(function (snap) {
+      var a = []; snap.forEach(function (d) { a.push(d.data()); });
+      a.reverse(); state.worldMsgs = a;
+      if (state.tab === 'world' && !state.activeTid) renderFeed(a, true);
+    });
+  });
+</script>
+</body>
+</html>

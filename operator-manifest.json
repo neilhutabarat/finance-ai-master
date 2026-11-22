@@ -1,0 +1,11 @@
+{
+  "name": "ON Operator — CS Live",
+  "short_name": "ON Operator",
+  "description": "Aplikasi Operator CS Live (Ony) untuk membalas pesan toko Oneilverse.",
+  "start_url": "./operator.html",
+  "display": "standalone",
+  "background_color": "#0b1120",
+  "theme_color": "#0f172a",
+  "orientation": "portrait",
+  "lang": "id"
+}

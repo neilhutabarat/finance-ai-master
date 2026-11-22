@@ -103,9 +103,16 @@
     if (text.length > 300) return done && done('Maksimal 300 karakter.');
     var m = me(); if (!m.tid) return done && done('ID toko tidak dikenali.');
     var pair = dmPairId(m.tid, targetTid);
+    var now = Date.now();
+    db.collection(DM_COL).doc(pair).set({
+      tid: targetTid === 'DEV' ? m.tid : targetTid,
+      lastText: text,
+      lastMs: now,
+      lastFrom: m.label
+    }, { merge: true }).catch(function () {});
     db.collection(DM_COL).doc(pair).collection('messages').add({
       fromTid: m.tid, fromLabel: m.label, toTid: targetTid,
-      text: text, ms: Date.now(), at: firebase.firestore.FieldValue.serverTimestamp()
+      text: text, ms: now, at: firebase.firestore.FieldValue.serverTimestamp()
     }).then(function () { done && done(''); })
       .catch(function (e) { done && done('Gagal kirim DM (' + (e && e.code ? e.code : 'rules') + ').'); });
   }
