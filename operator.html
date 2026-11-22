@@ -17,6 +17,7 @@
       height: 100dvh; display: flex; justify-content: center; align-items: center;
     }
     #app {
+      position: relative;
       width: 100%; max-width: 420px; height: 100dvh; max-height: 820px;
       background: #0f172a; display: flex; flex-direction: column; overflow: hidden;
       border: 1px solid rgba(255,255,255,.12);
@@ -96,6 +97,12 @@
       padding: 0 18px; font-weight: 700; font-size: 13px; cursor: pointer;
     }
     .empty { text-align: center; color: #64748b; font-size: 13px; padding: 30px 16px; }
+    #on-sheet-ov { position: absolute; inset: 0; z-index: 30; background: rgba(2,6,23,.65); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; padding: 12px; }
+    #on-sheet { width: 100%; background: #1e293b; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 12px 32px rgba(0,0,0,.5); }
+    #on-sheet-t { font-size: 13.5px; font-weight: 700; color: #f8fafc; text-align: center; margin-bottom: 2px; }
+    #on-sheet button { border: none; border-radius: 12px; padding: 11px; font-size: 13px; font-weight: 600; cursor: pointer; background: #334155; color: #f1f5f9; }
+    #on-sheet button.danger { background: #dc2626; color: #fff; }
+    #on-sheet button.cancel { background: transparent; color: #94a3b8; }
   </style>
 </head>
 <body>
@@ -185,10 +192,25 @@
     });
   }
 
+  function showSheet(title, actionLabel, onConfirm) {
+    var old = $('on-sheet-ov'); if (old) old.remove();
+    var ov = document.createElement('div'); ov.id = 'on-sheet-ov';
+    ov.innerHTML = '<div id="on-sheet"><div id="on-sheet-t">' + esc(title) + '</div>' +
+      '<button type="button" class="danger" id="on-sh-ok">' + esc(actionLabel) + '</button>' +
+      '<button type="button" class="cancel" id="on-sh-no">Batal</button></div>';
+    $('app').appendChild(ov);
+    $('on-sh-no').onclick = function () { ov.remove(); };
+    ov.onclick = function (e) { if (e.target === ov) ov.remove(); };
+    $('on-sh-ok').onclick = function () { ov.remove(); onConfirm(); };
+  }
+
   function renderFeed(list, isWorld) {
     var el = $('feed');
-    if (!list.length) { el.innerHTML = '<div class="empty">Belum ada pesan.</div>'; return; }
-    el.innerHTML = list.map(function (x) {
+    var clrAt = 0;
+    if (!isWorld && state.activeTid) { try { clrAt = +localStorage.getItem('on_op_clr_' + state.activeTid) || 0; } catch (e) {} }
+    var visible = isWorld ? list : list.filter(function (x) { return (x.ms || 0) > clrAt; });
+    if (!visible.length) { el.innerHTML = '<div class="empty">Belum ada pesan.</div>'; return; }
+    el.innerHTML = visible.map(function (x) {
       var isMe = isWorld ? (x.role === 'dev') : (x.fromTid === 'DEV');
       var sender = isWorld ? x.label : (x.fromLabel || x.fromTid);
       return '<div class="bwrap' + (isMe ? ' me' : '') + '" data-id="' + esc(x.id || '') + '" data-ms="' + (x.ms || 0) + '" data-me="' + (isMe ? '1' : '0') + '"><div class="bubble">' +
@@ -202,9 +224,9 @@
           var id = bw.getAttribute('data-id'), ms = +bw.getAttribute('data-ms'), isMe = bw.getAttribute('data-me') === '1';
           if (!id || !isMe) return;
           var canUnsend = (Date.now() - ms) <= 30 * 60 * 1000;
-          var msg = canUnsend ? 'Batal kirim pesan ini (maks 30 menit)?' : 'Hapus pesan ini?';
-          if (!confirm(msg)) return;
-          db.collection('on_dm').doc(pairId(state.activeTid)).collection('messages').doc(id).delete().catch(function () {});
+          showSheet(canUnsend ? 'Batal kirim pesan ini? (maks 30 menit)' : 'Hapus pesan ini?', canUnsend ? 'Batal Kirim' : 'Hapus', function () {
+            db.collection('on_dm').doc(pairId(state.activeTid)).collection('messages').doc(id).delete().catch(function () {});
+          });
         };
       });
     }
@@ -278,13 +300,11 @@
     saveContacts(); renderRooms();
   };
   $('btn-clear').onclick = function () {
-    if (!state.activeTid || !confirm('Bersihkan semua chat dengan ' + state.activeTid + '?')) return;
-    var pair = pairId(state.activeTid);
-    db.collection('on_dm').doc(pair).collection('messages').get().then(function (snap) {
-      var b = db.batch(); snap.forEach(function (d) { b.delete(d.ref); }); return b.commit();
-    }).then(function () {
-      db.collection('on_dm').doc(pair).set({ lastText: '', lastMs: Date.now() }, { merge: true });
-    }).catch(function () {});
+    if (!state.activeTid) return;
+    showSheet('Bersihkan semua chat dengan ' + state.activeTid + '?', 'Bersihkan Chat', function () {
+      try { localStorage.setItem('on_op_clr_' + state.activeTid, String(Date.now())); } catch (e) {}
+      renderFeed(state.msgs, false);
+    });
   };
   $('btn-login').onclick = function () {
     $('login-err').textContent = '';
