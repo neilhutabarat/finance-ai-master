@@ -170,9 +170,11 @@
   }
   function dmFeedHtml() {
     if (S.dmErr) return '<div class="fmc-empty">DM belum aktif di Firestore Rules.<br><small>Tambahkan rule koleksi <b>on_dm</b> di Firebase Console agar DM ke Ony &amp; antar toko berjalan.</small></div>';
-    if (!S.dmMsgs.length) return '<div class="fmc-empty">Mulai percakapan dengan ' + esc(S.activeRoom ? S.activeRoom.name : '') + '.</div>';
-    var myTid = me().tid;
-    return S.dmMsgs.map(function (x) {
+    var myTid = me().tid, clrAt = 0;
+    try { clrAt = +localStorage.getItem('on_clr_' + myTid + '_' + (S.activeRoom ? S.activeRoom.tid : '')) || 0; } catch (e) {}
+    var visible = S.dmMsgs.filter(function (x) { return (x.ms || 0) > clrAt; });
+    if (!visible.length) return '<div class="fmc-empty">Mulai percakapan dengan ' + esc(S.activeRoom ? S.activeRoom.name : '') + '.</div>';
+    return visible.map(function (x) {
       var isMe = x.fromTid === myTid;
       return '<div class="on-bwrap' + (isMe ? ' me' : '') + '" data-id="' + esc(x.id || '') + '" data-ms="' + (x.ms || 0) + '" data-me="' + (isMe ? '1' : '0') + '">' +
         '<div class="on-bubble">' +
@@ -225,6 +227,12 @@
     '#fmc-in{flex:none;display:flex;gap:8px;padding:10px 12px;background:#1e293b;border-top:1px solid rgba(255,255,255,.1)}',
     '#fmc-in input{flex:1;min-width:0;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:9px 14px;color:#f8fafc;font-size:13px;outline:none}',
     '#fmc-in button{all:unset;cursor:pointer;padding:8px 16px;border-radius:99px;background:#2563eb;color:#fff;font:700 12.5px system-ui}',
+    '#on-sheet-ov{position:absolute;inset:0;z-index:20;background:rgba(2,6,23,.65);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:12px}',
+    '#on-sheet{width:100%;background:#1e293b;border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 12px 32px rgba(0,0,0,.5)}',
+    '#on-sheet-t{font-size:13.5px;font-weight:700;color:#f8fafc;text-align:center;margin-bottom:2px}',
+    '#on-sheet button{border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;background:#334155;color:#f1f5f9}',
+    '#on-sheet button.danger{background:#dc2626;color:#fff}',
+    '#on-sheet button.cancel{background:transparent;color:#94a3b8}',
     'html[data-fm-invert="1"] #fmc-panel,html[data-fm-invert="1"] #fmc-tab{filter:invert(1) hue-rotate(180deg)}',
     '@media(max-width:1023px){#fmc-tab{bottom:88px;padding:11px 16px}#fmc-tab.kasir{left:auto;right:12px}#fmc-panel,#fmc-panel.kasir,#fmc-panel.owner{inset:0;bottom:0;left:0;right:0;width:auto;height:auto;max-height:none;border-radius:0;z-index:2147482000;transform:none}}'
   ].join('\n');
@@ -336,23 +344,32 @@
       feed.innerHTML = rm.type === 'world' ? feedHtml(60) : dmFeedHtml();
       stickScroll(feed);
       if (rm.type !== 'world') {
+        function showSheet(title, actionLabel, onConfirm) {
+          var old = $('on-sheet-ov'); if (old) old.remove();
+          var ov = document.createElement('div'); ov.id = 'on-sheet-ov';
+          ov.innerHTML = '<div id="on-sheet"><div id="on-sheet-t">' + esc(title) + '</div>' +
+            '<button type="button" class="danger" id="on-sh-ok">' + esc(actionLabel) + '</button>' +
+            '<button type="button" class="cancel" id="on-sh-no">Batal</button></div>';
+          pn.appendChild(ov);
+          $('on-sh-no').onclick = function () { ov.remove(); };
+          ov.onclick = function (e) { if (e.target === ov) ov.remove(); };
+          $('on-sh-ok').onclick = function () { ov.remove(); onConfirm(); };
+        }
         var clr = $('on-clr');
         if (clr) clr.onclick = function () {
-          if (!confirm('Bersihkan semua chat di room ini?')) return;
-          var pair = dmPairId(me().tid, rm.tid);
-          db.collection(DM_COL).doc(pair).collection('messages').get().then(function (snap) {
-            var b = db.batch(); snap.forEach(function (d) { b.delete(d.ref); }); return b.commit();
-          }).then(function () {
-            db.collection(DM_COL).doc(pair).set({ lastText: '', lastMs: Date.now() }, { merge: true });
-          }).catch(function () {});
+          showSheet('Bersihkan semua chat di room ini?', 'Bersihkan Chat', function () {
+            try { localStorage.setItem('on_clr_' + me().tid + '_' + rm.tid, String(Date.now())); } catch (e) {}
+            paint();
+          });
         };
         feed.querySelectorAll('.on-bwrap').forEach(function (bw) {
           bw.onclick = function () {
             var id = bw.getAttribute('data-id'), ms = +bw.getAttribute('data-ms'), isMe = bw.getAttribute('data-me') === '1';
             if (!id || !isMe) return;
             var canUnsend = (Date.now() - ms) <= 30 * 60 * 1000;
-            if (!confirm(canUnsend ? 'Batal kirim pesan ini (maks 30 menit)?' : 'Hapus pesan ini?')) return;
-            db.collection(DM_COL).doc(dmPairId(me().tid, rm.tid)).collection('messages').doc(id).delete().catch(function () {});
+            showSheet(canUnsend ? 'Batal kirim pesan ini? (maks 30 menit)' : 'Hapus pesan ini?', canUnsend ? 'Batal Kirim' : 'Hapus', function () {
+              db.collection(DM_COL).doc(dmPairId(me().tid, rm.tid)).collection('messages').doc(id).delete().catch(function () {});
+            });
           };
         });
       }
