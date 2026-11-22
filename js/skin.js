@@ -110,7 +110,6 @@
     /* latar dedaunan diredam sedikit di belakang kartu: tetap terlihat, tapi tidak lagi mengganggu bacaan */
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit]:not([data-fm-black]) body[class]{background-image:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,.34)),var(--fm-wp,url("/img/wp/1.jpg"))!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit]:not([data-fm-black]) body header.oneui-hero,html[data-fm-page="manager"][data-fm-native][data-fm-fit]:not([data-fm-black]) body header.oneui-hero,html[data-fm-page="owner"][data-fm-native][data-fm-fit]:not([data-fm-black]) body header.oneui-hero{background:#ffffff!important;border:0!important;box-shadow:0 1px 2px rgba(15,23,42,.05),0 10px 26px -14px rgba(15,23,42,.14)!important}',
-    'html[data-fm-page="manager"][data-fm-fit] body header.oneui-hero,html[data-fm-page="owner"][data-fm-fit] body header.oneui-hero{max-width:calc(80rem - 3rem)!important;width:calc(100% - 3rem)!important;margin:14px auto 14px!important;border-radius:20px!important}',
     'html[data-fm-page="kasir"][data-fm-native][data-fm-fit]:not([data-fm-black]) #fm-dock,html[data-fm-page="manager"][data-fm-native][data-fm-fit]:not([data-fm-black]) #fm-dock,html[data-fm-page="owner"][data-fm-native][data-fm-fit]:not([data-fm-black]) #fm-dock{background:rgba(255,255,255,.86)!important;border-color:rgba(51,65,85,.28)!important}',
 
     /* ---- MODE GELAP di halaman kasir: menimpa warna terang di atas dengan palet gelap yang dirancang. ---- */
@@ -340,7 +339,7 @@
 
     /* ===== desktop: pas satu layar (tanpa gulir halaman) ===== */
     '@media (min-width:1024px) and (min-height:540px){',
-    'html[data-fm-fit] .oneui-hero{max-width:1448px;margin-left:auto!important;margin-right:auto!important;width:calc(100% - 24px)}',
+    'html[data-fm-fit] .oneui-hero{max-width:1448px!important;margin-left:auto!important;margin-right:auto!important;width:calc(100% - 32px)!important}',
     'html[data-fm-fit] body{height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding-bottom:0!important}',
     'html[data-fm-fit] main{flex:1 1 0;min-height:0;display:flex!important;flex-direction:column;gap:10px;padding:10px 16px 94px!important;margin:0 auto!important;max-width:1480px!important}',
     'html[data-fm-fit] main>*{margin:0!important}',

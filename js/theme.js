@@ -2,12 +2,16 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.9';
-  var BETA = 'v1.1.9';
+  var APP_VERSION = '1.1.10';
+  var BETA = 'v1.1.10';
   /* Catatan rilis HANYA untuk aplikasi yang dipakai klien (kasir, manager, owner, partner, login).
      Perbaikan dapur (Tower, master APK, pembukuan pribadi) tidak ditulis di sini.
      Setiap rilis wajib memuat [Perbaikan] dan [Keamanan]. Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.1.10', '22 Nov 2026', [
+      '[Perbaikan] Menyamakan warna putih murni (#ffffff) seluruh kartu Manager & Owner dengan header di mode terang, serta meluruskan lebar header (1448px / calc(100% - 32px)) agar presisi sejajar dengan kartu di bawahnya',
+      '[Keamanan] Penyesuaian visual murni tanpa mengubah data maupun hak akses'
+    ]],
     ['v1.1.9', '22 Nov 2026', [
       '[Perbaikan] Menyamakan lebar, warna putih solid, dan bayangan header Manager & Owner agar sejajar presisi dengan kartu di bawahnya',
       '[Keamanan] Penyesuaian visual tanpa memengaruhi fungsi maupun hak akses'
