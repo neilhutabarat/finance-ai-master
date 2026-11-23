@@ -1186,7 +1186,8 @@
                         if (kind === 'susun') towerPulau(t);
                         else if (kind === 'pulau') { openTenantSettings(t.id, 'fitur'); setTimeout(function () { try { var q = document.getElementById('ts-q'); if (q) { q.value = 'oneilverse 2'; FM_PLANS.cariFitur('ts', 'oneilverse 2'); q.scrollIntoView({ block: 'center' }); } var tt = document.getElementById('ts-card-title'); if (tt) tt.innerText = 'Pulau & Kartu Oneilverse 2: centang yang ingin ditampilkan di toko ini'; } catch (e) {} }, 400); }
                         else if (kind === 'profil' || kind === 'fitur' || kind === 'coa' || kind === 'produk') openTenantSettings(t.id, kind);
-                        else if (kind === 'kuota' || kind === 'paket' || kind === 'billing' || kind === 'lokasi' || kind === 'versi') openInspectUMKM(t.id, kind);
+                        else if (kind === 'paket') towerPaketPanel(t);
+                        else if (kind === 'kuota' || kind === 'billing' || kind === 'lokasi' || kind === 'versi') openInspectUMKM(t.id, kind);
                         else if (kind === 'salin') towerPick('salin2', t);
                         else if (kind === 'salin2') { if (confirm('Salin fitur ' + (t.nama || t.id) + ' ke ' + (extra.nama || extra.id) + '? Fitur ' + (extra.nama || extra.id) + ' yang sekarang akan diganti.')) towerSaveFeatures(extra, towerEffFeatures(t)).then(function () { ctAudit(extra.id, 'SALIN_FITUR', 'Provider menyalin fitur dari ' + t.id, '-', t.id); alert('Fitur tersalin ke ' + (extra.nama || extra.id) + '.'); }).catch(function (e) { fmPermAlert(e); }); }
                         else if (kind === 'hapus') { if (t.deletedByTower) restoreMasterTenant(t.id); else if (confirm('Yakin menghapus klien ' + (t.nama || t.id) + ' [' + t.id + ']? Ada satu konfirmasi lagi setelah ini.')) deleteTenantRegistry(t.id); }
@@ -1198,6 +1199,42 @@
             q.oninput = draw; drawTabs(); draw(); setTimeout(function () { q.focus(); }, 50);
         }
         window.towerPick = towerPick;
+        /* Panel ganti paket berdiri sendiri (tidak lewat pop-up Inspeksi): pilih Basic/Plus/Pro + durasi, lalu Terapkan */
+        function towerPaketPanel(t) {
+            const old = document.getElementById('tw-paket'); if (old) old.remove();
+            const o = document.createElement('div'); o.id = 'tw-paket';
+            o.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+            let tier = String(t.tier || 'basic').trim().toLowerCase(); if (!TIER_LABEL[tier]) tier = 'basic';
+            let expired = false; try { expired = !!(window.FM_PLANS && FM_PLANS.PAKET && FM_PLANS.PAKET.isExpired(t)); } catch (e) {}
+            const until = t.planUntil ? new Date(Number(t.planUntil)) : null;
+            const info = expired ? '<span style="color:#fda4af;font-weight:800">Sudah HABIS sejak ' + until.toLocaleDateString('id-ID') + ' (berjalan sebagai Basic)</span>' : (until && tier !== 'basic' ? 'Berlaku sampai ' + until.toLocaleDateString('id-ID') : '');
+            const B = 'flex:1;padding:12px 6px;border-radius:12px;font-size:13px;font-weight:900;color:#fff;';
+            o.innerHTML = '<div style="width:min(460px,100%);border-radius:22px;background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 20px 60px rgba(0,0,0,.5);padding:18px">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px"><button id="tp-back" type="button" style="padding:6px 12px;border-radius:99px;font-size:12px;font-weight:800;background:rgba(255,255,255,.1)">← Kembali</button><button id="tp-x" type="button" style="font-size:22px;line-height:1;opacity:.7">×</button></div>' +
+                '<div style="font-weight:900;font-size:16px">Ubah Paket</div><div style="opacity:.7;font-size:12px;margin-bottom:12px">' + escHtml(t.nama || t.id) + ' [' + escHtml(t.id) + ']</div>' +
+                '<div style="font-size:12px;opacity:.8;margin-bottom:8px">Paket saat ini: <b>' + TIER_LABEL[tier] + '</b>' + (info ? '<br>' + info : '') + '</div>' +
+                '<div id="tp-tiers" style="display:flex;gap:8px;margin-bottom:12px"></div>' +
+                '<div id="tp-durwrap" style="margin-bottom:12px"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:4px">Durasi</label><select id="tp-dur" style="width:100%;padding:10px;border-radius:12px;background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.18);font-size:13px">' + Array.from({ length: 12 }, (_, i) => i + 1).map(n => '<option value="' + n + '">' + n + ' bulan</option>').join('') + '</select></div>' +
+                '<p style="font-size:11px;opacity:.6;margin-bottom:12px">Fitur toko mengikuti isi paket di "Isi Paket Basic/Plus/Pro". Fitur yang digembok 🔒 tetap dipertahankan.</p>' +
+                '<button id="tp-go" type="button" style="width:100%;padding:12px;border-radius:12px;background:#0284c7;font-weight:900;font-size:13px">Terapkan Paket</button></div>';
+            document.body.appendChild(o);
+            let pick = tier;
+            const draw = function () {
+                const bx = document.getElementById('tp-tiers');
+                bx.innerHTML = ['basic', 'plus', 'pro'].map(function (k) { const on = k === pick; return '<button type="button" data-tp="' + k + '" style="' + B + 'background:' + (on ? '#4f46e5' : '#1e293b') + ';border:' + (on ? '2px solid #a5b4fc' : '1px solid rgba(255,255,255,.15)') + ';opacity:' + (on ? 1 : .75) + '">' + (on ? '✓ ' : '') + TIER_LABEL[k] + '</button>'; }).join('');
+                bx.querySelectorAll('[data-tp]').forEach(function (b) { b.onclick = function () { pick = b.getAttribute('data-tp'); draw(); }; });
+                document.getElementById('tp-durwrap').style.display = pick === 'basic' ? 'none' : '';
+            };
+            draw();
+            const close = function () { o.remove(); };
+            o.onclick = function (e) { if (e.target === o) close(); };
+            document.getElementById('tp-x').onclick = close;
+            document.getElementById('tp-back').onclick = function () { close(); towerPick('paket'); };
+            document.getElementById('tp-go').onclick = function () {
+                const dur = pick === 'basic' ? 0 : parseInt(document.getElementById('tp-dur').value) || 1;
+                close(); setTenantPlan(t.id, pick, 'monthly', '', '', dur);
+            };
+        }
         /* Tombol "← Kembali" di pop-up toko: tutup pop-up lalu buka lagi daftar toko yang tadi */
         window.towerPickBack = function () { const b = window.__twBack; closeModal(); if (b) towerPick(b.kind, b.extra); };
 
@@ -2954,8 +2991,8 @@
         let tierPanelFor = null;
         function renderInspectTier(tenant) {
             const box = document.getElementById('inspect-tier-card'); if (!box) return;
-            if (!isManaged(tenant)) { box.classList.add('hidden'); box.innerHTML = ''; tierPanelFor = null; return; }
-            if (tierPanelFor === tenant.id) return;
+            if (!isManaged(tenant)) { box.classList.remove('hidden'); box.innerHTML = '<span class="font-black text-sm text-white block">Paket Toko</span><p class="text-amber-300">Paket toko ini tidak bisa diubah dari sini karena bukan toko yang dikelola Tower (fromRegistry=' + String(!!tenant.fromRegistry) + ', id=' + escHtml(tenant.id) + ', paket=' + escHtml(String(tenant.tier)) + ').</p>'; tierPanelFor = null; return; }
+            if (tierPanelFor === tenant.id && box.innerHTML) return;
             tierPanelFor = tenant.id;
             const c = getCtrl(tenant.id), cycle = c.billingCycle || 'monthly';
             let tier = String(tenant.tier || 'basic').trim().toLowerCase(); if (!TIER_LABEL[tier]) tier = 'basic'; /* nilai paket aneh/lama dianggap Basic supaya panel tidak kosong */
