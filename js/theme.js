@@ -2,8 +2,8 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.2.0';
-  var BETA = 'v1.2.0';
+  var APP_VERSION = '1.2';
+  var BETA = 'v1.2';
   /* Catatan rilis ringkas per versi utama (v1.0, v1.1, v1.2, dst). Terbaru di atas. */
   var RELEASE_NOTES = [
     ['v1.2', '23 Nov 2026', [
