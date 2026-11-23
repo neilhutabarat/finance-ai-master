@@ -647,7 +647,7 @@
       return;
     }
 
-    var PAYLBL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer', petty: 'Petty Cash' };
+    var PAYLBL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer', petty: 'Petty Cash', hutang: 'Hutang' };
     box.innerHTML = list.slice(0, 30).map(function (tx, i) {
       var isIn = (typeof fmKasMasuk === 'function') ? fmKasMasuk(tx.category) : (tx.category === 'sales');
       var payTag = tx.payDetail || PAYLBL[tx.pay] || tx.pay || 'Tunai';
@@ -682,7 +682,7 @@
   }
 
   function reopenReceiptForTx(tx, directlyOpenWA) {
-    var PAYLBL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer', petty: 'Petty Cash' };
+    var PAYLBL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer', petty: 'Petty Cash', hutang: 'Hutang' };
     var isIn = (typeof fmKasMasuk === 'function') ? fmKasMasuk(tx.category) : (tx.category === 'sales');
     var signed = isIn ? tx.amount : -tx.amount;
     var payText = tx.payDetail || (PAYLBL[tx.pay] || tx.pay || 'Tunai') + (tx.bankName ? ' (' + tx.bankName + ')' : '');
@@ -757,6 +757,8 @@
     var old = document.getElementById('v12-pay-modal');
     if (old) old.remove();
 
+    var hutangOn = false;
+    try { hutangOn = !!(window.FM_PLANS && FM_PLANS.has('piutang') && window.FM_PIU && FM_PIU.createFromSale); } catch (e) {}
     var initPm = ((document.getElementById('pay-method') || {}).value) || 'tunai';
     var modal = document.createElement('div');
     modal.id = 'v12-pay-modal';
@@ -783,7 +785,18 @@
             '<button type="button" class="v12-pm-tab" data-mpm="bank">Transfer</button>' +
             '<button type="button" class="v12-pm-tab" data-mpm="petty">Petty Cash</button>' +
             '<button type="button" class="v12-pm-tab" data-mpm="split">Split Bayar</button>' +
+            (hutangOn ? '<button type="button" class="v12-pm-tab" data-mpm="hutang">Hutang</button>' : '') +
           '</div>' +
+        '</div>' +
+        '<div id="v12-m-hutangwrap" class="hidden space-y-2 p-3 rounded-2xl bg-amber-50 border border-amber-200">' +
+          '<label>Tempo Pembayaran (TOP)</label>' +
+          '<div class="v12-pm-tabs" id="v12-m-top">' +
+            '<button type="button" class="v12-pm-tab on" data-top="14">14 hari</button>' +
+            '<button type="button" class="v12-pm-tab" data-top="30">30 hari</button>' +
+            '<button type="button" class="v12-pm-tab" data-top="45">45 hari</button>' +
+          '</div>' +
+          '<div id="v12-m-hstat" class="text-xs font-extrabold text-amber-800 pt-1"></div>' +
+          '<div class="text-[11px] text-amber-700 font-medium">Nama pelanggan wajib diisi. Tagihan otomatis masuk ke Piutang &amp; Utang.</div>' +
         '</div>' +
         '<div id="v12-m-cashwrap" class="space-y-2">' +
           '<div><label>Uang Tunai Diterima (Rp)</label><input type="text" id="v12-m-cash" inputmode="numeric" placeholder="Kosongkan bila uang pas" class="font-mono text-base"></div>' +
@@ -818,7 +831,11 @@
 
     document.body.appendChild(modal);
 
-    var curPm = initPm;
+    var curPm = initPm === 'hutang' ? 'tunai' : initPm;
+    var curTop = 14;
+    function topDue() { var d = new Date(); d.setDate(d.getDate() + curTop); return d; }
+    function isoOf(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+    function dmyOf(d) { return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear(); }
     var discEl = document.getElementById('v12-m-disc');
     var cashEl = document.getElementById('v12-m-cash');
     var sa1El = document.getElementById('v12-m-sa1');
@@ -881,6 +898,8 @@
       });
       document.getElementById('v12-m-cashwrap').classList.toggle('hidden', curPm !== 'tunai');
       document.getElementById('v12-m-splitwrap').classList.toggle('hidden', curPm !== 'split');
+      document.getElementById('v12-m-hutangwrap').classList.toggle('hidden', curPm !== 'hutang');
+      if (curPm === 'hutang') document.getElementById('v12-m-hstat').textContent = 'Jatuh tempo: ' + dmyOf(topDue());
       if (curPm === 'split') {
         var t = calcState().target;
         if (t > 0 && !parseNum(sa1El.value) && !parseNum(sa2El.value)) {
@@ -892,7 +911,15 @@
       calcState();
     }
 
-    setModalPm(initPm);
+    setModalPm(curPm);
+
+    document.getElementById('v12-m-top').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-top]');
+      if (!b) return;
+      curTop = parseInt(b.getAttribute('data-top'), 10) || 14;
+      [].forEach.call(modal.querySelectorAll('[data-top]'), function (x) { x.classList.toggle('on', x === b); });
+      document.getElementById('v12-m-hstat').textContent = 'Jatuh tempo: ' + dmyOf(topDue());
+    });
 
     document.getElementById('v12-m-pmtabs').addEventListener('click', function (e) {
       var b = e.target.closest('[data-mpm]');
@@ -937,8 +964,8 @@
     document.getElementById('v12-pay-ok').onclick = function () {
       var st = calcState();
       var cust = (document.getElementById('v12-m-cust').value || '').trim();
-      var cashIn = 0, change = 0, splitInfo = '';
-      var PAYLBL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer', bank: 'Transfer', petty: 'Petty Cash' };
+      var cashIn = 0, change = 0, splitInfo = '', hutang = null;
+      var PAYLBL = { tunai: 'Tunai', qris: 'QRIS', transfer: 'Transfer', bank: 'Transfer', petty: 'Petty Cash', hutang: 'Hutang' };
 
       if (curPm === 'tunai' && st.target > 0 && cashEl.value.trim()) {
         cashIn = parseNum(cashEl.value);
@@ -947,6 +974,12 @@
           return alert('Uang diterima (' + fmtRp(cashIn) + ') kurang dari total tagihan (' + fmtRp(st.target) + ')!');
         }
         change = cashIn - st.target;
+      } else if (curPm === 'hutang') {
+        if (st.target <= 0) { beepWarn(); return alert('Metode Hutang hanya untuk transaksi penjualan bernilai lebih dari 0.'); }
+        if (!cust) { beepWarn(); document.getElementById('v12-m-cust').focus(); return alert('Nama pelanggan wajib diisi untuk pembayaran Hutang.'); }
+        var dd = topDue();
+        hutang = { top: curTop, dueISO: isoOf(dd), total: st.target };
+        splitInfo = 'Hutang · TOP ' + curTop + ' hari · Jatuh tempo ' + dmyOf(dd);
       } else if (curPm === 'split' && st.target > 0) {
         var m1 = document.getElementById('v12-m-sm1').value;
         var m2 = document.getElementById('v12-m-sm2').value;
@@ -963,7 +996,7 @@
 
       // Sinkronkan ke dropdown pay-method kiri
       var leftSel = document.getElementById('pay-method');
-      if (leftSel) {
+      if (leftSel && curPm !== 'hutang') {
         if (curPm !== 'split') leftSel.value = curPm;
         else {
           var sm1 = document.getElementById('v12-m-sm1').value;
@@ -978,7 +1011,8 @@
         disc: st.disc,
         cashIn: cashIn,
         change: change,
-        splitInfo: splitInfo
+        splitInfo: splitInfo,
+        hutang: hutang
       });
     };
 
@@ -1211,12 +1245,15 @@
 
           // Bypass fmAsk kedua karena kasir sudah mengonfirmasi di Modal Pembayaran v1.2
           var origAsk = window.fmAsk;
+          var origPay = window.currentPay;
           window.fmAsk = function () { return Promise.resolve(true); };
+          if (meta.hutang) window.currentPay = function () { return 'hutang'; };
           var prevCount = (typeof txList !== 'undefined') ? txList.length : 0;
           try {
             await origFinalize();
           } finally {
             window.fmAsk = origAsk;
+            if (meta.hutang) window.currentPay = origPay;
           }
           var nowCount = (typeof txList !== 'undefined') ? txList.length : 0;
 
@@ -1228,6 +1265,23 @@
               if (meta.disc > 0) txList[k].billDiscount = meta.disc;
               if (meta.cashIn > 0) { txList[k].cashReceived = meta.cashIn; txList[k].cashChange = meta.change; }
               if (meta.splitInfo) txList[k].payDetail = meta.splitInfo;
+            }
+            if (meta.hutang) {
+              var saleIds = [], saleTotal = 0;
+              for (var h = 0; h < added && h < txList.length; h++) {
+                txList[h].dueISO = meta.hutang.dueISO; txList[h].topDays = meta.hutang.top;
+                saleIds.push(txList[h].id);
+              }
+              try {
+                if (window.FM_PIU && FM_PIU.createFromSale) {
+                  await FM_PIU.createFromSale({
+                    customer: meta.customer, total: meta.hutang.total, dueISO: meta.hutang.dueISO,
+                    top: meta.hutang.top, saleTxIds: saleIds
+                  });
+                } else {
+                  alert('Modul Piutang & Utang belum aktif di paket ini. Transaksi hutang tercatat, tetapi tagihan belum masuk daftar piutang.');
+                }
+              } catch (er) { console.error(er); alert('Struk tersimpan, tetapi gagal mencatat piutang otomatis. Catat manual di Piutang & Utang.'); }
             }
             if (typeof persistData === 'function') persistData();
 
