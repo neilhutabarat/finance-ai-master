@@ -2,11 +2,11 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.2.1';
-  var BETA = 'v1.2.1';
+  var APP_VERSION = '1.2a';
+  var BETA = 'v1.2a';
   /* Catatan rilis ringkas per versi utama (v1.0, v1.1, v1.2, dst). Terbaru di atas. */
   var RELEASE_NOTES = [
-    ['v1.2.1', '23 Nov 2026', [
+    ['v1.2a', '23 Nov 2026', [
       '[Baru] Metode bayar Hutang di Kasir dengan pilihan TOP 14, 30, atau 45 hari. Nama pelanggan wajib diisi, jatuh tempo otomatis dihitung dan tampil di struk',
       '[Baru] Penjualan hutang otomatis masuk ke Piutang & Utang (Paket Plus ke atas), dan tidak dihitung sebagai uang tunai sampai dilunasi',
       '[Perbaikan] Pelunasan piutang dari Kasir tidak mencatat omzet dua kali'
