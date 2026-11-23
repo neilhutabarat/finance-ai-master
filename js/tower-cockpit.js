@@ -262,6 +262,7 @@
     return { v: g(function () { return FM_BILL.dateText(st.E); }, '-'), c: '', dueMs: st.E || 9e15 };
   }
   var VIEW = store('tw_view', null) === 'table' ? 'table' : 'card';
+  var FILTER = 'all';
   var QUERY = '';
   var OPEN_POP_ID = null;
   var SORT = { key: 'last', dir: -1 };
@@ -297,9 +298,16 @@
     });
     renderTable();
   }
-  function getRows() {
+  function setFilter(fl) {
+    FILTER = fl || 'all';
+    [].forEach.call(document.querySelectorAll('#tw-ctrl [data-fl]'), function (b) {
+      b.classList.toggle('on', b.getAttribute('data-fl') === FILTER);
+    });
+    renderTable();
+  }
+  function getRows(ignoreFilter) {
     if (Date.now() - aggAt > 4000) compute();
-    var now = Date.now(), ts = tenants(), rows = [], q = QUERY.trim().toLowerCase();
+    var now = Date.now(), ts = tenants(), rows = [], q = ignoreFilter ? '' : QUERY.trim().toLowerCase(), fl = ignoreFilter ? 'all' : FILTER;
     ts.forEach(function (tn) {
       var a = agg[tn.id] || { inc: 0, out: 0, tax: 0, trx: 0, today: 0, yest: 0, sp: [0, 0, 0, 0, 0, 0, 0] };
       var on = online(tn.id).length, sus = suspended(tn.id), bc = billCell(tn.id, now), dc = dueCell(tn.id, now);
@@ -310,9 +318,13 @@
       var lastMs = on ? (now + on) : rawLast;
       var last = on ? 'sekarang' : g(function () { return agoText(rawLast); }, '-'), geo = geoOf(tn.id), lab = a.inc - a.out;
       var kotaName = geo && geo.name ? geo.name : '-';
+      var bState = bc.st ? bc.st.state : 'none';
+      if (fl === 'on' && !on) return;
+      if (fl === 'trial' && !bc.trial) return;
+      if (fl === 'due' && bState !== 'lewat' && bState !== 'tempo') return;
       if (q && (tn.id + ' ' + tn.nama + ' ' + kotaName).toLowerCase().indexOf(q) < 0) return;
       rows.push({
-        tn: tn, a: a, on: on, sus: sus, bc: bc, dc: dc, lamp: lamp, ps: ps, vsT: vsT, vsC: vsC, vsN: vsN, last: last, lastMs: lastMs, kota: kotaName, lab: lab,
+        tn: tn, a: a, on: on, sus: sus, bc: bc, dc: dc, bState: bState, lamp: lamp, ps: ps, vsT: vsT, vsC: vsC, vsN: vsN, last: last, lastMs: lastMs, kota: kotaName, lab: lab,
         billN: g(function () { return FM_BILL.meter(ctrl(tn.id).billing, now); }, 0)
       });
     });
@@ -480,12 +492,53 @@
     var al = alarms();
     box.innerHTML = al.length ? al.map(function (a) { return '<div class="' + (a.lv === 2 ? 'r' : 'y') + '">' + (a.lv === 2 ? '● ' : '○ ') + esc(a.tx) + '</div>'; }).join('') : '<div class="g">● Semua aman. Tidak ada alarm atau tiket.</div>';
   }
+  function renderMon2Extras() {
+    var topBox = $('tw-top'), bBox = $('tw-bstat'), liveBox = $('tw-livebox');
+    if (!topBox && !bBox && !liveBox) return;
+    var rows = getRows(true);
+    if (topBox) {
+      var byInc = rows.slice().sort(function (a, b) { return b.a.inc - a.a.inc; }).slice(0, 5);
+      var mxInc = Math.max(1, byInc.length ? byInc[0].a.inc : 1);
+      topBox.innerHTML = byInc.length ? byInc.map(function (r, idx) {
+        var pct = Math.max(3, Math.round(r.a.inc / mxInc * 100));
+        return '<div class="tw-top-r" data-pop="' + esc(r.tn.id) + '" title="Klik untuk detail ' + esc(r.tn.nama) + '">' +
+          '<div class="tw-top-hd"><span><b>#' + (idx + 1) + '</b> ' + esc(r.tn.nama) + '</span><b class="' + (r.a.inc ? 'g' : 'm') + '">' + rp(r.a.inc) + '</b></div>' +
+          '<div class="tw-top-bar"><i style="width:' + (r.a.inc ? pct : 0) + '%"></i></div>' +
+        '</div>';
+      }).join('') : '<div class="m sm">Belum ada data omzet.</div>';
+    }
+    if (bBox) {
+      var cnt = { aktif: 0, trial: 0, tempo: 0, lewat: 0, belum: 0, none: 0 };
+      rows.forEach(function (r) {
+        if (r.bc.trial) cnt.trial++;
+        else if (cnt[r.bState] !== undefined) cnt[r.bState]++;
+        else cnt.none++;
+      });
+      bBox.innerHTML =
+        '<div class="tw-bs"><span class="g">● Aktif</span><b>' + cnt.aktif + '</b></div>' +
+        '<div class="tw-bs"><span class="y">● Uji Coba</span><b>' + cnt.trial + '</b></div>' +
+        '<div class="tw-bs"><span class="y">● Tempo</span><b>' + cnt.tempo + '</b></div>' +
+        '<div class="tw-bs"><span class="r">● Lewat</span><b>' + cnt.lewat + '</b></div>' +
+        '<div class="tw-bs"><span class="m">● Belum</span><b>' + (cnt.belum + cnt.none) + '</b></div>';
+    }
+    if (liveBox) {
+      var byAct = rows.slice().sort(function (a, b) { return b.lastMs - a.lastMs; }).slice(0, 6);
+      liveBox.innerHTML = byAct.length ? byAct.map(function (r) {
+        return '<div class="tw-lv-r" data-pop="' + esc(r.tn.id) + '">' +
+          '<span class="' + r.lamp + '">●</span>' +
+          '<div class="tw-lv-m"><div class="tw-lv-n">' + esc(r.tn.nama) + '</div><div class="m sm">' + esc(r.kota) + '</div></div>' +
+          '<div class="tw-lv-s"><b class="' + (r.on ? 'g' : 'm') + '">' + esc(r.last) + '</b><span class="m sm">' + r.on + ' term</span></div>' +
+        '</div>';
+      }).join('') : '<div class="m sm">Belum ada toko terdaftar.</div>';
+    }
+  }
   function updateBar() {
     var ts = tenants(), on = ts.filter(function (t) { return online(t.id).length; }).length, lv = defcon(), al = alarms().length, pc = pendingCount();
     var df = $('tw-df'); if (df) { df.textContent = '● SIAGA ' + lv; df.className = lv === 5 ? 'g' : lv === 4 ? 'y' : 'r'; }
     var o = $('tw-on'); if (o) o.innerHTML = '<b>' + on + '/' + ts.length + '</b> toko online';
     var tk = $('tw-tk'); if (tk) { tk.textContent = pc + ' tiket'; tk.className = pc ? 'y' : 'm'; }
     var a = $('tw-al'); if (a) { a.textContent = al + ' alarm'; a.className = al ? 'r' : 'm'; }
+    var m2b = $('tw-m2b'); if (m2b) { var tot = al + pc; m2b.textContent = tot ? String(tot) : ''; m2b.style.display = tot ? 'inline-block' : 'none'; }
     if (lastDef !== null && lv < lastDef) { SND.alarm(); speak('Tingkat siaga naik ke ' + lv); addLog('alarm', 'TINGKAT SIAGA ' + lastDef + ' → ' + lv, false, null); }
     lastDef = lv;
   }
@@ -500,7 +553,8 @@
     document.documentElement.setAttribute('data-tw-pg', m);
     [].forEach.call(document.querySelectorAll('#tw-bar [data-pg]'), function (b) { b.classList.toggle('on', b.getAttribute('data-pg') === m); });
     if (!quiet) SND.tab();
-    if (m === 'mon') { [renderTable, renderStrip, renderJam, renderAttn].forEach(function (fn) { try { fn(); } catch (e) { try { console.warn('tower render', e); } catch (e2) {} } }); }
+    var fns = m === 'mon' ? [renderTable] : m === 'mon2' ? [renderStrip, renderMon2Extras, renderJam, renderAttn] : [];
+    fns.forEach(function (fn) { try { fn(); } catch (e) { try { console.warn('tower render', e); } catch (e2) {} } });
   }
 
   function build() {
@@ -511,9 +565,9 @@
     var cell = function (n, lab, cls) { return '<div><small>' + lab + '</small><b id="tw-s' + n + '" class="' + (cls || '') + '">-</b></div>'; };
     var th = ['', 'ID', 'TOKO', 'KOTA', 'TRX HARI INI', 'PENDAPATAN', 'PENGELUARAN', 'LABA', 'PAJAK 12%', 'TREN 7 HARI', 'vs KEMARIN', 'TERMINAL', 'BILLING (Rp)', 'JATUH TEMPO', 'AKTIF TERAKHIR'], num = { 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 10: 1, 11: 1, 12: 1 };
     root.innerHTML =
-      '<div id="tw-bar"><span class="pgs"><button data-pg="mon" class="on">MONITOR</button><button data-pg="ken">KENDALI</button></span><span id="tw-df" class="g">● SIAGA 5</span><span id="tw-on"></span><span id="tw-tk" class="m"></span><span id="tw-al" class="m"></span><span class="sp"></span><span id="tw-clk" class="m"></span>' +
+      '<div id="tw-bar"><span class="pgs"><button data-pg="mon" class="on">MONITOR 1</button><button data-pg="mon2">MONITOR 2 <span id="tw-m2b" class="tw-m2b"></span></button><button data-pg="ken">KENDALI</button></span><span id="tw-df" class="g">● SIAGA 5</span><span id="tw-on"></span><span id="tw-tk" class="m"></span><span id="tw-al" class="m"></span><span class="sp"></span><span id="tw-clk" class="m"></span>' +
       '<button id="tw-snd" class="pl"></button><button id="tw-eco" class="pl"></button><button id="tw-set" class="pl">Atur</button><button id="tw-out" class="pl bad">Keluar</button></div>' +
-      '<div id="tw-mon"><div id="tw-strip">' + cell(1, 'OMZET HARI INI') + cell(2, 'OMZET BULAN INI') + cell(3, 'PENGELUARAN BULAN INI') + cell(4, 'PAJAK DISUMBANG') + cell(5, 'BILLING BERJALAN', 'g') + cell(6, 'BILLING UJI COBA', 'y') + cell(7, 'PROYEKSI BULAN INI') + '</div>' +
+      '<div id="tw-mon">' +
       '<div id="tw-ctrl">' +
         '<span class="tw-cl">Urut:</span>' +
         '<button type="button" class="tw-sb' + (SORT.key === 'last' ? ' on' : '') + '" data-sk="last">Online / Aktif<span class="sk-ar">' + (SORT.key === 'last' ? (SORT.dir > 0 ? ' ▲' : ' ▼') : '') + '</span></button>' +
@@ -521,6 +575,11 @@
         '<button type="button" class="tw-sb' + (SORT.key === 'bill' ? ' on' : '') + '" data-sk="bill">Billing<span class="sk-ar"></span></button>' +
         '<button type="button" class="tw-sb' + (SORT.key === 'lab' ? ' on' : '') + '" data-sk="lab">Laba<span class="sk-ar"></span></button>' +
         '<button type="button" class="tw-sb' + (SORT.key === 'inc' ? ' on' : '') + '" data-sk="inc">Omzet<span class="sk-ar"></span></button>' +
+        '<span class="tw-sep"></span>' +
+        '<button type="button" class="tw-sb on" data-fl="all">Semua</button>' +
+        '<button type="button" class="tw-sb" data-fl="on">Online</button>' +
+        '<button type="button" class="tw-sb" data-fl="trial">Uji Coba</button>' +
+        '<button type="button" class="tw-sb" data-fl="due">Tempo/Lewat</button>' +
         '<span class="sp"></span>' +
         '<input id="tw-q" type="search" placeholder="Cari toko / ID / kota..." autocomplete="off">' +
         '<span class="tw-vws"><button type="button" data-vw="card" class="' + (VIEW === 'card' ? 'on' : '') + '">Kartu</button><button type="button" data-vw="table" class="' + (VIEW === 'table' ? 'on' : '') + '">Tabel</button></span>' +
@@ -528,8 +587,19 @@
       '<div id="tw-tbw" data-view="' + VIEW + '"><div id="tw-cards"></div><table><thead><tr>' + th.map(function (h, i) {
         var sk = SORTKEY[i], cls = (num[i] ? 'n' : '') + (sk && SORT.key === sk ? ' sorted' : '');
         return '<th' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + (sk ? ' data-sk="' + sk + '"' : '') + '>' + h + (sk ? '<span class="sk-ar">' + (SORT.key === sk ? (SORT.dir > 0 ? ' ▲' : ' ▼') : '') + '</span>' : '') + '</th>';
-      }).join('') + '</tr></thead><tbody id="tw-rows"></tbody></table></div>' +
-      '<div id="tw-bot"><div class="bx"><h4>LOG TRANSAKSI</h4><div id="tw-log"></div></div><div class="bx"><h4>JAM SIBUK</h4><div id="tw-jam"></div><h4 style="margin-top:10px">PERHATIAN</h4><div id="tw-attn"></div></div><div class="bx"><h4>CHAT GLOBAL <span class="m">(kamu: DEV)</span></h4><div id="tw-chat" class="tw-chat"></div></div></div></div>' +
+      }).join('') + '</tr></thead><tbody id="tw-rows"></tbody></table></div></div>' +
+      '<div id="tw-mon2">' +
+        '<div id="tw-strip">' + cell(1, 'OMZET HARI INI') + cell(2, 'OMZET BULAN INI') + cell(3, 'PENGELUARAN BULAN INI') + cell(4, 'PAJAK DISUMBANG') + cell(5, 'BILLING BERJALAN', 'g') + cell(6, 'BILLING UJI COBA', 'y') + cell(7, 'PROYEKSI BULAN INI') + '</div>' +
+        '<div id="tw-m2mid">' +
+          '<div class="bx"><h4>TOP TOKO (OMZET BULAN INI)</h4><div id="tw-top"></div><h4 style="margin-top:8px">KESEHATAN TAGIHAN</h4><div id="tw-bstat"></div></div>' +
+          '<div class="bx"><h4>JAM SIBUK</h4><div id="tw-jam"></div><h4 style="margin-top:10px">PERHATIAN</h4><div id="tw-attn"></div></div>' +
+          '<div class="bx"><h4>AKTIVITAS & WILAYAH TOKO</h4><div id="tw-livebox"></div></div>' +
+        '</div>' +
+        '<div id="tw-m2bot">' +
+          '<div class="bx"><h4>LOG TRANSAKSI</h4><div id="tw-log"></div></div>' +
+          '<div class="bx"><h4>CHAT GLOBAL <span class="m">(kamu: DEV)</span></h4><div id="tw-chat" class="tw-chat"></div></div>' +
+        '</div>' +
+      '</div>' +
       '<div id="tw-ken"></div>' +
       '<div id="tw-pop" role="dialog" aria-modal="true"><div id="tw-pop-b"></div></div>';
     document.body.appendChild(root);
@@ -552,10 +622,14 @@
     $('tw-ken').addEventListener('click', function (e) { if (e.target.closest('.fm-act') && !e.target.closest('.tw-soon')) SND.click(); });
     $('tw-ctrl').addEventListener('click', function (e) {
       var sb = e.target.closest('[data-sk]'); if (sb) { SND.click(); setSort(sb.getAttribute('data-sk')); return; }
+      var fl = e.target.closest('[data-fl]'); if (fl) { SND.click(); setFilter(fl.getAttribute('data-fl')); return; }
       var vw = e.target.closest('[data-vw]'); if (vw) { SND.click(); setView(vw.getAttribute('data-vw')); return; }
     });
     var qIn = $('tw-q');
     if (qIn) qIn.addEventListener('input', function () { QUERY = qIn.value || ''; renderTable(); });
+    $('tw-mon2').addEventListener('click', function (e) {
+      var popEl = e.target.closest('[data-pop]'); if (popEl) { SND.click(); openPop(popEl.getAttribute('data-pop')); }
+    });
     $('tw-tbw').addEventListener('click', function (e) {
       var th = e.target.closest('th[data-sk]'); if (th) { SND.click(); setSort(th.getAttribute('data-sk')); return; }
       var popEl = e.target.closest('[data-pop]'); if (popEl) { SND.click(); openPop(popEl.getAttribute('data-pop')); return; }
@@ -583,7 +657,10 @@
       var tag = (document.activeElement && document.activeElement.tagName) || '';
       if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
       var mo = modalOpen();
-      if (e.key === 'Tab' && !mo) { e.preventDefault(); setMode(mode === 'mon' ? 'ken' : 'mon'); return; }
+      if (e.key === 'Tab' && !mo) { e.preventDefault(); setMode(mode === 'mon' ? 'mon2' : mode === 'mon2' ? 'ken' : 'mon'); return; }
+      if (e.key === '1' && !mo) { setMode('mon'); return; }
+      if (e.key === '2' && !mo) { setMode('mon2'); return; }
+      if (e.key === '3' && !mo) { setMode('ken'); return; }
       if ((e.key === 'm' || e.key === 'M') && !mo) { $('tw-snd').click(); return; }
       if (e.key === 'Escape' && g(function () { return !$('main-modal-container').classList.contains('hidden'); }, false)) g(function () { closeModal(); });
     });
@@ -609,8 +686,22 @@
     '#tw-bar{flex:none;display:flex;align-items:center;gap:12px;padding:10px 18px;margin:10px 18px 0;background:#ffffff!important;border:1px solid #e2e8f0!important;border-radius:16px!important;box-shadow:0 4px 14px -6px rgba(15,23,42,.08)!important;white-space:nowrap}#tw-bar .sp{flex:1}',
     '#tw-bar .pgs{display:flex;background:#f1f5f9;border:1px solid #cbd5e1!important;border-radius:10px;overflow:hidden;padding:2px;gap:2px}#tw-bar .pgs button{all:unset;cursor:pointer;padding:5px 14px;border-radius:8px;color:#475569!important;font:700 12px/1.2 inherit;transition:all .15s ease}#tw-bar .pgs button.on{background:#2563eb!important;color:#ffffff!important;box-shadow:0 2px 6px rgba(37,99,235,.28)}',
     '#tw-bar .pl{all:unset;cursor:pointer;color:#334155!important;font:700 11.5px/1.2 inherit;padding:6px 12px;border:1px solid #cbd5e1!important;border-radius:10px;background:#f8fafc!important;transition:all .15s ease}#tw-bar .pl:hover{color:#0f172a!important;border-color:#94a3b8!important;background:#f1f5f9!important}#tw-bar .pl.on{color:#059669!important;border-color:#a7f3d0!important;background:#ecfdf5!important}#tw-bar .pl.bad{color:#dc2626!important;border-color:#fecaca!important;background:#fef2f2!important}',
-    '#tw-mon{flex:1 1 0;min-height:0;display:none;flex-direction:column;padding:10px 18px 14px;gap:10px}',
-    'html[data-tw-pg="mon"] #tw-mon{display:flex}html[data-tw-pg="mon"] #tw-ken{display:none}html[data-tw-pg="ken"] #tw-mon{display:none}html[data-tw-pg="ken"] #tw-ken{display:flex}',
+    '#tw-mon,#tw-mon2{flex:1 1 0;min-height:0;display:none;flex-direction:column;padding:10px 18px 14px;gap:10px}',
+    'html[data-tw-pg="mon"] #tw-mon{display:flex}html[data-tw-pg="mon2"] #tw-mon2{display:flex}html[data-tw-pg="ken"] #tw-ken{display:flex}',
+    '#tw-bar .tw-m2b{display:none;margin-left:5px;padding:1px 5px;border-radius:999px;background:#ef4444;color:#ffffff;font-size:9.5px;line-height:1.2;font-weight:800}',
+    '#tw-ctrl .tw-sep{width:1px;height:18px;background:#e2e8f0;margin:0 2px}',
+    '#tw-m2mid{flex:1.1 1 0;min-height:140px;display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:12px}',
+    '#tw-m2bot{flex:1 1 0;min-height:120px;display:grid;grid-template-columns:1.35fr 1fr;gap:12px}',
+    '#tw-top{display:flex;flex-direction:column;gap:6px;overflow:auto;min-height:0}',
+    '.tw-top-r{cursor:pointer;padding:4px 6px;border-radius:8px;transition:background .12s}.tw-top-r:hover{background:#f8fafc}',
+    '.tw-top-hd{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;margin-bottom:3px}.tw-top-hd span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+    '.tw-top-bar{height:5px;background:#f1f5f9;border-radius:999px;overflow:hidden}.tw-top-bar i{display:block;height:100%;background:linear-gradient(90deg,#2563eb,#10b981);border-radius:999px}',
+    '#tw-bstat{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:2px}',
+    '.tw-bs{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:5px 6px;text-align:center}.tw-bs span{display:block;font-size:9.5px;font-weight:700;white-space:nowrap}.tw-bs b{font-size:13px;font-family:"JetBrains Mono",Consolas,monospace}',
+    '#tw-livebox{flex:1 1 0;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:6px}',
+    '.tw-lv-r{display:flex;align-items:center;gap:8px;padding:5px 8px;background:#f8fafc;border:1px solid #f1f5f9;border-radius:9px;cursor:pointer}.tw-lv-r:hover{border-color:#93c5fd;background:#eff6ff}',
+    '.tw-lv-m{flex:1;min-width:0}.tw-lv-n{font-weight:700;font-size:12px;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.tw-lv-s{display:flex;flex-direction:column;align-items:flex-end;flex:none;font-size:11px;line-height:1.2}',
     '#tw-strip{flex:none;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;overflow:visible;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}#tw-strip>div{min-width:0;padding:10px 12px;background:#ffffff!important;border:1px solid #e2e8f0!important;border-radius:14px!important;box-shadow:0 2px 8px -4px rgba(15,23,42,.06)!important}#tw-strip small{display:block;color:#64748b!important;font-size:10px;font-weight:700;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}#tw-strip b{display:block;color:#0f172a!important;font-family:"JetBrains Mono",Consolas,monospace;font-size:clamp(11px,1.15vw,16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#tw-strip b.g{color:#059669!important}#tw-strip b.y{color:#d97706!important}',
     '#tw-ctrl{flex:none;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 12px;background:#ffffff!important;border:1px solid #e2e8f0!important;border-radius:14px!important;box-shadow:0 2px 8px -4px rgba(15,23,42,.05)!important}#tw-ctrl .sp{flex:1}#tw-ctrl .tw-cl{font-size:11px;font-weight:700;color:#64748b;margin-right:2px}',
     '#tw-ctrl .tw-sb{all:unset;cursor:pointer;padding:4px 10px;border-radius:8px;font:700 11px/1.2 inherit;color:#475569!important;background:#f8fafc!important;border:1px solid #e2e8f0!important;transition:all .12s ease;white-space:nowrap}#tw-ctrl .tw-sb:hover{background:#f1f5f9!important;color:#0f172a!important}#tw-ctrl .tw-sb.on{background:#eff6ff!important;color:#2563eb!important;border-color:#93c5fd!important}',
@@ -677,13 +768,13 @@
     var slow = S.eco ? 3 : 1;
     timers.push(
       setInterval(function () { if (!document.hidden) tickLive(); }, 1000 * slow),
-      setInterval(function () { if (document.hidden) return; try { if (mode === 'mon') { renderTable(); renderStrip(); renderAttn(); } updateBar(); } catch (e) { try { console.warn('tower tick', e); } catch (e2) {} } }, 4000),
-      setInterval(function () { if (!document.hidden && mode === 'mon') renderJam(); }, 60000),
+      setInterval(function () { if (document.hidden) return; try { if (mode === 'mon') renderTable(); else if (mode === 'mon2') { renderStrip(); renderMon2Extras(); renderAttn(); } updateBar(); } catch (e) { try { console.warn('tower tick', e); } catch (e2) {} } }, 4000),
+      setInterval(function () { if (!document.hidden && mode === 'mon2') renderJam(); }, 60000),
       setInterval(function () { if (!document.hidden) scanEvents(); }, 2000),
       setInterval(function () { if (!document.hidden) pollSecurity(); }, 5000),
       setInterval(function () { if (!document.hidden && seeded) trend(); }, 180000),
       /* sapuan radar: berbunyi di layar MONITOR selama masih ada toko online (ikut kedipan lampu hijau) */
-      setInterval(function () { try { if (document.hidden || mode !== 'mon' || !S.on || S.eco) return; if (tenants().some(function (t) { return online(t.id).length; })) SND.radar(); } catch (e) {} }, 2600)
+      setInterval(function () { try { if (document.hidden || (mode !== 'mon' && mode !== 'mon2') || !S.on || S.eco) return; if (tenants().some(function (t) { return online(t.id).length; })) SND.radar(); } catch (e) {} }, 2600)
     );
   }
   function restartTimers() { clearTimers(); startTimers(); }
@@ -695,7 +786,7 @@
       var acts = $('fm-actions');
       if (acts && acts.classList.contains('tw-grouped')) {
         build(); preflight(function () { lastTouch = Date.now(); });
-        compute(); renderStrip(); renderTable(); renderJam(); renderAttn(); updateBar(); tickLive();
+        compute(); renderStrip(); renderTable(); renderMon2Extras(); renderJam(); renderAttn(); updateBar(); tickLive();
         if (window.FM_CHAT) FM_CHAT.mountTower($('tw-chat'));
         startTimers();
         var ca = window.ctAudit;
