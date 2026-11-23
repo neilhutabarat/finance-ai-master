@@ -99,7 +99,7 @@
     <script src="js/logo.js?v=paket1"></script>
     <script src="js/skin.js?v=1119"></script>
     <script src="js/tower-menu.js?v=1118"></script>
-    <script src="js/tower-lab.js?v=proto"></script>
+    <script src="js/tower-lab.js?v=1124"></script>
     <script src="js/admins.js?v=1120"></script>
     <script src="js/tower-monitor.js?v=proto"></script>
     <script src="js/tower-help.js?v=proto"></script>
@@ -332,9 +332,12 @@
     <div id="main-modal-container" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="ios-glass w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl modal-sheet overflow-hidden bg-slate-950 border border-white/20">
             <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-slate-900 text-white">
-                <div>
+                <div class="flex items-center gap-3">
+                    <button id="modal-back" type="button" onclick="towerPickBack()" class="hidden shrink-0 px-3 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold">← Kembali</button>
+                    <div>
                     <h3 id="modal-title" class="font-black text-base text-white">Judul Pop-Up</h3>
                     <p id="modal-subtitle" class="text-xs text-slate-400">Keterangan Laporan</p>
+                    </div>
                 </div>
                 <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-900/10 hover:bg-slate-900/20 text-white flex items-center justify-center transition">
                     <i data-lucide="x" class="w-4 h-4"></i>
@@ -549,11 +552,15 @@
                         <div id="ts-features" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-200 text-xs"></div>
                         <div id="ts-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Nama Toko</label><input id="ts-nama" type="text" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
-                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Slogan (teks di bawah nama toko)</label><input id="ts-slogan" type="text" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
-                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Alamat Usaha</label><input id="ts-alamat" type="text" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
-                            <div><label class="font-bold text-slate-300 block mb-1">Inisial Logo (maks. 3 huruf)</label><input id="ts-logo" type="text" maxlength="3" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
-                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Logo UMKM (gambar persegi / PNG transparan, disarankan 512x512)</label><div class="flex items-center gap-3"><div id="ts-logo-prev" class="w-16 h-16 rounded-2xl bg-slate-900 border border-white/15 flex items-center justify-center overflow-hidden text-slate-500 text-[10px]">Belum ada</div><label class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs cursor-pointer">Pilih &amp; Unggah<input id="ts-logo-file" type="file" accept="image/*" class="hidden"></label><button id="ts-logo-del" type="button" class="px-3 py-2 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white font-black text-xs">Hapus Logo</button></div><p id="ts-logo-msg" class="mt-1 text-[11px] text-slate-400"></p></div>
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Alamat (nama jalan / lokasi)</label><input id="ts-alamat" type="text" placeholder="Contoh: Jl. Merdeka" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Nomor Bangunan</label><input id="ts-nobang" type="text" placeholder="Contoh: 5A" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Kota / Kabupaten</label><input id="ts-kota" type="text" placeholder="Contoh: Medan" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Provinsi</label><input id="ts-prov" type="text" placeholder="Contoh: Sumatera Utara" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Negara</label><input id="ts-negara" type="text" value="Indonesia" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div class="hidden"><input id="ts-slogan" type="hidden"><input id="ts-alamat-lama" type="hidden"><div><label class="font-bold text-slate-300 block mb-1">Inisial Logo (maks. 3 huruf)</label><input id="ts-logo" type="text" maxlength="3" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div class="hidden"><label class="font-bold text-slate-300 block mb-1">Logo UMKM (gambar persegi / PNG transparan, disarankan 512x512)</label><div class="flex items-center gap-3"><div id="ts-logo-prev" class="w-16 h-16 rounded-2xl bg-slate-900 border border-white/15 flex items-center justify-center overflow-hidden text-slate-500 text-[10px]">Belum ada</div><label class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs cursor-pointer">Pilih &amp; Unggah<input id="ts-logo-file" type="file" accept="image/*" class="hidden"></label><button id="ts-logo-del" type="button" class="px-3 py-2 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white font-black text-xs">Hapus Logo</button></div><p id="ts-logo-msg" class="mt-1 text-[11px] text-slate-400"></p></div>
                             <div class="grid grid-cols-2 gap-2"><div><label class="font-bold text-slate-300 block mb-1">Warna Utama</label><input id="ts-warna" type="color" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div></div>
+                        </div>
                         </div>
                         <button id="ts-profile-save" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs transition">Simpan Profil Toko</button>
                     </div>
@@ -650,20 +657,23 @@
                 <div id="popup-content-add_tenant" class="space-y-4 hidden">
                     <div class="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-400/30 space-y-3 text-xs">
                         <span class="font-black text-sm text-white block">Data Klien Baru</span>
-                        <div id="nt-features" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-200 text-xs"></div>
+                        <div><label class="font-bold text-slate-300 block mb-1">Paket</label>
+                            <div id="nt-tiers" class="grid grid-cols-3 gap-2"><button type="button" data-nt-tier="basic" class="nt-tier-btn py-3 rounded-xl border border-white/15 bg-slate-900 text-white font-black text-xs">Basic</button><button type="button" data-nt-tier="plus" class="nt-tier-btn py-3 rounded-xl border border-white/15 bg-slate-900 text-white font-black text-xs">Plus</button><button type="button" data-nt-tier="pro" class="nt-tier-btn py-3 rounded-xl border border-white/15 bg-slate-900 text-white font-black text-xs">Pro</button></div>
+                            <p class="mt-1 text-[11px] text-slate-400">Fitur toko mengikuti isi paket di menu Isi Paket Basic/Plus/Pro.</p></div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">ID Toko (kosongkan = otomatis)</label>
                                 <input id="nt-id" type="text" maxlength="11" placeholder="Kosongkan untuk otomatis. Format: ID + YYMMDD + hari(1-7) + urutan, contoh ID261112403" oninput="previewNewTenantId()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
                                 <p id="nt-idprev" class="mt-1 text-[11px] text-slate-400"></p></div>
-                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Nama Usaha *</label><input id="nt-nama" type="text" placeholder="Contoh: Kedai Kopi Senja" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
-                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Slogan / Keterangan</label><input id="nt-slogan" type="text" placeholder="Contoh: Kopi lokal, harga bersahabat" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
-                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Jenis Usaha (menentukan COA awal)</label>
-                                <select id="nt-type" onchange="ntTypeChanged()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></select>
-                                <label id="nt-catwrap" style="display:none;align-items:center;gap:8px" class="mt-2 text-[11px] text-slate-300"><input type="checkbox" id="nt-cat" checked> Isi katalog awal (kategori & harga perkiraan, stok 0) — harga wajib dicek toko</label>
-                                <div class="mt-3"><label class="font-bold text-slate-300 block mb-1">Model Usaha</label>
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Nama Toko *</label><input id="nt-nama" type="text" placeholder="Contoh: Kedai Kopi Senja" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Model Usaha</label>
                                     <select id="nt-model" onchange="ntModelChanged()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="tunggal">Tunggal: satu usaha</option><option value="multi">Multi: beberapa usaha dalam satu toko (tiap Admin punya buku sendiri)</option></select>
                                     <div id="nt-multiwrap" style="display:none" class="mt-2"><input id="nt-usaha" type="text" placeholder="Nama tiap usaha, pisahkan koma. Contoh: Konveksi, Karung, Kelontong" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
-                                    <p class="mt-1 text-[11px] text-slate-400">Fitur Banyak Usaha dan Admin per Usaha otomatis dicentang. Setelah toko jadi, buat akun tiap Admin lewat Akun Login, tombol Admin tambahan per usaha.</p></div></div></div>
+                                    <p class="mt-1 text-[11px] text-slate-400">Fitur Banyak Usaha dan Admin per Usaha otomatis dicentang. Setelah toko jadi, buat akun tiap Admin lewat Akun Login, tombol Admin tambahan per usaha.</p></div>
+                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Alamat (nama jalan / lokasi)</label><input id="nt-alamat" type="text" placeholder="Contoh: Jl. Merdeka" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Nomor Bangunan</label><input id="nt-nobang" type="text" placeholder="Contoh: 5A" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Kota / Kabupaten</label><input id="nt-kota" type="text" placeholder="Contoh: Medan" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Provinsi</label><input id="nt-prov" type="text" placeholder="Contoh: Sumatera Utara" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
+                            <div><label class="font-bold text-slate-300 block mb-1">Negara</label><input id="nt-negara" type="text" value="Indonesia" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <input type="hidden" id="nt-tier" value="basic">
                             <div><label class="font-bold text-slate-300 block mb-1">Kuota Terminal Awal (Kasir / Manager / Owner)</label>
                                 <div class="grid grid-cols-3 gap-2"><input id="nt-kasir" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><input id="nt-mgr" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><input id="nt-own" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div></div>
@@ -671,9 +681,7 @@
                                 <select id="nt-cycle" onchange="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="monthly">Per Bulan</option><option value="yearly">Per Tahun (hemat)</option></select></div>
                             <div style="display:none"><label class="font-bold text-slate-300 block mb-1">Harga Khusus (opsional, Rp)</label><input id="nt-custom" type="number" min="0" placeholder="Kosongkan = harga standar" oninput="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div class="sm:col-span-2" style="display:none"><div id="nt-planprev" class="p-3 rounded-xl bg-slate-900 border border-white/10 text-slate-300"></div></div>
-                            <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">Alamat Usaha (untuk catatan lokasi)</label><input id="nt-alamat" type="text" placeholder="Contoh: Jl. Merdeka No. 5, Ketapang" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
-                            <div><label class="font-bold text-slate-300 block mb-1">Warna Utama</label><input id="nt-warna" type="color" value="#0f172a" class="w-full h-10 bg-slate-900 border border-white/15 rounded-xl"></div>
-                        </div>
+                                                    </div>
                         <button id="nt-submit" onclick="createTenant()" class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-black text-xs transition">Buat Toko Klien</button>
                     </div>
                     <div id="nt-result" class="hidden p-4 rounded-2xl bg-emerald-950/40 border border-emerald-400/30 text-xs space-y-2"></div>
@@ -795,7 +803,7 @@
 
     <script src="js/tenants.js"></script>
     <script src="js/auth.js?v=proto"></script>
-    <script src="js/plans.js?v=1119"></script>
+    <script src="js/plans.js?v=1124"></script>
     <script src="js/templates.js?v=proto"></script>
     <script src="js/widgets.js?v=proto"></script>
     <script>window.NO_AUTO_STORE = true;</script>
@@ -1067,7 +1075,7 @@
 
         function towerPick(kind, extra) {
             var T = {
-                profil: ['Profil Toko', 'Pilih toko: nama, slogan, warna, logo'],
+                profil: ['Profil Toko', 'Pilih toko: nama dan alamat'],
                 fitur: ['Fitur Toko', 'Pilih toko: centang fitur per peran'],
                 susun: ['Susunan Pulau ON2', 'Pilih toko: atur urutan dan tampil pulau kiri/kanan'],
                 pulau: ['Pulau & Kartu ON2', 'Pilih toko: atur pulau kiri/kanan, kartu, denyut, dan tutup hari'],
@@ -1091,21 +1099,61 @@
             o.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px';
             o.innerHTML = '<div style="width:min(520px,100%);max-height:86vh;display:flex;flex-direction:column;border-radius:22px;background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 20px 60px rgba(0,0,0,.5)">' +
                 '<div style="padding:16px 18px 10px;display:flex;justify-content:space-between;gap:10px"><div><div style="font-weight:900;font-size:16px">' + T[0] + '</div><div style="opacity:.65;font-size:12px">' + T[1] + '</div></div><button id="tw-pick-x" style="font-size:22px;line-height:1;opacity:.7">×</button></div>' +
+                (kind === 'paket' ? '<div id="tw-pick-tabs" style="padding:0 18px 10px;display:flex;gap:6px"></div>' : '') +
+                (kind === 'versi' ? '<div style="padding:0 18px 10px;display:flex;gap:8px;align-items:center"><button id="tw-pick-multi" type="button" style="padding:6px 12px;border-radius:99px;font-size:11.5px;font-weight:800;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18)">Pilih banyak</button><span id="tw-pick-mhint" style="font-size:11px;opacity:.6">Pindahkan versi beberapa toko sekaligus</span></div>' : '') +
                 '<div style="padding:0 18px 10px"><input id="tw-pick-q" placeholder="Cari nama atau ID toko" style="width:100%;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:13px;outline:none"></div>' +
-                '<div id="tw-pick-l" style="overflow:auto;padding:0 12px 14px"></div></div>';
+                '<div id="tw-pick-l" style="overflow:auto;padding:0 12px 14px"></div>' +
+                (kind === 'versi' ? '<div id="tw-pick-bulk" style="display:none;padding:10px 18px 16px;border-top:1px solid rgba(255,255,255,.1);gap:8px;flex-wrap:wrap;align-items:center"></div>' : '') +
+                '</div>';
             document.body.appendChild(o);
             var close = function () { o.remove(); };
             o.onclick = function (e) { if (e.target === o) close(); };
             document.getElementById('tw-pick-x').onclick = close;
             var q = document.getElementById('tw-pick-q'), L = document.getElementById('tw-pick-l');
+            /* Paket: 3 tab Basic / Plus / Pro */
+            var tierTab = 'basic', tierOfT = function (t) { try { return FM_PLANS.tierOf(t); } catch (e) { return 'basic'; } };
+            /* Versi: mode pilih banyak */
+            var multi = false, picked = {};
+            function baseList() { return listNetworkTenants().filter(function (t) { return (kind === 'hapus' || !t.deletedByTower) && (!NEED_MANAGED[kind] || isManaged(t)) && !(kind === 'salin2' && extra && t.id === extra.id); }); }
+            function drawTabs() {
+                var tb = document.getElementById('tw-pick-tabs'); if (!tb) return;
+                var all = baseList(), n = { basic: 0, plus: 0, pro: 0 }; all.forEach(function (t) { n[tierOfT(t)]++; });
+                tb.innerHTML = [['basic', 'Basic'], ['plus', 'Plus'], ['pro', 'Pro']].map(function (x) {
+                    var on = x[0] === tierTab;
+                    return '<button type="button" data-tier="' + x[0] + '" style="flex:1;padding:8px 6px;border-radius:12px;font-size:12px;font-weight:800;border:1px solid ' + (on ? '#6366f1' : 'rgba(255,255,255,.15)') + ';background:' + (on ? '#4f46e5' : 'rgba(255,255,255,.06)') + '">' + x[1] + ' <span style="opacity:.7">(' + n[x[0]] + ')</span></button>';
+                }).join('');
+                tb.querySelectorAll('[data-tier]').forEach(function (b) { b.onclick = function () { tierTab = b.getAttribute('data-tier'); drawTabs(); draw(); }; });
+            }
+            function drawBulk() {
+                var bx = document.getElementById('tw-pick-bulk'); if (!bx) return;
+                bx.style.display = multi ? 'flex' : 'none'; if (!multi) return;
+                var ids = Object.keys(picked).filter(function (i) { return picked[i]; });
+                var opts = '<option value="">Ikuti generasi</option>' + FM_ROLLOUT_VERSIONS.map(function (v) { return '<option value="' + escHtml(v) + '">Kunci ke ' + escHtml(v) + '</option>'; }).join('');
+                bx.innerHTML = '<span style="font-size:12px;font-weight:800">' + ids.length + ' toko dipilih</span>' +
+                    '<button type="button" id="tw-bulk-all" style="padding:5px 10px;border-radius:99px;font-size:11px;font-weight:700;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)">Centang semua klien</button>' +
+                    '<button type="button" id="tw-bulk-none" style="padding:5px 10px;border-radius:99px;font-size:11px;font-weight:700;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)">Kosongkan</button>' +
+                    '<select id="tw-bulk-ver" style="flex:1;min-width:140px;padding:7px 10px;border-radius:10px;background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.18);font-size:12px">' + opts + '</select>' +
+                    '<button type="button" id="tw-bulk-go" style="padding:8px 14px;border-radius:12px;font-size:12px;font-weight:900;background:#4f46e5">Terapkan</button>';
+                document.getElementById('tw-bulk-all').onclick = function () { baseList().forEach(function (t) { if (!isDemoListed(t)) picked[t.id] = true; }); draw(); };
+                document.getElementById('tw-bulk-none').onclick = function () { picked = {}; draw(); };
+                document.getElementById('tw-bulk-go').onclick = function () {
+                    var ver = document.getElementById('tw-bulk-ver').value;
+                    if (!ids.length) return alert('Centang dulu toko yang mau dipindahkan versinya.');
+                    if (!confirm((ver ? 'Kunci ' + ids.length + ' toko ke versi ' + ver : ids.length + ' toko kembali mengikuti generasinya') + '?')) return;
+                    setTenantsPinnedVersionBulk(ids, ver).then(function (r) { alert('Selesai: ' + r.ok + ' toko berhasil' + (r.fail ? ', ' + r.fail + ' gagal' : '') + '. Berlaku saat laman toko dibuka lagi.'); picked = {}; draw(); });
+                };
+            }
+            var mb = document.getElementById('tw-pick-multi');
+            if (mb) mb.onclick = function () { multi = !multi; picked = {}; mb.textContent = multi ? 'Selesai pilih' : 'Pilih banyak'; mb.style.background = multi ? '#4f46e5' : 'rgba(255,255,255,.1)'; draw(); };
             function draw() {
                 var k = q.value.trim().toLowerCase();
-                var list = listNetworkTenants().filter(function (t) { return (kind === 'hapus' || !t.deletedByTower) && (!NEED_MANAGED[kind] || isManaged(t)) && !(kind === 'salin2' && extra && t.id === extra.id) && (!k || String(t.id).toLowerCase().indexOf(k) >= 0 || String(t.nama || '').toLowerCase().indexOf(k) >= 0); });
+                var list = baseList().filter(function (t) { return (kind !== 'paket' || tierOfT(t) === tierTab) && (!k || String(t.id).toLowerCase().indexOf(k) >= 0 || String(t.nama || '').toLowerCase().indexOf(k) >= 0); });
+                drawBulk();
                 L.innerHTML = '';
                 if (!list.length) { L.innerHTML = '<div style="padding:18px;text-align:center;opacity:.6;font-size:13px">Tidak ada toko yang cocok</div>'; return; }
                 var demoStarted = false;
                 list.forEach(function (t) {
-                    if (!demoStarted && isDemoTenantId(t.id)) {
+                    if (!demoStarted && isDemoListed(t)) {
                         demoStarted = true;
                         var h = document.createElement('div');
                         h.textContent = '— DEMO —';
@@ -1117,6 +1165,15 @@
                     var act = kind === 'freeze' ? (sus ? 'Aktifkan' : 'Bekukan') : (kind === 'hapus' ? (t.deletedByTower ? 'Pulihkan' : 'Hapus') : '');
                     b.innerHTML = '<span><span style="font-weight:800;font-size:13px">' + escHtml(t.nama || t.id) + '</span><span style="display:block;opacity:.6;font-size:11px;font-family:monospace">' + escHtml(t.id) + '</span></span>' +
                         '<span style="font-size:10px;font-weight:900;padding:3px 9px;border-radius:99px;' + (sus ? 'background:rgba(244,63,94,.2);color:#fda4af' : 'background:rgba(16,185,129,.2);color:#6ee7b7') + '">' + (act || (sus ? 'BEKU' : 'AKTIF')) + '</span>';
+                    if (multi) {
+                        var on = !!picked[t.id];
+                        b.lastChild.textContent = on ? '✓ DIPILIH' : (t.pinnedVersion || 'Ikut generasi');
+                        b.lastChild.style.cssText = 'font-size:10px;font-weight:900;padding:3px 9px;border-radius:99px;' + (on ? 'background:#4f46e5;color:#fff' : 'background:rgba(255,255,255,.1);color:#cbd5e1');
+                        if (on) b.style.borderColor = '#6366f1';
+                        b.onclick = function () { picked[t.id] = !picked[t.id]; draw(); };
+                        L.appendChild(b);
+                        return;
+                    }
                     b.onclick = function () {
                         if (kind === 'link') {
                             var link = tenantLink(t.id), ok = function () { b.lastChild.textContent = 'Tersalin ✓'; setTimeout(close, 700); };
@@ -1125,6 +1182,7 @@
                             return;
                         }
                         close();
+                        window.__twBack = (kind === 'salin' || kind === 'salin2' || kind === 'hapus' || kind === 'freeze') ? null : { kind: kind, extra: extra };
                         if (kind === 'susun') towerPulau(t);
                         else if (kind === 'pulau') { openTenantSettings(t.id, 'fitur'); setTimeout(function () { try { var q = document.getElementById('ts-q'); if (q) { q.value = 'oneilverse 2'; FM_PLANS.cariFitur('ts', 'oneilverse 2'); q.scrollIntoView({ block: 'center' }); } var tt = document.getElementById('ts-card-title'); if (tt) tt.innerText = 'Pulau & Kartu Oneilverse 2: centang yang ingin ditampilkan di toko ini'; } catch (e) {} }, 400); }
                         else if (kind === 'profil' || kind === 'fitur' || kind === 'coa' || kind === 'produk') openTenantSettings(t.id, kind);
@@ -1137,19 +1195,25 @@
                     L.appendChild(b);
                 });
             }
-            q.oninput = draw; draw(); setTimeout(function () { q.focus(); }, 50);
+            q.oninput = draw; drawTabs(); draw(); setTimeout(function () { q.focus(); }, 50);
         }
         window.towerPick = towerPick;
+        /* Tombol "← Kembali" di pop-up toko: tutup pop-up lalu buka lagi daftar toko yang tadi */
+        window.towerPickBack = function () { const b = window.__twBack; closeModal(); if (b) towerPick(b.kind, b.extra); };
 
         function isDemoTenantId(id) { return /^ID0{4,}/i.test(String(id || '')); }
         window.isDemoTenantId = isDemoTenantId;
+        /* Toko milik sendiri (Oneilverse & Oneilmedia) bukan klien: ikut ditaruh di bagian DEMO pada semua daftar toko */
+        function isOwnTenant(t) { var id = String((t && t.id) || '').toUpperCase().trim(), nm = String((t && t.nama) || '').toLowerCase().trim(); return id === 'ID26110901' || id === 'ID260220017' || nm === 'oneilverse' || nm === 'oneilmedia'; }
+        function isDemoListed(t) { return isDemoTenantId(t && t.id) || isOwnTenant(t); }
+        window.isDemoListed = isDemoListed;
         function listNetworkTenants() {
             if (typeof TENANTS_CONFIG === 'undefined') return [];
             var arr = Object.keys(TENANTS_CONFIG).map(function (k) { return TENANTS_CONFIG[k]; })
                 .filter(function (t) { return !t.isSinglePage; });
             /* toko DEMO (ID0000...) ditaruh di bawah, biar gak nyampur sama toko klien sungguhan */
-            var real = arr.filter(function (t) { return !isDemoTenantId(t.id); });
-            var demo = arr.filter(function (t) { return isDemoTenantId(t.id); });
+            var real = arr.filter(function (t) { return !isDemoListed(t); });
+            var demo = arr.filter(function (t) { return isDemoListed(t); });
             return real.concat(demo);
         }
 
@@ -1743,6 +1807,21 @@
                 .catch(function (e) { fmPermAlert(e); });
         }
 
+        /* Pindah versi banyak toko sekaligus (dari mode "Pilih banyak" di Versi Toko) */
+        function setTenantsPinnedVersionBulk(ids, version) {
+            if (!(typeof db !== 'undefined' && db)) { alert('Firestore belum terhubung.'); return Promise.resolve({ ok: 0, fail: ids.length }); }
+            let ok = 0, fail = 0;
+            return Promise.all(ids.map(function (id) {
+                const key = String(id).toLowerCase(), tn = TENANTS_CONFIG[key];
+                if (!isManaged(tn)) { fail++; return null; }
+                const cfg = Object.assign({}, tn); delete cfg.fromRegistry;
+                if (version) cfg.pinnedVersion = version; else delete cfg.pinnedVersion;
+                return db.collection('tenants_registry').doc(key).set({ id: tn.id, nama: tn.nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+                    .then(function () { ok++; if (version) tn.pinnedVersion = version; else delete tn.pinnedVersion; try { ctAudit(tn.id, 'KUNCI_VERSI', 'Pindah versi massal', '-', version || 'ikut generasi'); } catch (e) {} })
+                    .catch(function () { fail++; });
+            })).then(function () { rolloutPanelFor = null; return { ok: ok, fail: fail }; });
+        }
+
         // ===== ROLLOUT ONEIL SHIELD (terpisah dari rollout aplikasi di atas) =====
         // Versi Shield yang tersedia sebagai file di js/shield/shield-<versi>.js. Daftar ini HARUS sinkron
         // dengan KNOWN_VERSIONS di js/shield.js (pemuat) — tambahkan versi baru di DUA tempat itu sekaligus.
@@ -1869,7 +1948,8 @@
             note.innerText = editable ? '' : 'Toko bawaan sistem: nama, slogan, dan warna diatur lewat file tenants.js. COA dan produk tetap bisa diatur di bawah.';
             const loc = (tn.locations && tn.locations.kasir && tn.locations.kasir.name) || '';
             const set = function (id, v) { const el = document.getElementById(id); el.value = v || ''; el.disabled = !editable; };
-            set('ts-nama', tn.nama); set('ts-slogan', tn.slogan); set('ts-alamat', loc); set('ts-logo', tn.logoText);
+            set('ts-nama', tn.nama); set('ts-slogan', tn.slogan); set('ts-logo', tn.logoText);
+            fillAddr('ts', tn); ['ts-alamat', 'ts-nobang', 'ts-kota', 'ts-prov', 'ts-negara'].forEach(function (i) { const e = document.getElementById(i); if (e) e.disabled = !editable; });
             set('ts-warna', /^#[0-9a-f]{6}$/i.test(tn.warna || '') ? tn.warna : '#0f172a');
             window.__tsAksenOld = tn.warnaAksen; window.__tsWarnaOld = tn.warna;
             const usahaHtml =
@@ -1911,12 +1991,11 @@
             } else {
                 nama = document.getElementById('ts-nama').value.trim();
                 if (!nama) return alert('Nama toko wajib diisi.');
-                const alamat = document.getElementById('ts-alamat').value.trim() || 'Alamat belum diisi';
+                const addrObj = readAddr('ts');
+                const alamat = addrText(addrObj) || 'Alamat belum diisi';
                 cfg.nama = nama;
-                cfg.slogan = document.getElementById('ts-slogan').value.trim() || 'Mitra UMKM Oneilverse';
-                cfg.logoText = (document.getElementById('ts-logo').value.trim() || nama.slice(0, 2)).toUpperCase().slice(0, 3);
-                cfg.warna = document.getElementById('ts-warna').value;
-                cfg.warnaAksen = (cfg.warna === window.__tsWarnaOld && window.__tsAksenOld) ? window.__tsAksenOld : accentFrom(cfg.warna);
+                cfg.alamat = addrObj;
+                /* slogan, inisial logo, dan warna tidak lagi diatur dari Tower: nilai lama dibiarkan */
                 ['kasir', 'manager', 'owner'].forEach(function (r) {
                     cfg.locations = cfg.locations || {};
                     cfg.locations[r] = Object.assign({ lat: 0, lon: 0 }, cfg.locations[r] || {}, { name: alamat });
@@ -2103,11 +2182,25 @@
             el.className = 'mt-1 text-[11px] text-emerald-300'; el.innerText = 'ID tersedia: ' + v;
         }
 
+        /* Alamat terpisah (jalan, nomor bangunan, kota, provinsi, negara) supaya formatnya rapi */
+        function readAddr(px) { const g = function (k) { const e = document.getElementById(px + '-' + k); return e ? e.value.trim() : ''; }; return { jalan: g('alamat'), no: g('nobang'), kota: g('kota'), prov: g('prov'), negara: g('negara') || 'Indonesia' }; }
+        function addrText(a) { if (!a) return ''; const j = [a.jalan, a.no ? 'No. ' + a.no : ''].filter(Boolean).join(' '); return [j, a.kota, a.prov, (a.jalan || a.kota || a.prov) ? a.negara : ''].filter(Boolean).join(', '); }
+        function fillAddr(px, tn) {
+            const a = (tn && tn.alamat && typeof tn.alamat === 'object') ? tn.alamat : { jalan: ((tn && tn.locations && tn.locations.kasir && tn.locations.kasir.name) || '').replace(/^Alamat belum diisi$/, '') };
+            const set = function (k, v) { const e = document.getElementById(px + '-' + k); if (e) e.value = v || ''; };
+            set('alamat', a.jalan); set('nobang', a.no); set('kota', a.kota); set('prov', a.prov); set('negara', a.negara || 'Indonesia');
+        }
+        function ntSetTier(t) {
+            document.getElementById('nt-tier').value = t;
+            document.querySelectorAll('[data-nt-tier]').forEach(function (b) { const on = b.getAttribute('data-nt-tier') === t; b.style.background = on ? '#4f46e5' : ''; b.style.borderColor = on ? '#818cf8' : ''; });
+        }
+
         function createTenant() {
             const nama = document.getElementById('nt-nama').value.trim();
             if (!nama) return alert('Nama usaha wajib diisi.');
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung. Toko baru tidak dapat dibuat.');
-            const alamat = document.getElementById('nt-alamat').value.trim() || 'Alamat belum diisi';
+            const addrObj = readAddr('nt');
+            const alamat = addrText(addrObj) || 'Alamat belum diisi';
             const kasir = Math.max(1, parseInt(document.getElementById('nt-kasir').value) || 1);
             const manualId = (document.getElementById('nt-id').value || '').trim().toUpperCase();
             if (manualId && !/^ID\d{8,9}$/.test(manualId)) return alert('Format ID harus ID diikuti 9 angka, contoh ID261112403.');
@@ -2120,17 +2213,18 @@
             const cfg = {
                 id: id,
                 nama: nama,
-                slogan: document.getElementById('nt-slogan').value.trim() || 'Mitra UMKM Oneilverse',
-                warna: document.getElementById('nt-warna').value,
-                warnaAksen: accentFrom(document.getElementById('nt-warna').value),
+                slogan: '',
+                alamat: addrObj,
+                warna: '#0f172a',
+                warnaAksen: accentFrom('#0f172a'),
                 logoText: nama.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0].toUpperCase(); }).join('') || 'UM',
                 tier: document.getElementById('nt-tier').value,
                 isMaster: false,
                 isSinglePage: false,
                 isProviderID: false,
-                features: FM_PLANS.readChecklist('nt'),
+                features: (function () { const f = FM_PLANS.paketFeatures(document.getElementById('nt-tier').value || 'basic'); if (multi) ['banyak_usaha', 'admin_usaha'].forEach(function (k) { f[k] = f[k] || {}; ['kasir', 'manager', 'owner'].forEach(function (r) { f[k][r] = true; }); }); return f; })(),
                 ...(multi ? { usaha: usahaList } : {}),
-                customCOA: JSON.parse(JSON.stringify(COA_TEMPLATES[document.getElementById('nt-type').value || 'umum'].coa)),
+                customCOA: [],
                 locations: { kasir: loc, manager: loc, owner: loc },
                 createdAtMs: Date.now()
             };
@@ -2141,16 +2235,9 @@
             btn.disabled = true;
             const batch = db.batch();
             batch.set(db.collection('tenants_registry').doc(key), { id: id, nama: nama, json: JSON.stringify(cfg), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-            batch.set(db.collection('tenant_settings').doc(id), { coa: cfg.customCOA, templateKey: document.getElementById('nt-type').value || 'umum', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            batch.set(db.collection('tenant_settings').doc(id), { coa: cfg.customCOA, templateKey: 'kosong', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
             batch.set(db.collection('tenant_ctrl').doc(id), { gajiOwner: !!(cfg.features.gaji && cfg.features.gaji.owner), suspended: false, suspendReason: '', allowedCashiers: kasir, allowedManagers: Math.max(1, parseInt(document.getElementById('nt-mgr').value) || 1), allowedOwners: Math.max(1, parseInt(document.getElementById('nt-own').value) || 1), tier: cfg.tier, billingCycle: cycle, priceMonthlyAtPurchase: plan.monthly, billedAmount: plan.amount, customPrice: plan.custom, planStartedAt: Date.now(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-            const tType = document.getElementById('nt-type').value || 'umum';
-            const wantCat = !!(window.FM_TPL && FM_TPL.hasCatalog(tType) && document.getElementById('nt-cat') && document.getElementById('nt-cat').checked);
             batch.commit().then(function () {
-                if (!wantCat) return;
-                const cat = FM_TPL.catalog(tType); let pr = Promise.resolve();
-                for (let i = 0; i < cat.length; i += 400) (function (part) { pr = pr.then(function () { const b = db.batch(); part.forEach(function (x) { b.set(db.collection('tp_' + id).doc(x.id), x.v); }); return b.commit(); }); })(cat.slice(i, i + 400));
-                return pr.then(function () { try { ctAudit(id, 'KATALOG_AWAL', 'Katalog awal template ' + tType + ' (' + cat.length + ' jenis)', '-', 'TERISI'); } catch (e) {} });
-            }).then(function () {
                 registryMergeLocal(cfg);
                 const link = tenantLink(id);
                 const box = document.getElementById('nt-result');
@@ -2164,7 +2251,7 @@
                 const tb = document.getElementById('nt-tpl'); if (tb) tb.onclick = function () { if (window.FM_LAB) FM_LAB.open('template', id); };
                 const cb = document.getElementById('nt-copy');
                 cb.onclick = function () { const i = document.getElementById('nt-link'); i.select(); try { document.execCommand('copy'); cb.innerText = 'Tersalin'; } catch (e) {} };
-                ['nt-id', 'nt-nama', 'nt-slogan', 'nt-alamat', 'nt-custom', 'nt-usaha'].forEach(function (x) { const e = document.getElementById(x); if (e) e.value = ''; }); try { document.getElementById('nt-model').value = 'tunggal'; ntModelChanged(); } catch (e) {}
+                ['nt-id', 'nt-nama', 'nt-alamat', 'nt-nobang', 'nt-kota', 'nt-prov', 'nt-custom', 'nt-usaha'].forEach(function (x) { const e = document.getElementById(x); if (e) e.value = ''; }); try { document.getElementById('nt-model').value = 'tunggal'; ntModelChanged(); } catch (e) {}
                 btn.disabled = false;
             }).catch(function (e) { btn.disabled = false; alert('Gagal membuat toko: ' + e.message); });
         }
@@ -3492,6 +3579,7 @@
         }
 
         window.openModal = function(type) {
+            { const bk = document.getElementById('modal-back'); if (bk) bk.classList.toggle('hidden', !window.__twBack); }
             if (type !== 'tenant_settings' && tsStore) { tsStore.stop(); tsStore = null; }
             ['akun_login', 'billing_net', 'tax_net', 'provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'paket_fitur', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
                 const el = document.getElementById(`popup-content-${k}`);
@@ -3566,9 +3654,8 @@
             } else if (type === 'add_tenant') {
                 previewNewTenantPlan();
                 previewNewTenantId();
-                fillBusinessTypes();
-                document.getElementById('nt-features').innerHTML = FM_PLANS.checklistHtml('nt', null, true);
-                try { ntTypeChanged(); } catch (e) {}
+                document.querySelectorAll('[data-nt-tier]').forEach(function (b) { b.onclick = function () { ntSetTier(b.getAttribute('data-nt-tier')); }; });
+                ntSetTier(document.getElementById('nt-tier').value || 'basic');
                 document.getElementById('modal-title').innerText = "Tambah Klien Baru";
                 document.getElementById('modal-subtitle').innerText = "Toko langsung aktif dan bisa dibuka lewat link khusus";
                 document.getElementById('nt-result').classList.add('hidden');
@@ -3600,6 +3687,7 @@
         };
 
         window.closeModal = function() {
+            window.__twBack = null; { const bk = document.getElementById('modal-back'); if (bk) bk.classList.add('hidden'); }
             if (tsStore) { tsStore.stop(); tsStore = null; }
             document.getElementById('main-modal-container').classList.add('hidden');
         };

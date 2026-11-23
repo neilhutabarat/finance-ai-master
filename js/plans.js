@@ -163,6 +163,14 @@
     FEATURES.forEach(function (f) { if (f.soon) return; ROLES.forEach(function (r) { if (f.r[r] === 'o') { out[f.key] = out[f.key] || {}; out[f.key][r] = defaultFor(f.key, r, tier); } }); });
     return out;
   }
+  /* Isi fitur toko baru dari pilihan paket di Tower: HANYA yang dicentang di "Isi Paket Basic/Plus/Pro" (berjenjang basic -> plus -> pro) */
+  function paketFeatures(tier) {
+    var tiers = tier === 'pro' ? ['basic', 'plus', 'pro'] : tier === 'plus' ? ['basic', 'plus'] : ['basic'], out = {};
+    FEATURES.forEach(function (f) { if (f.soon) return; ROLES.forEach(function (r) { if (f.r[r] !== 'o') return;
+      var on = DEFAULT_ON.indexOf(f.key) >= 0 || ALWAYS_ON.indexOf(f.key) >= 0 || tiers.some(function (t) { return paketHas(t, f.key, r); });
+      out[f.key] = out[f.key] || {}; out[f.key][r] = on; }); });
+    return out;
+  }
   function legacyValue(f, role, tn) {
     if (tn && tn.isMaster) return true;
     return defaultFor(f.key, role, tierOf(tn));
@@ -647,6 +655,6 @@
   }
 
   window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, periods: PERIODS, permUntil: PERM_UNTIL, price: sprice, sold: ssold, free: sfree, features: featList, bundles: function () { return (CAT && CAT.bundles) || []; }, trialOn: function () { return !(CAT && CAT.trial === false); }, quote: squote, disc: sdisc, untilFor: untilForPeriod, cat: function () { return CAT; }, setCat: storeSetCat, fetchCat: fetchCat, catAt: function () { return CAT_AT; }, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
-    ISLES: ISL_G, readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; },
+    ISLES: ISL_G, readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, paketFeatures: paketFeatures, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; },
     PAKET: { cat: function () { return PAKET_CAT; }, setCat: setPaketCat, fetchCat: fetchPaketCat, isExpired: isExpired, lastPaidTier: lastPaidTier } };
 })();

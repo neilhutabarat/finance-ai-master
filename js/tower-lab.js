@@ -91,7 +91,7 @@
       if (!list.length) { L.innerHTML = '<div style="padding:18px;text-align:center;opacity:.6;font-size:13px">Tidak ada toko yang cocok</div>'; return; }
       var demoShown = false;
       list.forEach(function (t) {
-        if (isDemoTenantId(t.id) && !demoShown) {
+        if ((window.isDemoListed ? isDemoListed(t) : isDemoTenantId(t.id)) && !demoShown) {
           demoShown = true;
           var div = document.createElement('div');
           div.style.cssText = 'margin:10px 0 6px;padding:0 2px;font-size:11px;font-weight:800;letter-spacing:.04em;opacity:.55';
