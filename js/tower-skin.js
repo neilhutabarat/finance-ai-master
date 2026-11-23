@@ -39,7 +39,9 @@
     'html[data-tw-ck] #tw-ken #fm-actions{gap:12px!important}',
     'html[data-tw-ck] #tw-ken .tw-ken-q{border-radius:14px;padding:9px 16px 9px 38px;font-size:13px;font-weight:600;border:1px solid #dbe3ef;background:#fff url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2394a3b8\' stroke-width=\'2\' stroke-linecap=\'round\'%3E%3Ccircle cx=\'11\' cy=\'11\' r=\'6.5\'/%3E%3Cpath d=\'M16 16l4 4\'/%3E%3C/svg%3E") no-repeat 13px 50%/17px!important;box-shadow:0 1px 2px rgba(15,23,42,.04)}',
     'html[data-tw-ck] #tw-ken #tw-favs{display:flex;flex-wrap:wrap;gap:8px;flex:none;align-items:center}',
-    'html[data-tw-ck] #tw-ken #tw-favs:before{content:"Favorit";font-size:11px;font-weight:800;color:#64748b;margin-right:2px}',
+    'html[data-tw-ck] #tw-ken #tw-favs.has:before{content:"Favorit";font-size:11px;font-weight:800;color:#64748b;margin-right:2px}',
+    'html[data-tw-ck] #tw-ken #tw-favs .tw-tab-edit{margin-left:auto;padding:5px 12px;font-size:11.5px}',
+    /* layar pendek (laptop kecil): sembunyikan deskripsi tombol & rapatkan, agar semua kartu muat tanpa gulir */
     'html[data-tw-ck] #tw-ken .tw-fav{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:6px 13px 6px 9px;border-radius:999px;background:#fff;border:1px solid #dbe3ef;font:700 12px/1 "Plus Jakarta Sans",system-ui,sans-serif;color:#1e293b;box-shadow:0 1px 2px rgba(15,23,42,.04);transition:transform .15s,border-color .15s,box-shadow .15s}',
     'html[data-tw-ck] #tw-ken .tw-fav:hover{transform:translateY(-1px);border-color:var(--tw-acc);box-shadow:0 6px 14px -8px rgba(59,108,246,.5)}',
     'html[data-tw-ck] #tw-ken .tw-fav svg{width:16px;height:16px;color:var(--tw-acc)}',
@@ -92,6 +94,7 @@
   ].join('\n');
   /* lembar gaya lain memakai selektor "digelembungkan" ([data-fm-page] berulang); gandakan atribut agar gaya ini tetap menang */
   var KP = 'html' + new Array(12).join('[data-tw-ck]');
+  CSS += '\n' + ('@media (max-height:760px){html[data-tw-ck][data-fm-page="tower"] #tw-ken #fm-actions.tw-grouped .tw-group .fm-act.tw-tile>small{display:none!important}html[data-tw-ck][data-fm-page="tower"] #tw-ken #fm-actions.tw-grouped .tw-group .fm-act.tw-tile{padding:5px 10px 5px 8px!important}html[data-tw-ck][data-fm-page="tower"] #tw-ken #fm-actions.tw-grouped .tw-group .fm-act.tw-tile>span:not(.tw-pill){grid-row:1 / 3!important;align-self:center!important}html[data-tw-ck] #tw-ken .tw-group{padding:10px 12px!important;gap:8px!important}html[data-tw-ck] #tw-ken .tw-gi{width:30px;height:30px}html[data-tw-ck] #tw-ken .tw-group .tw-head .tw-ht span{display:none!important}html[data-tw-ck] #tw-ken .tw-grid{gap:6px!important;grid-auto-rows:minmax(42px,1fr)!important}}');
   CSS = CSS.split('html[data-tw-ck][data-fm-page="tower"] #tw-ken').join(KP + '[data-fm-page="tower"] #tw-ken').split('html[data-tw-ck] #tw-ken').join(KP + ' #tw-ken');
   CSS += '\n' + KP + '[data-tw-theme="dark"],' + KP + '[data-tw-theme="dark"] body{background:#0b101c!important;background-image:none!important}';
   var st = document.createElement('style'); st.id = 'tw-skin-css'; st.textContent = CSS; document.head.appendChild(st);

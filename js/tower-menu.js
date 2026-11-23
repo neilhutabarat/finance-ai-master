@@ -306,7 +306,7 @@
           var c = document.createElement('em'); c.className = 'tw-cnt'; c.style.fontStyle = 'normal'; c.setAttribute('data-tw-badge', it.badge); c.style.display = 'none';
           el.appendChild(c);
         }
-        el.setAttribute('data-tw-key', it.key);
+        el.setAttribute('data-tw-key', it.key); if (it.d && !el.title) el.title = it.t + ' — ' + it.d;
         var star = document.createElement('b'); star.className = 'tw-star'; star.setAttribute('role', 'button'); star.title = 'Sematkan ke Favorit';
         star.onclick = function (e) { e.preventDefault(); e.stopPropagation(); toggleFav(it.key); };
         el.appendChild(star);
@@ -330,14 +330,13 @@
         sec.style.setProperty('display', (!q || any) ? 'flex' : 'none', 'important');
       });
     };
-    nav.appendChild(qIn);
     var editBtn = document.createElement('button'); editBtn.type = 'button'; editBtn.className = 'tw-tab tw-tab-edit'; editBtn.textContent = 'Atur Menu';
     editBtn.onclick = function (e) { e.stopPropagation(); openMenuEditor(); };
-    nav.appendChild(editBtn);
+    editBtn.id = 'tw-edit-menu';
     var board = document.createElement('div'); board.id = 'tw-board';
     board.appendChild(frag);
     var favs = document.createElement('div'); favs.id = 'tw-favs';
-    host.appendChild(nav); host.appendChild(favs); host.appendChild(board);
+    host.appendChild(favs); host.appendChild(board); favs.appendChild(editBtn);
     host.classList.add('tw-grouped');
     renderFavs();
   }
@@ -354,7 +353,7 @@
     var l = favList(), meta = {};
     allItemsFlat().forEach(function (it) { meta[it.key] = it; });
     [].slice.call(document.querySelectorAll('#tw-board .fm-act[data-tw-key]')).forEach(function (b) { b.classList.toggle('is-fav', l.indexOf(b.getAttribute('data-tw-key')) >= 0); });
-    host.innerHTML = ''; host.style.display = l.length ? '' : 'none';
+    var eb = document.getElementById('tw-edit-menu'); host.innerHTML = ''; host.classList.toggle('has', l.length > 0);
     l.forEach(function (k) {
       var it = meta[k]; if (!it) return;
       var c = document.createElement('button'); c.type = 'button'; c.className = 'tw-fav';
@@ -362,6 +361,7 @@
       c.onclick = function () { var t = document.querySelector('#tw-board .fm-act[data-tw-key="' + k + '"]'); if (t) t.click(); };
       host.appendChild(c);
     });
+    if (eb) host.appendChild(eb);
   }
 
   function badges() {
