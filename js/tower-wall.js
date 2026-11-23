@@ -88,9 +88,9 @@
     };
     fr.readAsDataURL(file);
   }
-  function removeItem(i) {
+  async function removeItem(i) {
     if (cfg.items.length <= 1) { msg = 'Gagal: minimal satu gambar harus ada.'; return draw(); }
-    var key = cfg.items[i]; if (!confirm('Hapus gambar ' + (i + 1) + ' dari galeri?' + (key.charAt(0) === 'u' ? ' File unggahan ikut dihapus.' : ' (Gambar bawaan bisa dipulihkan.)'))) return;
+    var key = cfg.items[i]; if (!(await fmAsk('Hapus gambar ' + (i + 1) + ' dari galeri?' + (key.charAt(0) === 'u' ? ' File unggahan ikut dihapus.' : ' (Gambar bawaan bisa dipulihkan.)')))) return;
     cfg.items.splice(i, 1); resetOrder();
     var d = DB(); if (key.charAt(0) === 'u' && d) d.collection('app_meta').doc('wpimg_' + key.slice(2)).delete().catch(function () {});
     save('Gambar dihapus.');

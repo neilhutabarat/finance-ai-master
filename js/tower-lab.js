@@ -208,8 +208,8 @@
     if (!f) return alert('Semua fitur sudah diaktifkan.');
     toggleFeat(t, f.key);
   }
-  function clearFeats(t) {
-    if (!confirm('Mulai dari awal?\n\nSemua fitur tambahan dimatikan (fitur inti tetap). Catatan uji lama tetap tersimpan.')) return;
+  async function clearFeats(t) {
+    if (!(await fmAsk('Mulai dari awal?\n\nSemua fitur tambahan dimatikan (fitur inti tetap). Catatan uji lama tetap tersimpan.'))) return;
     saveFeats(t, FM_PLANS.tierDefaults('basic'), 'Rakit: mulai dari awal (hanya fitur inti)', 'basic').then(renderRakit);
   }
 
@@ -340,13 +340,13 @@
       '<div id="rn-log" style="margin-top:10px;font-size:12px;min-height:16px"></div>' +
       '<button id="rn-go" style="' + BTN + 'background:#7c3aed;margin-top:10px;width:100%">Ubah ID sekarang</button></div>');
     var go = ov.el.querySelector('#rn-go'), log = ov.el.querySelector('#rn-log');
-    go.onclick = function () {
+    go.onclick = async function () {
       if (isPub(t.id)) return lockedMsg(t);
       var nid = ov.el.querySelector('#rn-id').value.trim().toUpperCase();
       if (!/^ID\d{8,9}$/.test(nid)) return alert('Format ID harus ID diikuti 8 atau 9 angka, contoh ID261113501.');
       if (nid === String(t.id).toUpperCase()) return alert('ID baru sama dengan ID sekarang.');
       if (T(nid) || (typeof formerMap !== 'undefined' && formerMap[nid.toLowerCase()])) return alert('ID ' + nid + ' sudah pernah dipakai (aktif atau arsip).');
-      if (!confirm('Ubah ID ' + t.id + ' menjadi ' + nid + '?\n\nProses ini memindahkan seluruh data dan membuat PIN baru. Jangan tutup halaman sampai selesai.')) return;
+      if (!(await fmAsk('Ubah ID ' + t.id + ' menjadi ' + nid + '?\n\nProses ini memindahkan seluruh data dan membuat PIN baru. Jangan tutup halaman sampai selesai.'))) return;
       go.disabled = true;
       runRename(t, nid, function (m) { log.textContent = m; }).then(function (res) {
         showRenameResult(ov, res);
@@ -548,7 +548,7 @@
     box.querySelector('#tp-save').onclick = saveTpl;
     box.querySelector('#ap-go').onclick = applyTpl;
     [].slice.call(box.querySelectorAll('[data-del]')).forEach(function (b) {
-      b.onclick = function () { var p = tplMap[b.getAttribute('data-del')]; if (p && confirm('Hapus template "' + p.name + '"? Toko yang sudah memakainya tidak berubah.')) DB().collection(TPL).doc(p._id).delete().catch(fail); };
+      b.onclick = async function () { var p = tplMap[b.getAttribute('data-del')]; if (p && (await fmAsk('Hapus template "' + p.name + '"? Toko yang sudah memakainya tidak berubah.'))) DB().collection(TPL).doc(p._id).delete().catch(fail); };
     });
   }
   function checked(box, prefix) { var o = {}; [].slice.call(box.querySelectorAll('[data-' + prefix + ']')).forEach(function (i) { o[i.getAttribute('data-' + prefix)] = i.checked && !i.disabled; }); return o; }
@@ -565,7 +565,7 @@
     }).then(function () { log.innerHTML = '<b style="color:#6ee7b7">Template tersimpan.</b>'; box.querySelector('#tp-name').value = ''; })
       .catch(function (e) { log.innerHTML = '<span style="color:#fda4af">Gagal: ' + H(e && e.message) + '</span>'; });
   }
-  function applyTpl() {
+  async function applyTpl() {
     var box = document.getElementById('tp-body'), log = box.querySelector('#ap-log');
     var src = box.querySelector('#ap-src').value, dst = T(box.querySelector('#ap-dst').value);
     if (!src) return alert('Pilih sumber template atau toko.');
@@ -578,7 +578,7 @@
     else if (kind === 'tpl') { var p = tplMap[key]; if (!p) return alert('Template tidak ditemukan.'); label = 'template "' + p.name + '"'; getSnap = Promise.resolve(p.snap); }
     else { var s = T(key); if (!s) return alert('Toko sumber tidak ditemukan.'); if (s.id === dst.id) return alert('Sumber dan tujuan sama.'); label = 'toko ' + (s.nama || s.id); getSnap = snapshot(s, null); }
     var names = PARTS.filter(function (x) { return parts[x[0]]; }).map(function (x) { return x[1]; }).join(', ');
-    if (!confirm('Terapkan ' + label + ' ke ' + (dst.nama || dst.id) + ' [' + dst.id + ']?\n\nBagian yang ditimpa: ' + names + '.\nTransaksi dan akun login tidak disentuh.')) return;
+    if (!(await fmAsk('Terapkan ' + label + ' ke ' + (dst.nama || dst.id) + ' [' + dst.id + ']?\n\nBagian yang ditimpa: ' + names + '.\nTransaksi dan akun login tidak disentuh.'))) return;
     log.textContent = 'Menerapkan…';
     getSnap.then(function (snap) { return applySnap(dst, snap, parts); }).then(function () {
       ctAudit(dst.id, 'TERAPKAN_TEMPLATE', 'Menerapkan ' + label + ': ' + names, '-', label);

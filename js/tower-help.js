@@ -45,13 +45,13 @@
     if (keepId) { var el = ov.querySelector('textarea[data-r="' + keepId.replace(/"/g, '\\"') + '"]'); if (el) { el.value = keepVal || ''; el.focus(); } }
   }
   function upd(id, data) { var d = DB(); if (!d) return alert('Firestore belum terhubung.'); d.collection('provider_tickets').doc(id).update(data).catch(function (e) { alert('Gagal: ' + (e && e.message || e)); }); }
-  function act(a, id) {
+  async function act(a, id) {
     if (a === 'reply') {
       var ta = ov.querySelector('textarea[data-r="' + id.replace(/"/g, '\\"') + '"]'), v = ta ? ta.value.trim() : ''; if (!v) return alert('Tulis balasan dulu.');
       upd(id, { reply: v.slice(0, 1500), repliedAt: new Date().toLocaleString('id-ID'), repliedAtMs: Date.now(), status: 'DIJAWAB' });
     } else if (a === 'done') upd(id, { status: 'SELESAI' });
     else if (a === 'reopen') upd(id, { status: 'BARU' });
-    else if (a === 'del') { if (!confirm('Hapus tiket ini?')) return; var d = DB(); if (d) d.collection('provider_tickets').doc(id).delete().catch(function (e) { alert('Gagal: ' + (e && e.message || e)); }); }
+    else if (a === 'del') { if (!(await fmAsk('Hapus tiket ini?'))) return; var d = DB(); if (d) d.collection('provider_tickets').doc(id).delete().catch(function (e) { alert('Gagal: ' + (e && e.message || e)); }); }
   }
   function ensure() {
     if (ov) return;

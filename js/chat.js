@@ -441,10 +441,11 @@
   }
 
   /* Kosongkan seluruh isi Chat Global (Chat Universe). Hanya Tower. Percakapan pribadi (DM) tidak disentuh. */
-  function clearAll() {
+  async function clearAll() {
     if (!IS_TOWER) return;
     if (typeof db === 'undefined' || !db) return alert('Firestore belum terhubung.');
-    if (!confirm('Kosongkan SELURUH isi Chat Global untuk semua toko?\n\nPesan yang dihapus tidak bisa dikembalikan. Percakapan pribadi tidak ikut terhapus.')) return;
+    var yakin = window.fmAsk ? await fmAsk('Kosongkan SELURUH isi Chat Global untuk semua toko?\n\nPesan yang dihapus tidak bisa dikembalikan. Percakapan pribadi tidak ikut terhapus.', { ok: 'Ya, Kosongkan', bahaya: true }) : confirm('Kosongkan SELURUH isi Chat Global untuk semua toko?');
+    if (!yakin) return;
     var total = 0;
     function round() {
       return db.collection(COL).limit(400).get().then(function (snap) {

@@ -34,16 +34,16 @@
   function fill() {
     var d = DB(); if (!d || !sel || busy) return; var t = shops().filter(function (x) { return x.id === sel; })[0]; if (!t) return;
     busy = true; say('Memeriksa toko…');
-    isPublished(sel).then(function (pub) {
+    isPublished(sel).then(async function (pub) {
       if (pub) { busy = false; return say(t.nama + ' sudah Published (diserahkan ke klien). Data demo ditolak agar data klien tidak tercampur.'); }
-      if (!confirm('Isi ' + t.nama + ' [' + t.id + '] dengan sekitar 400 transaksi contoh (45 hari terakhir)?\n\nTiap catatan diberi tanda demo sehingga bisa dihapus lagi.')) { busy = false; return say(''); }
+      if (!(await fmAsk('Isi ' + t.nama + ' [' + t.id + '] dengan sekitar 400 transaksi contoh (45 hari terakhir)?\n\nTiap catatan diberi tanda demo sehingga bisa dihapus lagi.'))) { busy = false; return say(''); }
       return d.collection('tenant_settings').doc(sel).get().then(function (s) { var coa = (s.exists && Array.isArray(s.data().coa)) ? s.data().coa : []; var list = gen(sel, coa); say('Menulis ' + list.length + ' catatan…');
         return commit(list.map(function (x) { return function (b) { b.set(d.collection('tx_' + sel).doc(), x); }; })).then(function () { busy = false; say('Selesai: ' + list.length + ' transaksi contoh ditambahkan ke ' + t.nama + '. Muat ulang halaman toko untuk melihatnya.'); }); });
     }).catch(function (e) { busy = false; say('Gagal: ' + (e && e.message || e)); });
   }
-  function wipe() {
+  async function wipe() {
     var d = DB(); if (!d || !sel || busy) return; var t = shops().filter(function (x) { return x.id === sel; })[0]; if (!t) return;
-    if (!confirm('Hapus semua transaksi contoh (bertanda demo) di ' + t.nama + '? Transaksi asli tidak disentuh.')) return;
+    if (!(await fmAsk('Hapus semua transaksi contoh (bertanda demo) di ' + t.nama + '? Transaksi asli tidak disentuh.'))) return;
     busy = true; say('Mencari catatan demo…');
     d.collection('tx_' + sel).where('demo', '==', true).get().then(function (s) {
       var refs = []; s.forEach(function (x) { refs.push(x.ref); });

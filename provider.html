@@ -92,7 +92,7 @@
         ];
     </script>
     <script src="js/billing.js?v=proto"></script>
-    <script src="js/dialog.js?v=proto"></script>
+    <script src="js/dialog.js?v=1140"></script>
     <script src="js/theme.js?v=1121"></script>
     <script src="js/langit.js?v=1121" defer></script>
     <script src="js/logo.js?v=paket1"></script>
@@ -109,7 +109,7 @@
     <script src="js/tower-health.js?v=h4"></script>
     <script src="js/chat.js?v=1124"></script>
     <script src="js/tower-cockpit.js?v=1135"></script>
-    <script src="js/tower-skin.js?v=1139"></script>
+    <script src="js/tower-skin.js?v=1140"></script>
     <style>#main-modal-container{z-index:70 !important}
     .fm-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
     .fm-dot-on{background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:fmBlink 1.4s infinite}
@@ -959,30 +959,30 @@
             const byId = function (id) { return TENANTS_CONFIG[String(id).toLowerCase()]; };
             ov.el.querySelector('#tm-all').onclick = function () { L.querySelectorAll('input').forEach(function (i) { i.checked = true; }); };
             ov.el.querySelector('#tm-none').onclick = function () { L.querySelectorAll('input').forEach(function (i) { i.checked = false; }); };
-            const setSus = function (flag) {
+            const setSus = async function (flag) {
                 const p = need(); if (!p) return;
                 let reason = '';
-                if (flag) { reason = prompt('Alasan pembekuan (terlihat oleh toko):', 'Pembayaran belum diterima'); if (reason === null) return; }
-                else if (!confirm('Aktifkan ' + p.length + ' toko?')) return;
-                if (flag && !confirm('Bekukan ' + p.length + ' toko?')) return;
+                if (flag) { reason = (await fmPrompt('Alasan pembekuan (terlihat oleh toko):', 'Pembayaran belum diterima', { judul: 'Bekukan toko', ok: 'Bekukan' })); if (reason === null) return; }
+                else if (!(await fmAsk('Aktifkan ' + p.length + ' toko?'))) return;
+                if (flag && !(await fmAsk('Bekukan ' + p.length + ' toko?'))) return;
                 const batch = db.batch();
                 p.forEach(function (id) { batch.set(db.collection('tenant_ctrl').doc(id), { suspended: flag, suspendReason: flag ? reason : '', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); });
                 batch.commit().then(function () { p.forEach(function (id) { ctAudit(id, flag ? 'BEKUKAN_MASSAL' : 'AKTIFKAN_MASSAL', 'Provider ' + (flag ? 'membekukan' : 'mengaktifkan') + ' toko (massal)', '-', flag ? reason : 'aktif'); }); ov.close(); alert(p.length + ' toko ' + (flag ? 'dibekukan' : 'diaktifkan') + '.'); }).catch(function (e) { fmPermAlert(e); });
             };
             ov.el.querySelector('#tm-frz').onclick = function () { setSus(true); };
             ov.el.querySelector('#tm-act').onclick = function () { setSus(false); };
-            ov.el.querySelector('#tm-msg').onclick = function () {
+            ov.el.querySelector('#tm-msg').onclick = async function () {
                 const p = need(); if (!p) return;
-                const title = prompt('Judul pesan:', ''); if (!title) return;
-                const msg = prompt('Isi pesan:', ''); if (!msg) return;
-                if (!confirm('Kirim pesan ke ' + p.length + ' toko?')) return;
+                const title = (await fmPrompt('Judul pesan:', '')); if (!title) return;
+                const msg = (await fmPrompt('Isi pesan:', '')); if (!msg) return;
+                if (!(await fmAsk('Kirim pesan ke ' + p.length + ' toko?'))) return;
                 sendNoticeTo(p, title.trim(), msg.trim(), 'info', 7).then(function () { ov.close(); alert('Pesan terkirim ke ' + p.length + ' toko.'); }).catch(function (e) { fmPermAlert(e); });
             };
-            const setFeat = function (tier) {
+            const setFeat = async function (tier) {
                 const p = need(); if (!p) return;
                 const ok = p.filter(function (id) { return isManaged(byId(id)); });
                 if (!ok.length) return alert('Toko terpilih tidak dikelola Tower.');
-                if (!confirm('⚠️ RESET FITUR ke bawaan ' + (tier === 'plus' ? 'Plus' : 'Basic') + ' untuk ' + ok.length + ' toko?\n\nSemua fitur tambahan yang TIDAK digembok (🔒) akan DIHAPUS dari toko-toko ini. Tindakan ini tidak bisa dibatalkan.\n\nLanjutkan?')) return;
+                if (!(await fmAsk('⚠️ RESET FITUR ke bawaan ' + (tier === 'plus' ? 'Plus' : 'Basic') + ' untuk ' + ok.length + ' toko?\n\nSemua fitur tambahan yang TIDAK digembok (🔒) akan DIHAPUS dari toko-toko ini. Tindakan ini tidak bisa dibatalkan.\n\nLanjutkan?'))) return;
                 Promise.all(ok.map(function (id) { return towerSaveFeatures(byId(id), FM_PLANS.applyTierLocked(byId(id), tier)).then(function () { ctAudit(id, 'FITUR_MASSAL', 'Provider memasang fitur bawaan ' + tier + ' (massal, gembok dipertahankan)', '-', tier); }); }))
                     .then(function () { ov.close(); alert('Fitur ' + (tier === 'plus' ? 'Plus' : 'Basic') + ' terpasang di ' + ok.length + ' toko.'); }).catch(function (e) { fmPermAlert(e); });
             };
@@ -1019,10 +1019,10 @@
                 L.appendChild(row);
             });
             ov.el.querySelector('#td-all').onclick = function () { L.querySelectorAll('input').forEach(function (i) { i.checked = true; }); };
-            ov.el.querySelector('#td-send').onclick = function () {
+            ov.el.querySelector('#td-send').onclick = async function () {
                 const sel = [].slice.call(L.querySelectorAll('input:checked'));
                 if (!sel.length) return alert('Centang minimal satu toko.');
-                if (!confirm('Kirim pengingat pembayaran ke ' + sel.length + ' toko?')) return;
+                if (!(await fmAsk('Kirim pengingat pembayaran ke ' + sel.length + ' toko?'))) return;
                 Promise.all(sel.map(function (i) {
                     const late = i.getAttribute('data-late') === '1', d = FM_BILL.dateText(Number(i.getAttribute('data-due')));
                     return sendNoticeTo([i.getAttribute('data-id')], 'Pengingat pembayaran layanan', (late ? 'Pembayaran layanan sudah melewati jatuh tempo (' + d + '). ' : 'Pembayaran layanan jatuh tempo pada ' + d + '. ') + 'Mohon segera diselesaikan agar layanan tetap berjalan.', late ? 'penting' : 'info', 7);
@@ -1135,10 +1135,10 @@
                     '<button type="button" id="tw-bulk-go" style="padding:8px 14px;border-radius:12px;font-size:12px;font-weight:900;background:#4f46e5">Terapkan</button>';
                 document.getElementById('tw-bulk-all').onclick = function () { baseList().forEach(function (t) { if (!isDemoListed(t)) picked[t.id] = true; }); draw(); };
                 document.getElementById('tw-bulk-none').onclick = function () { picked = {}; draw(); };
-                document.getElementById('tw-bulk-go').onclick = function () {
+                document.getElementById('tw-bulk-go').onclick = async function () {
                     var ver = document.getElementById('tw-bulk-ver').value;
                     if (!ids.length) return alert('Centang dulu toko yang mau dipindahkan versinya.');
-                    if (!confirm((ver ? 'Kunci ' + ids.length + ' toko ke versi ' + ver : ids.length + ' toko kembali mengikuti generasinya') + '?')) return;
+                    if (!(await fmAsk((ver ? 'Kunci ' + ids.length + ' toko ke versi ' + ver : ids.length + ' toko kembali mengikuti generasinya') + '?'))) return;
                     setTenantsPinnedVersionBulk(ids, ver).then(function (r) { alert('Selesai: ' + r.ok + ' toko berhasil' + (r.fail ? ', ' + r.fail + ' gagal' : '') + '. Berlaku saat laman toko dibuka lagi.'); picked = {}; draw(); });
                 };
             }
@@ -1173,7 +1173,7 @@
                         L.appendChild(b);
                         return;
                     }
-                    b.onclick = function () {
+                    b.onclick = async function () {
                         if (kind === 'link') {
                             var link = tenantLink(t.id), ok = function () { b.lastChild.textContent = 'Tersalin ✓'; setTimeout(close, 700); };
                             if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(ok, function () { close(); alert(link); });
@@ -1188,8 +1188,8 @@
                         else if (kind === 'paket') towerPaketPanel(t);
                         else if (kind === 'kuota' || kind === 'billing' || kind === 'lokasi' || kind === 'versi') openInspectUMKM(t.id, kind);
                         else if (kind === 'salin') towerPick('salin2', t);
-                        else if (kind === 'salin2') { if (confirm('Salin fitur ' + (t.nama || t.id) + ' ke ' + (extra.nama || extra.id) + '? Fitur ' + (extra.nama || extra.id) + ' yang sekarang akan diganti.')) towerSaveFeatures(extra, towerEffFeatures(t)).then(function () { ctAudit(extra.id, 'SALIN_FITUR', 'Provider menyalin fitur dari ' + t.id, '-', t.id); alert('Fitur tersalin ke ' + (extra.nama || extra.id) + '.'); }).catch(function (e) { fmPermAlert(e); }); }
-                        else if (kind === 'hapus') { if (t.deletedByTower) restoreMasterTenant(t.id); else if (confirm('Yakin menghapus klien ' + (t.nama || t.id) + ' [' + t.id + ']? Ada satu konfirmasi lagi setelah ini.')) deleteTenantRegistry(t.id); }
+                        else if (kind === 'salin2') { if ((await fmAsk('Salin fitur ' + (t.nama || t.id) + ' ke ' + (extra.nama || extra.id) + '? Fitur ' + (extra.nama || extra.id) + ' yang sekarang akan diganti.'))) towerSaveFeatures(extra, towerEffFeatures(t)).then(function () { ctAudit(extra.id, 'SALIN_FITUR', 'Provider menyalin fitur dari ' + t.id, '-', t.id); alert('Fitur tersalin ke ' + (extra.nama || extra.id) + '.'); }).catch(function (e) { fmPermAlert(e); }); }
+                        else if (kind === 'hapus') { if (t.deletedByTower) restoreMasterTenant(t.id); else if ((await fmAsk('Yakin menghapus klien ' + (t.nama || t.id) + ' [' + t.id + ']? Ada satu konfirmasi lagi setelah ini.'))) deleteTenantRegistry(t.id); }
                         else setTenantSuspended(t.id, !sus);
                     };
                     L.appendChild(b);
@@ -1593,7 +1593,7 @@
             };
         }
 
-        function setTenantPlan(tenantId, tier, cycle, custom, disc, durasiBulan) {
+        async function setTenantPlan(tenantId, tier, cycle, custom, disc, durasiBulan) {
             const key = String(tenantId).toLowerCase();
             const tn = TENANTS_CONFIG[key];
             if (!isManaged(tn)) return alert('Paket hanya dapat diubah untuk toko yang dikelola Tower.');
@@ -1602,7 +1602,7 @@
             const bulan = Math.min(12, Math.max(1, parseInt(durasiBulan) || 1));
             const planUntil = tier === 'basic' ? null : (function () { const d = new Date(); d.setMonth(d.getMonth() + bulan); return d.getTime(); })();
             const labelPaket = tier === 'basic' ? 'BASIC' : (TIER_LABEL[tier] || tier).toUpperCase() + ' selama ' + bulan + ' bulan (sampai ' + new Date(planUntil).toLocaleDateString('id-ID') + ')';
-            if (!confirm('Terapkan paket ' + tn.nama + ' menjadi ' + labelPaket + '?\n\nFitur bawaan paket ini akan dinyalakan (fitur yang digembok 🔒 tetap dipertahankan). Setelah durasi habis, toko otomatis kembali ke Basic.')) return;
+            if (!(await fmAsk('Terapkan paket ' + tn.nama + ' menjadi ' + labelPaket + '?\n\nFitur bawaan paket ini akan dinyalakan (fitur yang digembok 🔒 tetap dipertahankan). Setelah durasi habis, toko otomatis kembali ke Basic.'))) return;
             const cfg = Object.assign({}, tn); delete cfg.fromRegistry; cfg.tier = tier;
             cfg.planUntil = planUntil;
             /* nyalakan fitur bawaan paket (dari "Isi Paket Plus/Pro"), fitur yang digembok tidak ikut diubah */
@@ -1663,9 +1663,9 @@
             }, function () {});
         }
 
-        function saveGenerations(generations) {
+        async function saveGenerations(generations) {
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
-            if (!confirm('Simpan pengaturan generasi?\n\nToko di tiap generasi yang tidak dikunci manual akan ikut berpindah saat laman mereka dibuka lagi.')) return;
+            if (!(await fmAsk('Simpan pengaturan generasi?\n\nToko di tiap generasi yang tidak dikunci manual akan ikut berpindah saat laman mereka dibuka lagi.'))) return;
             db.collection('app_meta').doc('rollout').set({ json: JSON.stringify({ generations: generations }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
                 .then(function () { alert('Pengaturan generasi tersimpan.'); })
                 .catch(function (e) { fmPermAlert(e); });
@@ -1857,9 +1857,9 @@
             }, function () {});
         }
 
-        function saveShieldRolloutDefaults(def) {
+        async function saveShieldRolloutDefaults(def) {
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
-            if (!confirm('Ubah default Oneil Shield ke v' + def + '?\n\nSemua toko yang tidak dikunci manual akan ikut berpindah saat laman mereka dibuka lagi.')) return;
+            if (!(await fmAsk('Ubah default Oneil Shield ke v' + def + '?\n\nSemua toko yang tidak dikunci manual akan ikut berpindah saat laman mereka dibuka lagi.'))) return;
             db.collection('app_meta').doc('rollout_shield').set({ json: JSON.stringify({ default: def }), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
                 .then(function () { alert('Default Oneil Shield tersimpan.'); })
                 .catch(function (e) { fmPermAlert(e); });
@@ -1937,7 +1937,7 @@
                 say('Memproses...', true);
                 window.FM_STORELOGO.compress(f).then(save).catch(function (e) { say(e.message, false); });
             };
-            del.onclick = function () { if (confirm('Hapus logo ' + (tn.nama || id) + '?')) save(null); };
+            del.onclick = async function () { if ((await fmAsk('Hapus logo ' + (tn.nama || id) + '?'))) save(null); };
         }
         function openTenantSettings(tenantId, part) {
             tsPart = TS_TITLE[part] ? part : 'profil';
@@ -2100,30 +2100,30 @@
             document.getElementById('ts-coa-code').value = ''; document.getElementById('ts-coa-name').value = '';
         }
 
-        function tsEditCOA(code) {
+        async function tsEditCOA(code) {
             const coa = tsStore.getCOA();
             const it = coa.find(function (c) { return c.code === code; });
             if (!it) return;
-            const nn = prompt('Ubah nama akun [' + it.code + ']:', it.name);
+            const nn = (await fmPrompt('Ubah nama akun [' + it.code + ']:', it.name));
             if (!nn || !nn.trim() || nn.trim() === it.name) return;
             const old = it.name; it.name = nn.trim();
             tsStore.saveCOA(coa).then(function () { ctAudit(tsTenant.id, 'EDIT_AKUN_COA', 'Provider mengubah nama akun [' + code + ']', old, it.name); });
         }
 
-        function tsDelCOA(code) {
+        async function tsDelCOA(code) {
             const coa = tsStore.getCOA();
             const i = coa.findIndex(function (c) { return c.code === code; });
             if (i < 0) return;
-            if (!confirm('Hapus akun [' + coa[i].code + '] ' + coa[i].name + '?\nTransaksi lama dengan akun ini tetap tersimpan.')) return;
+            if (!(await fmAsk('Hapus akun [' + coa[i].code + '] ' + coa[i].name + '?\nTransaksi lama dengan akun ini tetap tersimpan.'))) return;
             const del = coa.splice(i, 1)[0];
             tsStore.saveCOA(coa).then(function () { ctAudit(tsTenant.id, 'HAPUS_AKUN_COA', 'Provider menghapus akun [' + del.code + '] ' + del.name, del.name, 'DIHAPUS'); });
         }
 
-        function tsApplyTemplate() {
+        async function tsApplyTemplate() {
             const k = document.getElementById('ts-coa-tpl').value;
             const t = COA_TEMPLATES[k];
             if (!t) return;
-            if (!confirm('Ganti SELURUH daftar akun toko ini dengan template "' + t.label + '" (' + t.coa.length + ' akun)?\nAkun yang ada sekarang akan diganti. Transaksi lama tidak dihapus.')) return;
+            if (!(await fmAsk('Ganti SELURUH daftar akun toko ini dengan template "' + t.label + '" (' + t.coa.length + ' akun)?\nAkun yang ada sekarang akan diganti. Transaksi lama tidak dihapus.'))) return;
             tsStore.saveCOA(JSON.parse(JSON.stringify(t.coa))).then(function () { ctAudit(tsTenant.id, 'TERAPKAN_TEMPLATE_COA', 'Provider menerapkan template COA: ' + t.label, '-', t.coa.length + ' akun'); });
         }
 
@@ -2138,9 +2138,9 @@
             ['ts-p-code', 'ts-p-name', 'ts-p-sell', 'ts-p-hpp', 'ts-p-stock', 'ts-p-barcode'].forEach(function (i) { document.getElementById(i).value = ''; });
         }
 
-        function tsDelProduct(code) {
+        async function tsDelProduct(code) {
             const p = tsStore.getProducts().find(function (x) { return x.code === code; });
-            if (!p || !confirm('Hapus produk [' + p.code + '] ' + p.name + '?')) return;
+            if (!p || !(await fmAsk('Hapus produk [' + p.code + '] ' + p.name + '?'))) return;
             tsStore.deleteProduct(code).then(function () { ctAudit(tsTenant.id, 'HAPUS_PRODUK', 'Provider menghapus produk [' + p.code + '] ' + p.name, 'Stok ' + p.stock, 'DIHAPUS'); });
         }
 
@@ -2287,9 +2287,9 @@
             }
         }
 
-        function restoreMasterTenant(tenantId) {
+        async function restoreMasterTenant(tenantId) {
             const key = String(tenantId).toLowerCase();
-            if (!confirm('Pulihkan toko ' + tenantId + '? Link toko aktif kembali dengan data lamanya.')) return;
+            if (!(await fmAsk('Pulihkan toko ' + tenantId + '? Link toko aktif kembali dengan data lamanya.'))) return;
             const batch = db.batch();
             batch.delete(db.collection('tenants_registry').doc(key));
             batch.delete(db.collection('former_tenants').doc(key));
@@ -2297,11 +2297,11 @@
                 .catch(function (e) { alert('Gagal: ' + e.message); });
         }
 
-        function deleteTenantRegistry(tenantId) {
+        async function deleteTenantRegistry(tenantId) {
             const key = String(tenantId).toLowerCase();
             const tn = TENANTS_CONFIG[key];
             if (!isManaged(tn)) return alert('Toko ini tidak dapat diberhentikan dari sini.');
-            if (!confirm('Hentikan kerja sama dengan ' + tn.nama + ' [' + tenantId + ']?\n\n• Link toko langsung tidak bisa dipakai.\n• Data riwayat toko DISIMPAN 90 hari, bisa diminta toko lewat link tokonya, lalu dihapus otomatis.\n• ID ini tidak bisa dipakai lagi.')) return;
+            if (!(await fmAsk('Hentikan kerja sama dengan ' + tn.nama + ' [' + tenantId + ']?\n\n• Link toko langsung tidak bisa dipakai.\n• Data riwayat toko DISIMPAN 90 hari, bisa diminta toko lewat link tokonya, lalu dihapus otomatis.\n• ID ini tidak bisa dipakai lagi.'))) return;
             const now = Date.now();
             const batch = db.batch();
             if (tn.isMaster) {
@@ -2358,7 +2358,7 @@
                     const act = document.createElement('div'); act.className = 'flex flex-wrap gap-2';
                     const mk = function (t, cls, fn) { const b = document.createElement('button'); b.className = 'px-3 py-1.5 rounded-lg font-black text-[10px] ' + cls; b.textContent = t; b.onclick = fn; act.appendChild(b); };
                     mk('Unduh Riwayat (1x) & Hapus', 'bg-emerald-600 hover:bg-emerald-700 text-white', function () { downloadFormerHistory(f.key); });
-                    mk('Hapus Data Sekarang', 'bg-rose-600 hover:bg-rose-700 text-white', function () { if (confirm('Hapus PERMANEN seluruh data ' + f.nama + '? Tidak bisa dikembalikan.')) purgeFormerData(f.key, false); });
+                    mk('Hapus Data Sekarang', 'bg-rose-600 hover:bg-rose-700 text-white', async function () { if ((await fmAsk('Hapus PERMANEN seluruh data ' + f.nama + '? Tidak bisa dikembalikan.'))) purgeFormerData(f.key, false); });
                     row.appendChild(act);
                 }
                 box.appendChild(row);
@@ -2381,9 +2381,9 @@
         function readAll(col) {
             return db.collection(col).get().then(function (snap) { const a = []; snap.forEach(function (d) { const x = d.data(); x._id = d.id; a.push(x); }); return a; });
         }
-        function downloadFormerHistory(key) {
+        async function downloadFormerHistory(key) {
             const f = formerMap[key]; if (!f) return;
-            if (!confirm('Unduh riwayat ' + f.nama + ' (seluruh waktu)?\n\nUnduhan hanya 1 kali. Setelah file terunduh Anda akan diminta konfirmasi untuk menghapus data permanen.')) return;
+            if (!(await fmAsk('Unduh riwayat ' + f.nama + ' (seluruh waktu)?\n\nUnduhan hanya 1 kali. Setelah file terunduh Anda akan diminta konfirmasi untuk menghapus data permanen.'))) return;
             const id = f.id;
             Promise.all([readAll('tx_' + id), readAll('tp_' + id), db.collection('tenant_settings').doc(id).get()]).then(function (r) {
                 const coa = (r[2].exists && r[2].data().coa) || [];
@@ -2393,11 +2393,11 @@
                 a.href = URL.createObjectURL(new Blob([out], { type: 'text/csv;charset=utf-8' }));
                 a.download = 'riwayat_' + id + '_' + new Date().toISOString().slice(0, 10) + '.csv';
                 document.body.appendChild(a); a.click(); a.remove();
-                setTimeout(function () {
+                setTimeout(async function () {
                     if (f.contactEmail) {
                         window.open('mailto:' + encodeURIComponent(f.contactEmail) + '?subject=' + encodeURIComponent('Riwayat toko ' + f.nama + ' [' + id + ']') + '&body=' + encodeURIComponent('Terlampir riwayat transaksi toko ' + f.nama + ' (seluruh waktu). Data di sistem kami telah dihapus.\n\nSalam,\nOneilverse'), '_blank');
                     }
-                    if (confirm('File sudah terunduh' + (f.contactEmail ? ' dan email klien dibuka' : '') + '?\n\nLampirkan file ke email terlebih dahulu.\nOK = HAPUS PERMANEN seluruh data toko dari sistem.\nBatal = simpan dulu (data tetap ada).')) purgeFormerData(key, false);
+                    if ((await fmAsk('File sudah terunduh' + (f.contactEmail ? ' dan email klien dibuka' : '') + '?\n\nLampirkan file ke email terlebih dahulu.\nOK = HAPUS PERMANEN seluruh data toko dari sistem.\nBatal = simpan dulu (data tetap ada).'))) purgeFormerData(key, false);
                 }, 800);
             }).catch(function (e) { alert('Gagal membaca data: ' + e.message); });
         }
@@ -2524,13 +2524,13 @@
             });
         }
 
-        function saveBillingFields(tenant, f, quiet) {
+        async function saveBillingFields(tenant, f, quiet) {
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const startMs = f.startMs;
             if (!startMs) return alert('Isi tanggal dan jam mulai billing.');
             const old = getCtrl(tenant.id).billing || null;
             const sameStart = !!(old && old.startMs === startMs);
-            if (old && !sameStart && !confirm('Tanggal/jam mulai berubah. Hitungan siklus diulang dari awal dan catatan pembayaran di billing ini di-reset. Lanjut?')) return;
+            if (old && !sameStart && !(await fmAsk('Tanggal/jam mulai berubah. Hitungan siklus diulang dari awal dan catatan pembayaran di billing ini di-reset. Lanjut?'))) return;
             const a = FM_BILL.cycleTotal(f.base, 0, 0, f.ppn);
             let segs;
             if (sameStart && old.segs && old.segs.length) {
@@ -2548,12 +2548,12 @@
                 .catch(function (e) { fmPermAlert(e); });
         }
 
-        function recordBillingPayment(tenant) {
+        async function recordBillingPayment(tenant) {
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
             const b = getCtrl(tenant.id).billing;
             if (!FM_BILL.ok(b)) return alert('Simpan billing dulu.');
             const def = Math.round(FM_BILL.curA(b, Date.now()));
-            const v = prompt('Nominal pembayaran yang diterima dari ' + tenant.nama + ' (Rp):', String(def));
+            const v = (await fmPrompt('Nominal pembayaran yang diterima dari ' + tenant.nama + ' (Rp):', String(def)));
             if (v === null) return;
             const n = parseInt(String(v).replace(/\D/g, '')) || 0;
             if (n <= 0) return alert('Nominal tidak valid.');
@@ -2701,14 +2701,14 @@
             }, function (e) { console.error('Provider: gagal membaca provider_tickets', e); });
         }
 
-        function setTenantSuspended(tenantId, suspend) {
+        async function setTenantSuspended(tenantId, suspend) {
             const tn = (typeof TENANTS_CONFIG !== 'undefined') ? TENANTS_CONFIG[String(tenantId).toLowerCase()] : null;
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung, status beku tidak dapat disimpan.');
             let reason = '';
             if (suspend) {
-                reason = prompt('Alasan pembekuan (akan terlihat oleh toko):', 'Pembayaran cicilan belum diterima');
+                reason = (await fmPrompt('Alasan pembekuan (akan terlihat oleh toko):', 'Pembayaran cicilan belum diterima', { judul: 'Bekukan toko', ok: 'Bekukan' }));
                 if (reason === null) return;
-            } else if (!confirm('Aktifkan kembali toko ' + tenantId + '?')) return;
+            } else if (!(await fmAsk('Aktifkan kembali toko ' + tenantId + '?'))) return;
             db.collection('tenant_ctrl').doc(tenantId).set({
                 suspended: !!suspend,
                 suspendReason: suspend ? reason : '',
@@ -3069,9 +3069,9 @@
             });
         }
 
-        function deleteTenantTx(tenantId, txKey) {
+        async function deleteTenantTx(tenantId, txKey) {
             if (!txKey) return;
-            if (!confirm('Hapus transaksi ini dari tenant ' + tenantId + '? Tindakan ini permanen.')) return;
+            if (!(await fmAsk('Hapus transaksi ini dari tenant ' + tenantId + '? Tindakan ini permanen.'))) return;
             const list = getTenantTxList(tenantId);
             const tx = list.filter(function (t) { return (t.docId || t.id) === txKey; })[0];
             const desc = tx ? ((tx.accountName || '') + ' ' + (tx.amount || 0)) : txKey;
@@ -3188,8 +3188,8 @@
                     '<button class="px-2 py-1 rounded-lg bg-rose-600 text-white font-bold text-[10px]" data-ptx="' + escHtml(t.id) + '">Hapus</button></div></div>';
             }).join('');
             [].slice.call(box.querySelectorAll('[data-ptx]')).forEach(function (b) {
-                b.onclick = function () {
-                    if (!confirm('Hapus catatan ini dari pembukuan pribadi?')) return;
+                b.onclick = async function () {
+                    if (!(await fmAsk('Hapus catatan ini dari pembukuan pribadi?'))) return;
                     providerTx = providerTx.filter(function (x) { return x.id !== b.getAttribute('data-ptx'); });
                     localStorage.setItem('fm_provider_tx', JSON.stringify(providerTx));
                     renderProviderTxHistory(); loadProviderDashboard();
@@ -3235,11 +3235,11 @@
             alert("Akun COA Provider berhasil ditambahkan!");
         }
 
-        function deleteProviderCOA(code) {
+        async function deleteProviderCOA(code) {
             let coa = JSON.parse(localStorage.getItem('fm_provider_coa') || "[]");
             if (coa.length === 0) coa = [...DEFAULT_PROVIDER_COA];
 
-            if (confirm(`Hapus akun COA [${code}]?`)) {
+            if ((await fmAsk(`Hapus akun COA [${code}]?`))) {
                 coa = coa.filter(c => c.code !== code);
                 localStorage.setItem('fm_provider_coa', JSON.stringify(coa));
                 renderProviderCOATable();
@@ -3271,16 +3271,16 @@
             });
         }
 
-        function editProviderCOA(code) {
+        async function editProviderCOA(code) {
             let coa = JSON.parse(localStorage.getItem('fm_provider_coa') || "[]");
             if (coa.length === 0) coa = [...DEFAULT_PROVIDER_COA];
             const it = coa.find(c => c.code === code);
             if (!it) return;
-            const nn = prompt('Ubah nama akun [' + it.code + ']:', it.name);
+            const nn = (await fmPrompt('Ubah nama akun [' + it.code + ']:', it.name));
             if (nn === null) return;
             const name = nn.trim();
             if (!name) return alert('Nama akun tidak boleh kosong.');
-            const inc = confirm('Kategori akun ini:\n\nOK = Pendapatan (Income)\nBatal = Beban (Outcome)');
+            const inc = (await fmAsk('Kategori akun ini:\n\nOK = Pendapatan (Income)\nBatal = Beban (Outcome)'));
             it.name = name; it.category = inc ? 'income' : 'outcome';
             localStorage.setItem('fm_provider_coa', JSON.stringify(coa));
             renderProviderCOATable();
@@ -3361,8 +3361,8 @@
                     '<p class="text-slate-400 mt-0.5">' + escHtml(n.message) + '</p>' +
                     '<span class="text-[10px] text-slate-500">Ke: ' + escHtml(n.targetTenant === 'ALL' ? 'Semua toko' : n.targetTenant) + ' • ' + escHtml(n.date || '') + '</span></div>' +
                     '<button class="px-2 py-1 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white font-bold text-[10px] shrink-0">Tarik</button>';
-                row.querySelector('button').onclick = function () {
-                    if (!confirm('Tarik pengumuman ini? Pengumuman akan hilang dari layar semua klien.')) return;
+                row.querySelector('button').onclick = async function () {
+                    if (!(await fmAsk('Tarik pengumuman ini? Pengumuman akan hilang dari layar semua klien.'))) return;
                     db.collection('provider_notices').doc(n.docId).delete().catch(function (e) { alert('Gagal: ' + e.message); });
                 };
                 box.appendChild(row);
@@ -3483,10 +3483,10 @@
             }
         }
 
-        function deleteTickets(list) {
+        async function deleteTickets(list) {
             list = (list || []).filter(function (x) { return x && x.status !== 'PENDING'; });
             if (!list.length) return;
-            if (!confirm('Hapus ' + list.length + ' riwayat permohonan? Tindakan ini tidak bisa dibatalkan.')) return;
+            if (!(await fmAsk('Hapus ' + list.length + ' riwayat permohonan? Tindakan ini tidak bisa dibatalkan.'))) return;
             if (!(typeof db !== 'undefined' && db)) {
                 allTickets = allTickets.filter(function (x) { return list.indexOf(x) < 0; });
                 try { localStorage.setItem('fm_cashier_license_requests', JSON.stringify(allTickets)); } catch (e) {}
@@ -3497,10 +3497,10 @@
                 .catch(function (e) { alert('Gagal menghapus: ' + e.message); });
         }
 
-        function approveTicket(idx) {
+        async function approveTicket(idx) {
             const ticket = allTickets[idx];
             if (!ticket) return;
-            if (!confirm(`Setujui permohonan +${ticket.qty} terminal kasir baru untuk ${ticket.tenantName}?`)) return;
+            if (!(await fmAsk(`Setujui permohonan +${ticket.qty} terminal kasir baru untuk ${ticket.tenantName}?`))) return;
             if (!(typeof db !== 'undefined' && db) || !ticket.docId) return alert('Firestore belum terhubung.');
             const qty = parseInt(ticket.qty) || 1;
             const ctrlRef = db.collection('tenant_ctrl').doc(ticket.tenantId);
@@ -3519,10 +3519,10 @@
             }).catch(function (e) { alert('Gagal memproses: ' + e.message); });
         }
 
-        function rejectTicket(idx) {
+        async function rejectTicket(idx) {
             const ticket = allTickets[idx];
             if (!ticket) return;
-            if (!confirm(`Tolak permohonan pembukaan kasir baru ini?`)) return;
+            if (!(await fmAsk(`Tolak permohonan pembukaan kasir baru ini?`))) return;
             if (!(typeof db !== 'undefined' && db) || !ticket.docId) return alert('Firestore belum terhubung.');
             db.collection('provider_tickets').doc(ticket.docId).update({
                 status: 'REJECTED', processedAt: new Date().toLocaleString('id-ID')
@@ -3841,8 +3841,8 @@ function closeWeatherModal() {
 
 <script>
 /* Logout: hapus semua kunci sesi yang dipakai halaman (core.js hanya menghapus kunci lama) */
-window.logout = function () {
-  if (!confirm("Keluar dari sistem?")) return;
+window.logout = async function () {
+  if (!(await fmAsk("Keluar dari sistem?"))) return;
   try { ['currentUser','auth_role','auth_title','fm_session_user_v13','fm_tower_ok'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
   var t = new URLSearchParams(window.location.search).get('toko');
   window.location.replace('index.html' + (t ? '?toko=' + encodeURIComponent(t) : ''));

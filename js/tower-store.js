@@ -63,7 +63,7 @@
   function upd(id, data) { var d = DB(); if (!d) return Promise.reject(); return d.collection('provider_tickets').doc(id).update(data); }
   function find(id) { return reqs.filter(function (r) { return r.docId === id; })[0]; }
 
-  function act(a, id, extra) {
+  async function act(a, id, extra) {
     if (a === 'ok') {
       var r = find(id); if (!r) return;
       var ids = (r.items && r.items.length) ? r.items : [r.item], its = ids.map(function (x) { return ST() && ST().item(x); });
@@ -79,20 +79,20 @@
         if (!q.ok) msg = 'PERINGATAN: periode ' + (PER[r.period] || r.period) + ' tidak ada di katalog untuk item ini.\n\n' + msg;
         else if (Number(r.price) !== q.total) msg = 'PERINGATAN: harga di permintaan (' + rp(r.price) + ') BERBEDA dari katalog sekarang (' + rp(q.total) + ').\nPeriksa dulu sebelum mengaktifkan.\n\n' + msg;
       }
-      if (!confirm(msg)) return;
-      var nt = prompt('Catatan untuk klien (boleh kosong):', 'Terima kasih, fitur sudah aktif.'); if (nt === null) return;
+      if (!(await fmAsk(msg))) return;
+      var nt = (await fmPrompt('Catatan untuk klien (boleh kosong):', 'Terima kasih, fitur sudah aktif.')); if (nt === null) return;
       Promise.all(ids.map(function (x) { return grant(r.tenantId, x, r.period); })).then(function (es) {
         return upd(id, { status: 'AKTIF', note: String(nt).slice(0, 300), processedAt: new Date().toLocaleString('id-ID'), until: es[0].until });
       }).catch(function (e) { if (e) alert('Gagal: ' + (e.message || e)); });
     } else if (a === 'no') {
-      var nt2 = prompt('Alasan penolakan (terlihat oleh klien):', 'Pembayaran belum diterima.'); if (nt2 === null) return;
+      var nt2 = (await fmPrompt('Alasan penolakan (terlihat oleh klien):', 'Pembayaran belum diterima.')); if (nt2 === null) return;
       upd(id, { status: 'DITOLAK', note: String(nt2).slice(0, 300), processedAt: new Date().toLocaleString('id-ID') }).catch(function (e) { alert('Gagal: ' + (e && e.message || e)); });
     } else if (a === 'del') {
-      if (!confirm('Hapus permintaan ini?')) return; var d = DB(); if (d) d.collection('provider_tickets').doc(id).delete().catch(function (e) { alert('Gagal: ' + (e && e.message || e)); });
+      if (!(await fmAsk('Hapus permintaan ini?'))) return; var d = DB(); if (d) d.collection('provider_tickets').doc(id).delete().catch(function (e) { alert('Gagal: ' + (e && e.message || e)); });
     } else if (a === 'revoke') {
-      var p = String(id).split('|'); if (confirm('Cabut sewa ' + p[1] + ' dari ' + nameOf(p[0]) + '? Data toko tidak berubah, hanya fiturnya terkunci lagi.')) revoke(p[0], p[1]);
+      var p = String(id).split('|'); if ((await fmAsk('Cabut sewa ' + p[1] + ' dari ' + nameOf(p[0]) + '? Data toko tidak berubah, hanya fiturnya terkunci lagi.'))) revoke(p[0], p[1]);
     } else if (a === 'date') {
-      var q = String(id).split('|'), cur = ((ctrls[q[0]] || {}).rentals || {})[q[1]], v = prompt('Tanggal berakhir baru (YYYY-MM-DD):', cur ? iso(cur.until) : iso(Date.now())); if (v === null) return;
+      var q = String(id).split('|'), cur = ((ctrls[q[0]] || {}).rentals || {})[q[1]], v = (await fmPrompt('Tanggal berakhir baru (YYYY-MM-DD):', cur ? iso(cur.until) : iso(Date.now()))); if (v === null) return;
       var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v).trim()); if (!m) return alert('Format harus YYYY-MM-DD.');
       var ms = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 23, 59, 59).getTime(); if (!isFinite(ms)) return alert('Tanggal tidak valid.');
       var d2 = DB(); if (!d2) return; var u = {}; u['rentals.' + q[1] + '.until'] = ms;
@@ -106,11 +106,11 @@
     } else if (a === 'dm_on' || a === 'dm_ext') {
       var dd = DB(); if (!dd) return alert('Firestore belum terhubung.');
       var cur2 = Number((ctrls[id] || {}).demoUntil) || 0, base = (a === 'dm_ext' && cur2 > Date.now()) ? cur2 : Date.now();
-      var dy = prompt((a === 'dm_ext' ? 'Tambah berapa hari?' : 'Masa demo berapa hari?') + ' (' + nameOf(id) + ')', '7'); if (dy === null) return;
+      var dy = (await fmPrompt((a === 'dm_ext' ? 'Tambah berapa hari?' : 'Masa demo berapa hari?') + ' (' + nameOf(id) + ')', '7')); if (dy === null) return;
       dy = Math.round(Number(dy)); if (!(dy >= 1 && dy <= 90)) return alert('Isi angka 1 sampai 90.');
       dd.collection('tenant_ctrl').doc(id).set({ demoUntil: base + dy * 86400000, demo: true }, { merge: true }).catch(function (e) { alert('Gagal: ' + (e && e.message || e)); });
     } else if (a === 'dm_off') {
-      if (!confirm('Jadikan ' + nameOf(id) + ' toko asli? Label dan batas demo dicabut. Data toko TIDAK dihapus (bersihkan data contoh lewat Kesehatan Sistem bila perlu).')) return;
+      if (!(await fmAsk('Jadikan ' + nameOf(id) + ' toko asli? Label dan batas demo dicabut. Data toko TIDAK dihapus (bersihkan data contoh lewat Kesehatan Sistem bila perlu).'))) return;
       var d3 = DB(); if (!d3) return; var u3 = { demo: firebase.firestore.FieldValue.delete(), demoUntil: firebase.firestore.FieldValue.delete() };
       d3.collection('tenant_ctrl').doc(id).update(u3).catch(function (e) { alert('Gagal: ' + (e && e.message || e)); });
     } else if (a === 'dm_new') { ov.style.display = 'none'; try { openModal('add_tenant'); } catch (e) { alert('Buka menu Klien Baru dari beranda Tower.'); }
@@ -118,7 +118,7 @@
     } else if (a === 'give') {
       var tId = (ov.querySelector('#ts-t') || {}).value, item = (ov.querySelector('#ts-i') || {}).value, per = (ov.querySelector('#ts-p') || {}).value;
       if (!tId || !item) { note = 'Pilih toko dan item.'; return render(); }
-      var itm = ST().item(item); if (!confirm('Beri sewa ' + (itm ? itm.name : item) + ' (' + (PER[per] || per) + ') ke ' + nameOf(tId) + '?')) return;
+      var itm = ST().item(item); if (!(await fmAsk('Beri sewa ' + (itm ? itm.name : item) + ' (' + (PER[per] || per) + ') ke ' + nameOf(tId) + '?'))) return;
       grant(tId, item, per).then(function (e) { note = e.perm ? 'Sewa permanen aktif.' : 'Sewa aktif sampai ' + dstr(e.until) + '.'; render(); }).catch(function (e) { if (e) { note = 'Gagal: ' + (e.message || e); render(); } });
     }
   }
@@ -269,7 +269,7 @@
     return h;
   }
   function bulk(s) { fresh = true; nSel().forEach(function (k) { dcat.feats[k] = setStat(dcat.feats[k], s); }); sel = {}; catNote = ''; render(); }
-  function bundleAct(a, id) {
+  async function bundleAct(a, id) {
     var st = ST(); fresh = true;
     if (a === 'kb_new') { bform = { id: 'b:' + Date.now().toString(36), isNew: true, name: '', desc: '', keys: [], sell: false, free: false, p: {} }; kview = 'bundel'; }
     else if (a === 'ks_bundle') { bform = { id: 'b:' + Date.now().toString(36), isNew: true, name: '', desc: '', keys: st.features().map(function (f) { return f.key; }).filter(function (k) { return sel[k]; }), sell: false, free: false, p: {} }; sel = {}; kview = 'bundel'; }
@@ -290,24 +290,24 @@
     else if (a === 'kb_del') {
       var use = Object.keys(ctrls).filter(function (t) { var e = (ctrls[t].rentals || {})[id]; return e && Number(e.until) > Date.now(); });
       if (use.length) { catNote = 'Bundel ini masih disewa aktif oleh: ' + use.map(nameOf).join(', ') + '. Ubah status menjadi Tidak dijual saja, atau tunggu sewa habis.'; return render(); }
-      if (!confirm('Hapus bundel ini dari katalog?')) return;
+      if (!(await fmAsk('Hapus bundel ini dari katalog?'))) return;
       dcat.bundles = dcat.bundles.filter(function (x) { return x.id !== id; }); bform = null; catNote = 'Bundel dihapus di layar ini. Tekan Simpan katalog agar berlaku.';
     }
     render();
   }
-  function saveCat() {
+  async function saveCat() {
     var d = DB(); if (!d) { catNote = 'Firestore belum terhubung.'; return render(); }
     collect();
     var st = ST(), bad = Object.keys(dcat.feats).filter(function (k) { var e = dcat.feats[k]; return stat(e) === 'sell' && !st.periods.some(function (x) { return e.p && e.p[x[0]]; }); })
       .concat(dcat.bundles.filter(function (b) { return stat(b) === 'sell' && !st.periods.some(function (x) { return b.p && b.p[x[0]]; }); }).map(function (b) { return b.id; }));
-    if (bad.length && !confirm(bad.length + ' item berstatus Dijual tapi belum punya harga, jadi tidak akan tampil di klien. Tetap simpan?')) return;
+    if (bad.length && !(await fmAsk(bad.length + ' item berstatus Dijual tapi belum punya harga, jadi tidak akan tampil di klien. Tetap simpan?'))) return;
     var out = JSON.parse(JSON.stringify(dcat)); out.v = 2;
     d.collection('app_meta').doc('store_catalog').set({ json: JSON.stringify(out), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }).then(function () {
       st.setCat(out); catNote = 'Katalog tersimpan. Klien memakainya saat membuka Store.'; render();
     }).catch(function (e) { catNote = 'Gagal menyimpan: ' + (e && e.message || e); render(); });
   }
-  function resetCat() {
-    if (!confirm('Kosongkan katalog? Semua fitur dan bundel menjadi Tidak dijual dan Store klien tampil kosong. Sewa yang sudah berjalan tetap aktif sampai tanggalnya.')) return;
+  async function resetCat() {
+    if (!(await fmAsk('Kosongkan katalog? Semua fitur dan bundel menjadi Tidak dijual dan Store klien tampil kosong. Sewa yang sudah berjalan tetap aktif sampai tanggalnya.'))) return;
     var d = DB(); if (!d) return; var empty = emptyCat();
     d.collection('app_meta').doc('store_catalog').set({ json: JSON.stringify(empty), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }).then(function () { ST().setCat(empty); dcat = emptyCat(); bform = null; sel = {}; fresh = true; catNote = 'Katalog dikosongkan.'; render(); }).catch(function (e) { catNote = 'Gagal: ' + (e && e.message || e); render(); });
   }

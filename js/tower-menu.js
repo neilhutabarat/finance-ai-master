@@ -208,13 +208,13 @@
 
     renderGroups(); renderItems();
 
-    ov.querySelector('#tme-addgroup').onclick = function () {
-      var nama = prompt('Nama kategori baru:'); if (!nama) return;
+    ov.querySelector('#tme-addgroup').onclick = async function () {
+      var nama = (await fmPrompt('Nama kategori baru:')); if (!nama) return;
       draftGroups.push({ id: 'g_' + Date.now(), title: nama });
       renderGroups(); renderItems();
     };
-    ov.querySelector('#tme-reset').onclick = function () {
-      if (!confirm('Kembalikan semua ke susunan bawaan? Perubahanmu akan hilang.')) return;
+    ov.querySelector('#tme-reset').onclick = async function () {
+      if (!(await fmAsk('Kembalikan semua ke susunan bawaan? Perubahanmu akan hilang.'))) return;
       resetCustomConfig(function (ok) {
         if (!ok) { alert('Gagal, cek koneksi Firestore.'); return; }
         location.reload();

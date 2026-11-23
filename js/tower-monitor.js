@@ -52,11 +52,11 @@
     }
     box.innerHTML = h;
   }
-  function purge(older) {
+  async function purge(older) {
     var d = DB(), col = tab === 'error' ? 'error_logs' : 'login_logs', cut = older ? Date.now() - 30 * 864e5 : Infinity;
     var ids = data[tab].filter(function (x) { return (!shop || x.tenantId === shop) && x.ms < cut; });
     if (!ids.length) return alert('Tidak ada yang perlu dihapus.');
-    if (!confirm('Hapus ' + ids.length + ' catatan ' + (tab === 'error' ? 'error' : 'login') + '?')) return;
+    if (!(await fmAsk('Hapus ' + ids.length + ' catatan ' + (tab === 'error' ? 'error' : 'login') + '?'))) return;
     var p = Promise.resolve();
     for (var i = 0; i < ids.length; i += 400) (function (part) { p = p.then(function () { var b = d.batch(); part.forEach(function (x) { b.delete(d.collection(col).doc(x._id)); }); return b.commit(); }); })(ids.slice(i, i + 400));
     p.then(load).then(render).catch(function (e) { alert('Gagal: ' + (e && e.message)); });

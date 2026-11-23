@@ -280,9 +280,9 @@
           (canFix ? '<br><button data-fix="' + i + '" style="' + BTN + 'background:#059669;margin-top:6px">Pulihkan ' + r.lost.filter(function (m) { return m.name && OKCAT[m.category]; }).length + ' akun dari transaksi</button>' : '') + '</div>';
       }).join('') || '<div style="padding:16px;text-align:center">Tidak ada toko.</div>';
       [].forEach.call(out.querySelectorAll('[data-fix]'), function (b) {
-        b.onclick = function () {
+        b.onclick = async function () {
           var r = res[+b.getAttribute('data-fix')];
-          if (!confirm('Pulihkan akun COA ' + (r.t.nama || r.t.id) + ' dari transaksinya?\n\nHanya menambah akun yang hilang, tidak menghapus apa pun.')) return;
+          if (!(await fmAsk('Pulihkan akun COA ' + (r.t.nama || r.t.id) + ' dari transaksinya?\n\nHanya menambah akun yang hilang, tidak menghapus apa pun.'))) return;
           b.disabled = true; b.textContent = 'Memulihkan…';
           coaRestore(r).then(function () { b.textContent = 'Selesai. Cek ulang lewat tombol ini.'; }).catch(function (e) { b.disabled = false; b.textContent = 'Gagal: ' + ((e && e.message) || e); });
         };
@@ -334,9 +334,9 @@
         if (!c.length) { note.innerHTML = '<b style="color:#6ee7b7">Server bersih.</b> Tidak ada sisa data.'; out.innerHTML = ''; return; }
         note.textContent = 'Centang bagian yang mau dibersihkan, lalu tekan tombol di bawah. Penghapusan tidak bisa dibatalkan.';
         out.innerHTML = rowsHtml(c, true, 'Sampah di server', '#c4b5fd') + '<button id="hl-do" style="' + BTN + 'background:#be123c;width:100%;margin-top:8px">Bersihkan yang dicentang</button>';
-        out.querySelector('#hl-do').onclick = guard(function () {
+        out.querySelector('#hl-do').onclick = guard(async function () {
           var sel = picked(c); if (!sel.length) return alert('Centang minimal satu.');
-          if (!confirm('Hapus permanen ' + sel.length + ' jenis sampah? Toko yang masih terdaftar tidak disentuh.')) return;
+          if (!(await fmAsk('Hapus permanen ' + sel.length + ' jenis sampah? Toko yang masih terdaftar tidak disentuh.'))) return;
           return runClean(sel, say).then(function (n) {
             note.innerHTML = '<b style="color:#6ee7b7">Selesai. ' + fmtN(n) + ' item dibersihkan.</b>'; out.innerHTML = '';
           });
@@ -352,16 +352,16 @@
         out.innerHTML = rowsHtml(fixable, true, 'Bisa diperbaiki otomatis', '#6ee7b7') + (fixable.length ? '<button id="hl-fx" style="' + BTN + 'background:#059669;width:100%;margin-top:8px">Perbaiki yang dicentang</button><button id="hl-fxall" style="' + BTN + 'background:#0d9488;width:100%;margin-top:6px">Perbaiki semua yang aman (' + fixable.length + ')</button>' : '') + rowsHtml(info, false, 'Perlu keputusanmu (hanya dilaporkan)', '#fcd34d') +
           (dd.length ? '' : '<div style="padding:16px;text-align:center;font-size:13px;color:#6ee7b7">Tidak ada bug data.</div>');
         var ba = out.querySelector('#hl-fxall');
-        if (ba) ba.onclick = guard(function () {
-          if (!confirm('Perbaiki SEMUA ' + fixable.length + ' temuan yang aman secara otomatis?')) return;
+        if (ba) ba.onclick = guard(async function () {
+          if (!(await fmAsk('Perbaiki SEMUA ' + fixable.length + ' temuan yang aman secara otomatis?'))) return;
           var p = Promise.resolve(), n = 0;
           fixable.forEach(function (it) { p = p.then(function () { say('Memperbaiki ' + it.nama + ': ' + it.title + '…'); return it.run().then(function () { n++; try { ctAudit(it.tenant, 'PERBAIKI_DATA', it.title + ': ' + it.fixLabel, '-', String(it.count)); } catch (e) {} }); }); });
           return p.then(function () { note.innerHTML = '<b style="color:#6ee7b7">Selesai. ' + n + ' temuan diperbaiki.</b> Jalankan pemeriksaan lagi untuk memastikan.'; out.innerHTML = ''; });
         });
         var b = out.querySelector('#hl-fx');
-        if (b) b.onclick = guard(function () {
+        if (b) b.onclick = guard(async function () {
           var sel = picked(fixable); if (!sel.length) return alert('Centang minimal satu.');
-          if (!confirm('Perbaiki ' + sel.length + ' temuan secara otomatis?')) return;
+          if (!(await fmAsk('Perbaiki ' + sel.length + ' temuan secara otomatis?'))) return;
           var p = Promise.resolve(), n = 0;
           sel.forEach(function (it) { p = p.then(function () { say('Memperbaiki ' + it.nama + ': ' + it.title + '…'); return it.run().then(function () { n++; try { ctAudit(it.tenant, 'PERBAIKI_DATA', it.title + ': ' + it.fixLabel, '-', String(it.count)); } catch (e) {} }); }); });
           return p.then(function () { note.innerHTML = '<b style="color:#6ee7b7">Selesai. ' + n + ' temuan diperbaiki.</b> Jalankan pemeriksaan lagi untuk memastikan.'; out.innerHTML = ''; });
@@ -369,15 +369,15 @@
       });
     });
     ov.el.querySelector('[data-a=coa]').onclick = function () { openCoa(); };
-    ov.el.querySelector('[data-a=copy]').onclick = function () {
+    ov.el.querySelector('[data-a=copy]').onclick = async function () {
       if (!last || (!last.clean && !last.data)) return alert('Belum ada hasil. Tekan Pindai dulu.');
       var L = ['LAPORAN KESEHATAN SISTEM — ' + new Date().toLocaleString('id-ID')];
       (last.clean || []).forEach(function (x) { L.push('[SAMPAH] ' + x.title + (x.count ? ' — ' + x.count : '') + (x.detail ? ' (' + x.detail + ')' : '')); });
       (last.data || []).forEach(function (x) { L.push('[' + (x.kind === 'fix' ? 'BISA DIPERBAIKI' : 'LAPORAN') + '] ' + x.nama + ' [' + x.tenant + ']: ' + x.title + (x.count ? ' — ' + x.count : '') + (x.detail ? ' (' + x.detail + ')' : '')); });
       if (L.length === 1) L.push('Tidak ada temuan.');
       var txt = L.join('\n');
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { alert('Laporan tersalin. Tempel ke Claude bila perlu.'); }, function () { prompt('Salin laporan:', txt); });
-      else prompt('Salin laporan:', txt);
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { alert('Laporan tersalin. Tempel ke Claude bila perlu.'); }, async function () { (await fmPrompt('Salin laporan:', txt)); });
+      else (await fmPrompt('Salin laporan:', txt));
     };
   }
   window.FM_HEALTH = { open: open, openCoa: openCoa, _scanClean: scanClean, _scanData: scanData, _runClean: runClean };

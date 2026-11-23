@@ -19,6 +19,8 @@
     '#fm-dlg .fm-dlg-ok{background:#2f55d4;color:#fff;box-shadow:0 6px 16px rgba(47,85,212,.35)}' +
     '#fm-dlg .fm-dlg-ok.bahaya{background:#e11d48;box-shadow:0 6px 16px rgba(225,29,72,.35)}' +
     'html[data-fm-invert="1"] #fm-dlg{filter:invert(1) hue-rotate(180deg)}' +
+    '#fm-dlg .fm-dlg-in{width:100%;box-sizing:border-box;border:1.5px solid #cbd5e1;border-radius:13px;padding:11px 13px;font:600 14px/1.2 inherit;font-family:inherit;color:#0f172a;background:rgba(255,255,255,.92);outline:none;transition:border-color .15s,box-shadow .15s}' +
+    '#fm-dlg .fm-dlg-in:focus{border-color:#2f55d4;box-shadow:0 0 0 4px rgba(47,85,212,.15)}' +
     '#fm-dlg button:focus-visible{outline:2px solid #0f172a;outline-offset:2px}';
   (document.head || document.documentElement).appendChild(css);
 
@@ -55,5 +57,34 @@
   function masuk(item) { if (!document.body) { document.addEventListener('DOMContentLoaded', function () { masuk(item); }); return; } if (tampil) antre.push(item); else buka(item); }
   window.fmAsk = function (msg, opt) { return new Promise(function (res) { masuk({ msg: msg, opt: opt, res: res }); }); };
   window.alert = function (msg) { masuk({ msg: msg, info: true, res: function () {} }); };
+
+  /* fmPrompt(pesan, isiAwal, {ok,batal,judul}) -> Promise<string|null>  (pengganti prompt() bawaan peramban) */
+  window.fmPrompt = function (msg, def, opt) {
+    opt = opt || {};
+    return new Promise(function (res) {
+      function jalan() {
+        var el = document.createElement('div'); el.id = 'fm-dlg'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true');
+        var box = document.createElement('div'); box.className = 'fm-dlg-box';
+        var h = document.createElement('h4'); h.textContent = opt.judul || 'Isi data';
+        var p = document.createElement('p'); p.textContent = String(msg == null ? '' : msg); p.style.marginBottom = '12px';
+        var inp = document.createElement('input'); inp.type = 'text'; inp.value = def == null ? '' : String(def); inp.className = 'fm-dlg-in';
+        var row = document.createElement('div'); row.className = 'fm-dlg-row'; row.style.marginTop = '16px';
+        var no = document.createElement('button'); no.type = 'button'; no.className = 'fm-dlg-no'; no.textContent = opt.batal || 'Batal';
+        var ok = document.createElement('button'); ok.type = 'button'; ok.className = 'fm-dlg-ok'; ok.textContent = opt.ok || 'Simpan';
+        row.appendChild(no); row.appendChild(ok); box.appendChild(h); box.appendChild(p); box.appendChild(inp); box.appendChild(row); el.appendChild(box);
+        function tutup(v) { document.removeEventListener('keydown', kunci, true); if (el.parentNode) el.parentNode.removeChild(el); res(v); }
+        function kunci(e) {
+          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); tutup(null); }
+          else if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); tutup(inp.value); }
+        }
+        ok.onclick = function () { tutup(inp.value); }; no.onclick = function () { tutup(null); };
+        el.addEventListener('mousedown', function (e) { if (e.target === el) tutup(null); });
+        document.addEventListener('keydown', kunci, true);
+        document.body.appendChild(el);
+        try { inp.focus(); inp.select(); } catch (x) {}
+      }
+      if (document.body) jalan(); else document.addEventListener('DOMContentLoaded', jalan);
+    });
+  };
   window.fmNativeAlert = nativeAlert;
 })();
