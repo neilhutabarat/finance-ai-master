@@ -15,7 +15,6 @@
     { id: 'bangun', title: '2. Fitur, Kuota & Status', hint: 'Hak akses, terminal & status toko', c: '#0d9488', items: [
       { key: 'kuota_terminal', t: 'Batas Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Jatah Kasir, Manager, Owner' },
       { key: 'bekukan_aktifkan', t: 'Bekukan / Aktifkan', ic: 'moon', run: "towerPick('freeze')", d: 'Hentikan sementara akses toko' },
-      { key: 'kendali_massal', t: 'Aksi Massal Toko', ic: 'users', run: "towerMass()", d: 'Bekukan/kirim pesan sekaligus' },
       { key: 'toko_berhenti', t: 'Arsip Toko Berhenti', ic: 'archive', find: 'Toko Berhenti', d: 'Daftar toko yang nonaktif' },
       { key: 'hapus_pulihkan', t: 'Hapus / Pulihkan', ic: 'trash', run: "towerPick('hapus')", d: 'Hapus klien atau kembalikan' }
     ] },
@@ -24,7 +23,6 @@
       { key: 'isi_paket_fitur', t: 'Isi Paket Basic/Plus/Pro', ic: 'list', run: "openModal('paket_fitur')", d: 'Atur daftar fitur bawaan paket' },
       { key: 'billing_toko', t: 'Tagihan per Toko', ic: 'chart', run: "towerPick('billing')", d: 'Biaya & pembayaran satu toko' },
       { key: 'billing_jaringan', t: 'Tagihan Semua Toko', ic: 'chart', find: 'Billing Jaringan', d: 'Rekap tagihan & jatuh tempo' },
-      { key: 'pengingat_jatuh_tempo', t: 'Pengingat Tempo', ic: 'bell', run: "towerDue()", d: 'Cek toko yang hampir habis masa' },
       { key: 'store', t: 'OneilStore', ic: 'tag', run: "FM_TSTORE.open()", d: 'Atur harga & sewa fitur satuan' },
       { key: 'demo_toko', t: 'Atur Toko Demo', ic: 'moon', run: "FM_TSTORE.openDemo()", d: 'Ubah jadi toko demo atau asli' }
     ] },
@@ -33,7 +31,6 @@
       { key: 'pemantauan_error', t: 'Laporan Error', ic: 'bell', run: "FM_MON.open('error')", d: 'Lacak error dari perangkat toko' },
       { key: 'log_login', t: 'Riwayat Login', ic: 'users', run: "FM_MON.open('login')", d: 'Siapa masuk, kapan & di mana' },
       { key: 'kesehatan_sistem', t: 'Pindai & Perbaiki', ic: 'shield', run: "FM_HEALTH.open()", d: 'Cek kesehatan server & data' },
-      { key: 'pajak_jaringan', t: 'Pajak Semua Toko', ic: 'tax', run: "openModal('tax_net')", d: 'Total pajak dari tiap toko' },
       { key: 'kurs_emas', t: 'Kurs & Harga Emas', ic: 'coins', find: 'Kurs', d: 'Perbarui kurs & harga emas' }
     ] },
     { id: 'versi', title: '5. Versi, Uji & Serah Terima', hint: 'Versi rilis, uji coba & serah terima', c: '#9333ea', items: [
@@ -44,14 +41,11 @@
       { key: 'uji_mandiri', t: 'Cek Kelayakan', ic: 'shield', run: "FM_QA.open()", d: 'Verifikasi file & data toko' },
       { key: 'reset_statistik', t: 'Reset Data Uji', warn: true, ic: 'trash', run: "FM_LAB.open('reset')", d: 'Hapus data uji coba ke 0' }
     ] },
-    { id: 'tampil', title: '6. Tampilan, Chat & ON2', hint: 'Wallpaper, pengumuman, chat & ON2', c: '#059669', items: [
+    { id: 'tampil', title: '6. Tampilan & Chat', hint: 'Wallpaper, pengumuman & chat', c: '#059669', items: [
       { key: 'wallpaper', t: 'Wallpaper & Kaca', ic: 'spark', run: "FM_TWALL.open()", d: 'Atur latar & efek kaca aplikasi' },
       { key: 'pesan_siaran', t: 'Kirim Pengumuman', dup: true, ic: 'send', run: "openModal('broadcast_modal')", d: 'Kirim pesan siaran ke semua toko' },
-      { key: 'catatan_rilis', t: 'Catatan Rilis Klien', ic: 'book', find: 'Catatan Rilis', d: 'Riwayat pembaruan aplikasi' },
       { key: 'chat_global', t: 'Moderasi Chat', ic: 'bell', run: "if(window.FM_CHAT)FM_CHAT.openModeration()", d: 'Bisukan atau atur Chat Global' },
       { key: 'hapus_semua_chat', t: 'Kosongkan Chat', ic: 'trash', run: "if(window.FM_CHAT)FM_CHAT.clearAll()", d: 'Hapus seluruh isi Chat Universe' },
-      { key: 'susun_pulau', t: 'Susun Pulau ON2', ic: 'grid', run: "towerPick('susun')", d: 'Urutan pulau kiri/kanan Gen 2' },
-      { key: 'pulau_on2', t: 'Kartu & Fitur ON2', ic: 'spark', run: "towerPick('pulau')", d: 'Atur kartu & denyut Gen 2' }
     ] }
   ];
 
