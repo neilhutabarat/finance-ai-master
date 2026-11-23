@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oneilverse - Terminal Kasir v1.2 (Uji Coba)</title>
+    <title>Oneilverse - Terminal Kasir</title>
     <style id="fm-boot">html:not(.fm-ready) body{visibility:hidden}@keyframes fmboot{to{visibility:visible}}html:not(.fm-ready) body{animation:fmboot 0s linear 3s forwards}</style>
     
     <script src="/js/loader.js?v=ld110"></script>
@@ -768,7 +768,7 @@
 
 
     <script src="js/tenants.js"></script>
-    <!-- rollout.js dilewati khusus di kasir-v12.html agar uji coba v1.2 tidak dialihkan ke folder rilis lama -->
+    <script src="/js/rollout.js"></script>
     <script src="js/auth.js?v=proto"></script>
     <script src="js/monitor.js?v=proto"></script>
     <script src="js/plans.js?v=1119"></script>
@@ -2086,6 +2086,5 @@
             try { const pm = document.getElementById('pay-method'); if (pm && pm.value === 'bank') fillBankAccOptions(); } catch (e) { console.warn(e); }
         });
     </script>
-    <script src="js/kasir-v12.js?v=1201"></script>
 </body>
 </html>

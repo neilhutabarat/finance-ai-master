@@ -2,10 +2,15 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.1.21';
-  var BETA = 'v1.1.21';
+  var APP_VERSION = '1.2.0';
+  var BETA = 'v1.2.0';
   /* Catatan rilis ringkas per versi utama (v1.0, v1.1, v1.2, dst). Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.2', '23 Nov 2026', [
+      '[Baru] Kasir v1.2: Modal Konfirmasi Pembayaran dengan hitung Kembalian otomatis, tombol pecahan cepat, Diskon Struk, dan nama Pelanggan',
+      '[Baru] Dukungan Split Payment (bayar campuran dua metode), Parkir Antrean (Hold), dan tab Riwayat Hari Ini untuk cetak ulang struk atau kirim WhatsApp',
+      '[Baru] Chip cepat Sering Dipakai (1-Klik), kontrol jumlah (+/-) langsung di draft, peringatan stok real-time, suara bip scanner, shortcut keyboard (F2–F8), serta Mode Panduan (ⓘ) di menu bantuan'
+    ]],
     ['v1.1', '22 Nov 2026', [
       '[Baru] Tampilan One UI lebih bersih dengan mode terang dan mode gelap pekat di Kasir, Manager, Owner, dan Partner',
       '[Baru] Dock bawah bergaya pulau yang simetris serta sistem Paket Basic, Plus, dan Pro dengan lencana khusus',
