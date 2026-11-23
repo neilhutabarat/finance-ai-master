@@ -2946,7 +2946,7 @@
         }
 
         let inspectPart = 'lokasi';
-        const INSPECT_TITLE = { lokasi: ['Lokasi & Aktivitas', 'Lokasi terminal, yang sedang online, dan mutasi live (hanya lihat)'], kuota: ['Kuota Terminal', 'Jumlah terminal Kasir, Manager, dan Owner'], paket: ['Paket', 'Basic atau Plus'], billing: ['Billing', 'Biaya layanan dan pembayaran'], versi: ['Versi Toko', 'Kunci toko ke versi aplikasi tertentu'] };
+        const INSPECT_TITLE = { lokasi: ['Lokasi & Aktivitas', 'Lokasi terminal, yang sedang online, dan mutasi live (hanya lihat)'], kuota: ['Kuota Terminal', 'Jumlah terminal Kasir, Manager, dan Owner'], paket: ['Paket', 'Basic, Plus, atau Pro'], billing: ['Billing', 'Biaya layanan dan pembayaran'], versi: ['Versi Toko', 'Kunci toko ke versi aplikasi tertentu'] };
         function applyInspectPart() {
             const map = { 'inspect-header-card': 'lokasi', 'inspect-gps-card': 'lokasi', 'inspect-tx-card': 'lokasi', 'inspect-plan-card': 'kuota', 'inspect-tier-card': 'paket', 'inspect-bill-card': 'billing', 'inspect-rollout-card': 'versi' };
             Object.keys(map).forEach(function (id) { const el = document.getElementById(id); if (el) el.style.display = map[id] === inspectPart ? '' : 'none'; });
@@ -2957,7 +2957,8 @@
             if (!isManaged(tenant)) { box.classList.add('hidden'); box.innerHTML = ''; tierPanelFor = null; return; }
             if (tierPanelFor === tenant.id) return;
             tierPanelFor = tenant.id;
-            const c = getCtrl(tenant.id), tier = tenant.tier || 'basic', cycle = c.billingCycle || 'monthly';
+            const c = getCtrl(tenant.id), cycle = c.billingCycle || 'monthly';
+            let tier = String(tenant.tier || 'basic').trim().toLowerCase(); if (!TIER_LABEL[tier]) tier = 'basic'; /* nilai paket aneh/lama dianggap Basic supaya panel tidak kosong */
             const sel = function (v, cur) { return v === cur ? ' selected' : ''; };
             const cls = 'w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none';
             let expired = false; try { expired = !!(window.FM_PLANS && FM_PLANS.PAKET && FM_PLANS.PAKET.isExpired(tenant)); } catch (e) {}
@@ -3013,7 +3014,7 @@
             renderInspectPlan(tenant);
             renderInspectRollout(tenant);
             renderInspectBill(tenant);
-            renderInspectTier(tenant);
+            try { renderInspectTier(tenant); } catch (e) { const bx = document.getElementById('inspect-tier-card'); if (bx) { bx.classList.remove('hidden'); bx.innerHTML = '<p class="text-rose-300 font-bold">Panel paket gagal dimuat: ' + escHtml(e && e.message || e) + '</p>'; } }
             applyInspectPart();
 
             const loc = tenant.locations || {};
