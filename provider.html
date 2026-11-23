@@ -88,7 +88,6 @@
     <script>
         window.FM_DOCK_ITEMS = [
             { label: 'Klien Baru', icon: 'store', run: "openModal('add_tenant')" },
-            { label: 'Catat', icon: 'plus', run: "openModal('provider_input_tx')" },
             { label: 'Pesan', icon: 'send', run: "openModal('broadcast_modal')" }
         ];
     </script>
@@ -98,7 +97,7 @@
     <script src="js/langit.js?v=1121" defer></script>
     <script src="js/logo.js?v=paket1"></script>
     <script src="js/skin.js?v=1119"></script>
-    <script src="js/tower-menu.js?v=1118"></script>
+    <script src="js/tower-menu.js?v=1124"></script>
     <script src="js/tower-lab.js?v=1124"></script>
     <script src="js/admins.js?v=1120"></script>
     <script src="js/tower-monitor.js?v=proto"></script>
@@ -281,7 +280,6 @@
 
         <!-- TOMBOL AKSI CEPAT PROVIDER -->
         <div id="fm-actions" class="fm-actions">
-            <button data-fm-action data-ic="list" onclick="openModal('provider_coa_mgmt')"><span>COA Provider</span></button>
             <button data-fm-action data-ic="tag" onclick="openModal('pricing')"><span>Harga Paket</span></button>
             <button data-fm-action data-ic="list" onclick="openModal('paket_fitur')"><span>Isi Paket Plus/Pro</span></button>
             <button data-fm-action data-ic="archive" onclick="openModal('former')"><span>Toko Berhenti</span><span id="former-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-600 text-[10px] font-black"></span></button>
@@ -2294,9 +2292,7 @@
                     '<p class="text-slate-300">Kirim link ini ke klien:</p>' +
                     '<input readonly id="nt-link" value="' + escHtml(link) + '" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-[11px] text-cyan-300 font-mono outline-none">' +
                     '<button id="nt-copy" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]">Salin Link</button>' +
-                    '<p class="text-amber-300 text-[11px]">Akun login toko belum dibuat. Buka menu Akun Login, atur PIN Kasir, Manager, dan Owner, lalu berikan PIN ke klien.</p>' +
-                    '<button id="nt-tpl" class="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-[11px]">Terapkan template / salin pengaturan toko lain</button>';
-                const tb = document.getElementById('nt-tpl'); if (tb) tb.onclick = function () { if (window.FM_LAB) FM_LAB.open('template', id); };
+                    '<p class="text-amber-300 text-[11px]">Akun login toko belum dibuat. Buka menu Akun Login, atur PIN Kasir, Manager, dan Owner, lalu berikan PIN ke klien.</p>';
                 const cb = document.getElementById('nt-copy');
                 cb.onclick = function () { const i = document.getElementById('nt-link'); i.select(); try { document.execCommand('copy'); cb.innerText = 'Tersalin'; } catch (e) {} };
                 ['nt-id', 'nt-nama', 'nt-alamat', 'nt-nobang', 'nt-kota', 'nt-prov', 'nt-custom', 'nt-usaha'].forEach(function (x) { const e = document.getElementById(x); if (e) e.value = ''; }); try { document.getElementById('nt-model').value = 'tunggal'; ntModelChanged(); } catch (e) {}

@@ -5,19 +5,14 @@
   if (!/provider/.test(location.pathname)) return;
 
   var DEFAULT_GROUPS = [
-    { id: 'klien', title: '1. Toko & Klien', hint: 'Toko baru, profil, akun & lokasi', c: '#2563eb', items: [
-      { key: 'klien_baru', t: 'Tambah Toko Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko & jenis usaha' },
-      { key: 'profil_toko', t: 'Profil & Logo', ic: 'store', run: "towerPick('profil')", d: 'Ubah nama, slogan, warna, logo' },
-      { key: 'coa_toko', t: 'Daftar Akun (COA)', ic: 'list', run: "towerPick('coa')", d: 'Atur akun pemasukan/keluar' },
-      { key: 'stok_katalog', t: 'Template Katalog', ic: 'box', run: "FM_LAB.open('template')", d: 'Salin katalog awal ke toko baru' },
+    { id: 'klien', title: '1. Toko & Klien', hint: 'Toko baru, profil & akun', c: '#2563eb', items: [
+      { key: 'klien_baru', t: 'Tambah Toko Baru', dup: true, ic: 'store', run: "openModal('add_tenant')", d: 'Daftarkan toko & pilih paket' },
+      { key: 'profil_toko', t: 'Profil Toko', ic: 'store', run: "towerPick('profil')", d: 'Ubah nama & alamat toko' },
       { key: 'link_toko', t: 'Salin Link Login', ic: 'send', run: "towerPick('link')", d: 'Bagikan link masuk ke klien' },
       { key: 'akun_login', t: 'PIN & Akun Login', ic: 'key', find: 'Akun Login', d: 'Cek PIN Admin, Manager, Owner' },
-      { key: 'lokasi_aktivitas', t: 'Lokasi & Aktivitas', ic: 'shield', run: "towerPick('lokasi')", d: 'Pantau GPS & transaksi toko' },
       { key: 'permohonan_kasir', t: 'Permohonan Kasir', ic: 'users', run: "openModal('tickets')", badge: 'stat-pending-tickets', d: 'Setujui/tolak perangkat kasir' }
     ] },
     { id: 'bangun', title: '2. Fitur, Kuota & Status', hint: 'Hak akses, terminal & status toko', c: '#0d9488', items: [
-      { key: 'fitur_toko', t: 'Atur Fitur Toko', ic: 'grid', run: "towerPick('fitur')", d: 'Centang fitur Admin/Manager/Owner' },
-      { key: 'salin_fitur', t: 'Salin Fitur Toko', ic: 'grid', run: "towerPick('salin')", d: 'Tiru susunan fitur toko lain' },
       { key: 'kuota_terminal', t: 'Batas Terminal', ic: 'users', run: "towerPick('kuota')", d: 'Jatah Kasir, Manager, Owner' },
       { key: 'bekukan_aktifkan', t: 'Bekukan / Aktifkan', ic: 'moon', run: "towerPick('freeze')", d: 'Hentikan sementara akses toko' },
       { key: 'kendali_massal', t: 'Aksi Massal Toko', ic: 'users', run: "towerMass()", d: 'Bekukan/kirim pesan sekaligus' },
@@ -39,17 +34,13 @@
       { key: 'log_login', t: 'Riwayat Login', ic: 'users', run: "FM_MON.open('login')", d: 'Siapa masuk, kapan & di mana' },
       { key: 'kesehatan_sistem', t: 'Pindai & Perbaiki', ic: 'shield', run: "FM_HEALTH.open()", d: 'Cek kesehatan server & data' },
       { key: 'pajak_jaringan', t: 'Pajak Semua Toko', ic: 'tax', run: "openModal('tax_net')", d: 'Total pajak dari tiap toko' },
-      { key: 'catat_pembukuan', t: 'Catat Kas Provider', dup: true, ic: 'swap', run: "openModal('provider_input_tx')", d: 'Pemasukan & pengeluaran Tower' },
-      { key: 'coa_provider', t: 'Akun (COA) Provider', ic: 'list', find: 'COA Provider', d: 'Akun kas internal Provider' },
       { key: 'kurs_emas', t: 'Kurs & Harga Emas', ic: 'coins', find: 'Kurs', d: 'Perbarui kurs & harga emas' }
     ] },
     { id: 'versi', title: '5. Versi, Uji & Serah Terima', hint: 'Versi rilis, uji coba & serah terima', c: '#9333ea', items: [
       { key: 'versi_toko', t: 'Kunci Versi Toko', ic: 'swap', run: "towerPick('versi')", d: 'Kunci toko ke versi tertentu' },
       { key: 'rollout_versi', t: 'Atur Rollout Versi', ic: 'box', run: "if(window.openRolloutModal)openRolloutModal()", d: 'Titik beku rilis & Oneil Shield' },
-      { key: 'rakit_uji', t: 'Uji Fitur Toko', ic: 'grid', run: "FM_LAB.open('rakit')", d: 'Catat hasil uji fitur satu per satu' },
       { key: 'ubah_id', t: 'Ganti ID Toko', ic: 'key', run: "FM_LAB.open('rename')", d: 'Ubah ID toko sebelum diserahkan' },
       { key: 'published', t: 'Tandai Diserahkan', ic: 'send', run: "FM_LAB.open('publish')", d: 'Tandai toko siap pakai klien' },
-      { key: 'data_demo', t: 'Isi Data Demo', ic: 'grid', run: "FM_DEMO.open()", d: 'Isi toko uji dengan contoh' },
       { key: 'uji_mandiri', t: 'Cek Kelayakan', ic: 'shield', run: "FM_QA.open()", d: 'Verifikasi file & data toko' },
       { key: 'reset_statistik', t: 'Reset Data Uji', warn: true, ic: 'trash', run: "FM_LAB.open('reset')", d: 'Hapus data uji coba ke 0' }
     ] },
