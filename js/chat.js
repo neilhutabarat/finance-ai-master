@@ -440,7 +440,23 @@
     if (ready()) subscribe();
   }
 
-  window.FM_CHAT = { start: start, toggle: toggle, mountTower: mountTower, openModeration: openModeration };
+  /* Kosongkan seluruh isi Chat Global (Chat Universe). Hanya Tower. Percakapan pribadi (DM) tidak disentuh. */
+  function clearAll() {
+    if (!IS_TOWER) return;
+    if (typeof db === 'undefined' || !db) return alert('Firestore belum terhubung.');
+    if (!confirm('Kosongkan SELURUH isi Chat Global untuk semua toko?\n\nPesan yang dihapus tidak bisa dikembalikan. Percakapan pribadi tidak ikut terhapus.')) return;
+    var total = 0;
+    function round() {
+      return db.collection(COL).limit(400).get().then(function (snap) {
+        if (snap.empty) return;
+        var b = db.batch(); snap.forEach(function (d) { b.delete(d.ref); total++; });
+        return b.commit().then(round);
+      });
+    }
+    round().then(function () { alert('Chat Global dikosongkan (' + total + ' pesan dihapus).'); }).catch(function (e) { alert('Gagal mengosongkan chat: ' + ((e && e.message) || e)); });
+  }
+
+  window.FM_CHAT = { start: start, toggle: toggle, mountTower: mountTower, openModeration: openModeration, clearAll: clearAll };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 })();
