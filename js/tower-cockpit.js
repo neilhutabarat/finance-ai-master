@@ -12,7 +12,11 @@
   function clock(ms, off) { var d = new Date(ms + off * 3600000); return pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()); }
   function rp(n) { return g(function () { return formatThousand(n); }, 'Rp ' + Math.round(n || 0)); }
   function isDemoId(id) { return /^ID0{4,}/i.test(String(id || '')); }
-  function tenants() { return g(function () { return billTenants(); }, []).filter(function (t) { return !isDemoId(t.id); }); }
+  function isInternalMon(t) {
+    var id = String((t && t.id) || '').toUpperCase().trim(), nm = String((t && t.nama) || '').toLowerCase().trim();
+    return isDemoId(id) || id === 'ID26110901' || id === 'ID260220017' || nm === 'oneilverse' || nm === 'oneilmedia';
+  }
+  function tenants() { return g(function () { return billTenants(); }, []).filter(function (t) { return !isInternalMon(t); }); }
   function ctrl(id) { return g(function () { return getCtrl(id); }, {}); }
   function txs(id) { return g(function () { return getTenantTxList(id); }, []); }
   function online(id) { return g(function () { return onlineSessions(id); }, []); }
