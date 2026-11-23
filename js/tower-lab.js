@@ -295,10 +295,7 @@
      ===================================================================== */
   function openPublish(t) {
     var s = summary(t.id), c = s.c, pub = isPub(t.id), n = 0; try { n = getTenantTxList(t.id).length; } catch (e) {}
-    var probs = [];
-    if (c.gagal) probs.push(c.gagal + ' fitur gagal / ada bug (' + s.names.gagal.join(', ') + ')');
-    if (c.terlewat) probs.push(c.terlewat + ' fitur terlewat, belum diuji (' + s.names.terlewat.join(', ') + ')');
-    if (c.uji) probs.push(c.uji + ' fitur masih diuji (' + s.names.uji.join(', ') + ')');
+    var probs = []; /* peringatan hasil uji fitur dihapus: fitur toko kini mengikuti paket, bukan dirakit satu per satu */
     var body;
     if (pub) {
       var when = lab(t.id).publishedAt ? new Date(lab(t.id).publishedAt).toLocaleString('id-ID') : '-';
@@ -309,7 +306,7 @@
       body = '<div style="overflow:auto;padding:0 18px 16px"><div style="font-size:12.5px;opacity:.85">Setelah ditandai Published, <b>Reset Statistik</b> dan <b>Ubah ID</b> dikunci untuk toko ini, supaya data klien tidak terhapus karena salah pencet.</div>' +
         (probs.length ? '<div style="margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.45);font-size:12px;color:#fde68a"><b>Perhatian, uji coba belum bersih:</b><ul style="margin:6px 0 0 16px;list-style:disc">' + probs.map(function (p) { return '<li>' + H(p) + '</li>'; }).join('') + '</ul>' +
           '<label style="display:flex;gap:8px;margin-top:8px;align-items:center"><input type="checkbox" id="pb-ok" style="width:16px;height:16px"><span>Saya tahu, serahkan tetap</span></label></div>' :
-          '<div style="margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.4);font-size:12px;color:#a7f3d0">Semua fitur aktif sudah lolos uji.</div>') +
+          '') +
         '<label style="display:flex;gap:8px;margin-top:12px;align-items:center;font-size:12.5px"><input type="checkbox" id="pb-rs" ' + (n > 0 ? 'checked' : '') + ' style="width:16px;height:16px"><span>Reset statistik uji coba dulu (transaksi, stok jadi 0, closing, gaji, audit)' + (n ? ' — ' + n + ' transaksi tercatat' : '') + '</span></label>' +
         '<div id="pb-log" style="margin-top:8px;font-size:12px;min-height:14px"></div>' +
         '<button id="pb-go" style="' + BTN + 'background:#059669;margin-top:10px;width:100%">Tandai Published</button></div>';

@@ -114,7 +114,7 @@
     if (busy) h += '<div style="margin-top:8px;font-size:12px;color:#fbbf24">' + esc(busy) + '</div>';
     h += '<div style="margin-top:8px"><button data-restore style="' + BTN + 'background:rgba(255,255,255,.12);padding:6px 12px;font-size:11.5px">Pulihkan gambar bawaan</button></div>';
     h += '<div style="' + BOX + '"><label style="display:flex;gap:8px;align-items:center;font-size:13px;font-weight:700"><input type="radio" name="fm-tw-mode" value="auto" ' + (cfg.mode === 'auto' ? 'checked' : '') + '> Otomatis bergilir tiap minggu</label>' +
-      '<div style="display:' + (cfg.mode === 'auto' ? 'grid' : 'none') + ';grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 4px">' +
+      '<div style="display:none;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 4px">' +
       '<label style="font-size:11.5px;color:#c7cbd6">Hari berganti<br><select data-g="day" style="' + SEL + ';width:100%">' + opts(DAYS.map(function (x, k) { return [k, x]; }), cfg.day) + '</select></label>' +
       '<label style="font-size:11.5px;color:#c7cbd6">Jam berganti (WIB)<br><select data-g="hour" style="' + SEL + ';width:100%">' + opts(Array.apply(null, Array(24)).map(function (_, k) { return [k, ('0' + k).slice(-2) + ':00']; }), cfg.hour) + '</select></label>' +
       '<label style="font-size:11.5px;color:#c7cbd6;grid-column:1/3">Urutan gambar (pisahkan koma)<br><input data-g="order" value="' + esc(cfg.order.join(',')) + '" style="' + SEL + ';width:100%;box-sizing:border-box"></label>' +
@@ -127,7 +127,8 @@
   function tabKaca() {
     var h = '<div style="' + BOX + '"><b style="font-size:13px">Kejelasan kaca (semua toko dan portal)</b><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">' + GL.map(function (g) { return chip(String(cfg.glass) === g[0], 'data-gl="' + g[0] + '"', g[1]); }).join('') + '</div>' +
       '<div style="font-size:11px;color:#94a3b8;margin-top:6px">Klien melapor tulisan kurang jelas: naikkan ke buram untuk toko itu di tab "Per toko".</div></div>';
-    h += '<div style="' + BOX + '"><label style="display:flex;gap:8px;align-items:center;font-size:13px;font-weight:800"><input type="checkbox" data-rain-on ' + (cfg.rain.on ? 'checked' : '') + '> Efek hujan di kaca (tetesan air pada kartu, tombol, pop-up, header, dock)</label>' +
+    /* Hujan di kaca disembunyikan (dekoratif); bagian hanya tampil bila sedang nyala supaya bisa dimatikan */
+    h += '<div style="' + BOX + ';display:' + (cfg.rain.on ? 'block' : 'none') + '"><label style="display:flex;gap:8px;align-items:center;font-size:13px;font-weight:800"><input type="checkbox" data-rain-on ' + (cfg.rain.on ? 'checked' : '') + '> Efek hujan di kaca (tetesan air pada kartu, tombol, pop-up, header, dock)</label>' +
       '<div style="display:' + (cfg.rain.on ? 'block' : 'none') + '"><div style="font-size:12px;color:#c7cbd6;margin:10px 0 6px">Ukuran butiran</div><div style="display:flex;gap:6px;flex-wrap:wrap">' + [1, 2, 3, 4, 5].map(function (v) { return chip(cfg.rain.size === v, 'data-rsize="' + v + '"', v === 1 ? '1 Halus' : v === 5 ? '5 Besar' : String(v)); }).join('') + '</div>' +
       '<div style="font-size:12px;color:#c7cbd6;margin:10px 0 6px">Deras</div><div style="display:flex;gap:6px;flex-wrap:wrap">' + [1, 2, 3, 4, 5].map(function (v) { return chip(cfg.rain.rate === v, 'data-rrate="' + v + '"', v === 1 ? '1 Gerimis' : v === 5 ? '5 Deras' : String(v)); }).join('') + '</div>' +
       '<div style="font-size:11px;color:#94a3b8;margin-top:8px">Efek ini memakai tenaga komputer. Bila PC toko lemah, matikan per toko di tab "Per toko". Aplikasi juga berhenti sendiri bila terasa berat.</div></div></div>';
@@ -151,7 +152,7 @@
       return '<div data-row="' + esc(t.id) + '" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);margin-bottom:6px"><div><b style="font-size:13px">' + esc(t.nama) + '</b><div style="font-size:11px;color:#94a3b8">' + esc(t.id) + '</div></div>' +
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11px;color:' + (/^Gagal/.test(rowMsg[t.id] || '') ? '#fca5a5' : '#86efac') + '">' + esc(rowMsg[t.id] || '') + '</span>' +
         '<select data-f="glass" title="Kejelasan kaca" style="' + SEL + '"><option value="">Kaca: ikut global (' + cfg.glass + ')</option>' + GL.map(function (g) { return '<option value="' + g[0] + '"' + (String(gcur) === g[0] ? ' selected' : '') + '>Kaca ' + esc(g[1]) + '</option>'; }).join('') + '</select>' +
-        '<select data-f="rain" title="Hujan di kaca" style="' + SEL + '"><option value="">Hujan: ikut global (' + (cfg.rain.on ? 'nyala' : 'mati') + ')</option><option value="on"' + (rcur === 'on' ? ' selected' : '') + '>Hujan nyala</option><option value="off"' + (rcur === 'off' ? ' selected' : '') + '>Hujan mati</option></select></div></div>';
+        '<select data-f="rain" style="display:none"><option value="">-</option></select></div></div>';
     }).join('') || '<div style="color:#94a3b8;font-size:12.5px">Tidak ada toko.</div>';
     return h;
   }

@@ -98,12 +98,12 @@
     <script src="js/logo.js?v=paket1"></script>
     <script src="js/skin.js?v=1119"></script>
     <script src="js/tower-menu.js?v=1124b"></script>
-    <script src="js/tower-lab.js?v=1124"></script>
+    <script src="js/tower-lab.js?v=1125"></script>
     <script src="js/admins.js?v=1120"></script>
     <script src="js/tower-monitor.js?v=proto"></script>
     <script src="js/tower-help.js?v=proto"></script>
     <script src="js/tower-store.js?v=proto"></script>
-    <script src="js/tower-wall.js?v=proto"></script>
+    <script src="js/tower-wall.js?v=1125"></script>
     <script src="js/tower-demo.js?v=proto"></script>
     <script src="js/tower-qa.js?v=proto"></script>
     <script src="js/tower-health.js?v=h4"></script>
@@ -673,7 +673,7 @@
                             <div><label class="font-bold text-slate-300 block mb-1">Provinsi</label><input id="nt-prov" type="text" placeholder="Contoh: Sumatera Utara" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <div><label class="font-bold text-slate-300 block mb-1">Negara</label><input id="nt-negara" type="text" value="Indonesia" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div>
                             <input type="hidden" id="nt-tier" value="basic">
-                            <div><label class="font-bold text-slate-300 block mb-1">Kuota Terminal Awal (Kasir / Manager / Owner)</label>
+                            <div style="display:none"><label class="font-bold text-slate-300 block mb-1">Kuota Terminal Awal (Kasir / Manager / Owner)</label>
                                 <div class="grid grid-cols-3 gap-2"><input id="nt-kasir" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><input id="nt-mgr" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><input id="nt-own" type="number" min="1" value="1" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"></div></div>
                             <div style="display:none"><label class="font-bold text-slate-300 block mb-1">Siklus Tagihan</label>
                                 <select id="nt-cycle" onchange="previewNewTenantPlan()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none"><option value="monthly">Per Bulan</option><option value="yearly">Per Tahun (hemat)</option></select></div>
@@ -1687,31 +1687,18 @@
         function renderRolloutDefaults() {
             const el = document.getElementById('tw-rollout-defaults');
             if (!el) return;
-            const gens = (FM_ROLLOUT_CFG && FM_ROLLOUT_CFG.generations) || { '1': { label: 'Oneilverse', pin: 'v1.0.25' } };
-            const nums = Object.keys(gens).sort(function (a, b) { return (+a) - (+b); });
-            let rows = ''; nums.forEach(function (n) { rows += genRowHtml(n, gens[n]); });
+            const gens = Object.assign({}, (FM_ROLLOUT_CFG && FM_ROLLOUT_CFG.generations) || {});
+            const g1 = gens['1'] || { label: 'Oneilverse', pin: '' };
+            const opt = ['<option value="">Ikuti kode terbaru</option>'].concat(
+                FM_ROLLOUT_VERSIONS.map(function (v) { return '<option value="' + v + '"' + (v === g1.pin ? ' selected' : '') + '>Kunci ke ' + v + '</option>'; })
+            ).join('');
             el.innerHTML =
-                '<div id="gen-rows">' + rows + '</div>' +
-                '<button id="gen-add" type="button" style="width:100%;padding:7px;margin-bottom:8px;border-radius:10px;border:1px dashed rgba(255,255,255,.25);background:transparent;color:#cbd5e1;font-size:12px;cursor:pointer">+ Tambah Generasi</button>' +
-                '<button id="gen-save" class="w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-black text-xs transition">Simpan Generasi</button>';
-            el.querySelector('#gen-add').onclick = function () {
-                const rows2 = el.querySelectorAll('.gen-row');
-                const used = Array.prototype.map.call(rows2, function (r) { return parseInt(r.getAttribute('data-n'), 10); });
-                let next = 2; while (used.indexOf(next) >= 0) next++;
-                el.querySelector('#gen-rows').insertAdjacentHTML('beforeend', genRowHtml(String(next), { label: 'Oneilverse ' + next, pin: '' }));
-                Array.prototype.forEach.call(el.querySelectorAll('.gen-del'), bindDel);
-            };
-            function bindDel(btn) { btn.onclick = function () { btn.closest('.gen-row').remove(); }; }
-            Array.prototype.forEach.call(el.querySelectorAll('.gen-del'), bindDel);
+                '<label style="display:block;font-size:11.5px;font-weight:700;color:#cbd5e1;margin-bottom:4px">Versi bawaan semua toko</label>' +
+                '<select id="gen-pin1" style="width:100%;background:#0f172a;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:8px;color:#fff;font-size:12px;margin-bottom:8px">' + opt + '</select>' +
+                '<button id="gen-save" class="w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-black text-xs transition">Simpan</button>';
             el.querySelector('#gen-save').onclick = function () {
-                const out = {};
-                Array.prototype.forEach.call(el.querySelectorAll('.gen-row'), function (r) {
-                    const n = r.getAttribute('data-n');
-                    const label = r.querySelector('.gen-label').value.trim() || ('Generasi ' + n);
-                    const pin = r.querySelector('.gen-pin').value;
-                    out[n] = { label: label, pin: pin };
-                });
-                saveGenerations(out);
+                gens['1'] = { label: g1.label || 'Oneilverse', pin: el.querySelector('#gen-pin1').value };
+                saveGenerations(gens);
             };
         }
 
@@ -1743,11 +1730,6 @@
                 .map(function (o) { return '<option value="' + o[0] + '"' + ((tpl.latar || 'kabut') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
             box.classList.remove('hidden');
             box.innerHTML =
-                '<span class="font-black text-sm text-white block mb-1">Generasi Toko Ini</span>' +
-                '<p class="text-[11px] text-slate-400 mb-2">Saat ini: <b class="text-violet-300">' + escHtml((gens[curGen] && gens[curGen].label) || ('Generasi ' + curGen)) + '</b></p>' +
-                '<select id="ir-gen" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">' + genOpt + '</select>' +
-                '<button id="ir-gen-save" class="mt-2 w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-black text-xs transition">Simpan Generasi</button>' +
-                '<div style="margin:14px 0 8px;border-top:1px solid rgba(255,255,255,.1)"></div>' +
                 '<span class="font-black text-sm text-white block mb-1">Versi Aplikasi Toko Ini</span>' +
                 '<p class="text-[11px] text-slate-400 mb-2">Saat ini ikut versi: <b class="text-violet-300">' + (tenant.pinnedVersion || ikut) + '</b></p>' +
                 '<select id="ir-version" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">' + opt + '</select>' +
@@ -1765,9 +1747,6 @@
                 '<label class="text-[11px] text-slate-300 font-bold block mb-1">Warna latar (tema Base)</label>' +
                 '<select id="ir-latar" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">' + latarOpt + '</select>' +
                 '<button id="ir-tampilan-save" class="mt-2 w-full py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs transition">Simpan Tampilan</button>';
-            document.getElementById('ir-gen-save').onclick = function () {
-                setTenantGeneration(tenant.id, document.getElementById('ir-gen').value);
-            };
             document.getElementById('ir-save').onclick = function () {
                 setTenantPinnedVersion(tenant.id, document.getElementById('ir-version').value);
             };
@@ -1787,7 +1766,7 @@
             ov.innerHTML =
                 '<div style="width:100%;max-width:440px;max-height:88vh;overflow:auto;background:#0b0b10;border:1px solid rgba(167,139,250,.35);border-radius:20px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)">' +
                 '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="color:#fff;font-size:14px">Rollout Versi</b><button id="tw-rollout-close" style="all:unset;cursor:pointer;color:#94a3b8;font-size:13px">Tutup</button></div>' +
-                '<p style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:10px">Tiap generasi Oneilverse punya titik beku sendiri. Kosongkan titik bekunya kalau generasi itu mau ikut kode terbaru di akar situs (dipakai saat generasi itu masih dikembangkan). Toko yang belum punya generasi otomatis dianggap Generasi 1. Untuk mengunci satu toko tertentu, pakai tombol Versi Toko di ruang Kendali.</p>' +
+                '<p style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:10px">Versi bawaan dipakai semua toko yang tidak dikunci sendiri lewat Kunci Versi Toko. Kosongkan kalau mau semua toko ikut kode terbaru. Toko yang belum punya generasi otomatis dianggap Generasi 1. Untuk mengunci satu toko tertentu, pakai tombol Versi Toko di ruang Kendali.</p>' +
                 '<div id="tw-rollout-defaults"></div>' +
                 '<div style="margin:16px 0 4px;border-top:1px solid rgba(255,255,255,.1)"></div>' +
                 '<div style="display:flex;align-items:center;gap:6px;margin:10px 0 4px"><b style="color:#fff;font-size:13px">🛡️ Rollout Oneil Shield</b></div>' +
