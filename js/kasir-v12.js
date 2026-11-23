@@ -758,7 +758,7 @@
     if (old) old.remove();
 
     var hutangOn = false;
-    try { hutangOn = !!(window.FM_PLANS && FM_PLANS.has('piutang') && window.FM_PIU && FM_PIU.createFromSale); } catch (e) {}
+    try { hutangOn = !!(window.FM_PIU && FM_PIU.createFromSale); } catch (e) {}
     var initPm = ((document.getElementById('pay-method') || {}).value) || 'tunai';
     var modal = document.createElement('div');
     modal.id = 'v12-pay-modal';

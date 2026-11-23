@@ -8,7 +8,7 @@
   var RELEASE_NOTES = [
     ['v1.2', '23 Nov 2026', [
       '[Baru] Metode bayar Hutang di Kasir dengan pilihan TOP 14, 30, atau 45 hari. Nama pelanggan wajib diisi, jatuh tempo otomatis dihitung dan tampil di struk',
-      '[Baru] Penjualan hutang otomatis masuk ke Piutang & Utang (Paket Plus ke atas), dan tidak dihitung sebagai uang tunai sampai dilunasi',
+      '[Baru] Penjualan hutang otomatis masuk ke Piutang & Utang (tersedia di semua paket), dan tidak dihitung sebagai uang tunai sampai dilunasi',
       '[Perbaikan] Pelunasan piutang dari Kasir tidak mencatat omzet dua kali',
       '[Baru] Kasir v1.2: Modal Konfirmasi Pembayaran dengan hitung Kembalian otomatis, tombol pecahan cepat, Diskon Struk, dan nama Pelanggan',
       '[Baru] Dukungan Split Payment (bayar campuran dua metode), Parkir Antrean (Hold), dan tab Riwayat Hari Ini untuk cetak ulang struk atau kirim WhatsApp',

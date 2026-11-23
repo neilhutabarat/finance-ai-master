@@ -30,7 +30,7 @@
     if (hasDb()) {
       try {
         unsub = db.collection(col()).onSnapshot(function (s) {
-          rows = []; s.forEach(function (d) { var x = d.data(); x.id = x.id || d.id; rows.push(x); }); note = ''; render(); badge();
+          rows = []; s.forEach(function (d) { var x = d.data(); x.id = x.id || d.id; rows.push(x); }); note = ''; render(); badge(); floatBtn();
         }, function (e) { note = 'Data belum bisa dibaca dari server (' + ((e && e.code) || 'ditolak') + '). Pastikan aturan Firestore terbaru sudah dipasang.'; render(); });
       } catch (e) { note = String(e.message || e); }
     } else { try { rows = JSON.parse(localStorage.getItem(lsKey()) || '[]'); } catch (e) { rows = []; } }
@@ -255,8 +255,9 @@
   window.FM_PIU = { createFromSale: createFromSale, open: open, mount: function () {}, start: start, all: function () { start(); return rows.slice(); },
     totals: function (biz) { start(); var a = 0, b = 0, ok = function (e) { if (!biz) return true; try { return FM_BIZ.canon(e.biz) === biz; } catch (x) { return true; } }; entries('piutang').filter(ok).forEach(function (e) { a += sisa(e); }); entries('utang').filter(ok).forEach(function (e) { b += sisa(e); }); return { piutang: a, utang: b, ready: rows.length > 0 || started }; } };
   function floatBtn() {
-    try { if (!(window.FM_PLANS && FM_PLANS.has('piutang'))) return; } catch (e) { return; }
     start();
+    /* Paket Basic: tombol Piutang tetap muncul bila ada penjualan hutang dari Kasir, supaya tagihannya bisa dipantau dan dilunasi */
+    try { if (!(window.FM_PLANS && FM_PLANS.has('piutang')) && !rows.some(function (x) { return x.t === 'e' && x.fromKasir; })) return; } catch (e) { return; }
     if (document.querySelector('[onclick*="FM_PIU"]')) return;
     var b = document.createElement('button'); b.type = 'button'; b.className = 'fm-fab'; b.setAttribute('data-fc', 'piu'); b.setAttribute('onclick', 'FM_PIU.open()');
     b.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:2147482000;padding:11px 16px;border-radius:999px;background:#2f55d4;color:#fff;font:800 12.5px -apple-system,sans-serif;border:0;box-shadow:0 8px 24px rgba(0,0,0,.35)';
