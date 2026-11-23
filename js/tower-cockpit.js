@@ -26,7 +26,7 @@
   function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
 
   /* ============ suara (Web Audio, tanpa file) ============ */
-  var S = { ctx: null, on: store('tw_snd') !== '0', voice: store('tw_voice') !== '0', eco: store('tw_eco') === '1', last: 0, vol: Math.max(1, Math.min(10, +store('tw_vol') || 5)), master: null };
+  var S = { ctx: null, on: store('tw_snd') !== '0', voice: store('tw_voice') !== '0', atc: store('tw_atc') !== '0', eco: store('tw_eco') === '1', last: 0, vol: Math.max(1, Math.min(10, +store('tw_vol') || 5)), master: null };
   function ac() {
     if (!S.ctx) { try { S.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
     if (S.ctx.state === 'suspended') S.ctx.resume();
@@ -44,26 +44,135 @@
     gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(vol || 0.05, t + 0.005); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     o.connect(gn); gn.connect(master(c)); o.start(t); o.stop(t + dur + 0.02);
   }
+  var NOP = function () {};
   var SND = {
-    tick: function () { tone(1500, 0.03, 'square', 0.035); tone(1100, 0.04, 'square', 0.03, 0.035); },
-    type: function () { var n = Date.now(); if (n - S.last < 45) return; S.last = n; tone(2300 + Math.random() * 400, 0.012, 'square', 0.012); },
-    click: function () { tone(260, 0.05, 'square', 0.07, 0, 90); },
-    lever: function () { tone(180, 0.06, 'sawtooth', 0.06, 0, 70); tone(520, 0.03, 'square', 0.04, 0.07); },
-    beep: function () { tone(880, 0.07, 'sine', 0.06); },
-    tab: function () { tone(660, 0.04, 'sine', 0.05); tone(990, 0.04, 'sine', 0.04, 0.045); },
-    notif: function () { tone(740, 0.09, 'sine', 0.07); tone(988, 0.12, 'sine', 0.07, 0.1); },
-    alarm: function () { for (var i = 0; i < 3; i++) { tone(620, 0.14, 'square', 0.06, i * 0.3); tone(880, 0.14, 'square', 0.06, i * 0.3 + 0.15); } },
-    flap: function () { tone(900, 0.02, 'square', 0.03); tone(600, 0.025, 'square', 0.03, 0.03); },
-    fanfare: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.16, 'triangle', 0.08, i * 0.11); }); tone(1319, 0.4, 'triangle', 0.08, 0.46); },
-    goal: function () { [392, 523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.14, 'sawtooth', 0.05, i * 0.09); }); },
-    ok: function () { tone(520, 0.08, 'sine', 0.06); tone(780, 0.08, 'sine', 0.06, 0.09); tone(1040, 0.12, 'sine', 0.06, 0.18); },
-    radar: function () { tone(1570, 0.055, 'sine', 0.05, 0, 2090); tone(1570, 0.055, 'sine', 0.045, 0.13, 2090); } /* "bip-bip" naik — menyerupai Dragon Radar */
+    /* Di layar Monitor hanya ada: denyut EKG (toko online), bunyi tiit saat log transaksi diketik, alarm offline. */
+    tick: NOP, beep: NOP, click: NOP, lever: NOP, tab: NOP, notif: NOP, flap: NOP, radar: NOP, goal: NOP, fanfare: NOP,
+    type: NOP,
+    blip: function () { var long = Math.random() < 0.35; tone((long ? 1080 : 1300) + Math.random() * 160, long ? 0.075 : 0.028, 'sine', 0.05); return long; },
+    ekg: function () { tone(1000, 0.17, 'sine', 0.07, 0); tone(1000, 0.17, 'sine', 0.07, 0.62); },
+    rapid: function () { for (var i = 0; i < 16; i++) tone(1900, 0.035, 'square', 0.04, i * 0.075); },
+    alarm: function () { for (var i = 0; i < 3; i++) { tone(620, 0.14, 'square', 0.05, i * 0.3); tone(880, 0.14, 'square', 0.05, i * 0.3 + 0.15); } },
+    ok: function () { tone(520, 0.08, 'sine', 0.06); tone(780, 0.08, 'sine', 0.06, 0.09); tone(1040, 0.12, 'sine', 0.06, 0.18); }
   };
-  var lastSpeak = 0;
-  function speak(txt) {
-    if (!S.on || !S.voice || !window.speechSynthesis || Date.now() - lastSpeak < 8000) return;
-    lastSpeak = Date.now();
-    try { var u = new SpeechSynthesisUtterance(txt); u.lang = 'id-ID'; u.rate = 0.95; u.volume = 1; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+
+  /* ============ suara ATC: radio menara kontrol (bahasa Indonesia) ============
+     Suara bicara dari browser tidak bisa difilter, jadi kesan radio dibuat dari bunyi di sekitarnya:
+     ceklik "kshh" saat tombol bicara ditekan, desis statis selama bicara, bip "roger" di akhir. */
+  var ATC = { token: 0, hiss: null, noise: null, speaking: false };
+  function noiseBuf(c) {
+    if (!ATC.noise) { var n = c.sampleRate * 2, b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0); for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; ATC.noise = b; }
+    return ATC.noise;
+  }
+  function burst(dur, vol, freq, when) {
+    var c = ac(); if (!c || !S.on) return; var t = c.currentTime + (when || 0);
+    var src = c.createBufferSource(); src.buffer = noiseBuf(c);
+    var bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = freq || 2400; bp.Q.value = 0.8;
+    var gn = c.createGain(); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(Math.min(0.6, vol * S.vol), t + 0.01); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(bp); bp.connect(gn); gn.connect(master(c)); src.start(t, Math.random()); src.stop(t + dur + 0.02);
+  }
+  function hissOn() {
+    var c = ac(); if (!c || ATC.hiss) return;
+    var src = c.createBufferSource(); src.buffer = noiseBuf(c); src.loop = true;
+    var bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1900; bp.Q.value = 0.6;
+    var gn = c.createGain(); gn.gain.value = Math.min(0.12, 0.004 * S.vol);
+    src.connect(bp); bp.connect(gn); gn.connect(master(c)); src.start();
+    ATC.hiss = { stop: function () { try { gn.gain.setTargetAtTime(0.0001, c.currentTime, 0.05); src.stop(c.currentTime + 0.3); } catch (e) {} } };
+  }
+  function hissOff() { if (ATC.hiss) { ATC.hiss.stop(); ATC.hiss = null; } }
+  function idVoice() {
+    var v = g(function () { return speechSynthesis.getVoices(); }, []);
+    for (var i = 0; i < v.length; i++) if (/^id/i.test(v[i].lang)) return v[i];
+    return null;
+  }
+  function atcStop() {
+    ATC.token++; ATC.speaking = false; hissOff();
+    try { speechSynthesis.cancel(); } catch (e) {}
+    syncToggles();
+  }
+  /* lines: array kalimat. opts.before dijalankan sebelum bicara (mis. alarm), opts.done saat selesai. */
+  function atcSay(lines, opts) {
+    opts = opts || {};
+    if (!S.on || !S.voice || !window.speechSynthesis) { if (opts.done) opts.done(); return; }
+    var c = ac(); if (!c) { if (opts.done) opts.done(); return; }
+    try { speechSynthesis.cancel(); } catch (e) {}
+    hissOff();
+    var my = ++ATC.token, i = 0, v = idVoice(), lead = opts.lead || 0;
+    ATC.speaking = true; syncToggles();
+    function finish() {
+      if (my !== ATC.token) return;
+      burst(0.1, 0.05, 2600); tone(1450, 0.07, 'sine', 0.05, 0.12); hissOff(); ATC.speaking = false; syncToggles();
+      if (opts.done) opts.done();
+    }
+    function next() {
+      if (my !== ATC.token) return;
+      if (i >= lines.length) return finish();
+      var u = new SpeechSynthesisUtterance(lines[i++]);
+      u.lang = 'id-ID'; if (v) u.voice = v; u.rate = 1.03; u.pitch = 0.82; u.volume = 1;
+      var moved = false; function go() { if (moved) return; moved = true; if (i < lines.length) burst(0.07, 0.035, 2600); setTimeout(next, 220); }
+      u.onend = go; u.onerror = go;
+      try { speechSynthesis.speak(u); } catch (e) { go(); }
+    }
+    setTimeout(function () {
+      if (my !== ATC.token) return;
+      burst(0.14, 0.07, 2400); hissOn();
+      setTimeout(next, 260);
+    }, lead);
+  }
+  function speak(txt) { atcSay([txt]); }
+
+  function sayRp(n) {
+    n = Math.round(n || 0);
+    if (n >= 1e9) return (n / 1e9).toFixed(1).replace('.', ',').replace(/,0$/, '') + ' miliar rupiah';
+    if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',').replace(/,0$/, '') + ' juta rupiah';
+    if (n >= 1e3) return Math.round(n / 1e3) + ' ribu rupiah';
+    return n + ' rupiah';
+  }
+  function sayAgo(ms) {
+    if (!ms) return '';
+    var m = Math.round((Date.now() - ms) / 60000);
+    if (m < 1) return 'baru saja';
+    if (m < 60) return m + ' menit yang lalu';
+    var h = Math.round(m / 60); if (h < 24) return h + ' jam yang lalu';
+    return Math.round(h / 24) + ' hari yang lalu';
+  }
+  function atcScript() {
+    if (Date.now() - aggAt > 4000) compute();
+    var d0 = ymd(new Date()), ts = tenants(), hr = new Date().getHours();
+    var sapa = hr < 11 ? 'selamat pagi' : hr < 15 ? 'selamat siang' : hr < 18 ? 'selamat sore' : 'selamat malam';
+    var rows = ts.map(function (tn) {
+      var on = online(tn.id).length > 0, a = agg[tn.id] || {}, sales = 0, out = 0, n = 0;
+      txs(tn.id).forEach(function (t) { if ((t.dateISO || '') !== d0) return; n++; if (t.category === 'sales') sales += t.amount || 0; else out += t.amount || 0; });
+      return { tn: tn, on: on, n: n, sales: sales, out: out, last: g(function () { return lastActiveMs(tn.id); }, 0), bill: state(tn.id), sus: suspended(tn.id) };
+    });
+    rows.sort(function (a, b) { return (b.on - a.on) || (b.last - a.last); });
+    var nOn = rows.filter(function (r) { return r.on; }).length;
+    var brief = rows.length > 7, lines = [];
+    lines.push('Menara kontrol Oneilverse, ' + sapa + '. Terpantau ' + rows.length + ' toko, ' + nOn + ' sedang online.');
+    rows.forEach(function (r) {
+      var nm = r.tn.nama, t = '';
+      if (r.on) {
+        t = nm + ' sedang online';
+        if (r.n) t += brief ? ', ' + r.n + ' transaksi.' : ', melakukan ' + r.n + ' transaksi hari ini, penjualan ' + sayRp(r.sales) + (r.out ? ', pengeluaran ' + sayRp(r.out) : '') + '.';
+        else t += ', belum ada transaksi hari ini.';
+      } else {
+        var ago = sayAgo(r.last);
+        t = nm + ' offline' + (ago ? ', terakhir aktif ' + ago : '') + '.';
+        if (r.n && !brief) t += ' Hari ini ' + r.n + ' transaksi, penjualan ' + sayRp(r.sales) + '.';
+      }
+      if (r.sus) t += ' Toko ini sedang dibekukan.'; else if (r.bill === 'lewat') t += ' Tagihan sudah lewat tenggang.'; else if (r.bill === 'tempo' && !brief) t += ' Tagihan masuk masa tenggang.';
+      lines.push(t);
+    });
+    var pc = pendingCount();
+    lines.push((pc ? 'Ada ' + pc + ' permohonan kasir menunggu persetujuan. ' : 'Tidak ada permohonan kasir yang menunggu. ') + (alarms().length ? 'Ada ' + alarms().length + ' peringatan aktif.' : 'Tidak ada peringatan.') + ' Laporan selesai. Menara kontrol, keluar.');
+    return lines;
+  }
+  var broadcasted = false, entered = false, muteEntry = false;
+  function broadcast(force) {
+    if (!force && (broadcasted || !S.atc || S.eco || muteEntry)) return;
+    if (!seeded || !entered) return;
+    broadcasted = true;
+    atcSay(atcScript(), { lead: 300 });
   }
   function geoOf(id) {
     var best = null;
@@ -102,10 +211,13 @@
     var it = typeQ.shift(), i = 0;
     if (it.sound) SND[it.sound] && SND[it.sound]();
     (function step() {
-      i = Math.min(it.text.length, i + 2);
+      i = Math.min(it.text.length, i + 1);
+      var ch = it.text.charAt(i - 1), delay = 38, quiet = /[\s·|]/.test(ch);
       it.m.innerHTML = esc(it.text.slice(0, i)) + (i < it.text.length ? '<i class="caret">_</i>' : '');
-      fitLog(it.box); SND.type();
-      if (i < it.text.length) setTimeout(step, 22); else { typing = false; setTimeout(pump, 40); }
+      fitLog(it.box);
+      /* tiap karakter yang diketik berbunyi "tit" pendek atau "tiit" panjang acak, seperti monitor detak jantung */
+      if (quiet) delay = 85; else if (SND.blip()) delay = 80; else delay = 34 + Math.random() * 14;
+      if (i < it.text.length) setTimeout(step, delay); else { typing = false; setTimeout(pump, 160); }
     })();
   }
 
@@ -147,7 +259,11 @@
       }
       lastState[tn.id] = s;
       var on = online(tn.id).length > 0;
-      if (lastOnline[tn.id] !== undefined && lastOnline[tn.id] !== on) addLog('sys', tn.id + ' · ' + tn.nama + (on ? ' · ONLINE' : ' · OFFLINE'), false, on ? 'notif' : null);
+      if (lastOnline[tn.id] !== undefined && lastOnline[tn.id] !== on) {
+        addLog('sys', tn.id + ' · ' + tn.nama + (on ? ' · ONLINE' : ' · OFFLINE'), false, null);
+        if (on) SND.ekg();
+        else { SND.rapid(); atcSay([tn.nama + ' baru saja offline. Mohon periksa koneksi toko. Menara kontrol, keluar.'], { lead: 1350 }); }
+      }
       lastOnline[tn.id] = on;
     });
     var pc = pendingCount();
@@ -185,7 +301,8 @@
   function briefing(all) {
     var d0 = ymd(new Date()), sales = 0, n = 0;
     all.forEach(function (o) { if (o.t.category === 'sales' && (o.t.dateISO || '') === d0) { sales += o.t.amount || 0; n++; } });
-    addLog('sys', 'BRIEFING · hari ini ' + n + ' penjualan senilai ' + rp(sales) + ' · ' + alarms().length + ' alarm · ' + pendingCount() + ' tiket menunggu', false, 'ok');
+    addLog('sys', 'BRIEFING · hari ini ' + n + ' penjualan senilai ' + rp(sales) + ' · ' + alarms().length + ' alarm · ' + pendingCount() + ' tiket menunggu', false, null);
+    if (mode === 'mon' || mode === 'mon2') setTimeout(function () { broadcast(false); }, 600);
   }
 
   /* ============ alarm & siaga ============ */
@@ -556,7 +673,7 @@
     if (m === mode) return; mode = m;
     document.documentElement.setAttribute('data-tw-pg', m);
     [].forEach.call(document.querySelectorAll('#tw-bar [data-pg]'), function (b) { b.classList.toggle('on', b.getAttribute('data-pg') === m); });
-    if (!quiet) SND.tab();
+    if (m === 'mon' || m === 'mon2') setTimeout(function () { broadcast(false); }, 400);
     var fns = m === 'mon' ? [renderTable] : m === 'mon2' ? [renderStrip, renderMon2Extras, renderJam, renderAttn] : [];
     fns.forEach(function (fn) { try { fn(); } catch (e) { try { console.warn('tower render', e); } catch (e2) {} } });
   }
@@ -570,7 +687,7 @@
     var th = ['', 'ID', 'TOKO', 'KOTA', 'TRX HARI INI', 'PENDAPATAN', 'PENGELUARAN', 'LABA', 'PAJAK 12%', 'TREN 7 HARI', 'vs KEMARIN', 'TERMINAL', 'BILLING (Rp)', 'JATUH TEMPO', 'AKTIF TERAKHIR'], num = { 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 10: 1, 11: 1, 12: 1 };
     root.innerHTML =
       '<div id="tw-bar"><span class="pgs"><button data-pg="mon" class="on">MONITOR 1</button><button data-pg="mon2">MONITOR 2 <span id="tw-m2b" class="tw-m2b"></span></button><button data-pg="ken">KENDALI</button></span><span id="tw-df" class="g">● SIAGA 5</span><span id="tw-on"></span><span id="tw-tk" class="m"></span><span id="tw-al" class="m"></span><span class="sp"></span><span id="tw-clk" class="m"></span>' +
-      '<button id="tw-snd" class="pl"></button><button id="tw-eco" class="pl"></button><button id="tw-set" class="pl">Atur</button><button id="tw-out" class="pl bad">Keluar</button></div>' +
+      '<button id="tw-snd" class="pl"></button><button id="tw-atc" class="pl"></button><button id="tw-eco" class="pl"></button><button id="tw-set" class="pl">Atur</button><button id="tw-out" class="pl bad">Keluar</button></div>' +
       '<div id="tw-mon">' +
       '<div id="tw-ctrl">' +
         '<span class="tw-cl">Urut:</span>' +
@@ -612,13 +729,20 @@
   }
   function syncToggles() {
     $('tw-snd').textContent = 'Suara: ' + (S.on ? 'nyala' : 'mati'); $('tw-snd').classList.toggle('on', S.on);
+    var ab = $('tw-atc'); if (ab) { ab.textContent = ATC.speaking ? 'Siaran: berhenti' : 'Siaran: ' + (S.atc ? 'nyala' : 'mati'); ab.classList.toggle('on', S.atc || ATC.speaking); }
     $('tw-eco').textContent = 'Hemat: ' + (S.eco ? 'nyala' : 'mati'); $('tw-eco').classList.toggle('on', S.eco);
   }
   function wire() {
     $('tw-bar').addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
       if (b.hasAttribute('data-pg')) return setMode(b.getAttribute('data-pg'));
-      if (b.id === 'tw-snd') { S.on = !S.on; store('tw_snd', S.on ? '1' : '0'); syncToggles(); if (S.on) SND.ok(); }
+      if (b.id === 'tw-snd') { S.on = !S.on; store('tw_snd', S.on ? '1' : '0'); if (!S.on) atcStop(); syncToggles(); if (S.on) SND.ok(); }
+      else if (b.id === 'tw-atc') {
+        /* sedang siaran: hentikan. Selain itu: nyalakan/matikan siaran otomatis; menyalakan langsung memutar siaran */
+        if (ATC.speaking) { atcStop(); return; }
+        S.atc = !S.atc; store('tw_atc', S.atc ? '1' : '0'); syncToggles();
+        if (S.atc) { if (!S.on) { S.on = true; store('tw_snd', '1'); syncToggles(); } broadcast(true); }
+      }
       else if (b.id === 'tw-eco') { S.eco = !S.eco; store('tw_eco', S.eco ? '1' : '0'); syncToggles(); SND.click(); restartTimers(); }
       else if (b.id === 'tw-set') { SND.click(); var gb = $('fm-gear'); if (gb) gb.click(); }
       else if (b.id === 'tw-out') { SND.click(); if (window.FM_LOGOUT) FM_LOGOUT(); }
@@ -676,7 +800,7 @@
     ov.innerHTML = '<div><div class="pt">ONEILVERSE · CONTROL TOWER</div><button id="tw-pre-go">MASUK</button><small>Klik untuk menyalakan suara. Esc untuk masuk tanpa suara.</small></div>';
     document.body.appendChild(ov);
     var fin = false;
-    function end(snd) { if (fin) return; fin = true; if (snd) { ac(); SND.ok(); } ov.remove(); done(); }
+    function end(snd) { if (fin) return; fin = true; if (snd) { ac(); SND.ok(); } else muteEntry = true; entered = true; ov.remove(); done(); setTimeout(function () { broadcast(false); }, 800); }
     $('tw-pre-go').onclick = function () { end(true); };
     document.addEventListener('keydown', function k(e) { if (e.key === 'Escape') { document.removeEventListener('keydown', k); end(false); } });
     setTimeout(function () { var b = $('tw-pre-go'); if (b) b.focus(); }, 50);
@@ -776,9 +900,7 @@
       setInterval(function () { if (!document.hidden && mode === 'mon2') renderJam(); }, 60000),
       setInterval(function () { if (!document.hidden) scanEvents(); }, 2000),
       setInterval(function () { if (!document.hidden) pollSecurity(); }, 5000),
-      setInterval(function () { if (!document.hidden && seeded) trend(); }, 180000),
-      /* sapuan radar: berbunyi di layar MONITOR selama masih ada toko online (ikut kedipan lampu hijau) */
-      setInterval(function () { try { if (document.hidden || (mode !== 'mon' && mode !== 'mon2') || !S.on || S.eco) return; if (tenants().some(function (t) { return online(t.id).length; })) SND.radar(); } catch (e) {} }, 2600)
+      setInterval(function () { if (!document.hidden && seeded) trend(); }, 180000)
     );
   }
   function restartTimers() { clearTimers(); startTimers(); }
@@ -800,6 +922,6 @@
       if (++tries < 80) setTimeout(wait, 150);
     })();
   }
-  window.FM_COCKPIT = { sound: SND, state: S, addLog: addLog, setMode: setMode };
+  window.FM_COCKPIT = { sound: SND, state: S, addLog: addLog, setMode: setMode, atc: { script: atcScript, say: atcSay, broadcast: broadcast, stop: atcStop } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

@@ -597,9 +597,9 @@
     if (kind === 'template') return openTemplate(arg);
     var map = {
       rakit: ['Rakit Akun', 'Aktifkan fitur satu per satu dan catat hasil ujinya', null, openRakit],
-      reset: ['Reset Statistik', 'Pilih toko uji coba yang statistiknya dikembalikan ke 0', function (t) { return !isPub(t.id); }, openReset],
-      rename: ['Ubah ID', 'Hanya toko yang belum Published', function (t) { return !isPub(t.id); }, openRename],
-      publish: ['Published', 'Tandai toko yang sudah diserahkan ke klien', null, openPublish]
+      reset: ['Bersihkan Data Uji', 'Pilih toko uji coba yang statistiknya dikembalikan ke 0', function (t) { return !isPub(t.id); }, openReset],
+      rename: ['Ganti ID Toko', 'Hanya toko yang belum Published', function (t) { return !isPub(t.id); }, openRename],
+      publish: ['Tandai Diserahkan', 'Tandai toko yang sudah diserahkan ke klien', null, openPublish]
     }[kind];
     if (!map) return;
     pick(map[0], map[1], map[2], map[3], kind === 'reset' || kind === 'rename' ? 'Toko yang sudah Published tidak ditampilkan karena terkunci.' : '');
