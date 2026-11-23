@@ -659,7 +659,7 @@
                         <span class="font-black text-sm text-white block">Data Klien Baru</span>
                         <div><label class="font-bold text-slate-300 block mb-1">Paket</label>
                             <div id="nt-tiers" class="grid grid-cols-3 gap-2"><button type="button" data-nt-tier="basic" class="nt-tier-btn py-3 rounded-xl border border-white/15 bg-slate-900 text-white font-black text-xs">Basic</button><button type="button" data-nt-tier="plus" class="nt-tier-btn py-3 rounded-xl border border-white/15 bg-slate-900 text-white font-black text-xs">Plus</button><button type="button" data-nt-tier="pro" class="nt-tier-btn py-3 rounded-xl border border-white/15 bg-slate-900 text-white font-black text-xs">Pro</button></div>
-                            <p class="mt-1 text-[11px] text-slate-400">Fitur toko mengikuti isi paket di menu Isi Paket Basic/Plus/Pro.</p></div>
+                            <p id="nt-tier-label" class="mt-2 text-xs font-black text-indigo-300"></p><p class="mt-1 text-[11px] text-slate-400">Fitur toko mengikuti isi paket di menu Isi Paket Basic/Plus/Pro.</p></div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="sm:col-span-2"><label class="font-bold text-slate-300 block mb-1">ID Toko (kosongkan = otomatis)</label>
                                 <input id="nt-id" type="text" maxlength="11" placeholder="Kosongkan untuk otomatis. Format: ID + YYMMDD + hari(1-7) + urutan, contoh ID261112403" oninput="previewNewTenantId()" class="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-white outline-none">
@@ -2192,7 +2192,18 @@
         }
         function ntSetTier(t) {
             document.getElementById('nt-tier').value = t;
-            document.querySelectorAll('[data-nt-tier]').forEach(function (b) { const on = b.getAttribute('data-nt-tier') === t; b.style.background = on ? '#4f46e5' : ''; b.style.borderColor = on ? '#818cf8' : ''; });
+            const NM = { basic: 'Basic', plus: 'Plus', pro: 'Pro' };
+            document.querySelectorAll('[data-nt-tier]').forEach(function (b) {
+                const k = b.getAttribute('data-nt-tier'), on = k === t;
+                b.textContent = (on ? '✓ ' : '') + NM[k];
+                b.setAttribute('aria-pressed', on ? 'true' : 'false');
+                b.style.setProperty('background', on ? '#4f46e5' : '#0f172a', 'important');
+                b.style.setProperty('border', on ? '2px solid #a5b4fc' : '1px solid rgba(255,255,255,.15)', 'important');
+                b.style.setProperty('color', '#ffffff', 'important');
+                b.style.setProperty('box-shadow', on ? '0 0 0 3px rgba(129,140,248,.35)' : 'none', 'important');
+                b.style.setProperty('opacity', on ? '1' : '.7', 'important');
+            });
+            const lb = document.getElementById('nt-tier-label'); if (lb) lb.textContent = 'Paket dipilih: ' + NM[t];
         }
 
         function createTenant() {
