@@ -67,20 +67,6 @@
     return tx.id;
   }
   function addPayment(e, amount, pay) {
-    if (e.fromKasir) {
-      /* Penjualan hutang dari Kasir: omzet sudah tercatat saat struk dibuat, jadi pembayaran tidak mencatat omzet kedua. Saat lunas, transaksi aslinya dipindah ke metode bayar yang dipakai. */
-      var rk = Object.assign({}, e); rk.payments = (e.payments || []).concat([{ ms: Date.now(), amount: amount, pay: pay || 'tunai', by: who(), txId: '' }]);
-      rk.paid = (e.paid || 0) + amount; rk.status = rk.paid >= rk.total ? 'lunas' : 'berjalan';
-      if (rk.status === 'lunas') {
-        try {
-          var pm = pay || 'tunai', ids = e.saleTxIds || [];
-          if (typeof txList !== 'undefined') txList.forEach(function (t) { if (ids.indexOf(t.id) >= 0) { t.pay = pm; try { if (typeof db !== 'undefined' && db && typeof tenantFirestoreCol !== 'undefined') db.collection(tenantFirestoreCol).where('id', '==', t.id).get().then(function (s) { s.forEach(function (d) { d.ref.update({ pay: pm }); }); }); } catch (x) {} } });
-          try { persistData(); } catch (x) {}
-          try { if (typeof renderAllReports === 'function') renderAllReports(); } catch (x) {}
-        } catch (x) {}
-      }
-      save(rk); return true;
-    }
     var id = postTx(e, amount, pay); if (id === null) return false;
     var r = Object.assign({}, e); r.payments = (e.payments || []).concat([{ ms: Date.now(), amount: amount, pay: pay || 'tunai', by: who(), txId: id === 'tanpa-mutasi' ? '' : id }]);
     r.paid = (e.paid || 0) + amount; r.status = r.paid >= r.total ? 'lunas' : 'berjalan';
@@ -246,13 +232,7 @@
     }
   }
   function open() { ensure(); start(); form = payF = detail = pform = null; if (tab === 'utang' && !canUtang()) tab = 'piutang'; ov.style.display = 'flex'; render(); }
-  function createFromSale(o) {
-    start();
-    var pt = ensureParty('pelanggan', o.customer);
-    var ent = { id: 'pe_' + Date.now(), t: 'e', tenantId: tid(), kind: 'piutang', partyId: pt.id, partyName: pt.name, desc: 'Penjualan hutang Kasir · TOP ' + o.top + ' hari', total: o.total, paid: 0, dueISO: o.dueISO, dateISO: iso(), status: 'berjalan', accCode: '', payments: [], createdMs: Date.now(), by: who(), fromKasir: true, saleTxIds: o.saleTxIds || [], top: o.top };
-    return save(ent);
-  }
-  window.FM_PIU = { createFromSale: createFromSale, open: open, mount: function () {}, start: start, all: function () { start(); return rows.slice(); },
+  window.FM_PIU = { open: open, mount: function () {}, start: start, all: function () { start(); return rows.slice(); },
     totals: function (biz) { start(); var a = 0, b = 0, ok = function (e) { if (!biz) return true; try { return FM_BIZ.canon(e.biz) === biz; } catch (x) { return true; } }; entries('piutang').filter(ok).forEach(function (e) { a += sisa(e); }); entries('utang').filter(ok).forEach(function (e) { b += sisa(e); }); return { piutang: a, utang: b, ready: rows.length > 0 || started }; } };
   function floatBtn() {
     try { if (!(window.FM_PLANS && FM_PLANS.has('piutang'))) return; } catch (e) { return; }
