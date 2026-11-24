@@ -163,6 +163,14 @@
 
   function recentLogins(tid, role, slot, n) {
     var f = fsdb(); if (!f) return Promise.resolve([]);
+    /* dibuka dari Pengaturan (role 'acct'): tampilkan login terakhir seluruh toko ini, semua peran */
+    if (role === 'acct') {
+      return f.collection('login_log').where('tenantId', '==', tid).get().then(function (snap) {
+        var a = []; snap.forEach(function (d) { a.push(d.data()); });
+        a.sort(function (x, y) { return (y.at || 0) - (x.at || 0); });
+        return a.slice(0, n || 8);
+      }).catch(function () { return []; });
+    }
     var key = secKey(tid, role, slot);
     return recentLog(f, key, tid, n || 8)
       .then(function (snap) { var out = []; snap.forEach(function (d) { out.push(d.data()); }); return out; })
@@ -302,7 +310,7 @@
       recentLogins(tid, role, slot, 8).then(function (list) {
         var lEl = document.getElementById('fm-shield-log'); if (!lEl) return;
         if (!list.length) { lEl.textContent = 'Belum ada catatan login.'; return; }
-        lEl.innerHTML = list.map(function (t) { return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid rgba(255,255,255,.06)"><span>' + (t.deviceLabel || '-') + (t.isNewDevice ? ' <span style="color:#f5c542">· baru</span>' : '') + '</span><span style="color:#64748b">' + new Date(t.at || 0).toLocaleString('id-ID') + '</span></div>'; }).join('');
+        var RL = { staff: 'Kasir', manager: 'Manager', owner: 'Owner', partner: 'Mitra' }; lEl.innerHTML = list.map(function (t) { return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid rgba(255,255,255,.06)"><span>' + (role === 'acct' && t.role ? '<b>' + (RL[t.role] || t.role) + (t.slot ? ' ' + t.slot : '') + '</b> · ' : '') + (t.deviceLabel || '-') + (t.isNewDevice ? ' <span style="color:#f5c542">· baru</span>' : '') + '</span><span style="color:#64748b">' + new Date(t.at || 0).toLocaleString('id-ID') + '</span></div>'; }).join('');
       });
     } else {
       var sEl2 = document.getElementById('fm-shield-score'); if (sEl2) sEl2.innerHTML = '<div style="font-size:13px;color:#94a3b8">Buka panel ini dari dalam toko untuk melihat skor keamanan akunmu.</div>';

@@ -33,7 +33,7 @@
     function pick(v) { return (v && KNOWN_VERSIONS.indexOf(slug(v)) >= 0) ? slug(v) : DEFAULT_VERSION; }
 
     function load(ver) {
-        document.write('<script src="js/shield/shield-' + ver + '.js?v=s' + ver.replace(/\./g, '') + 'r3"><' + '/script>');
+        document.write('<script src="js/shield/shield-' + ver + '.js?v=s' + ver.replace(/\./g, '') + 'r4"><' + '/script>');
     }
 
     if (IS_LOGIN_PAGE) { load(DEFAULT_VERSION); return; } // portal login belum terikat toko/paket tertentu
