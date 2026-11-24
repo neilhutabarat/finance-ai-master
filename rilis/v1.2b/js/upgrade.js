@@ -155,6 +155,8 @@
       '#fm-upg-chip#fm-upg-chip.act{background:#052e16!important;color:#bbf7d0!important;box-shadow:inset 0 0 0 1px rgba(134,239,172,.6)!important}' +
       '#fm-upg-chip#fm-upg-chip.act::after{display:none}' +
       'html body header.oneui-hero.oneui-hero:not(#_):not(#__):not(#___){padding-top:10px!important;padding-bottom:12px!important}' +
+      'html body header.oneui-hero #topbar-store-slogan:not(#_):not(#__){margin-top:7px!important;line-height:1.35!important}' +
+      'html body header.oneui-hero #topbar-store-name:not(#_):not(#__){line-height:1.15!important}' +
       '@keyframes fmUpgChip{0%,70%{left:-40%}100%{left:130%}}' +
       '#fm-upg-chip:focus-visible{outline:2px solid #fff;outline-offset:2px}' +
       '#fm-upg-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:2147482700;display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:16px;background:#050505;color:#fff;font:700 12.5px ' + F + ';box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 0 1px #3a3a40;max-width:92vw}' +
