@@ -295,13 +295,13 @@
     var h = '<div style="display:flex;justify-content:space-between;align-items:center"><h3>Pengaturan</h3><button class="fm-btn" data-close>Tutup</button></div>';
     var THEME_ON = !(window.FM_PLANS && !FM_PLANS.has('theme'));
     var look = pref.look === 'original' ? 'original' : 'base';
-    h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
+    if (ROLE !== 'tower') h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (look === 'original' ? 'on' : '') + '" data-look="original"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#bfe3ff,#e8f6ff 45%,#9fd6c0)"></div>Original</button>' +
       '<button class="fm-mode ' + (look === 'base' ? 'on' : '') + '" data-look="base"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#eceff4)"></div>Base</button></div></div>';
     if (false) h += '<div class="fm-sec"><div class="fm-lab">Mode Control Tower</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (ctMode() === 'terang' ? 'on' : '') + '" data-ctm="terang"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#f3efe0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (ctMode() === 'gelap' ? 'on' : '') + '" data-ctm="gelap"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#0b1220,#1e293b)"></div>Gelap</button></div></div>';
-    if (ROLE === 'tower') { var _tg = parseInt(localStorage.getItem('fm_glass_tw'), 10) || 4; h += '<div class="fm-sec"><div class="fm-lab">Kaca Control Tower (1 buram, 8 bening)</div><div class="fm-modes">' + [1,2,3,4,5,6,8,7].sort().map(function (n) { return '<button class="fm-mode ' + (_tg === n ? 'on' : '') + '" data-twg="' + n + '">' + n + '</button>'; }).join('') + '</div></div>'; }
+    if (false) { var _tg = parseInt(localStorage.getItem('fm_glass_tw'), 10) || 4; h += '<div class="fm-sec"><div class="fm-lab">Kaca Control Tower (1 buram, 8 bening)</div><div class="fm-modes">' + [1,2,3,4,5,6,8,7].sort().map(function (n) { return '<button class="fm-mode ' + (_tg === n ? 'on' : '') + '" data-twg="' + n + '">' + n + '</button>'; }).join('') + '</div></div>'; }
     if (window.FM_I18N && FM_I18N.has && FM_I18N.has()) { var _ln = FM_I18N.lang(); h += '<div class="fm-sec"><div class="fm-lab">Bahasa / Language</div><div class="fm-modes"><button class="fm-mode ' + (_ln === 'id' ? 'on' : '') + '" data-lang="id">Indonesia</button><button class="fm-mode ' + (_ln === 'en' ? 'on' : '') + '" data-lang="en">English</button><button class="fm-mode ' + (_ln === 'my' ? 'on' : '') + '" data-lang="my">Melayu</button></div></div>'; }
     if (window.FM_PLANS) h += '<div class="fm-sec"><button class="fm-btn pri" data-plans style="width:100%;padding:13px">✨ Fitur Toko</button></div>';
     if (window.FM_SHIELD) h += '<div class="fm-sec"><button class="fm-btn" data-shield style="width:100%;padding:13px">🛡️ Oneil Shield v' + FM_SHIELD.ver + ' — Keamanan</button></div>';

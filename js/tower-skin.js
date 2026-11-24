@@ -35,6 +35,10 @@
     L + ' .tw-ov>*{filter:invert(1) hue-rotate(180deg);border-radius:24px;box-shadow:0 34px 80px -24px rgba(0,0,0,.55)}',
     L + ' .tw-ov img,' + L + ' .tw-ov canvas,' + L + ' .tw-ov video{filter:invert(1) hue-rotate(180deg)}',
 
+    /* Pengaturan (roda gigi) dirancang gelap: di tema terang CT dibalik supaya ikut terang */
+    L + ' #fm-set .fm-sheet{filter:invert(1) hue-rotate(180deg)}',
+    L + ' #fm-set .fm-sheet img{filter:invert(1) hue-rotate(180deg)}',
+
     /* ---------- KENDALI ---------- */
     'html[data-tw-ck] #tw-ken #fm-actions{gap:12px!important}',
     'html[data-tw-ck] #tw-ken .tw-ken-q{border-radius:14px;padding:9px 16px 9px 38px;font-size:13px;font-weight:600;border:1px solid #dbe3ef;background:#fff url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2394a3b8\' stroke-width=\'2\' stroke-linecap=\'round\'%3E%3Ccircle cx=\'11\' cy=\'11\' r=\'6.5\'/%3E%3Cpath d=\'M16 16l4 4\'/%3E%3C/svg%3E") no-repeat 13px 50%/17px!important;box-shadow:0 1px 2px rgba(15,23,42,.04)}',
