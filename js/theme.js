@@ -180,7 +180,10 @@
     var w = wpDays(now, cfg), days = Math.floor(w.t / 86400000), wk = Math.floor((days - 4 - wpShift(cfg)) / 7);
     return (4 + wpShift(cfg) + (wk + 1) * 7) * 86400000 + w.hr * 3600000 - WP_TZ;
   }
-  function ctMode() { try { return localStorage.getItem('fm_ct_mode') === 'gelap' ? 'gelap' : 'terang'; } catch (e) { return 'terang'; } }
+  /* Mode gelap CT lama (Atur > Mode Control Tower) bertabrakan dengan tombol Tema di bar CT: keduanya membalik warna,
+     sehingga tema tampil terbalik. Sekarang hanya tombol Tema yang dipakai; pilihan lama dipindahkan ke sana sekali. */
+  try { if (/provider\.html/.test(location.pathname) && localStorage.getItem('fm_ct_mode')) { if (localStorage.getItem('fm_ct_mode') === 'gelap' && !localStorage.getItem('tw_theme')) localStorage.setItem('tw_theme', 'dark'); localStorage.removeItem('fm_ct_mode'); } } catch (e) {}
+  function ctMode() { return 'terang'; }
   function applyCtMode() {
     if (ROLE !== 'tower') return;
     var h = document.documentElement, st = document.getElementById('fm-ctdark'), on = ctMode() === 'gelap';
@@ -295,7 +298,7 @@
     h += '<div class="fm-sec"><div class="fm-lab">Tema</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (look === 'original' ? 'on' : '') + '" data-look="original"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#bfe3ff,#e8f6ff 45%,#9fd6c0)"></div>Original</button>' +
       '<button class="fm-mode ' + (look === 'base' ? 'on' : '') + '" data-look="base"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#eceff4)"></div>Base</button></div></div>';
-    if (ROLE === 'tower') h += '<div class="fm-sec"><div class="fm-lab">Mode Control Tower</div><div class="fm-modes">' +
+    if (false) h += '<div class="fm-sec"><div class="fm-lab">Mode Control Tower</div><div class="fm-modes">' +
       '<button class="fm-mode ' + (ctMode() === 'terang' ? 'on' : '') + '" data-ctm="terang"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#ffffff,#f3efe0)"></div>Terang</button>' +
       '<button class="fm-mode ' + (ctMode() === 'gelap' ? 'on' : '') + '" data-ctm="gelap"><div class="fm-prev fm-keep" style="background:linear-gradient(135deg,#0b1220,#1e293b)"></div>Gelap</button></div></div>';
     if (ROLE === 'tower') { var _tg = parseInt(localStorage.getItem('fm_glass_tw'), 10) || 4; h += '<div class="fm-sec"><div class="fm-lab">Kaca Control Tower (1 buram, 8 bening)</div><div class="fm-modes">' + [1,2,3,4,5,6,8,7].sort().map(function (n) { return '<button class="fm-mode ' + (_tg === n ? 'on' : '') + '" data-twg="' + n + '">' + n + '</button>'; }).join('') + '</div></div>'; }
