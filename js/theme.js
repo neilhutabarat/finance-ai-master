@@ -19,7 +19,9 @@
       '[Perbaikan] Kartu Total Masuk, Total Keluar, dan Saldo Kas Sah tidak lagi terpotong; header lebih pipih dan nama toko tidak lagi mepet dengan alamat',
       '[Perubahan] Tombol Upgrade di header tampil lebih modern dan bersih, mengikuti tema terang / gelap',
       '[Perbaikan] Jendela Oneil Shield kini mengikuti tema: putih di mode terang, gelap di mode gelap',
-      '[Perbaikan] Kolom jumlah di Kasir diperlebar sehingga muat hingga 100.000'
+      '[Perbaikan] Kolom jumlah di Kasir diperlebar sehingga muat hingga 100.000',
+      '[Perubahan] Kotak pajak di Kasir hanya muncul bila fitur Pajak PPN 12% aktif untuk toko',
+      '[Perbaikan] Hitungan pajak harga sudah termasuk PPN 12% dibetulkan (12/112 dari total, bukan 12% dari total)'
     ]],
     ['v1.2', '23 Nov 2026', [
       '[Baru] Metode bayar Hutang di Kasir dengan pilihan TOP 14, 30, atau 45 hari. Nama pelanggan wajib diisi, jatuh tempo otomatis dihitung dan tampil di struk',

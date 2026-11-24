@@ -777,7 +777,7 @@
             if (index !== -1) {
                 const oldTx = { ...txList[index] };
                 const isOutcome = (txList[index].category !== 'sales');
-                const tax = isOutcome ? Math.round(amount * 0.12) : 0;
+                const tax = isOutcome ? Math.round(amount * 12 / 112) : 0;
 
                 txList[index].amount = amount;
                 txList[index].tax12 = tax;
@@ -948,7 +948,7 @@
             let totalTax = 0;
             const outcomes = fmV(txList).filter(t => t.category !== 'sales');
             outcomes.forEach(tx => {
-                const tax = tx.tax12 || Math.round(tx.amount * 0.12);
+                const tax = tx.tax12 || Math.round(tx.amount * 12 / 112);
                 totalTax += tax;
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-amber-100 text-xs";

@@ -2582,7 +2582,7 @@
                 let out = 0, taxM = 0, taxAll = 0;
                 getTenantTxList(tn.id).forEach(function (x) {
                     if (x.category === 'sales') return;
-                    const tax = x.tax12 || Math.round((x.amount || 0) * 0.12);
+                    const tax = x.tax12 || Math.round((x.amount || 0) * 12 / 112);
                     taxAll += tax;
                     if (txDateISO(x) >= first) { out += x.amount || 0; taxM += tax; }
                 });
@@ -2937,7 +2937,7 @@
                 if (t.category === 'sales') {
                     monthsMap[k].sales += t.amount;
                 } else {
-                    monthsMap[k].tax += (t.tax12 || Math.round(t.amount * 0.12));
+                    monthsMap[k].tax += (t.tax12 || Math.round(t.amount * 12 / 112));
                 }
             });
 

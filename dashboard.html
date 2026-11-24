@@ -983,7 +983,7 @@
             let totalTax = 0;
             const outcomes = fmV(txList).filter(t => t.category !== 'sales');
             outcomes.forEach(tx => {
-                const tax = tx.tax12 || Math.round(tx.amount * 0.12);
+                const tax = tx.tax12 || Math.round(tx.amount * 12 / 112);
                 totalTax += tax;
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-amber-100 text-xs";

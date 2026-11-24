@@ -1065,7 +1065,7 @@
       d.qty = newQty;
       d.amount = unitP * newQty;
       var isOut = (d.category === 'cogs' || d.category === 'expense');
-      d.tax12 = isOut ? Math.round(d.amount * 0.12) : 0;
+      d.tax12 = isOut ? Math.round(d.amount * 12 / 112) : 0;
       d.dpp = isOut ? (d.amount - d.tax12) : d.amount;
     }
     localStorage.setItem('fm_kasir_drafts', JSON.stringify(draftList));

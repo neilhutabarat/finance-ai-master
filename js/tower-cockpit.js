@@ -352,7 +352,7 @@
         if (sales) {
           if (inMonth) a.inc += amt;
           var k = days.indexOf(d); if (k >= 0) a.sp[k] += amt;
-        } else if (inMonth) { a.out += amt; a.tax += t.tax12 || Math.round(amt * 0.12); }
+        } else if (inMonth) { a.out += amt; a.tax += t.tax12 || Math.round(amt * 12 / 112); }
       });
       a.today = a.sp[6]; a.yest = a.sp[5];
       out[tn.id] = a;

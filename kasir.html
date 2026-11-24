@@ -1117,7 +1117,7 @@
                 badge.classList.remove('hidden');
 
                 if (opt.dataset.category === 'cogs' || opt.dataset.category === 'expense') {
-                    taxPill.classList.remove('hidden');
+                    if ((function () { try { return !!(window.FM_PLANS && FM_PLANS.has('tax', 'kasir')); } catch (e) { return false; } })()) taxPill.classList.remove('hidden'); else taxPill.classList.add('hidden');
                 } else {
                     taxPill.classList.add('hidden');
                 }
@@ -1136,9 +1136,11 @@
             const isOutcome = (opt && (opt.dataset.category === 'cogs' || opt.dataset.category === 'expense') && opt.dataset.isProduct !== "true");
 
             const previewBox = document.getElementById('pajak-preview-box');
-            if (isOutcome && amount > 0) {
+            /* kotak pajak hanya tampil bila fitur "Pajak PPN 12%" aktif untuk toko ini (diatur di Tower / paket) */
+            const taxOn = (function () { try { return !!(window.FM_PLANS && FM_PLANS.has('tax', 'kasir')); } catch (e) { return false; } })();
+            if (taxOn && isOutcome && amount > 0) {
                 previewBox.classList.remove('hidden');
-                const tax = Math.round(amount * 0.12);
+                const tax = Math.round(amount * 12 / 112);
                 document.getElementById('preview-dpp').innerText = "Rp " + formatThousandSeparator(amount - tax);
                 document.getElementById('preview-ppn').innerText = "Rp " + formatThousandSeparator(tax) + " (12%)";
             } else {
@@ -1180,7 +1182,7 @@
                 amount = dcRes.net; // harga selalu dari produk (dikurangi diskon), tidak bisa diketik kasir
             }
             if (!isProd) { const q2v = document.getElementById('tx-qty2'); qty = Math.max(1, parseInt(q2v && q2v.value) || 1); unitPrice = parseThousandSeparator((document.getElementById('tx-price2') || {}).value) || 0; }
-            const taxAmount = (isOutcome && !isProd) ? Math.round(amount * 0.12) : 0;
+            const taxAmount = (isOutcome && !isProd) ? Math.round(amount * 12 / 112) : 0;
             const dppAmount = (isOutcome && !isProd) ? (amount - taxAmount) : amount;
 
             if (editId) {
@@ -1652,7 +1654,7 @@
 
             const outcomes = myTx().filter(t => t.category !== 'sales');
             outcomes.forEach(tx => {
-                const tax = tx.tax12 || Math.round(tx.amount * 0.12);
+                const tax = tx.tax12 || Math.round(tx.amount * 12 / 112);
                 totalTax += tax;
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-amber-200 text-xs font-medium";
@@ -2054,7 +2056,7 @@
             try { const pm = document.getElementById('pay-method'); if (pm && pm.value === 'bank') fillBankAccOptions(); } catch (e) { console.warn(e); }
         });
     </script>
-    <script src="js/kasir-v12.js?v=12b6"></script>
+    <script src="js/kasir-v12.js?v=13b1"></script>
 <style id="fm-kform">
 /* Kasir v1.2b: form Input Transaksi dua kolom seimbang, kolom tetap lega dan terbaca tanpa gulir */
 @media (min-width:1024px){
