@@ -6,7 +6,8 @@
   if (!/provider/.test(location.pathname)) return;
   var RL = { staff: 'Admin / Kasir', manager: 'Manager', owner: 'Owner', partner: 'Mitra' };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function fs() { try { return firebase.firestore(); } catch (e) { return null; } }
+  /* pakai koneksi Tower (db = FM_AUTH.towerDb()), bukan koneksi bawaan yang tidak masuk sebagai Tower */
+  function fs() { try { if (typeof db !== 'undefined' && db) return db; } catch (e) {} try { return FM_AUTH.towerDb(); } catch (e) { return null; } }
   function storeName(id) {
     try { var C = (typeof TENANTS_CONFIG !== 'undefined') ? TENANTS_CONFIG : (window.TENANTS_CONFIG || {}); var t = C[String(id).toLowerCase()]; if (t && t.nama) return t.nama; } catch (e) {}
     return '';
