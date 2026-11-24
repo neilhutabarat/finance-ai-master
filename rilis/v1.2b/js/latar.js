@@ -11,9 +11,9 @@
     var s = document.createElement('style'); s.id = 'fm-latar-css';
     s.textContent = '#fm-latar{position:fixed;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;--mx:30%;--my:12%;background:radial-gradient(620px 460px at var(--mx) var(--my),rgba(255,255,255,.2),transparent 65%),linear-gradient(155deg,#26262b 0%,#0a0a0c 38%,#000 70%,#16161a 100%)}' +
       'html[data-fm-latar-on]:not(#_):not(#__):not(#___):not(#____) body{background:transparent!important;background-image:none!important}' +
-      'html[data-fm-latar-card]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body main :is(.ios-glass,.white-ice-glass-card){background-color:transparent!important;background-repeat:no-repeat!important;background-size:auto!important}' +
-      'html[data-fm-latar-card="dk"]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body main :is(.ios-glass,.white-ice-glass-card){background-image:radial-gradient(300px 220px at var(--cx,50%) var(--cy,-60%),rgba(255,255,255,.13),transparent 68%),linear-gradient(155deg,#26262b 0%,#0a0a0c 38%,#000 70%,#16161a 100%)!important}' +
-      'html[data-fm-latar-card="lt"]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body main :is(.ios-glass,.white-ice-glass-card){background-image:radial-gradient(300px 220px at var(--cx,50%) var(--cy,-60%),rgba(0,0,0,.075),transparent 68%),linear-gradient(155deg,#dedee3 0%,#f6f6f8 38%,#fff 70%,#e9e9ed 100%)!important}' +
+      'html[data-fm-latar-card]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body :is(main .ios-glass,main .white-ice-glass-card,header.oneui-hero){background-color:transparent!important;background-repeat:no-repeat!important;background-size:auto!important}' +
+      'html[data-fm-latar-card="dk"]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body :is(main .ios-glass,main .white-ice-glass-card,header.oneui-hero){background-image:radial-gradient(300px 220px at var(--cx,50%) var(--cy,-60%),rgba(255,255,255,.10),transparent 70%),linear-gradient(155deg,#1f1f24 0%,#101013 40%,#08080a 72%,#141418 100%)!important}' +
+      'html[data-fm-latar-card="lt"]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body :is(main .ios-glass,main .white-ice-glass-card,header.oneui-hero){background-image:radial-gradient(300px 220px at var(--cx,50%) var(--cy,-60%),rgba(0,0,0,.045),transparent 70%),linear-gradient(155deg,#e9e9ee 0%,#f5f5f8 40%,#fcfcfd 72%,#f0f0f3 100%)!important}' +
       'html body #fm-latar#fm-latar{filter:none!important}html body #fm-latar#fm-latar.si{filter:invert(1) hue-rotate(180deg)!important}';
     document.head.appendChild(s);
   }
@@ -38,7 +38,7 @@
     raf = requestAnimationFrame(function () {
       raf = 0; if (el) { el.style.setProperty('--mx', mx.toFixed(1) + '%'); el.style.setProperty('--my', my.toFixed(1) + '%'); }
       if (!h.hasAttribute('data-fm-latar-card')) return;
-      [].forEach.call(document.querySelectorAll('main .ios-glass, main .white-ice-glass-card'), function (c) {
+      [].forEach.call(document.querySelectorAll('main .ios-glass, main .white-ice-glass-card, header.oneui-hero'), function (c) {
         var r = c.getBoundingClientRect(); if (r.bottom < -300 || r.top > innerHeight + 300) return;
         c.style.setProperty('--cx', (px - r.left).toFixed(0) + 'px'); c.style.setProperty('--cy', (py - r.top).toFixed(0) + 'px');
       });
