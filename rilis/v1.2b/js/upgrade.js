@@ -90,14 +90,14 @@
       '#fm-upg h2{margin:0;font-size:19px;font-weight:900;letter-spacing:-.01em}' +
       '#fm-upg .u-sub{font-size:12.5px;color:#a1a1aa;margin-top:3px;line-height:1.5}' +
       '#fm-upg .u-x{border:0;background:#25252a;color:#d4d4d8;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer}' +
-      '#fm-upg .u-box.wide{max-width:640px}' +
+      '#fm-upg{--cw:min(80vw,284px,calc((100vh - 250px)*.6))}#fm-upg .u-box.wide{max-width:calc(var(--cw)*2 + 18px + 42px)}' +
       '#fm-upg .u-box{scrollbar-width:none;-ms-overflow-style:none}#fm-upg .u-box::-webkit-scrollbar{display:none}' +
       'html body #fm-upg#fm-upg#fm-upg{filter:none!important}' +
-      'html body #fm-upg#fm-upg#fm-upg.lt{filter:invert(1) hue-rotate(180deg)!important;background:rgba(255,255,255,.55)}' +
+      'html body #fm-upg#fm-upg#fm-upg.si{filter:invert(1) hue-rotate(180deg)!important}' +
       '#fm-upg.lt img.u-qr{filter:invert(1) hue-rotate(180deg)}' +
       '#fm-upg .u-cards{display:flex;gap:18px;margin:18px -20px 4px;padding:8px 20px 18px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;perspective:1100px}' +
-      '#fm-upg .u-cards::-webkit-scrollbar{display:none}' +
-      '#fm-upg .u-card{all:unset;box-sizing:border-box;flex:0 0 min(80vw,284px,calc((100vh - 250px)*.6));aspect-ratio:5/8.3;scroll-snap-align:center;border-radius:24px;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:20px 20px 16px;color:#fff;font-family:' + F + ';--mx:30%;--my:10%;--rx:0deg;--ry:0deg;background:linear-gradient(155deg,#26262b 0%,#0a0a0c 38%,#000 70%,#16161a 100%);box-shadow:0 26px 50px rgba(0,0,0,.7),inset 0 0 0 1px #3a3a41,inset 0 1px 0 rgba(255,255,255,.16);transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease-out}' +
+      '#fm-upg .u-cards::-webkit-scrollbar{display:none}#fm-upg .u-card:first-child{margin-left:auto}#fm-upg .u-card:last-child{margin-right:auto}' +
+      '#fm-upg .u-card{all:unset;box-sizing:border-box;flex:0 0 var(--cw);aspect-ratio:5/8.8;scroll-snap-align:center;border-radius:24px;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:20px 20px 16px;color:#fff;font-family:' + F + ';--mx:30%;--my:10%;--rx:0deg;--ry:0deg;background:linear-gradient(155deg,#26262b 0%,#0a0a0c 38%,#000 70%,#16161a 100%);box-shadow:0 26px 50px rgba(0,0,0,.7),inset 0 0 0 1px #3a3a41,inset 0 1px 0 rgba(255,255,255,.16);transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease-out}' +
       '#fm-upg .u-card.pro{background:linear-gradient(155deg,#3a2c12 0%,#14100a 36%,#000 68%,#241b0b 100%);box-shadow:0 26px 50px rgba(0,0,0,.7),0 0 0 1px #6f5320,0 0 0 3px #000,0 0 0 4.5px #e5c373,0 0 28px rgba(229,195,115,.28),inset 0 1px 0 rgba(255,232,170,.45)}' +
       '#fm-upg .u-foil{position:absolute;inset:0;pointer-events:none;background:radial-gradient(260px 200px at var(--mx) var(--my),rgba(255,255,255,.2),transparent 62%);mix-blend-mode:screen}' +
       '#fm-upg .pro .u-foil{background:radial-gradient(280px 220px at var(--mx) var(--my),rgba(255,226,150,.38),transparent 62%)}' +
@@ -123,13 +123,13 @@
       '#fm-upg .u-ben{list-style:none;margin:16px 0 0;padding:14px 0 0;border-top:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;gap:9px;position:relative;flex:1;min-height:0;overflow:hidden}' +
       '#fm-upg .pro .u-ben{border-color:rgba(229,195,115,.32)}' +
       '#fm-upg .u-ben li{display:flex;gap:10px;align-items:center;font-size:12.5px;line-height:1.3;font-weight:600;color:#ececef}' +
-      '#fm-upg .u-ben li svg{flex:0 0 auto}' +
+      '#fm-upg .u-ben li svg{flex:0 0 auto}#fm-upg .u-bn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}' +
       '#fm-upg .u-ben li.more{color:#8b8b93;font-weight:500;padding-left:20px}' +
       '#fm-upg .pro .u-ben li.more{color:#b8924a}' +
-      '#fm-upg .u-foot{position:relative;display:flex;justify-content:space-between;align-items:flex-end;gap:8px;margin-top:10px}' +
-      '#fm-upg .u-pr{font-size:10.5px;color:#9a9aa3;line-height:1.3}#fm-upg .u-pr b{display:block;font-size:21px;color:#fff;letter-spacing:-.01em;margin:1px 0}' +
+      '#fm-upg .u-foot{position:relative;display:flex;flex-direction:column;gap:9px;margin-top:10px}' +
+      '#fm-upg .u-pr{display:flex;align-items:baseline;gap:6px;font-size:10.5px;color:#9a9aa3}#fm-upg .u-pr b{font-size:21px;color:#fff;letter-spacing:-.01em}' +
       '#fm-upg .pro .u-pr b{color:#f1d58a}' +
-      '#fm-upg .u-tag{font-size:10.5px;font-weight:800;padding:7px 11px;border-radius:99px;background:#fff;color:#000;white-space:nowrap}' +
+      '#fm-upg .u-tag{display:block;text-align:center;font-size:11.5px;font-weight:800;padding:9px 10px;border-radius:99px;background:#fff;color:#000;white-space:nowrap}' +
       '#fm-upg .pro .u-tag{background:linear-gradient(135deg,#f6e0a0,#c49a45);color:#1a1405}' +
       '#fm-upg .u-hold{position:relative;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;gap:8px;font-size:9px;letter-spacing:.18em;color:#7d7d86;font-weight:700;text-transform:uppercase}' +
       '#fm-upg .pro .u-hold{border-color:rgba(229,195,115,.25);color:#a8884a}' +
@@ -173,8 +173,8 @@
   function logoSvg(px, c) { try { return window.FM_LOGO ? FM_LOGO.mark(px, { tile: false, color: c }) : ''; } catch (e) { return ''; } }
   function cardHtml(t) {
     var a = activeOf(t), tag = a ? (a.kind === 'coba' ? 'Coba · ' + leftText(untilOf(a)) : 'Aktif') : (trialUsed(t) ? 'Lihat isi' : 'Coba gratis 24 jam');
-    var rows = flyerRows(t), col = t === 'pro' ? GOLD : '#fff', max = t === 'pro' ? 5 : 6, mk = t === 'pro' ? '#e5c373' : '#ffffff', tt = tn();
-    var li = rows.slice(0, max).map(function (r) { return '<li>' + TICK(col) + '<span>' + esc(r.name) + '</span></li>'; }).join('');
+    var rows = flyerRows(t), col = t === 'pro' ? GOLD : '#fff', max = t === 'pro' ? 4 : 5, mk = t === 'pro' ? '#e5c373' : '#ffffff', tt = tn();
+    var li = rows.slice(0, max).map(function (r) { return '<li>' + TICK(col) + '<span class="u-bn">' + esc(r.name) + '</span></li>'; }).join('');
     if (!rows.length) li = '<li class="more"><span>Daftar manfaat sedang disiapkan</span></li>';
     if (rows.length > max) li += '<li class="more"><span>+ ' + (rows.length - max) + ' fitur lainnya</span></li>';
     if (t === 'pro' && rows.length) li = '<li>' + TICK(col) + '<span><b>Semua isi Plus</b></span></li>' + li;
@@ -182,7 +182,7 @@
       '<span class="u-top"><span class="u-lg">' + logoSvg(22, mk) + 'ONEILVERSE' + (t === 'plus' ? '<b class="u-pl">+</b>' : '<b class="u-pp">PRO</b>') + '</span><svg class="u-nfc" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="' + mk + '" stroke-width="1.7" stroke-linecap="round"><path d="M8 7.5a6.5 6.5 0 0 1 0 9M12 5a10 10 0 0 1 0 14M16 2.5a13.5 13.5 0 0 1 0 19"/></svg></span>' +
       '<span class="u-nm">' + NAME[t] + '<span class="u-vip">' + (t === 'plus' ? '+' : 'PRO') + '</span></span><span class="u-tl">' + (t === 'pro' ? 'Akses penuh, tanpa batas' : 'Naik kelas untuk usaha Anda') + '</span>' +
       '<ul class="u-ben">' + li + '</ul>' +
-      '<span class="u-foot"><span class="u-pr">mulai<b>' + rp(price(t, 'bulan')) + '</b>per bulan</span><span class="u-tag">' + esc(tag) + '</span></span>' +
+      '<span class="u-foot"><span class="u-pr"><b>' + rp(price(t, 'bulan')) + '</b>per bulan</span><span class="u-tag">' + esc(tag) + '</span></span>' +
       '<span class="u-hold"><span>Pemegang kartu</span><span>' + esc((tt && tt.nama) || tid()) + '</span></span></button>';
   }
   function head(title, sub, back) {
@@ -250,10 +250,12 @@
   function vDone() {
     return head(S.done === 'coba' ? 'Masa coba dimulai' : 'Paket aktif', '') + '<div class="u-note" style="margin-top:12px">' + (S.done === 'coba' ? 'Paket ' + NAME[S.tier] + ' aktif 24 jam. Muat ulang halaman supaya semua fitur terbuka.' : 'Paket ' + NAME[S.tier] + ' sudah aktif. Terima kasih. Muat ulang halaman supaya semua fitur terbuka.') + '</div><button class="u-b ' + (S.tier === 'pro' ? 'gold' : 'main') + '" data-a="reload">Muat ulang sekarang</button>';
   }
-  function isLight() { var h = document.documentElement; return h.getAttribute('data-fm-invert') === '1' || (h.getAttribute('data-fm-native') === 'light' && h.getAttribute('data-fm-black') !== '1'); }
+  /* Tema ikut halaman: terang atau gelap. Sebagian halaman dibalik warnanya oleh pembungkusnya, jadi jumlah pembalikan di atas popup dihitung dulu. */
+  function isLight() { return document.documentElement.getAttribute('data-fm-gelap') !== '1'; }
+  function ancInv() { var n = 0, e = ov.parentElement; while (e) { try { if (/invert/.test(getComputedStyle(e).filter)) n++; } catch (x) {} e = e.parentElement; } return n % 2; }
   function render() {
     if (!ov || ov.style.display === 'none') { chip(); return; }
-    ov.className = isLight() ? 'lt' : '';
+    var lt = isLight(); ov.className = ((lt ? 1 : 0) ^ ancInv() ? 'si ' : '') + (lt ? 'lt' : '');
     var v = S.v, h = v === 'flyer' ? vFlyer() : v === 'dur' ? vDur() : v === 'pay' ? vPay() : v === 'c1' ? vConf(0) : v === 'c2' ? vConf(1) : v === 'c3' ? vConf(2) : v === 'trial' ? vTrial() : v === 'done' ? vDone() : vHome();
     var box = ov.firstChild, top = box ? box.scrollTop : 0;
     ov.innerHTML = '<div class="u-box' + (v === 'home' ? ' wide' : '') + '" role="dialog" aria-modal="true">' + h + '</div>';
