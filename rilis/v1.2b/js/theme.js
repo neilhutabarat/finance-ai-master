@@ -10,7 +10,8 @@
       '[Baru] Tombol Upgrade di Kasir, Manager, dan Owner: dua kartu Plus dan Pro, tekan untuk melihat flyer isi paket',
       '[Baru] Coba gratis 24 jam, sekali untuk tiap paket per toko. Kasir boleh mencoba, hanya Manager dan Owner yang bisa berlangganan',
       '[Baru] Berlangganan 1 bulan atau 1 tahun lewat QRIS, kirim bukti ke WhatsApp, lalu paket aktif sementara 24 jam sampai dikonfirmasi',
-      '[Perubahan] Setelah masa coba atau paket habis, data tetap terlihat dan hanya fitur tambahan yang terkunci'
+      '[Perubahan] Setelah masa coba atau paket habis, data tetap terlihat dan hanya fitur tambahan yang terkunci',
+      '[Perubahan] Fitur Kirim Struk lewat WhatsApp dihapus dari aplikasi, termasuk tombolnya di struk dan Riwayat Hari Ini'
     ]],
     ['v1.2', '23 Nov 2026', [
       '[Baru] Metode bayar Hutang di Kasir dengan pilihan TOP 14, 30, atau 45 hari. Nama pelanggan wajib diisi, jatuh tempo otomatis dihitung dan tampil di struk',

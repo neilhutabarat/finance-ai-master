@@ -91,9 +91,13 @@
       '#fm-upg .u-sub{font-size:12.5px;color:#a1a1aa;margin-top:3px;line-height:1.5}' +
       '#fm-upg .u-x{border:0;background:#25252a;color:#d4d4d8;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer}' +
       '#fm-upg .u-box.wide{max-width:640px}' +
+      '#fm-upg .u-box{scrollbar-width:none;-ms-overflow-style:none}#fm-upg .u-box::-webkit-scrollbar{display:none}' +
+      'html body #fm-upg#fm-upg#fm-upg{filter:none!important}' +
+      'html body #fm-upg#fm-upg#fm-upg.lt{filter:invert(1) hue-rotate(180deg)!important;background:rgba(255,255,255,.55)}' +
+      '#fm-upg.lt img.u-qr{filter:invert(1) hue-rotate(180deg)}' +
       '#fm-upg .u-cards{display:flex;gap:18px;margin:18px -20px 4px;padding:8px 20px 18px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;perspective:1100px}' +
       '#fm-upg .u-cards::-webkit-scrollbar{display:none}' +
-      '#fm-upg .u-card{all:unset;box-sizing:border-box;flex:0 0 min(80vw,284px);aspect-ratio:5/8.3;scroll-snap-align:center;border-radius:24px;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:20px 20px 16px;color:#fff;font-family:' + F + ';--mx:30%;--my:10%;--rx:0deg;--ry:0deg;background:linear-gradient(155deg,#26262b 0%,#0a0a0c 38%,#000 70%,#16161a 100%);box-shadow:0 26px 50px rgba(0,0,0,.7),inset 0 0 0 1px #3a3a41,inset 0 1px 0 rgba(255,255,255,.16);transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease-out}' +
+      '#fm-upg .u-card{all:unset;box-sizing:border-box;flex:0 0 min(80vw,284px,calc((100vh - 250px)*.6));aspect-ratio:5/8.3;scroll-snap-align:center;border-radius:24px;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:20px 20px 16px;color:#fff;font-family:' + F + ';--mx:30%;--my:10%;--rx:0deg;--ry:0deg;background:linear-gradient(155deg,#26262b 0%,#0a0a0c 38%,#000 70%,#16161a 100%);box-shadow:0 26px 50px rgba(0,0,0,.7),inset 0 0 0 1px #3a3a41,inset 0 1px 0 rgba(255,255,255,.16);transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease-out}' +
       '#fm-upg .u-card.pro{background:linear-gradient(155deg,#3a2c12 0%,#14100a 36%,#000 68%,#241b0b 100%);box-shadow:0 26px 50px rgba(0,0,0,.7),0 0 0 1px #6f5320,0 0 0 3px #000,0 0 0 4.5px #e5c373,0 0 28px rgba(229,195,115,.28),inset 0 1px 0 rgba(255,232,170,.45)}' +
       '#fm-upg .u-foil{position:absolute;inset:0;pointer-events:none;background:radial-gradient(260px 200px at var(--mx) var(--my),rgba(255,255,255,.2),transparent 62%);mix-blend-mode:screen}' +
       '#fm-upg .pro .u-foil{background:radial-gradient(280px 220px at var(--mx) var(--my),rgba(255,226,150,.38),transparent 62%)}' +
@@ -246,8 +250,10 @@
   function vDone() {
     return head(S.done === 'coba' ? 'Masa coba dimulai' : 'Paket aktif', '') + '<div class="u-note" style="margin-top:12px">' + (S.done === 'coba' ? 'Paket ' + NAME[S.tier] + ' aktif 24 jam. Muat ulang halaman supaya semua fitur terbuka.' : 'Paket ' + NAME[S.tier] + ' sudah aktif. Terima kasih. Muat ulang halaman supaya semua fitur terbuka.') + '</div><button class="u-b ' + (S.tier === 'pro' ? 'gold' : 'main') + '" data-a="reload">Muat ulang sekarang</button>';
   }
+  function isLight() { var h = document.documentElement; return h.getAttribute('data-fm-invert') === '1' || (h.getAttribute('data-fm-native') === 'light' && h.getAttribute('data-fm-black') !== '1'); }
   function render() {
     if (!ov || ov.style.display === 'none') { chip(); return; }
+    ov.className = isLight() ? 'lt' : '';
     var v = S.v, h = v === 'flyer' ? vFlyer() : v === 'dur' ? vDur() : v === 'pay' ? vPay() : v === 'c1' ? vConf(0) : v === 'c2' ? vConf(1) : v === 'c3' ? vConf(2) : v === 'trial' ? vTrial() : v === 'done' ? vDone() : vHome();
     var box = ov.firstChild, top = box ? box.scrollTop : 0;
     ov.innerHTML = '<div class="u-box' + (v === 'home' ? ' wide' : '') + '" role="dialog" aria-modal="true">' + h + '</div>';
