@@ -629,6 +629,7 @@
                             <button id="pf-tab-plus" onclick="pfSwitchTab('plus')" class="flex-1 py-2 rounded-xl font-black text-xs transition">Paket Plus</button>
                             <button id="pf-tab-pro" onclick="pfSwitchTab('pro')" class="flex-1 py-2 rounded-xl font-black text-xs transition">Paket Pro</button>
                         </div>
+                        <button onclick="pfApplyRec()" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs transition">Pakai susunan rekomendasi (Basic, Plus &amp; Pro)</button>
                         <div id="pf-body" class="max-h-[50vh] overflow-y-auto space-y-1"></div>
                         <button id="pf-save-btn" onclick="savePaketFitur()" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition">Simpan Isi Paket</button>
                     </div>
@@ -1538,6 +1539,25 @@
             var sb = document.getElementById('pf-save-btn');
             if (sb) sb.textContent = 'Simpan Isi Paket ' + (tab === 'basic' ? 'Basic' : tab === 'plus' ? 'Plus' : 'Pro');
             document.getElementById('pf-body').innerHTML = FM_PLANS.checklistHtml('pf-' + tab, paketCat[tab] || {}, true);
+        }
+        /* Susunan paket rekomendasi (disepakati 24 Nov 2026). Tiap paket hanya berisi tambahannya; Plus mewarisi Basic, Pro mewarisi Plus. */
+        const PAKET_REC = {
+            basic: ['mutasi_wa', 'bukti', 'diskon', 'piutang', 'absensi', 'wallpaper', 'theme', 'bahasa', 'billing_card', 'chat', 'coa', 'clock', 'weather', 'rates'],
+            plus: ['tax', 'stok', 'stok_input', 'stok_closing', 'stok_habis', 'jual_produk', 'satuan_ganda', 'barcode', 'ledger', 'arus_kas', 'anggaran', 'rekon', 'gaji', 'gaji_auto', 'dashboard', 'laporan_bulanan', 'backup', 'import_tx', 'offline_penuh'],
+            pro: ['stok_admin', 'stok_scan', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'harian_wa', 'grafik', 'audit', 'export_csv', 'analisa', 'instruksi']
+        };
+        async function pfApplyRec() {
+            if (!(await fmAsk('Isi semua centang Basic, Plus, dan Pro dengan susunan rekomendasi? Centang yang sekarang akan diganti. Tekan Simpan setelahnya supaya tersimpan.'))) return;
+            ['basic', 'plus', 'pro'].forEach(function (t) {
+                const out = {};
+                FM_PLANS.FEATURES.forEach(function (f) {
+                    if (f.soon) return;
+                    ['kasir', 'manager', 'owner'].forEach(function (r) { if (f.r[r] !== 'o') return; out[f.key] = out[f.key] || {}; out[f.key][r] = PAKET_REC[t].indexOf(f.key) >= 0; });
+                });
+                paketCat[t] = out;
+            });
+            pfSwitchTab(pfTab);
+            const sb = document.getElementById('pf-save-btn'); if (sb) sb.textContent = 'Simpan susunan Basic, Plus & Pro';
         }
         function savePaketFitur() {
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
