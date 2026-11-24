@@ -14,7 +14,10 @@
     PANELS + '{background:' + CARD + '!important;background-color:#ebebef!important;border-color:rgba(20,20,30,.10)!important;box-shadow:0 10px 26px -16px rgba(15,15,25,.35),inset 0 1px 0 rgba(255,255,255,.8)!important}' +
     /* isi panel tetap putih bersih supaya kontras dengan perak */
     P + ' #tw-root #tw-ken .tw-group .fm-act.tw-tile{background:#fbfbfc!important;border-color:rgba(20,20,30,.10)!important}' +
-    P + ' #tw-root #tw-ctrl :is(input,select){background:#fff!important;border-color:rgba(20,20,30,.22)!important}';
+    P + ' #tw-root #tw-ctrl :is(input,select){background:#fff!important;border-color:rgba(20,20,30,.22)!important}' +
+    /* aturan aplikasi: tidak ada batang gulir yang terlihat (area tetap bisa digulir dengan roda mouse / sentuh) */
+    'html[data-tw-ck] #tw-root,html[data-tw-ck] #tw-root *,html[data-fm-page="tower"] body *{scrollbar-width:none!important;-ms-overflow-style:none!important}' +
+    'html[data-tw-ck] #tw-root::-webkit-scrollbar,html[data-tw-ck] #tw-root *::-webkit-scrollbar,html[data-fm-page="tower"] body *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}';
   var st = document.createElement('style'); st.id = 'tw-latar-css'; st.textContent = css; document.head.appendChild(st);
 
   /* cahaya kursor: satu lapisan bulat yang hanya digeser (transform), di dalam shadow DOM supaya tidak memicu pengamat lain */
