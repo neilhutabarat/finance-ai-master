@@ -16,6 +16,7 @@
       { key: 'kuota_terminal', t: 'Jatah Perangkat', ic: 'kuota_terminal', run: "towerPick('kuota')", d: 'Jumlah Kasir, Manager & Owner' },
       { key: 'bekukan_aktifkan', t: 'Bekukan / Aktifkan', ic: 'bekukan_aktifkan', run: "towerPick('freeze')", d: 'Hentikan sementara akses toko' },
       { key: 'toko_berhenti', t: 'Arsip Toko Berhenti', ic: 'toko_berhenti', find: 'Toko Berhenti', d: 'Daftar toko yang nonaktif' },
+      { key: 'buka_blokir', t: 'Buka Blokir Login', ic: 'akun_login', run: "FM_TUNB.open()", d: 'Buka akun yang terkunci karena salah PIN' },
       { key: 'hapus_pulihkan', t: 'Tempat Sampah Klien', ic: 'hapus_pulihkan', run: "towerPick('hapus')", d: 'Hapus klien atau kembalikan' }
     ] },
     { id: 'layanan', title: 'Paket & Tagihan', hint: 'Langganan, biaya & fitur sewa', c: '#f97316', items: [
