@@ -96,11 +96,33 @@
     el.style.setProperty('background-color', 'rgb(' + c.r + ',' + c.g + ',' + c.b + ')', 'important');
     el.style.setProperty('-webkit-backdrop-filter', 'none', 'important'); el.style.setProperty('backdrop-filter', 'none', 'important');
   }
+  /* Pop-up Oneil Shield (gaya bawaannya gelap, ditulis langsung di elemen): ikut tema.
+     Kelas fm-lt membuat isinya terang; dipasang bila (tema terang) XOR (pop-up ikut terbalik oleh filter halaman). */
+  var shCss = false;
+  function shieldTheme(ov) {
+    if (!shCss) {
+      shCss = true;
+      var S = ':is(#fm-shield-panel,#fm-shield-monthly).fm-lt';
+      var st = document.createElement('style'); st.id = 'fm-shield-theme';
+      st.textContent = ':is(#fm-shield-panel,#fm-shield-monthly)>div{scrollbar-width:none!important}:is(#fm-shield-panel,#fm-shield-monthly)>div::-webkit-scrollbar{display:none!important;width:0!important}' + S + '>div{background:#fff!important;color:#0f172a!important;border-color:rgba(15,23,42,.10)!important;box-shadow:0 30px 70px -20px rgba(15,23,42,.45)!important}' +
+        S + ' [style*="color:#94a3b8"]{color:#5b6576!important}' + S + ' [style*="color:#e2e8f0"]{color:#0f172a!important}' +
+        S + ' [style*="color:#64748b"]{color:#64748b!important}' + S + ' [style*="color:#60a5fa"]{color:#2563eb!important}' +
+        S + ' [style*="background:rgba(255,255,255,.06)"]{background:#f2f4f8!important}' +
+        S + ' [style*="rgba(255,255,255,.07)"],' + S + ' [style*="rgba(255,255,255,.06)"]{border-color:rgba(15,23,42,.08)!important}' +
+        S + ' [style*="background:rgba(255,255,255,.1)"]{background:#eef1f6!important;color:#0f172a!important}' +
+        S + ' #fm-shield-contact{background:#eef4ff!important;color:#1e40af!important}' +
+        S + ' [style*="color:#bfdbfe"]{color:#1e40af!important}';
+      document.head.appendChild(st);
+    }
+    var want = (light() ? 1 : 0) ^ ancInv(ov) ^ (/invert/.test(getComputedStyle(ov).filter) ? 1 : 0);
+    ov.classList.toggle('fm-lt', !!want);
+  }
   function popups() {
     popT = 0;
     var W = innerWidth, H = innerHeight;
     [].forEach.call(document.body ? document.body.children : [], function (ov) {
       if (ov.id === 'fm-latar' || /^fm-upg/.test(ov.id || '') || ov.tagName === 'SCRIPT' || ov.tagName === 'STYLE') return;
+      if (/^fm-shield-(panel|monthly)$/.test(ov.id || '')) shieldTheme(ov);
       var cs = getComputedStyle(ov);
       if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden') return;
       var r = ov.getBoundingClientRect();
@@ -109,7 +131,10 @@
         var oc = rgba(cs.backgroundColor);
         if (oc && oc.a > 0.02) {
           ov.setAttribute('data-fm-solid-ov', '1');
-          if (oc.a < 0.5) ov.style.setProperty('background-color', 'rgba(' + oc.r + ',' + oc.g + ',' + oc.b + ',.55)', 'important');
+          /* latar redup selalu tampak gelap: bila pop-up ikut terbalik oleh filter halaman (mode gelap), warnanya dibalik dulu */
+          var inv = ancInv(ov) ^ (/invert/.test(cs.filter) ? 1 : 0), lum = (0.299 * oc.r + 0.587 * oc.g + 0.114 * oc.b) / 255;
+          var rr = oc.r, gg = oc.g, bb = oc.b; if ((inv && lum < 0.5) || (!inv && lum > 0.5)) { rr = 255 - rr; gg = 255 - gg; bb = 255 - bb; }
+          ov.style.setProperty('background-color', 'rgba(' + rr + ',' + gg + ',' + bb + ',' + Math.max(0.55, oc.a) + ')', 'important');
           ov.style.setProperty('-webkit-backdrop-filter', 'blur(6px)', 'important'); ov.style.setProperty('backdrop-filter', 'blur(6px)', 'important');
         }
       }

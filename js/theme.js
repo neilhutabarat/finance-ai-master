@@ -16,7 +16,10 @@
       '[Perubahan] Form Input Transaksi Kasir ditata ulang: dua kolom seimbang, kolom lebih jelas, muat satu layar tanpa gulir',
       '[Perubahan] Metode bayar dan akun tujuan (bank / Petty Cash) kini dipilih di jendela Konfirmasi Pembayaran saja',
       '[Perbaikan] Semua jendela pop-up kini padat dan latar di belakangnya diredupkan supaya mudah dibaca',
-      '[Perbaikan] Kartu Total Masuk, Total Keluar, dan Saldo Kas Sah tidak lagi terpotong; header lebih pipih dan nama toko tidak lagi mepet dengan alamat'
+      '[Perbaikan] Kartu Total Masuk, Total Keluar, dan Saldo Kas Sah tidak lagi terpotong; header lebih pipih dan nama toko tidak lagi mepet dengan alamat',
+      '[Perubahan] Tombol Upgrade di header tampil lebih modern dan bersih, mengikuti tema terang / gelap',
+      '[Perbaikan] Jendela Oneil Shield kini mengikuti tema: putih di mode terang, gelap di mode gelap',
+      '[Perbaikan] Kolom jumlah di Kasir diperlebar sehingga muat hingga 100.000'
     ]],
     ['v1.2', '23 Nov 2026', [
       '[Baru] Metode bayar Hutang di Kasir dengan pilihan TOP 14, 30, atau 45 hari. Nama pelanggan wajib diisi, jatuh tempo otomatis dihitung dan tampil di struk',
