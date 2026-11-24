@@ -1117,7 +1117,7 @@
                 badge.classList.remove('hidden');
 
                 if (opt.dataset.category === 'cogs' || opt.dataset.category === 'expense') {
-                    taxPill.classList.remove('hidden');
+                    if ((function () { try { return !!(window.FM_PLANS && FM_PLANS.has('tax', 'kasir')); } catch (e) { return false; } })()) taxPill.classList.remove('hidden'); else taxPill.classList.add('hidden');
                 } else {
                     taxPill.classList.add('hidden');
                 }
