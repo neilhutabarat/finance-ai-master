@@ -30,7 +30,6 @@
     { id: 'pantau', title: 'Bantuan & Kesehatan', hint: 'Tiket klien, error & kondisi sistem', c: '#e11d74', items: [
       { key: 'tiket_bantuan', t: 'Tiket Bantuan', ic: 'tiket_bantuan', run: "FM_HELPDESK.open()", d: 'Balas pertanyaan dari toko' },
       { key: 'pemantauan_error', t: 'Laporan Error', ic: 'pemantauan_error', run: "FM_MON.open('error')", d: 'Error dari perangkat toko' },
-      { key: 'log_login', t: 'Riwayat Login', ic: 'log_login', run: "FM_MON.open('login')", d: 'Siapa masuk, kapan & di mana' },
       { key: 'kesehatan_sistem', t: 'Kesehatan Sistem', ic: 'kesehatan_sistem', run: "FM_HEALTH.open()", d: 'Periksa server & data' },
       { key: 'kurs_emas', t: 'Kurs & Harga Emas', ic: 'kurs_emas', find: 'Kurs', d: 'Perbarui kurs & harga emas' }
     ] },

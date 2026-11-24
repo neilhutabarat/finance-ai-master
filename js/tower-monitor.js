@@ -64,7 +64,7 @@
   function open(t) {
     if (!DB()) return alert('Firestore belum terhubung. Masuk ke Tower dulu.');
     tab = t === 'login' ? 'login' : 'error'; shop = '';
-    ov = towerOverlay('tw-mon', 'Pemantauan Error & Log Login', 'Error aplikasi dari toko, dan siapa yang masuk kapan', '<div id="mn-body" style="overflow:auto;padding:0 18px 16px"><div style="padding:20px;opacity:.7;font-size:12.5px">Memuat…</div></div>');
+    ov = towerOverlay('tw-monlog', 'Pemantauan Error & Log Login', 'Error aplikasi dari toko, dan siapa yang masuk kapan', '<div id="mn-body" style="overflow:auto;padding:0 18px 16px"><div style="padding:20px;opacity:.7;font-size:12.5px">Memuat…</div></div>');
     ov.el.firstChild.style.width = 'min(900px,100%)';
     ov.el.addEventListener('click', function (e) {
       var t = e.target.closest('[data-t]'); if (t) { tab = t.getAttribute('data-t'); shop = ''; render(); return; }
