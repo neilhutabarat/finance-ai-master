@@ -146,15 +146,6 @@
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
-<style id="fm-kasir-form">
-html body #tx-amount:not(#_){font-size:19px!important;font-weight:800!important;padding:10px 14px!important;min-height:48px!important}
-html body :is(#tx-desc,#tx-staff,#tx-price2,#tx-qty2,#tx-disc):not(#_){font-size:14px!important;font-weight:700!important;padding:9px 13px!important;min-height:42px!important;height:auto!important}
-html body #tx-desc:not(#_){min-height:42px!important;height:42px!important;resize:none}
-html body #tx-account:not(#_){font-size:14px!important;font-weight:700!important;padding-top:9px!important;padding-bottom:9px!important;min-height:42px!important}
-html body section:has(#tx-amount) label:not(#_){display:block;font-size:12px!important;font-weight:800!important;margin-bottom:6px!important;line-height:1.2}
-html body section:has(#tx-amount) :is(#tx-amount,#tx-desc,#tx-staff,#tx-account,#tx-price2):not(#_){margin-bottom:14px!important}
-html body #btn-save-draft:not(#_){padding-top:9px!important;padding-bottom:9px!important;font-size:12px!important;border-radius:14px!important;margin-top:4px}
-</style>
 
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
@@ -428,7 +419,7 @@ html body #btn-save-draft:not(#_){padding-top:9px!important;padding-bottom:9px!i
                             <input type="number" id="tx-qty2" min="1" value="1" oninput="onQty2Change()" class="flex-1 text-center glass-input rounded-2xl p-3 text-xl font-black outline-none">
                             <button type="button" onclick="changeQty2(1)" class="w-12 h-12 rounded-2xl bg-white border border-slate-300 text-xl font-black text-slate-700 active:scale-95">+</button>
                         </div>
-                        <input type="text" id="tx-price2" inputmode="numeric" oninput="formatInputThousand(this); onQty2Change()" placeholder="Harga satuan (Rp), kosongkan bila nominal total diketik manual" class="mt-2 w-full glass-input rounded-2xl p-3 text-sm font-black outline-none font-mono">
+                        <input type="text" id="tx-price2" inputmode="numeric" oninput="formatInputThousand(this); onQty2Change()" placeholder="Harga satuan (Rp)" class="mt-2 w-full glass-input rounded-2xl p-3 text-sm font-black outline-none font-mono">
                     </div>
 
                     <div id="tx-qty-wrap" class="hidden">
@@ -2064,5 +2055,38 @@ html body #btn-save-draft:not(#_){padding-top:9px!important;padding-bottom:9px!i
         });
     </script>
     <script src="js/kasir-v12.js?v=12b6"></script>
+<style id="fm-kform">
+/* Kasir v1.2b: form Input Transaksi dua kolom seimbang, kolom tetap lega dan terbaca tanpa gulir */
+@media (min-width:1024px){
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px 14px!important;align-items:start!important;align-content:start!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>*{margin:0!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child label{font-size:11.5px!important;line-height:1.2!important;margin-bottom:4px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div>.flex:first-child{margin-bottom:4px!important;min-height:22px}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div>.flex:first-child>label{margin-bottom:0!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child :is(#tx-desc,#tx-staff,#tx-price2,#tx-disc,#barcode-block input){height:36px!important;min-height:0!important;padding:0 12px!important;font-size:13.5px!important;border-radius:12px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-account{height:36px!important;min-height:0!important;padding-top:0!important;padding-bottom:0!important;font-size:13.5px!important;border-radius:12px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-amount{height:40px!important;min-height:0!important;padding:0 12px!important;font-size:19px!important;line-height:40px!important;border-radius:12px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child :is(#tx-qty,#tx-qty2){height:36px!important;padding:0 6px!important;font-size:16px!important;border-radius:12px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child :is(#tx-qty-wrap,#tx-qty2-wrap) button{width:34px!important;height:36px!important;font-size:17px!important;border-radius:12px!important;flex:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-price2{margin-top:8px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap>label>span{display:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-cat-badge{display:inline-block!important;margin-top:6px!important;padding:2px 9px!important;font-size:10.5px!important;line-height:1.5!important;border-radius:999px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-cat-badge.hidden{display:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #btn-save-draft{height:40px!important;padding:0 14px!important;font-size:13px!important;border-radius:12px!important;position:static!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child:is(:has(>#tx-qty-wrap:not(.hidden)),:has(>#tx-qty2-wrap:not(.hidden)))>#btn-save-draft{grid-column:auto!important;align-self:end!important;height:36px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;column-gap:8px!important;align-items:center!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap.hidden{display:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap>label{grid-column:1/-1!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap>.flex{gap:4px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap #tx-qty2{width:46px!important;flex:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap #tx-price2{margin-top:0!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div:has(>#tx-account){position:relative!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-account{padding-right:178px!important;text-overflow:ellipsis!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div:has(>#tx-account:not(:has(option:checked:not([value=""])))) #tx-account{padding-right:30px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-cat-badge{position:absolute!important;right:30px!important;bottom:8px!important;margin:0!important;max-width:150px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;pointer-events:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div>.flex:first-child button,html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div>.flex:first-child [class*="rounded-full"]{height:22px!important;min-height:0!important;padding:0 9px!important;font-size:10.5px!important;line-height:20px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div>.flex:first-child{min-height:22px!important;align-items:center!important}
+}
+</style>
 </body>
 </html>
