@@ -10,6 +10,7 @@
     if (document.getElementById('fm-latar-css')) return;
     var s = document.createElement('style'); s.id = 'fm-latar-css';
     s.textContent = '#fm-latar{position:fixed;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;--mx:30%;--my:12%;background:radial-gradient(620px 460px at var(--mx) var(--my),rgba(255,255,255,.2),transparent 65%),linear-gradient(155deg,#26262b 0%,#0a0a0c 38%,#000 70%,#16161a 100%)}' +
+      'html[data-fm-latar-on]:not(#_):not(#__):not(#___):not(#____) body{background:transparent!important;background-image:none!important}' +
       'html body #fm-latar#fm-latar{filter:none!important}html body #fm-latar#fm-latar.si{filter:invert(1) hue-rotate(180deg)!important}';
     document.head.appendChild(s);
   }
@@ -19,7 +20,8 @@
   function light() { return h.getAttribute('data-fm-gelap') !== '1'; }
   function sync() {
     var on = h.getAttribute('data-fm-look') === 'base';
-    if (!on) { if (el) { el.remove(); el = null; } return; }
+    if (!on) { h.removeAttribute('data-fm-latar-on'); if (el) { el.remove(); el = null; } return; }
+    h.setAttribute('data-fm-latar-on', '1');
     css();
     if (!el) { el = document.createElement('div'); el.id = 'fm-latar'; el.setAttribute('aria-hidden', 'true'); document.body.insertBefore(el, document.body.firstChild); }
     var si = (light() ? 1 : 0) ^ ancInv(el);

@@ -150,10 +150,11 @@
       '#fm-upg .u-warn{background:#2a1f10;color:#f3c98b}' +
       '#fm-upg img.u-qr{display:block;width:100%;max-width:260px;margin:14px auto 0;border-radius:14px;background:#fff;padding:10px}' +
       '#fm-upg .u-dots{display:flex;gap:6px;justify-content:center;margin:2px 0 12px}#fm-upg .u-dots i{width:22px;height:4px;border-radius:9px;background:#2c2c30}#fm-upg .u-dots i.on{background:#fff}' +
-      '#fm-upg-chip#fm-upg-chip{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 13px 0 10px;border-radius:999px;font:800 12px/1 ' + F + ';letter-spacing:.02em;white-space:nowrap;background:#0a0a0c!important;color:#f1d58a!important;box-shadow:inset 0 0 0 1px rgba(229,195,115,.7)!important;vertical-align:middle}' +
+      '#fm-upg-chip#fm-upg-chip{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:7px;height:24px;padding:0 11px 0 8px;border-radius:999px;font:800 11px/1 ' + F + ';letter-spacing:.02em;white-space:nowrap;flex:none;background:#0a0a0c!important;color:#f1d58a!important;box-shadow:inset 0 0 0 1px rgba(229,195,115,.7)!important;vertical-align:middle}' +
       '#fm-upg-chip#fm-upg-chip::after{content:"";position:absolute;top:0;bottom:0;left:-40%;width:30%;background:linear-gradient(100deg,transparent,rgba(255,236,180,.45),transparent);transform:skewX(-20deg);animation:fmUpgChip 7s ease-in-out infinite}' +
       '#fm-upg-chip#fm-upg-chip.act{background:#052e16!important;color:#bbf7d0!important;box-shadow:inset 0 0 0 1px rgba(134,239,172,.6)!important}' +
       '#fm-upg-chip#fm-upg-chip.act::after{display:none}' +
+      'html body header.oneui-hero.oneui-hero:not(#_):not(#__):not(#___){padding-top:10px!important;padding-bottom:12px!important}' +
       '@keyframes fmUpgChip{0%,70%{left:-40%}100%{left:130%}}' +
       '#fm-upg-chip:focus-visible{outline:2px solid #fff;outline-offset:2px}' +
       '#fm-upg-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:2147482700;display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:16px;background:#050505;color:#fff;font:700 12.5px ' + F + ';box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 0 1px #3a3a40;max-width:92vw}' +
@@ -173,10 +174,10 @@
   function logoSvg(px, c) { try { return window.FM_LOGO ? FM_LOGO.mark(px, { tile: false, color: c }) : ''; } catch (e) { return ''; } }
   function cardHtml(t) {
     var a = activeOf(t), tag = a ? (a.kind === 'coba' ? 'Coba · ' + leftText(untilOf(a)) : 'Aktif') : (trialUsed(t) ? 'Lihat isi' : 'Coba gratis 24 jam');
-    var rows = flyerRows(t), col = t === 'pro' ? GOLD : '#fff', max = t === 'pro' ? 4 : 5, mk = t === 'pro' ? '#e5c373' : '#ffffff', tt = tn();
+    var rows = flyerRows(t), col = t === 'pro' ? GOLD : '#fff', max = 14, mk = t === 'pro' ? '#e5c373' : '#ffffff', tt = tn();
     var li = rows.slice(0, max).map(function (r) { return '<li>' + TICK(col) + '<span class="u-bn">' + esc(r.name) + '</span></li>'; }).join('');
     if (!rows.length) li = '<li class="more"><span>Daftar manfaat sedang disiapkan</span></li>';
-    if (rows.length > max) li += '<li class="more"><span>+ ' + (rows.length - max) + ' fitur lainnya</span></li>';
+    li += '<li class="more" data-tot="' + rows.length + '"><span></span></li>';
     if (t === 'pro' && rows.length) li = '<li>' + TICK(col) + '<span><b>Semua isi Plus</b></span></li>' + li;
     return '<button class="u-card ' + t + '" data-t="' + t + '" aria-label="Paket ' + NAME[t] + '"><span class="u-foil"></span><span class="u-wm">' + logoSvg(250, mk) + '</span>' +
       '<span class="u-top"><span class="u-lg">' + logoSvg(22, mk) + 'ONEILVERSE' + (t === 'plus' ? '<b class="u-pl">+</b>' : '<b class="u-pp">PRO</b>') + '</span><svg class="u-nfc" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="' + mk + '" stroke-width="1.7" stroke-linecap="round"><path d="M8 7.5a6.5 6.5 0 0 1 0 9M12 5a10 10 0 0 1 0 14M16 2.5a13.5 13.5 0 0 1 0 19"/></svg></span>' +
@@ -253,6 +254,19 @@
   /* Tema ikut halaman: terang atau gelap. Sebagian halaman dibalik warnanya oleh pembungkusnya, jadi jumlah pembalikan di atas popup dihitung dulu. */
   function isLight() { return document.documentElement.getAttribute('data-fm-gelap') !== '1'; }
   function ancInv() { var n = 0, e = ov.parentElement; while (e) { try { if (/invert/.test(getComputedStyle(e).filter)) n++; } catch (x) {} e = e.parentElement; } return n % 2; }
+  /* Daftar manfaat di kartu: tampilkan sebanyak yang muat, sisanya diringkas "+N fitur lainnya" supaya tidak ada tulisan terpotong. */
+  function fitCards() {
+    [].forEach.call(ov.querySelectorAll('.u-ben'), function (ul) {
+      var more = ul.querySelector('li.more'); if (!more) return;
+      var tot = Number(more.getAttribute('data-tot')) || 0, pro = ul.parentNode.classList.contains('pro'), skip = pro && tot ? 1 : 0;
+      for (var guard = 0; guard < 40; guard++) {
+        var shown = ul.children.length - 1 - skip, hid = tot - shown;
+        more.style.display = hid > 0 ? '' : 'none'; more.firstChild.textContent = '+ ' + hid + ' fitur lainnya';
+        if (ul.scrollHeight <= ul.clientHeight + 1 || shown <= 1) break;
+        ul.removeChild(more.previousElementSibling);
+      }
+    });
+  }
   function render() {
     if (!ov || ov.style.display === 'none') { chip(); return; }
     var lt = isLight(); ov.className = ((lt ? 1 : 0) ^ ancInv() ? 'si ' : '') + (lt ? 'lt' : '');
@@ -260,6 +274,7 @@
     var box = ov.firstChild, top = box ? box.scrollTop : 0;
     ov.innerHTML = '<div class="u-box' + (v === 'home' ? ' wide' : '') + '" role="dialog" aria-modal="true">' + h + '</div>';
     if (top && ov.firstChild) ov.firstChild.scrollTop = top;
+    fitCards();
     chip();
   }
 
@@ -317,13 +332,14 @@
     var el = document.getElementById('fm-upg-chip'), vt = visibleTiers(), a = activeList().sort(function (x, y) { return RANK[y.tier] - RANK[x.tier]; })[0];
     if (!vt.length && !a) { if (el) el.remove(); return; }
     if (!el) {
-      var role = document.getElementById('user-role-display'), host = role && role.parentElement; if (!host || !host.parentElement) return;
+      var tb = document.getElementById('tier-badge-indicator'), row = tb && tb.parentElement, role = document.getElementById('user-role-display'), host = role && role.parentElement;
+      if (!row && !(host && host.parentElement)) return;
       el = document.createElement('button'); el.id = 'fm-upg-chip'; el.type = 'button'; el.addEventListener('click', function () { open(); });
-      host.parentElement.insertBefore(el, host);
+      if (row) row.appendChild(el); else host.parentElement.insertBefore(el, host);
     }
     var pro = (a && a.tier === 'pro') || (!a && vt.indexOf('pro') >= 0 && vt.length === 1);
     el.className = a ? 'act' : (pro ? 'pro' : '');
-    el.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2.5l2.6 6.4 6.9.5-5.3 4.5 1.7 6.7L12 17l-5.9 3.6 1.7-6.7L2.5 9.4l6.9-.5z"/></svg>' + (a ? NAME[a.tier] + ' · ' + leftText(untilOf(a)) : 'Upgrade');
+    el.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2.5l2.6 6.4 6.9.5-5.3 4.5 1.7 6.7L12 17l-5.9 3.6 1.7-6.7L2.5 9.4l6.9-.5z"/></svg>' + (a ? NAME[a.tier] + ' · ' + leftText(untilOf(a)) : 'Upgrade');
   }
   function changed() {
     if (loadedSig === null) { loadedSig = sig(); return; }
