@@ -103,6 +103,7 @@
     <script src="js/tower-monitor.js?v=proto"></script>
     <script src="js/tower-help.js?v=proto"></script>
     <script src="js/tower-store.js?v=proto"></script>
+    <script src="js/tower-upgrade.js?v=12b2"></script>
     <script src="js/tower-wall.js?v=1125"></script>
     <script src="js/tower-demo.js?v=proto"></script>
     <script src="js/tower-qa.js?v=proto"></script>
@@ -2696,7 +2697,7 @@
                 const list = [];
                 snap.forEach(function (doc) { const d = doc.data(); d.docId = doc.id; list.push(d); });
                 list.sort(function (a, b) { return (b.timestamp || 0) - (a.timestamp || 0); });
-                allTickets = list.filter(function (t) { return t.type !== 'bantuan' && t.type !== 'store'; });
+                allTickets = list.filter(function (t) { return t.type !== 'bantuan' && t.type !== 'store' && t.type !== 'upgrade'; });
                 refreshProviderViews();
             }, function (e) { console.error('Provider: gagal membaca provider_tickets', e); });
         }

@@ -77,6 +77,10 @@
       var isTrial = r.kind === 'coba';
       if (!(await fmAsk(isTrial ? 'Hapus catatan coba ini? Toko ini bisa mencoba paket ' + NAME[r.tier] + ' lagi.' : 'Hapus catatan pengajuan ini?', { ok: 'Hapus', bahaya: true }))) return;
       var d = DB(); if (d) d.collection('provider_tickets').doc(id).delete().catch(fail);
+    } else if (a === 'again') {
+      if (!r) return;
+      if (!(await fmAsk('Beri ' + nameOf(r.tenantId) + ' kesempatan coba ' + NAME[r.tier] + ' 24 jam sekali lagi? Jika paket coba masih berjalan, langsung berhenti.', { ok: 'Beri kesempatan', judul: 'Coba ulang' }))) return;
+      var d4 = DB(); if (d4) d4.collection('provider_tickets').doc(id).delete().catch(fail);
     } else if (a === 'savecfg') { saveCfg();
     } else if (a === 'qrdel') { collect(); draft.qris = ''; render();
     }
@@ -108,9 +112,23 @@
     h += '<div style="font-weight:800;font-size:12.5px;margin:14px 0 6px">Riwayat</div>' + (rest.length ? rest.slice(0, 40).map(card).join('') : '<div style="opacity:.6;font-size:12px;padding:6px 2px">Belum ada.</div>');
     return h;
   }
+  function tenantsAll() {
+    var out = []; try { var T = (typeof TENANTS_CONFIG !== 'undefined') ? TENANTS_CONFIG : {}; Object.keys(T).forEach(function (k) { var t = T[k]; if (t && t.id && !t.deletedByTower) out.push({ id: t.id, nama: t.nama || t.id }); }); } catch (e) {}
+    out.sort(function (a, b) { return String(a.nama).localeCompare(String(b.nama)); }); return out;
+  }
+  function trialOf(tid, tier) { return reqs.filter(function (r) { return r.kind === 'coba' && r.tier === tier && String(r.tenantId).toLowerCase() === String(tid).toLowerCase(); })[0]; }
+  function trialCell(t, tier) {
+    var r = trialOf(t.id, tier), lbl = NAME[tier] + ': ', btn = '';
+    if (!r) return '<div style="flex:1;min-width:150px"><b>' + lbl + '</b><span style="opacity:.6">belum pernah coba</span><div style="font-size:11px;opacity:.5;margin-top:2px">Klien bisa mencoba sendiri</div></div>';
+    var live = untilOf(r) > Date.now();
+    if (live) btn = '<button data-a="off" data-id="' + H(r.docId) + '" style="' + B + RED + '">Matikan</button>';
+    else btn = '<button data-a="again" data-id="' + H(r.docId) + '" style="' + B + GRN + '">Beri coba lagi</button>';
+    return '<div style="flex:1;min-width:150px"><b>' + lbl + '</b><span style="color:' + (live ? '#fbbf24' : '#94a3b8') + '">' + (live ? 'sedang coba, sampai ' + H(dstr(untilOf(r))) : (r.status === 'MATI' ? 'dimatikan, sudah terpakai' : 'sudah terpakai')) + '</span><div style="margin-top:6px">' + btn + '</div></div>';
+  }
   function viewCoba() {
-    var l = reqs.filter(function (r) { return r.kind === 'coba'; });
-    return '<div style="font-size:12px;opacity:.7;margin-bottom:8px">Coba gratis 24 jam, sekali per paket per toko. Hapus catatan bila ingin memberi kesempatan coba lagi.</div>' + (l.length ? l.slice(0, 60).map(card).join('') : '<div style="opacity:.6;font-size:12px;padding:6px 2px">Belum ada yang mencoba.</div>');
+    var l = tenantsAll();
+    return '<div style="font-size:12px;opacity:.7;margin-bottom:8px">Coba gratis 24 jam, sekali per paket per toko. Tekan "Beri coba lagi" untuk toko yang kamu izinkan mencoba ulang.</div>' +
+      (l.length ? l.map(function (t) { return '<div style="padding:10px 12px;margin-bottom:8px;border-radius:14px;background:rgba(255,255,255,.05);font-size:12.5px"><b>' + H(t.nama) + '</b> <span style="opacity:.55">(' + H(t.id) + ')</span><div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px">' + trialCell(t, 'plus') + trialCell(t, 'pro') + '</div></div>'; }).join('') : '<div style="opacity:.6;font-size:12px;padding:6px 2px">Belum ada toko.</div>');
   }
   function cur() {
     if (draft) return draft;

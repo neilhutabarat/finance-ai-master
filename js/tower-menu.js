@@ -21,6 +21,7 @@
     { id: 'layanan', title: 'Paket & Tagihan', hint: 'Langganan, biaya & fitur sewa', c: '#f97316', items: [
       { key: 'paket_billing', t: 'Ubah Paket Toko', ic: 'paket_billing', run: "towerPick('paket')", d: 'Basic, Plus, Pro & durasi' },
       { key: 'isi_paket_fitur', t: 'Atur Isi Paket', ic: 'isi_paket_fitur', run: "openModal('paket_fitur')", d: 'Fitur bawaan tiap paket' },
+      { key: 'upgrade_req', t: 'Permintaan Upgrade', ic: 'upgrade_req', run: "FM_TUPG.open()", badge: 'stat-upg-pending', d: 'Konfirmasi paket yang diajukan klien' },
       { key: 'billing_toko', t: 'Tagihan per Toko', ic: 'billing_toko', run: "towerPick('billing')", d: 'Biaya & pembayaran satu toko' },
       { key: 'billing_jaringan', t: 'Tagihan Semua Toko', ic: 'billing_jaringan', find: 'Billing Jaringan', d: 'Rekap tagihan & jatuh tempo' },
       { key: 'store', t: 'OneilStore', ic: 'store', run: "FM_TSTORE.open()", d: 'Harga & sewa fitur satuan' },
@@ -66,6 +67,7 @@
     isi_paket_fitur: '<rect class="f" x="4.5" y="4" width="15" height="16" rx="3"/><rect x="4.5" y="4" width="15" height="16" rx="3"/><path d="M8.3 9.3l1.2 1.2 2.2-2.4M13.5 10h3M8.3 15l1.2 1.2 2.2-2.4M13.5 15.7h3"/>',
     billing_toko: '<path class="f" d="M6 3.5h12v17l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4z"/><path d="M6 3.5h12v17l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4z"/><path d="M9 8.5h6M9 12h6M9 15.5h3.5"/>',
     billing_jaringan: '<rect class="f" x="4.5" y="12" width="3" height="8" rx="1"/><rect class="f" x="10.5" y="7" width="3" height="13" rx="1"/><rect class="f" x="16.5" y="10" width="3" height="10" rx="1"/><path d="M3.5 20.5h17"/><path d="M6 8.5l4-3 3.5 2.2L19 4"/>',
+    upgrade_req: '<rect class="f" x="5" y="3.5" width="14" height="17" rx="2.8"/><rect x="5" y="3.5" width="14" height="17" rx="2.8"/><path d="M12 16.2V9.6M9 12.4l3-3 3 3"/>',
     store: '<path class="f" d="M5.5 8h13l-1 11.5a1.5 1.5 0 0 1-1.5 1.4H8a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M5.5 8h13l-1 11.5a1.5 1.5 0 0 1-1.5 1.4H8a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/>',
     demo_toko: '<path class="f" d="M10.5 9.2L5.6 17.5A2 2 0 0 0 7.3 20.5h9.4a2 2 0 0 0 1.7-3l-4.9-8.3z"/><path d="M9.5 4h5M10.5 4v5.2L5.6 17.5A2 2 0 0 0 7.3 20.5h9.4a2 2 0 0 0 1.7-3l-4.9-8.3V4"/><path d="M8 15h8"/>',
     tiket_bantuan: '<circle class="f" cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.4"/><path d="M6 6l3.6 3.6M18 6l-3.6 3.6M6 18l3.6-3.6M18 18l-3.6-3.6"/>',

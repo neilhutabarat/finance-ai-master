@@ -90,20 +90,41 @@
       '#fm-upg h2{margin:0;font-size:19px;font-weight:900;letter-spacing:-.01em}' +
       '#fm-upg .u-sub{font-size:12.5px;color:#a1a1aa;margin-top:3px;line-height:1.5}' +
       '#fm-upg .u-x{border:0;background:#25252a;color:#d4d4d8;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer}' +
-      '#fm-upg .u-cards{display:flex;gap:14px;justify-content:center;margin:20px 0 6px}' +
-      '#fm-upg .u-card{all:unset;box-sizing:border-box;flex:1 1 0;max-width:168px;aspect-ratio:54/86;border-radius:16px;cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:14px;background:#050505;color:#fff;box-shadow:0 14px 30px rgba(0,0,0,.55),inset 0 0 0 1px #2c2c30;transition:transform .18s}' +
-      '#fm-upg .u-card:active{transform:scale(.97)}' +
+      '#fm-upg .u-box.wide{max-width:640px}' +
+      '#fm-upg .u-cards{display:flex;gap:16px;margin:18px -20px 4px;padding:6px 20px 14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}' +
+      '#fm-upg .u-cards::-webkit-scrollbar{display:none}' +
+      '#fm-upg .u-card{all:unset;box-sizing:border-box;flex:0 0 min(80vw,272px);aspect-ratio:5/8;scroll-snap-align:center;border-radius:22px;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:20px 20px 18px;color:#fff;font-family:' + F + ';background:radial-gradient(120% 80% at 0% 0%,#1d1d21 0%,#070708 55%,#000 100%);box-shadow:0 22px 44px rgba(0,0,0,.65),inset 0 0 0 1px #34343a,inset 0 1px 0 rgba(255,255,255,.12);transition:transform .2s}' +
+      '#fm-upg .u-card::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 1px,transparent 1px 7px);pointer-events:none}' +
+      '#fm-upg .u-card::after{content:"";position:absolute;top:-30%;left:-60%;width:40%;height:160%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.16),transparent);transform:rotate(12deg);animation:fmUpgSheen 3.6s ease-out 1 .5s both;pointer-events:none}' +
+      '@keyframes fmUpgSheen{from{left:-60%}to{left:140%}}' +
+      '@media (prefers-reduced-motion:reduce){#fm-upg .u-card::after{animation:none;opacity:0}#fm-upg-chip{animation:none!important}}' +
+      '#fm-upg .u-card:hover{transform:translateY(-3px)}#fm-upg .u-card:active{transform:scale(.98)}' +
       '#fm-upg .u-card:focus-visible{outline:2px solid #fff;outline-offset:3px}' +
-      '#fm-upg .u-card.pro{background:linear-gradient(160deg,#050505 55%,#14100a);box-shadow:0 14px 30px rgba(0,0,0,.55),inset 0 0 0 2px #b8924a,inset 0 0 0 4px #050505,inset 0 0 0 5px rgba(229,195,115,.55)}' +
-      '#fm-upg .u-chip{width:28px;height:21px;border-radius:5px;background:linear-gradient(135deg,#3a3a40,#1c1c20);box-shadow:inset 0 0 0 1px #4a4a50}' +
-      '#fm-upg .pro .u-chip{background:linear-gradient(135deg,#e9cd8a,#a67f36);box-shadow:inset 0 0 0 1px #f5e2ae}' +
-      '#fm-upg .u-ico{align-self:center;opacity:.95}' +
-      '#fm-upg .u-nm{font-size:20px;font-weight:900;letter-spacing:.02em}' +
-      '#fm-upg .pro .u-nm{color:' + GOLD + '}' +
-      '#fm-upg .u-pr{font-size:11px;color:#a1a1aa;margin-top:2px}' +
-      '#fm-upg .pro .u-pr{color:#c9ab6a}' +
-      '#fm-upg .u-tag{position:absolute;top:12px;right:12px;font-size:9.5px;font-weight:800;padding:3px 7px;border-radius:99px;background:#fff;color:#000}' +
-      '#fm-upg .pro .u-tag{background:' + GOLD + '}' +
+      '#fm-upg .u-card.pro{background:radial-gradient(120% 80% at 0% 0%,#2a2113 0%,#0b0905 55%,#000 100%);box-shadow:0 22px 44px rgba(0,0,0,.65),0 0 0 1px #8a6a2b,0 0 0 3px #000,0 0 0 4px #e5c373,inset 0 1px 0 rgba(255,225,150,.35)}' +
+      '#fm-upg .u-card.pro::before{background:repeating-linear-gradient(115deg,rgba(229,195,115,.05) 0 1px,transparent 1px 7px)}' +
+      '#fm-upg .u-wm{position:absolute;right:-26px;bottom:34px;opacity:.07;pointer-events:none}' +
+      '#fm-upg .pro .u-wm{opacity:.11}' +
+      '#fm-upg .u-top{display:flex;justify-content:space-between;align-items:center;position:relative}' +
+      '#fm-upg .u-brand{font-size:9.5px;font-weight:700;letter-spacing:.32em;color:#8b8b93}' +
+      '#fm-upg .pro .u-brand{color:#b8924a}' +
+      '#fm-upg .u-chip{width:34px;height:25px;border-radius:6px;background:linear-gradient(135deg,#4a4a52,#1c1c20 60%,#3c3c42);box-shadow:inset 0 0 0 1px #5a5a62}' +
+      '#fm-upg .pro .u-chip{background:linear-gradient(135deg,#f3dc9b,#a67f36 55%,#e5c373);box-shadow:inset 0 0 0 1px #f9ebc0}' +
+      '#fm-upg .u-nm{display:block;font-family:Didot,"Bodoni 72","Playfair Display",Georgia,serif;font-size:44px;line-height:1;font-weight:700;letter-spacing:.01em;margin-top:18px;position:relative;color:#f4f4f5}' +
+      '#fm-upg .pro .u-nm{background:linear-gradient(120deg,#f8e7b0,#d4a94f 45%,#fff0c2 60%,#c49a45);-webkit-background-clip:text;background-clip:text;color:transparent}' +
+      '#fm-upg .u-tl{display:block;font-size:11px;color:#9a9aa3;margin-top:5px;letter-spacing:.04em;position:relative}' +
+      '#fm-upg .pro .u-tl{color:#c9ab6a}' +
+      '#fm-upg .u-ben{list-style:none;margin:16px 0 0;padding:14px 0 0;border-top:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;gap:8px;position:relative;flex:1;min-height:0;overflow:hidden}' +
+      '#fm-upg .pro .u-ben{border-color:rgba(229,195,115,.3)}' +
+      '#fm-upg .u-ben li{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.35;font-weight:600;color:#e7e7ea}' +
+      '#fm-upg .u-ben li svg{flex:0 0 auto;margin-top:1px}' +
+      '#fm-upg .u-ben li.more{color:#8b8b93;font-weight:500}' +
+      '#fm-upg .pro .u-ben li.more{color:#b8924a}' +
+      '#fm-upg .u-foot{position:relative;display:flex;justify-content:space-between;align-items:flex-end;gap:8px;margin-top:12px}' +
+      '#fm-upg .u-pr{font-size:11px;color:#9a9aa3;line-height:1.35}#fm-upg .u-pr b{display:block;font-size:19px;color:#fff;letter-spacing:-.01em}' +
+      '#fm-upg .pro .u-pr b{color:#f1d58a}' +
+      '#fm-upg .u-tag{font-size:10.5px;font-weight:800;padding:6px 10px;border-radius:99px;background:#fff;color:#000;white-space:nowrap}' +
+      '#fm-upg .pro .u-tag{background:linear-gradient(135deg,#f6e0a0,#c49a45);color:#1a1405}' +
+      '#fm-upg .u-hint{text-align:center;font-size:11.5px;color:#7d7d86;margin:2px 0 0}' +
       '#fm-upg .u-b{all:unset;box-sizing:border-box;display:block;width:100%;text-align:center;padding:13px;border-radius:14px;font-size:14px;font-weight:800;cursor:pointer;margin-top:10px;background:#25252a;color:#f3f4f6}' +
       '#fm-upg .u-b.main{background:#fff;color:#000}' +
       '#fm-upg .u-b.gold{background:linear-gradient(135deg,#f1d58a,#c49a45);color:#1a1405}' +
@@ -120,8 +141,10 @@
       '#fm-upg .u-warn{background:#2a1f10;color:#f3c98b}' +
       '#fm-upg img.u-qr{display:block;width:100%;max-width:260px;margin:14px auto 0;border-radius:14px;background:#fff;padding:10px}' +
       '#fm-upg .u-dots{display:flex;gap:6px;justify-content:center;margin:2px 0 12px}#fm-upg .u-dots i{width:22px;height:4px;border-radius:9px;background:#2c2c30}#fm-upg .u-dots i.on{background:#fff}' +
-      '#fm-upg-chip{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font:800 12px ' + F + ';background:#050505;color:#fff;box-shadow:inset 0 0 0 1px #3a3a40,0 2px 8px rgba(0,0,0,.35)}' +
-      '#fm-upg-chip.pro{color:' + GOLD + ';box-shadow:inset 0 0 0 1px #b8924a,0 2px 8px rgba(0,0,0,.35)}' +
+      '#fm-upg-chip#fm-upg-chip{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:999px;font:900 13px ' + F + ';letter-spacing:.01em;background:linear-gradient(135deg,#000 0%,#1c1c20 100%)!important;color:#fff!important;box-shadow:inset 0 0 0 1.5px #56565e,0 4px 14px rgba(0,0,0,.45)!important;animation:fmUpgPulse 2.4s ease-in-out infinite}' +
+      '#fm-upg-chip#fm-upg-chip.pro{background:linear-gradient(135deg,#f6e0a0,#c49a45)!important;color:#1a1405!important;box-shadow:inset 0 0 0 1.5px #fff0c2,0 4px 14px rgba(196,154,69,.5)!important}' +
+      '#fm-upg-chip#fm-upg-chip.act{background:linear-gradient(135deg,#052e16,#14532d)!important;color:#bbf7d0!important;animation:none}' +
+      '@keyframes fmUpgPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}' +
       '#fm-upg-chip:focus-visible{outline:2px solid #fff;outline-offset:2px}' +
       '#fm-upg-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:2147482700;display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:16px;background:#050505;color:#fff;font:700 12.5px ' + F + ';box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 0 1px #3a3a40;max-width:92vw}' +
       '#fm-upg-bar button{all:unset;cursor:pointer;padding:7px 12px;border-radius:99px;background:#fff;color:#000;font-weight:800;font-size:12px}';
@@ -137,9 +160,17 @@
   function activeOf(t) { return activeList().filter(function (x) { return x.tier === t; })[0] || null; }
 
   function cardHtml(t) {
-    var a = activeOf(t), tag = a ? (a.kind === 'coba' ? 'Coba · ' + leftText(untilOf(a)) : (a.status === 'AKTIF' ? 'Aktif' : 'Sementara')) : (trialUsed(t) ? '' : 'Coba gratis');
-    return '<button class="u-card ' + t + '" data-t="' + t + '" aria-label="Paket ' + NAME[t] + '"><span class="u-chip"></span>' + (tag ? '<span class="u-tag">' + esc(tag) + '</span>' : '') + ICON[t] +
-      '<span><span class="u-nm">' + NAME[t] + '</span><span class="u-pr" style="display:block">mulai ' + rp(price(t, 'bulan')).replace(/\.000$/, 'rb') + ' / bulan</span></span></button>';
+    var a = activeOf(t), tag = a ? (a.kind === 'coba' ? 'Coba · ' + leftText(untilOf(a)) : (a.status === 'AKTIF' ? 'Aktif' : 'Sementara')) : (trialUsed(t) ? 'Lihat isi' : 'Coba gratis 24 jam');
+    var rows = flyerRows(t), col = t === 'pro' ? GOLD : '#fff', max = 6;
+    var li = rows.slice(0, max).map(function (r) { return '<li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + col + '" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>' + esc(r.name) + '</span></li>'; }).join('');
+    if (!rows.length) li = '<li class="more"><span>Daftar manfaat sedang disiapkan</span></li>';
+    if (rows.length > max) li += '<li class="more"><span>+ ' + (rows.length - max) + ' fitur lainnya</span></li>';
+    if (t === 'pro' && rows.length) li = '<li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + col + '" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Semua isi Plus</b></span></li>' + li;
+    return '<button class="u-card ' + t + '" data-t="' + t + '" aria-label="Paket ' + NAME[t] + '"><span class="u-wm">' + ICON[t].replace('width="54" height="54"', 'width="260" height="260"') + '</span>' +
+      '<span class="u-top"><span class="u-brand">ONEILVERSE</span><span class="u-chip"></span></span>' +
+      '<span class="u-nm">' + NAME[t] + '</span><span class="u-tl">' + (t === 'pro' ? 'Akses penuh, tanpa batas' : 'Naik kelas untuk usaha Anda') + '</span>' +
+      '<ul class="u-ben">' + li + '</ul>' +
+      '<span class="u-foot"><span class="u-pr">mulai<b>' + rp(price(t, 'bulan')) + '</b>per bulan</span><span class="u-tag">' + esc(tag) + '</span></span></button>';
   }
   function head(title, sub, back) {
     return '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px"><div style="display:flex;gap:10px;align-items:flex-start">' +
@@ -147,7 +178,7 @@
   }
   function vHome() {
     var vt = visibleTiers(), pend = pending();
-    var h = head('Tingkatkan toko Anda', 'Pilih kartu untuk melihat isi paket. Coba gratis 24 jam, sekali untuk tiap paket.');
+    var h = head('Tingkatkan toko Anda', 'Geser dan tekan kartu untuk melihat semua isi paket. Coba gratis 24 jam, sekali untuk tiap paket.');
     if (pend) h += '<div class="u-note u-warn">Pengajuan ' + NAME[pend.tier] + ' menunggu konfirmasi. Paket aktif sementara sampai ' + esc(dstr(untilOf(pend))) + '.</div>';
     h += vt.length ? '<div class="u-cards">' + vt.map(cardHtml).join('') + '</div>' : '<div class="u-note">Toko ini sudah memakai paket tertinggi.</div>';
     return h;
@@ -211,7 +242,7 @@
     if (!ov || ov.style.display === 'none') { chip(); return; }
     var v = S.v, h = v === 'flyer' ? vFlyer() : v === 'dur' ? vDur() : v === 'pay' ? vPay() : v === 'c1' ? vConf(0) : v === 'c2' ? vConf(1) : v === 'c3' ? vConf(2) : v === 'trial' ? vTrial() : v === 'done' ? vDone() : vHome();
     var box = ov.firstChild, top = box ? box.scrollTop : 0;
-    ov.innerHTML = '<div class="u-box" role="dialog" aria-modal="true">' + h + '</div>';
+    ov.innerHTML = '<div class="u-box' + (v === 'home' ? ' wide' : '') + '" role="dialog" aria-modal="true">' + h + '</div>';
     if (top && ov.firstChild) ov.firstChild.scrollTop = top;
     chip();
   }
@@ -269,8 +300,8 @@
       host.parentElement.insertBefore(el, host);
     }
     var pro = (a && a.tier === 'pro') || (!a && vt.indexOf('pro') >= 0 && vt.length === 1);
-    el.className = pro ? 'pro' : '';
-    el.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>' + (a ? NAME[a.tier] + ' · ' + leftText(untilOf(a)) : (vt.length === 1 ? 'Ke ' + NAME[vt[0]] : 'Upgrade'));
+    el.className = a ? 'act' : (pro ? 'pro' : '');
+    el.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>' + (a ? NAME[a.tier] + ' · ' + leftText(untilOf(a)) : (vt.length === 1 ? 'Upgrade ke ' + NAME[vt[0]] : 'Upgrade ke Plus / Pro'));
   }
   function changed() {
     if (loadedSig === null) { loadedSig = sig(); return; }
