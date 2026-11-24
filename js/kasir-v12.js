@@ -662,7 +662,6 @@
         '<div class="flex items-center gap-1.5 shrink-0">' +
           '<span class="font-black font-mono ' + (isIn ? 'text-emerald-700' : 'text-rose-600') + '">' + (isIn ? '' : '-') + 'Rp ' + fmtNum(tx.amount) + '</span>' +
           '<button type="button" data-hist-print="' + i + '" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[10.5px]">Struk</button>' +
-          '<button type="button" data-hist-wa="' + i + '" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-[10.5px]">WA</button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -671,12 +670,6 @@
       b.onclick = function () {
         var tx = list[Number(b.getAttribute('data-hist-print'))];
         if (tx) reopenReceiptForTx(tx, false);
-      };
-    });
-    [].forEach.call(box.querySelectorAll('[data-hist-wa]'), function (b) {
-      b.onclick = function () {
-        var tx = list[Number(b.getAttribute('data-hist-wa'))];
-        if (tx) reopenReceiptForTx(tx, true);
       };
     });
   }
@@ -717,8 +710,7 @@
       items: [itemLine]
     };
 
-    if (directlyOpenWA) window.sendReceiptWA();
-    else document.getElementById('modal-receipt').classList.remove('hidden');
+    document.getElementById('modal-receipt').classList.remove('hidden');
   }
 
   function updateReceiptExtraRows(meta) {
@@ -788,6 +780,7 @@
             (hutangOn ? '<button type="button" class="v12-pm-tab" data-mpm="hutang">Hutang</button>' : '') +
           '</div>' +
         '</div>' +
+        '<div id="v12-m-bankwrap" class="hidden"><label>Akun Tujuan</label><select id="v12-m-bank"></select><p id="v12-m-bankwarn" class="hidden" style="font-size:10.5px;font-weight:700;color:#d97706;margin-top:4px"></p></div>' +
         '<div id="v12-m-hutangwrap" class="hidden space-y-2 p-3 rounded-2xl bg-amber-50 border border-amber-200">' +
           '<label>Tempo Pembayaran (TOP)</label>' +
           '<div class="v12-pm-tabs" id="v12-m-top">' +
@@ -891,12 +884,29 @@
       return { disc: disc, net: net, target: target };
     }
 
+    function fillModalBank() {
+      var wrap = document.getElementById('v12-m-bankwrap'), sel = document.getElementById('v12-m-bank'), warn = document.getElementById('v12-m-bankwarn');
+      if (!wrap) return;
+      var need = curPm === 'qris' || curPm === 'bank' || curPm === 'petty';
+      wrap.classList.toggle('hidden', !need);
+      if (!need) return;
+      var cat = curPm === 'petty' ? 'petty' : 'bank', accs = [];
+      try { accs = ((typeof STORE !== 'undefined' && STORE.getCOA) ? STORE.getCOA() : []).filter(function (c) { return c.category === cat; }); } catch (e) {}
+      var cur = sel.value;
+      sel.innerHTML = accs.map(function (b) { return '<option value="' + String(b.code).replace(/"/g, '') + '">[' + b.code + '] ' + String(b.name).replace(/</g, '&lt;') + '</option>'; }).join('');
+      sel.style.display = accs.length ? '' : 'none';
+      if (accs.some(function (b) { return b.code === cur; })) sel.value = cur;
+      warn.classList.toggle('hidden', accs.length > 0);
+      warn.textContent = accs.length ? '' : (cat === 'petty' ? 'Belum ada akun Petty Cash di COA. Transaksi tetap tercatat tanpa akun tujuan.' : 'Belum ada akun bank di COA. Transaksi tetap tercatat tanpa akun tujuan.');
+    }
+
     function setModalPm(pm) {
       curPm = pm;
       [].forEach.call(modal.querySelectorAll('[data-mpm]'), function (b) {
         b.classList.toggle('on', b.getAttribute('data-mpm') === curPm);
       });
       document.getElementById('v12-m-cashwrap').classList.toggle('hidden', curPm !== 'tunai');
+      fillModalBank();
       document.getElementById('v12-m-splitwrap').classList.toggle('hidden', curPm !== 'split');
       document.getElementById('v12-m-hutangwrap').classList.toggle('hidden', curPm !== 'hutang');
       if (curPm === 'hutang') document.getElementById('v12-m-hstat').textContent = 'Jatuh tempo: ' + dmyOf(topDue());
@@ -1003,6 +1013,8 @@
           leftSel.value = sm1 === 'transfer' ? 'bank' : sm1;
         }
         if (typeof onPayMethodChange === 'function') onPayMethodChange();
+        var mb = document.getElementById('v12-m-bank'), lb = document.getElementById('pay-bank-acc');
+        if (curPm !== 'split' && mb && lb && mb.value && curPm !== 'tunai') lb.value = mb.value;
       }
 
       close();
@@ -1139,60 +1151,7 @@
       window.renderAllReports = wAll;
     }
 
-    // Upgrade sendReceiptWA
-    window.sendReceiptWA = function () {
-      if (!lastReceipt) return alert('Belum ada struk transaksi untuk dikirim.');
-      var lines = [
-        '*' + (lastReceipt.store || 'ONEILVERSE') + '*',
-        lastReceipt.when || '',
-        lastReceipt.customer ? ('Pelanggan: ' + lastReceipt.customer) : '',
-        '------------------',
-        (lastReceipt.items || []).join('\n'),
-        '------------------'
-      ].filter(Boolean);
-      if (lastReceipt.disc > 0) lines.push('Potongan: -Rp ' + fmtNum(lastReceipt.disc));
-      lines.push('*TOTAL: ' + fmtRp(lastReceipt.total) + '*');
-      lines.push('Bayar: ' + (lastReceipt.pay || 'Tunai'));
-      if (lastReceipt.cashIn > 0) {
-        lines.push('Diterima: Rp ' + fmtNum(lastReceipt.cashIn));
-        lines.push('Kembalian: Rp ' + fmtNum(lastReceipt.change || 0));
-      }
-      lines.push('Terima kasih!');
-      var txt = lines.join('\n');
 
-      var saved = '';
-      try { saved = localStorage.getItem('fm_wa_last') || ''; } catch (e) {}
-      var old = document.getElementById('fm-wa-box');
-      if (old) old.remove();
-      var ov = document.createElement('div');
-      ov.id = 'fm-wa-box';
-      ov.style.cssText = 'position:fixed;inset:0;z-index:2147483200;background:rgba(2,6,23,.55);display:flex;align-items:center;justify-content:center;padding:18px;font-family:system-ui,sans-serif';
-      ov.innerHTML = '<div style="width:100%;max-width:360px;background:#fff;color:#0f172a;border-radius:20px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.35)">' +
-        '<b style="font-size:15px">Kirim Struk Digital WhatsApp</b>' +
-        '<p style="font-size:12px;color:#64748b;margin:6px 0 10px">Masukkan nomor WA pelanggan (contoh 08123456789). Kosongkan bila ingin memilih kontak di WhatsApp.</p>' +
-        '<input id="fm-wa-num" type="tel" inputmode="numeric" placeholder="08..." value="' + esc(saved.replace(/[^0-9]/g, '')) + '" style="width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:12px;padding:11px 12px;font-size:14px;outline:none">' +
-        '<div style="display:flex;gap:8px;margin-top:12px"><button id="fm-wa-cancel" style="flex:1;border:0;border-radius:12px;padding:11px;background:#e2e8f0;color:#334155;font-weight:700;cursor:pointer">Batal</button>' +
-        '<button id="fm-wa-go" style="flex:2;border:0;border-radius:12px;padding:11px;background:#16a34a;color:#fff;font-weight:800;cursor:pointer">Kirim WhatsApp</button></div></div>';
-      document.body.appendChild(ov);
-      var inp = document.getElementById('fm-wa-num');
-      inp.focus();
-      var tutup = function () { ov.remove(); };
-      document.getElementById('fm-wa-cancel').onclick = tutup;
-      ov.addEventListener('click', function (e) { if (e.target === ov) tutup(); });
-      var kirim = function () {
-        var phone = (inp.value || '').replace(/[^0-9]/g, '');
-        if (phone.indexOf('0') === 0) phone = '62' + phone.slice(1);
-        else if (phone.indexOf('8') === 0) phone = '62' + phone;
-        try { localStorage.setItem('fm_wa_last', phone); } catch (e) {}
-        var url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(txt);
-        var a = document.createElement('a');
-        a.href = url; a.target = '_blank'; a.rel = 'noopener';
-        document.body.appendChild(a); a.click(); a.remove();
-        tutup();
-      };
-      document.getElementById('fm-wa-go').onclick = kirim;
-      inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') kirim(); });
-    };
 
     // Upgrade finalizeAndPrint: buka Modal Pembayaran & Kembalian yang lega (menggantikan fmAsk polos)
     var origFinalize = window.finalizeAndPrint;

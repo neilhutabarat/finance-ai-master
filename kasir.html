@@ -146,6 +146,7 @@
     <script src="js/pwa.js" defer></script>
     <script src="js/sw-register.js" defer></script>
     <script src="js/update-check.js" defer></script>
+
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -418,7 +419,7 @@
                             <input type="number" id="tx-qty2" min="1" value="1" oninput="onQty2Change()" class="flex-1 text-center glass-input rounded-2xl p-3 text-xl font-black outline-none">
                             <button type="button" onclick="changeQty2(1)" class="w-12 h-12 rounded-2xl bg-white border border-slate-300 text-xl font-black text-slate-700 active:scale-95">+</button>
                         </div>
-                        <input type="text" id="tx-price2" inputmode="numeric" oninput="formatInputThousand(this); onQty2Change()" placeholder="Harga satuan (Rp), kosongkan bila nominal total diketik manual" class="mt-2 w-full glass-input rounded-2xl p-3 text-sm font-black outline-none font-mono">
+                        <input type="text" id="tx-price2" inputmode="numeric" oninput="formatInputThousand(this); onQty2Change()" placeholder="Harga satuan (Rp)" class="mt-2 w-full glass-input rounded-2xl p-3 text-sm font-black outline-none font-mono">
                     </div>
 
                     <div id="tx-qty-wrap" class="hidden">
@@ -467,7 +468,7 @@
                         <input type="text" id="tx-staff" placeholder="Nama petugas" class="w-full glass-input rounded-2xl p-3 text-xs font-bold outline-none">
                     </div>
 
-                    <div>
+                    <div style="display:none" id="pay-method-wrap">
                         <label class="text-[10px] text-slate-500 block font-bold mb-1">Metode Bayar / Terima</label>
                         <select id="pay-method" onchange="onPayMethodChange()" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold bg-white text-slate-800">
                             <option value="tunai">Tunai</option>
@@ -595,9 +596,7 @@
                 <button onclick="FM_STRUK_PDF.save()" class="px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 rounded-xl text-xs transition active:scale-95 flex items-center justify-center space-x-1" id="btn-pdf-receipt" title="Simpan struk sebagai PDF">
                     <span>📄 Simpan PDF</span>
                 </button>
-                <button onclick="sendReceiptWA()" class="px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 rounded-xl text-xs transition active:scale-95 flex items-center justify-center space-x-1" id="btn-wa-receipt">
-                    <span>💬 WhatsApp</span>
-                </button>
+                
                 <button onclick="closeReceiptModal()" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
                     Tutup
                 </button>
@@ -771,7 +770,9 @@
     <script src="/js/rollout.js"></script>
     <script src="js/auth.js?v=proto"></script>
     <script src="js/monitor.js?v=proto"></script>
-    <script src="js/plans.js?v=1119"></script>
+    <script src="js/latar.js?v=12b17"></script>
+    <script src="js/upgrade.js?v=12b8"></script>
+    <script src="js/plans.js?v=12b5"></script>
     <script src="js/usaha.js?v=proto"></script>
     <script src="js/mutasi-share.js?v=proto"></script>
     <script src="js/struk-pdf.js?v=proto"></script>
@@ -1366,40 +1367,7 @@
             document.getElementById('btn-cancel-edit').classList.add('hidden');
         }
 
-        function sendReceiptWA() {
-            if (!(window.FM_PLANS && FM_PLANS.has('wa_receipt'))) { if (window.FM_PLANS) FM_PLANS.openModal('wa_receipt'); return; }
-            if (!lastReceipt) return;
-            const txt = lastReceipt.store + '\n' + lastReceipt.when + '\n------------------\n' + lastReceipt.items.join('\n') + '\n------------------\nTOTAL: ' + fmSigned(lastReceipt.total) + '\nBayar: ' + lastReceipt.pay + '\nTerima kasih!';
-            // Kotak isian sendiri (bukan prompt bawaan browser): window.open setelah prompt() sering diblokir popup-blocker, jadi WA tidak terbuka
-            let saved = ''; try { saved = localStorage.getItem('fm_wa_last') || ''; } catch (e) {}
-            const old = document.getElementById('fm-wa-box'); if (old) old.remove();
-            const ov = document.createElement('div'); ov.id = 'fm-wa-box';
-            ov.style.cssText = 'position:fixed;inset:0;z-index:2147483200;background:rgba(2,6,23,.55);display:flex;align-items:center;justify-content:center;padding:18px;font-family:system-ui,sans-serif';
-            ov.innerHTML = '<div style="width:100%;max-width:360px;background:#fff;color:#0f172a;border-radius:20px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.35)">' +
-                '<b style="font-size:15px">Kirim struk lewat WhatsApp</b>' +
-                '<p style="font-size:12px;color:#64748b;margin:6px 0 10px">Isi nomor pelanggan (contoh 08123456789). Kosongkan untuk memilih kontak sendiri di WhatsApp.</p>' +
-                '<input id="fm-wa-num" type="tel" inputmode="numeric" placeholder="08..." value="' + saved.replace(/[^0-9]/g, '') + '" style="width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:12px;padding:11px 12px;font-size:14px;outline:none">' +
-                '<div style="display:flex;gap:8px;margin-top:12px"><button id="fm-wa-cancel" style="flex:1;border:0;border-radius:12px;padding:11px;background:#e2e8f0;color:#334155;font-weight:700;cursor:pointer">Batal</button>' +
-                '<button id="fm-wa-go" style="flex:2;border:0;border-radius:12px;padding:11px;background:#16a34a;color:#fff;font-weight:800;cursor:pointer">Kirim WhatsApp</button></div></div>';
-            document.body.appendChild(ov);
-            const inp = document.getElementById('fm-wa-num'); inp.focus();
-            const tutup = function () { ov.remove(); };
-            document.getElementById('fm-wa-cancel').onclick = tutup;
-            ov.addEventListener('click', function (e) { if (e.target === ov) tutup(); });
-            const kirim = function () {
-                let phone = (inp.value || '').replace(/[^0-9]/g, '');
-                if (phone.startsWith('0')) phone = '62' + phone.slice(1);
-                else if (phone.startsWith('8')) phone = '62' + phone;
-                try { localStorage.setItem('fm_wa_last', phone); } catch (e) {}
-                const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(txt);
-                // klik langsung dari tombol = dihitung tindakan pengguna, tidak diblokir browser
-                const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener';
-                document.body.appendChild(a); a.click(); a.remove();
-                tutup();
-            };
-            document.getElementById('fm-wa-go').onclick = kirim;
-            inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') kirim(); });
-        }
+
 
         function cancelEditMode() { resetDraftForm(); }
 
@@ -2086,6 +2054,43 @@
             try { const pm = document.getElementById('pay-method'); if (pm && pm.value === 'bank') fillBankAccOptions(); } catch (e) { console.warn(e); }
         });
     </script>
-    <script src="js/kasir-v12.js?v=1210"></script>
+    <script src="js/kasir-v12.js?v=12b6"></script>
+<style id="fm-kform">
+/* Kasir v1.2b: form Input Transaksi dua kolom seimbang, kolom tetap lega dan terbaca tanpa gulir */
+@media (min-width:1024px){
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px 14px!important;align-items:start!important;align-content:start!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>*{margin:0!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child label{font-size:11.5px!important;line-height:1.2!important;margin-bottom:4px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div>.flex:first-child{margin-bottom:4px!important;min-height:22px}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div>.flex:first-child>label{margin-bottom:0!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child :is(#tx-desc,#tx-staff,#tx-price2,#tx-disc,#barcode-block input){height:36px!important;min-height:0!important;padding:0 12px!important;font-size:13.5px!important;border-radius:12px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-account{height:36px!important;min-height:0!important;padding-top:0!important;padding-bottom:0!important;font-size:13.5px!important;border-radius:12px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-amount{height:40px!important;min-height:0!important;padding:0 12px!important;font-size:19px!important;line-height:40px!important;border-radius:12px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child :is(#tx-qty,#tx-qty2){height:36px!important;padding:0 6px!important;font-size:16px!important;border-radius:12px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child :is(#tx-qty-wrap,#tx-qty2-wrap) button{width:34px!important;height:36px!important;font-size:17px!important;border-radius:12px!important;flex:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-price2{margin-top:8px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap>label>span{display:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-cat-badge{display:inline-block!important;margin-top:6px!important;padding:2px 9px!important;font-size:10.5px!important;line-height:1.5!important;border-radius:999px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-cat-badge.hidden{display:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #btn-save-draft{height:40px!important;padding:0 14px!important;font-size:13px!important;border-radius:12px!important;position:static!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child:is(:has(>#tx-qty-wrap:not(.hidden)),:has(>#tx-qty2-wrap:not(.hidden)))>#btn-save-draft{grid-column:auto!important;align-self:end!important;height:36px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;column-gap:8px!important;align-items:center!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap.hidden{display:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap>label{grid-column:1/-1!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap>.flex{gap:4px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap #tx-qty2{width:46px!important;flex:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-qty2-wrap #tx-price2{margin-top:0!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div:has(>#tx-account){position:relative!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-account{padding-right:178px!important;text-overflow:ellipsis!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div:has(>#tx-account:not(:has(option:checked:not([value=""])))) #tx-account{padding-right:30px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child #tx-cat-badge{position:absolute!important;right:30px!important;bottom:8px!important;margin:0!important;max-width:150px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;pointer-events:none!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div>.flex:first-child button,html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div>.flex:first-child [class*="rounded-full"]{height:22px!important;min-height:0!important;padding:0 9px!important;font-size:10.5px!important;line-height:20px!important}
+html[data-fm-page="kasir"][data-fm-fit]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:first-child>div:last-child>div>.flex:first-child{min-height:22px!important;align-items:center!important}
+html[data-fm-page="kasir"]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:last-child{padding:2px 6px 10px!important;margin:-2px -6px 0!important}
+html[data-fm-page="kasir"]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:last-child>.grid-cols-3>div{padding:9px 8px 10px!important;min-height:0!important;border-radius:18px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important}
+html[data-fm-page="kasir"]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:last-child>.grid-cols-3>div>span:first-child{font-size:10px!important;letter-spacing:.04em!important;white-space:nowrap!important}
+html[data-fm-page="kasir"]:not(#_):not(#__):not(#___) body main>.grid:nth-child(2)>section:last-child :is(#kas-total-in,#kas-total-out,#kas-net){font-size:clamp(14px,1.45vw,19px)!important;line-height:1.2!important;white-space:nowrap!important;display:block!important}
+}
+</style>
 </body>
 </html>

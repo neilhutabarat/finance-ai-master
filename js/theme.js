@@ -2,10 +2,22 @@
    menu Pengaturan (tema, warna, logo usaha, versi, catatan rilis). Dipakai Tower, kasir, manager, owner.
    Preferensi tersimpan di perangkat ini, terpisah per toko dan per peran. */
 (function () {
-  var APP_VERSION = '1.2';
-  var BETA = 'v1.2';
+  var APP_VERSION = '1.3';
+  var BETA = 'v1.3';
   /* Catatan rilis ringkas per versi utama (v1.0, v1.1, v1.2, dst). Terbaru di atas. */
   var RELEASE_NOTES = [
+    ['v1.3', '24 Nov 2026', [
+      '[Baru] Tombol Upgrade di Kasir, Manager, dan Owner: dua kartu Plus dan Pro, tekan untuk melihat flyer isi paket',
+      '[Baru] Coba gratis 24 jam, sekali untuk tiap paket per toko. Kasir boleh mencoba, hanya Manager dan Owner yang bisa berlangganan',
+      '[Baru] Berlangganan 1 bulan atau 1 tahun lewat QRIS, kirim bukti ke WhatsApp, lalu paket aktif sementara 24 jam sampai dikonfirmasi',
+      '[Perubahan] Setelah masa coba atau paket habis, data tetap terlihat dan hanya fitur tambahan yang terkunci',
+      '[Perubahan] Fitur Kirim Struk lewat WhatsApp dihapus dari aplikasi, termasuk tombolnya di struk dan Riwayat Hari Ini',
+      '[Baru] Tampilan bergaya kartu member: latar, kartu, dan header berwarna silver (mode terang) atau hitam (mode gelap), dan hitam-emas / sampanye saat paket Pro aktif, dengan cahaya lembut mengikuti kursor',
+      '[Perubahan] Form Input Transaksi Kasir ditata ulang: dua kolom seimbang, kolom lebih jelas, muat satu layar tanpa gulir',
+      '[Perubahan] Metode bayar dan akun tujuan (bank / Petty Cash) kini dipilih di jendela Konfirmasi Pembayaran saja',
+      '[Perbaikan] Semua jendela pop-up kini padat dan latar di belakangnya diredupkan supaya mudah dibaca',
+      '[Perbaikan] Kartu Total Masuk, Total Keluar, dan Saldo Kas Sah tidak lagi terpotong; header lebih pipih dan nama toko tidak lagi mepet dengan alamat'
+    ]],
     ['v1.2', '23 Nov 2026', [
       '[Baru] Metode bayar Hutang di Kasir dengan pilihan TOP 14, 30, atau 45 hari. Nama pelanggan wajib diisi, jatuh tempo otomatis dihitung dan tampil di struk',
       '[Baru] Penjualan hutang otomatis masuk ke Piutang & Utang (tersedia di semua paket), dan tidak dihitung sebagai uang tunai sampai dilunasi',

@@ -49,7 +49,6 @@
     { key: 'bahasa', label: 'Banyak Bahasa: pilihan Indonesia, English, dan Bahasa Melayu', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'stok_closing', label: 'Stok & Closing: isi sisa stok dan Closing Mingguan', r: { manager: 'o', owner: 'o' } },
     { key: 'bukti', label: 'Foto Bukti Struk (Kamera / Berkas)', r: { kasir: 'o' } },
-    { key: 'wa_receipt', label: 'Kirim Struk lewat WhatsApp', r: { kasir: 'o' } },
     { key: 'tax', label: 'Pajak PPN 12%', r: { kasir: 'o', manager: 'o', owner: 'o' } },
     { key: 'dashboard', label: 'Kartu: Ringkasan Hari Ini, Metode Bayar, Target Omzet, Stok Menipis, Laba & Margin per Produk', r: { manager: 'o', owner: 'o' } },
     { key: 'analisa', label: 'Analisa Keuangan', r: { manager: 'o', owner: 'o' } },
@@ -78,7 +77,7 @@
     { key: 'gaji_auto', label: 'Gaji otomatis tercatat sebagai pengeluaran', r: { manager: 'o' } }
   ];
   // nilai untuk toko lama yang belum punya pilihan tersimpan
-  var LEGACY = { wa_receipt: 'plus', analisa: { owner: true }, coa: {}, ledger: { kasir: true }, mutasi_wa: {}, gaji: {}, gaji_auto: {}, stok_input: { manager: true }, stok_closing: { manager: true } };
+  var LEGACY = { analisa: { owner: true }, coa: {}, ledger: { kasir: true }, mutasi_wa: {}, gaji: {}, gaji_auto: {}, stok_input: { manager: true }, stok_closing: { manager: true } };
 
   function find(key) { return FEATURES.filter(function (f) { return f.key === key; })[0]; }
   function tenant() { try { return (typeof getActiveTenant === 'function') ? getActiveTenant() : null; } catch (e) { return null; } }
@@ -87,7 +86,7 @@
     return p === 'kasir.html' ? 'kasir' : p === 'manager.html' ? 'manager' : p === 'dashboard.html' ? 'owner' : 'kasir';
   }
   /* Default per paket: Basic = hanya fitur inti (merah). Plus = fitur tambahan berikut sudah tercentang (hijau, boleh dicabut). */
-  var PLUS_KEYS = ['neraca_ai', 'dashboard', 'analisa', 'audit', 'export_csv', 'ledger', 'stok', 'stok_input:manager', 'stok_closing:manager', 'gaji', 'mutasi_wa', 'wa_receipt', 'bukti'];
+  var PLUS_KEYS = ['neraca_ai', 'dashboard', 'analisa', 'audit', 'export_csv', 'ledger', 'stok', 'stok_input:manager', 'stok_closing:manager', 'gaji', 'mutasi_wa', 'bukti'];
 
   /* ===== Paket Basic/Plus/Pro (dirakit Tower, isinya kosong sampai diisi manual) =====
      Disimpan di app_meta/paket_catalog = { json } (dibaca klien tanpa login, seperti wallpaper/rollout/store_catalog).
@@ -96,7 +95,7 @@
   var PAKET_KEY = 'fm_paket_cat_v1', PAKET_CAT = null, PAKET_AT = 0;
   function loadPaketCat() { try { var v = JSON.parse(localStorage.getItem(PAKET_KEY) || 'null'); PAKET_CAT = (v && typeof v === 'object') ? v : null; } catch (e) { PAKET_CAT = null; } }
   loadPaketCat();
-  function setPaketCat(c) { PAKET_CAT = c && typeof c === 'object' ? c : null; try { if (PAKET_CAT) localStorage.setItem(PAKET_KEY, JSON.stringify(PAKET_CAT)); else localStorage.removeItem(PAKET_KEY); } catch (e) {} try { window.dispatchEvent(new CustomEvent('fm:paketcat')); } catch (e) {} }
+  function setPaketCat(c) { _UM = {}; PAKET_CAT = c && typeof c === 'object' ? c : null; try { if (PAKET_CAT) localStorage.setItem(PAKET_KEY, JSON.stringify(PAKET_CAT)); else localStorage.removeItem(PAKET_KEY); } catch (e) {} try { window.dispatchEvent(new CustomEvent('fm:paketcat')); } catch (e) {} }
   function fetchPaketCat(cb) {
     try {
       var url = 'https://firestore.googleapis.com/v1/projects/finance-ai-master-byneilverse/databases/(default)/documents/app_meta/paket_catalog?key=AIzaSyBSxD060e_MyiS62hHsWkqlAhBqDuFYQMI';
@@ -207,7 +206,7 @@
     { id: 'barcode', name: 'Barcode & Scan Stok', grp: 'Stok & Barang', price: 15000, d: 'Scan dengan alat atau kamera, scan stok masuk', keys: ['barcode', 'stok_scan'] },
     { id: 'satuan', name: 'Satuan Ganda', grp: 'Stok & Barang', price: 10000, d: 'Contoh: 1 bal = 100 lembar', keys: ['satuan_ganda'] },
     { id: 'diskon', name: 'Diskon & Promo', grp: 'Transaksi', price: 10000, d: 'Promo otomatis dan diskon manual', keys: ['diskon'] },
-    { id: 'struk', name: 'Struk & Bukti', grp: 'Transaksi', price: 10000, d: 'Kirim struk lewat WhatsApp dan foto bukti', keys: ['wa_receipt', 'bukti'] },
+    { id: 'struk', name: 'Struk & Bukti', grp: 'Transaksi', price: 10000, d: 'Foto bukti transaksi', keys: ['bukti'] },
     { id: 'ppn', name: 'PPN 12%', grp: 'Transaksi', price: 10000, d: 'Hitung pajak langsung di nota', keys: ['tax'] },
     { id: 'piutang', name: 'Piutang & Utang', grp: 'Keuangan', price: 20000, d: 'DP, bayar sebagian, jatuh tempo, daftar pelanggan dan pemasok', keys: ['piutang'] },
     { id: 'kontrol', name: 'Kontrol Keuangan', grp: 'Keuangan', price: 20000, d: 'Arus kas, anggaran bulanan, rekonsiliasi kas', keys: ['arus_kas', 'anggaran', 'rekon'] },
@@ -355,14 +354,19 @@
     if (hasBase(key, role, tn)) return true;
     var f = find(key); if (!f || f.soon) return false;
     role = role || pageRole();
-    return !!f.r[role] && rentedKey(key);
+    return !!f.r[role] && (rentedKey(key) || upgHas(key, role));
   }
+  /* Upgrade 1.2b: coba 24 jam / paket sementara / paket diajukan klien (tiket 'upgrade', dikelola js/upgrade.js). Hanya MENAMBAH fitur. */
+  var _UM = {};
+  function upgMap(t) { var k = t + '|' + (PAKET_CAT ? 1 : 0); if (!_UM[k]) _UM[k] = paketFeatures(t); return _UM[k]; }
+  function upgHas(key, role) { var U = window.FM_UPG; if (!U || !U.tier) return false; var t = U.tier(); if (t !== 'plus' && t !== 'pro') return false; var m = upgMap(t)[key]; return !!(m && m[role] === true); }
+  function upgWas(key, role) { var U = window.FM_UPG; if (!U || !U.ever) return false; var t = U.ever(); if (t !== 'plus' && t !== 'pro') return false; var m = upgMap(t)[key]; return !!(m && m[role] === true); }
 
   function activeList(role, tn) { role = role || pageRole(); return FEATURES.filter(function (f) { return f.r[role] && !f.soon && has(f.key, role, tn); }); }
 
   /* ---- tabel centang untuk Tower: prefix 'nt' (toko baru), 'ts' (ubah toko), atau 'pf-plus'/'pf-pro' (isi paket) ---- */
   var CATS = [
-    { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'wa_receipt', 'bukti', 'diskon', 'tax'] },
+    { id: 'trx', label: 'Transaksi', keys: ['mutasi_wa', 'bukti', 'diskon', 'tax'] },
     { id: 'stok', label: 'Stok & Barang', keys: ['stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'stok_habis'] },
     { id: 'keu', label: 'Keuangan', keys: ['ledger', 'arus_kas', 'anggaran', 'rekon', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'piutang', 'gaji', 'gaji_auto'] },
     { id: 'lap', label: 'Laporan & Analisa', keys: ['dashboard', 'analisa', 'grafik', 'harian_wa', 'audit', 'export_csv', 'laporan_bulanan', 'backup', 'import_tx'] },
@@ -376,7 +380,7 @@
 
   /* Penempatan fitur untuk tampilan Tower (hanya label + pengelompokan, tidak mengubah hak akses):
      INTI = terkunci merah; TAMBAHAN = fitur standar yang diberikan; STORE = layak disewa satuan di OneilStore. */
-  var STORE_KEYS = ['wa_receipt', 'bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca_ai', 'analisa', 'grafik', 'penjelasan', 'perubahan_modal', 'penyusutan', 'stok_habis', 'harian_wa', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi'];
+  var STORE_KEYS = ['bukti', 'diskon', 'tax', 'admin_usaha', 'banyak_usaha', 'instruksi', 'stok', 'stok_input', 'stok_closing', 'stok_admin', 'stok_scan', 'jual_produk', 'satuan_ganda', 'barcode', 'arus_kas', 'anggaran', 'rekon', 'neraca_ai', 'analisa', 'grafik', 'penjelasan', 'perubahan_modal', 'penyusutan', 'stok_habis', 'harian_wa', 'pajak_bulanan', 'piutang', 'laporan_bulanan', 'backup', 'absensi'];
   function isStore(f) { return STORE_KEYS.indexOf(f.key) >= 0; }
   function isCore(f) { return Object.keys(f.r).some(function (r) { return f.r[r] === 'c'; }); }
   function catOf(f) { for (var i = 0; i < CATS.length; i++) if (CATS[i].keys.indexOf(f.key) >= 0) return CATS[i].id; return 'lain'; }
@@ -465,17 +469,17 @@
   var PRESETS = {
     basic: { label: 'Paket Basic', keys: [] },
     plus: { label: 'Paket Plus', keys: PLUS_KEYS },
-    warung: { label: 'Warung / Kafe', keys: ['laporan_bulanan', 'backup', 'stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'clock'] },
-    toko: { label: 'Toko Retail', keys: ['laporan_bulanan', 'backup', 'stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
-    properti: { label: 'Properti / Kost / Sewa', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'piutang', 'gaji', 'ledger', 'coa', 'dashboard', 'bukti', 'wa_receipt', 'mutasi_wa', 'export_csv', 'audit'] },
+    warung: { label: 'Warung / Kafe', keys: ['laporan_bulanan', 'backup', 'stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'mutasi_wa', 'clock'] },
+    toko: { label: 'Toko Retail', keys: ['laporan_bulanan', 'backup', 'stok', 'stok_input:manager', 'stok_closing:manager', 'bukti', 'mutasi_wa', 'ledger', 'coa', 'export_csv', 'clock'] },
+    properti: { label: 'Properti / Kost / Sewa', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'piutang', 'gaji', 'ledger', 'coa', 'dashboard', 'bukti', 'mutasi_wa', 'export_csv', 'audit'] },
     jasa: { label: 'Jasa / Klinik', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon',  'piutang','stok', 'stok_input:manager', 'stok_closing:manager', 'ledger', 'coa', 'tax', 'analisa', 'gaji', 'gaji_auto', 'audit', 'export_csv', 'mutasi_wa'] },
     umum: { label: 'Usaha Umum', keys: ['laporan_bulanan', 'backup', 'ledger', 'coa', 'dashboard', 'mutasi_wa', 'export_csv', 'clock', 'bukti'] },
-    minimarket: { label: 'Minimarket', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'diskon', 'satuan_ganda', 'barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'ledger', 'coa', 'tax', 'dashboard', 'analisa', 'audit', 'export_csv', 'gaji', 'gaji_auto', 'instruksi', 'clock'] },
+    minimarket: { label: 'Minimarket', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'diskon', 'satuan_ganda', 'barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'mutasi_wa', 'ledger', 'coa', 'tax', 'dashboard', 'analisa', 'audit', 'export_csv', 'gaji', 'gaji_auto', 'instruksi', 'clock'] },
     konveksi: { label: 'Konveksi / Jahit', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'satuan_ganda', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'banyak_usaha', 'gaji', 'gaji_auto', 'ledger', 'coa', 'dashboard', 'analisa', 'audit', 'export_csv', 'mutasi_wa', 'bukti', 'instruksi'] },
-    kafe: { label: 'Kafe & Resto', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'diskon', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'wa_receipt', 'mutasi_wa', 'dashboard', 'tax', 'gaji', 'clock', 'ledger'] },
-    laundry: { label: 'Laundry', keys: ['jual_produk', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'stok', 'stok_input:manager', 'ledger', 'gaji', 'wa_receipt', 'mutasi_wa', 'bukti', 'dashboard', 'export_csv'] },
-    salon: { label: 'Salon & Barbershop', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'diskon', 'jual_produk', 'stok', 'stok_input:manager', 'gaji', 'gaji_auto', 'wa_receipt', 'dashboard', 'mutasi_wa', 'ledger'] },
-    bengkel: { label: 'Bengkel', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'gaji', 'wa_receipt', 'ledger', 'coa', 'dashboard', 'bukti', 'mutasi_wa', 'export_csv'] },
+    kafe: { label: 'Kafe & Resto', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'diskon', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'bukti', 'mutasi_wa', 'dashboard', 'tax', 'gaji', 'clock', 'ledger'] },
+    laundry: { label: 'Laundry', keys: ['jual_produk', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'stok', 'stok_input:manager', 'ledger', 'gaji', 'mutasi_wa', 'bukti', 'dashboard', 'export_csv'] },
+    salon: { label: 'Salon & Barbershop', keys: ['laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'diskon', 'jual_produk', 'stok', 'stok_input:manager', 'gaji', 'gaji_auto', 'dashboard', 'mutasi_wa', 'ledger'] },
+    bengkel: { label: 'Bengkel', keys: ['stok_admin', 'stok_scan', 'laporan_bulanan', 'backup', 'offline_penuh', 'absensi', 'pajak_bulanan', 'neraca_ai', 'arus_kas', 'anggaran', 'rekon', 'barcode', 'piutang', 'stok', 'stok_input:manager', 'stok_closing:manager', 'jual_produk', 'gaji', 'ledger', 'coa', 'dashboard', 'bukti', 'mutasi_wa', 'export_csv'] },
     lengkap: { label: 'Lengkap', keys: null }
   };
   /* paket buatan sendiri (disimpan di browser Tower dan, bila ada, di provider_settings/plan_presets) */
@@ -575,14 +579,14 @@
       if (b.getAttribute('data-fm-locked')) return;
       b.setAttribute('data-fm-locked', '1');
       b.classList.add('fm-locked-fitur');
-      b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); alert(LOCK_MSG); }, true);
+      b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); if (window.FM_UPG && FM_UPG.openLocked && FM_UPG.openLocked()) return; alert(LOCK_MSG); }, true);
     });
   }
   /* sembunyikan total (fitur memang tidak termasuk paket apapun) ATAU kunci gelap saja (fitur pernah aktif, paket baru habis) */
   function dropOrLock(sel, key, role) {
     role = role || pageRole();
     var tn = tenant();
-    if (wouldHaveAtPaidTier(key, role, tn)) lockEls(sel); else drop(sel);
+    if (wouldHaveAtPaidTier(key, role, tn) || upgWas(key, role)) lockEls(sel); else drop(sel);
   }
   function applyDom() {
     var role = pageRole();
@@ -613,7 +617,6 @@
     if (!has('export_csv', role)) dropOrLock('button[onclick*="exportCSV"], button[onclick*="FM_LAPORAN"]', 'export_csv', role);
     if (!has('instruksi', role)) dropOrLock('section[data-fm-panel="instruksi"]', 'instruksi', role);
     if (!has('analisa', role)) dropOrLock('[data-fm-panel="analisa"]', 'analisa', role);
-    if (!has('wa_receipt', role)) hide(document.getElementById('btn-wa-receipt'));
     if (!has('clock', role)) { var c = document.getElementById('realtime-clock-display'); if (c) hide(c.parentElement); }
     if (!has('bukti', role)) {
       [].slice.call(document.querySelectorAll('label')).forEach(function (l) { if (/Bukti Struk/i.test(l.textContent) && l.parentElement) hide(l.parentElement); });
