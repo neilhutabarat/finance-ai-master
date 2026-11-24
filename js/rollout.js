@@ -96,16 +96,18 @@
       var inRilisM = /^\/rilis\/([^\/]+)\//.exec(location.pathname);
       var curFolder = inRilisM ? slug(inRilisM[1]) : '';
       var running = slug((window.FM_RELEASES && FM_RELEASES.beta) || '');
-      if (target && ((running && target === running) || (curFolder && curFolder === target))) { pinUpdateCheck(); return; }
+      if (target && ((running && target === running) || (curFolder && curFolder === target))) { try { sessionStorage.removeItem(SKIP_FLAG); } catch (e) {} pinUpdateCheck(); return; }
       if (!target || !running) return;
 
-      var n = 0; try { n = parseInt(sessionStorage.getItem(SKIP_FLAG) || '0', 10) || 0; } catch (e) {}
+      /* penghitung pengalihan hanya berlaku 30 detik (penjaga loop). Dulu berlaku sepanjang sesi tab, sehingga setelah
+         3 kali pindah versi di tab yang sama, toko tidak pernah dialihkan lagi ke versi yang dikunci Tower. */
+      var n = 0; try { var sf = JSON.parse(sessionStorage.getItem(SKIP_FLAG) || 'null'); if (sf && typeof sf === 'object' && Date.now() - (sf.at || 0) < 30000) n = sf.n || 0; } catch (e) {}
       if (n >= MAX_REDIRECT) return; // sudah dialihkan beberapa kali di sesi ini, jangan paksa lagi (hindari loop)
 
       var page = (location.pathname.split('/').pop() || 'index.html');
       var inRilis = /^\/rilis\/[^\/]+\//.test(location.pathname);
       function go(url) {
-        try { sessionStorage.setItem(SKIP_FLAG, String(n + 1)); } catch (e) {}
+        try { sessionStorage.setItem(SKIP_FLAG, JSON.stringify({ n: n + 1, at: Date.now() })); } catch (e) {}
         location.replace(url + location.search);
       }
       // Folder /rilis/<versi>/ hanya ada untuk versi lama yang dibekukan. Versi terbaru ada di akar (tanpa folder).
