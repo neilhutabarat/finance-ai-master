@@ -45,17 +45,25 @@
     var hd = document.querySelector('header.oneui-hero');
     if (hd) { var tn = hd.querySelector('h1,h2,p,span,div') || hd, m = (getComputedStyle(tn).color.match(/[\d.]+/g) || [0, 0, 0]), lum = (0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2]) / 255; h.setAttribute('data-fm-latar-hdr', lum > 0.5 ? 'dk' : 'lt'); }
   }
+  /* Posisi kursor ditulis ke satu <style> di <head>, bukan ke atribut style tiap kartu.
+     Menulis atribut style memicu pengamat tata letak (kasir/manager) di setiap gerakan mouse,
+     sehingga halaman menghitung ulang tata letak dan bayangan tampak patah-patah. */
+  var gst = null, gi = 0;
   function move(e) {
     mx = e.clientX / Math.max(1, innerWidth) * 100; my = e.clientY / Math.max(1, innerHeight) * 100;
     if (raf) return; var px = e.clientX, py = e.clientY;
     raf = requestAnimationFrame(function () {
-      raf = 0; if (el) { el.style.setProperty('--mx', mx.toFixed(1) + '%'); el.style.setProperty('--my', my.toFixed(1) + '%'); }
-      if (!h.hasAttribute('data-fm-latar-card')) return;
-      var hh = document.querySelector('header.oneui-hero'); if (hh) { var hr = hh.getBoundingClientRect(); hh.style.setProperty('--cx', (px - hr.left).toFixed(0) + 'px'); hh.style.setProperty('--cy', (py - hr.top).toFixed(0) + 'px'); }
-      [].forEach.call(document.querySelectorAll('main .ios-glass, main .white-ice-glass-card'), function (c) {
-        var r = c.getBoundingClientRect(); if (r.bottom < -300 || r.top > innerHeight + 300) return;
-        c.style.setProperty('--cx', (px - r.left).toFixed(0) + 'px'); c.style.setProperty('--cy', (py - r.top).toFixed(0) + 'px');
-      });
+      raf = 0;
+      if (!gst) { gst = document.createElement('style'); gst.id = 'fm-latar-pos'; document.head.appendChild(gst); }
+      var out = '#fm-latar{--mx:' + mx.toFixed(1) + '%;--my:' + my.toFixed(1) + '%}';
+      if (h.hasAttribute('data-fm-latar-card')) {
+        [].forEach.call(document.querySelectorAll('header.oneui-hero, main .ios-glass, main .white-ice-glass-card'), function (c) {
+          var r = c.getBoundingClientRect(); if (r.bottom < -300 || r.top > innerHeight + 300) return;
+          var k = c.getAttribute('data-fm-gi'); if (!k) { k = String(++gi); c.setAttribute('data-fm-gi', k); }
+          out += '[data-fm-gi="' + k + '"]{--cx:' + (px - r.left).toFixed(0) + 'px;--cy:' + (py - r.top).toFixed(0) + 'px}';
+        });
+      }
+      gst.textContent = out;
     });
   }
   function init() {
