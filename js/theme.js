@@ -13,19 +13,25 @@
       '[Perubahan] Cara bayar kini dipilih di jendela Konfirmasi Pembayaran',
       '[Perubahan] Fitur Kirim Struk lewat WhatsApp tidak tersedia lagi',
       '[Perbaikan] Hitungan pajak PPN 12% kini lebih tepat',
-      '[Perbaikan] Jendela pop-up lebih mudah dibaca'
+      '[Perbaikan] Jendela pop-up lebih mudah dibaca',
+      '[Keamanan] Peningkatan keamanan akun dan data toko',
+      '[Perbaikan] Perbaikan bug dan peningkatan stabilitas'
     ]],
     ['v1.2', '23 Nov 2026', [
       '[Baru] Bayar dengan Hutang dengan tempo 14, 30, atau 45 hari, langsung tercatat di Piutang & Utang',
       '[Baru] Hitung kembalian otomatis, diskon struk, dan nama pelanggan saat konfirmasi pembayaran',
       '[Baru] Bayar campuran dua cara, parkir antrean, dan cetak ulang struk dari Riwayat Hari Ini',
-      '[Baru] Tombol Sering Dipakai, atur jumlah langsung di antrean, dan peringatan stok menipis'
+      '[Baru] Tombol Sering Dipakai, atur jumlah langsung di antrean, dan peringatan stok menipis',
+      '[Keamanan] Peningkatan keamanan akun dan data toko',
+      '[Perbaikan] Perbaikan bug dan peningkatan stabilitas'
     ]],
     ['v1.1', '22 Nov 2026', [
       '[Baru] Mode terang dan mode gelap',
       '[Baru] Paket Basic, Plus, dan Pro',
       '[Baru] Pilihan bahasa Indonesia, English, dan Bahasa Melayu',
-      '[Baru] Impor akun dan riwayat transaksi dari Excel / CSV'
+      '[Baru] Impor akun dan riwayat transaksi dari Excel / CSV',
+      '[Keamanan] Peningkatan keamanan akun dan data toko',
+      '[Perbaikan] Perbaikan bug dan peningkatan stabilitas'
     ]],
     ['v1.0', '18 Nov 2026', [
       '[Baru] Kasir dan pembukuan lengkap: Mutasi, Buku Besar, Laba Rugi, Neraca AI, Stok, Piutang & Utang, dan Gaji',
