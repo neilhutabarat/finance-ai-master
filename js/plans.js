@@ -351,14 +351,14 @@
     return false;
   }
   /* Fitur khusus per toko (Tower > Fitur Khusus Toko): tenant_ctrl/<toko>.featX = { kunci: true | false }.
-     true = diberi walau tidak termasuk paket, false = dicabut walau termasuk paket. Berlaku untuk semua peran yang memakai fitur itu. */
+     Nilai: true / false untuk semua peran, atau { kasir: bool, manager: bool, owner: bool } per peran (peran yang tidak disebut ikut paket). */
   function featX() {
     var c = window.TENANT_CTRL;
     if (c) return (c.featX && typeof c.featX === 'object') ? c.featX : {};
     try { var t = tenant(), v = JSON.parse(localStorage.getItem('fm_featx_' + (t && t.id ? t.id : '')) || '{}'); return (v && typeof v === 'object') ? v : {}; } catch (e) { return {}; }
   }
   function has(key, role, tn) {
-    if (!tn) { var fx = featX()[key]; if (fx === true || fx === false) { var ff = find(key); var rr = role || pageRole(); if (ff && !ff.soon && ff.r[rr] === 'o') return fx; } }
+    if (!tn) { var fx = featX()[key], rr = role || pageRole(); if (fx && typeof fx === 'object') fx = fx[rr]; if (fx === true || fx === false) { var ff = find(key); if (ff && !ff.soon && ff.r[rr] === 'o') return fx; } }
     if (hasBase(key, role, tn)) return true;
     var f = find(key); if (!f || f.soon) return false;
     role = role || pageRole();

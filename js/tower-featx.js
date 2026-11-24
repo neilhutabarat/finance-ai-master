@@ -20,7 +20,8 @@
   function tierOf(tn) { try { return P().tierOf(tn) || 'basic'; } catch (e) { return 'basic'; } }
   function optional(f) { return f && !f.soon && ROLES.some(function (r) { return f.r[r] === 'o'; }); }
   /* menyala dari paket / pengaturan toko (tanpa fitur khusus) */
-  function baseOn(f, tn) { try { return ROLES.some(function (r) { return f.r[r] === 'o' && P().hasBase(f.key, r, tn); }); } catch (e) { return false; } }
+  function baseRole(f, r, tn) { try { return f.r[r] === 'o' && P().hasBase(f.key, r, tn); } catch (e) { return false; } }
+  var RLAB = { kasir: 'Admin', manager: 'Manager', owner: 'Owner' };
   function shortLabel(l) { return String(l || '').replace(/\s*\((?:Kamera|Excel)[^)]*\)/g, '').replace(/:\s*/, ' · ').trim(); }
 
   var ov = null;
@@ -69,8 +70,11 @@
     var rest = FEATS.filter(function (f) { return optional(f) && !used[f.key]; }).map(function (f) { return f.key; });
     if (rest.length) groups.push(['Lainnya', rest]);
 
-    function isOn(k) { return X[k] === true || X[k] === false ? X[k] : baseOn(byKey[k], tn); }
-    function nKhusus() { return Object.keys(X).filter(function (k) { return X[k] === true || X[k] === false; }).length; }
+    /* bentuk lama (true/false untuk semua peran) diubah ke per peran */
+    Object.keys(X).forEach(function (k) { var v = X[k], f = byKey[k]; if ((v === true || v === false) && f) { var o = {}; ROLES.forEach(function (r) { if (f.r[r] === 'o') o[r] = v; }); X[k] = o; } else if (!v || typeof v !== 'object') delete X[k]; });
+    function isOn(k, r) { var v = X[k]; return v && typeof v[r] === 'boolean' ? v[r] : baseRole(byKey[k], r, tn); }
+    function isKh(k) { var v = X[k]; return !!(v && Object.keys(v).length); }
+    function nKhusus() { return Object.keys(X).filter(isKh).length; }
 
     var body = '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">' +
         '<button data-back style="all:unset;cursor:pointer;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.08)">← Pilih toko lain</button>' +
@@ -78,27 +82,30 @@
         '<span id="tw-fx-n" style="font-size:12px;opacity:.7"></span></div>' +
       '<div style="display:flex;flex-direction:column;gap:12px">' + groups.map(function (g) {
         return '<div style="border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:6px 12px">' +
-          '<div style="font-weight:800;font-size:12.5px;padding:6px 2px 4px;opacity:.85">' + esc(g[0]) + '</div>' +
+          '<div style="display:flex;align-items:center;gap:10px;padding:6px 2px 4px"><b style="flex:1;font-size:12.5px;opacity:.85">' + esc(g[0]) + '</b>' + ROLES.map(function (r) { return '<span style="width:58px;text-align:center;font-size:11px;font-weight:800;opacity:.7">' + RLAB[r] + '</span>'; }).join('') + '</div>' +
           g[1].map(function (k) {
             var f = byKey[k];
-            return '<label style="display:flex;align-items:center;gap:10px;padding:8px 2px;border-top:1px solid rgba(255,255,255,.06);cursor:pointer">' +
-              '<input type="checkbox" data-k="' + esc(k) + '"' + (isOn(k) ? ' checked' : '') + ' style="width:17px;height:17px;flex:none;accent-color:#0891b2">' +
-              '<span style="flex:1;min-width:0">' + esc(shortLabel(f.label)) + '</span>' +
-              '<span data-tag="' + esc(k) + '" style="font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(8,145,178,.22);color:#67e8f9;display:none">Khusus</span></label>';
+            return '<div style="display:flex;align-items:center;gap:10px;padding:8px 2px;border-top:1px solid rgba(255,255,255,.06)">' +
+              '<span style="flex:1;min-width:0">' + esc(shortLabel(f.label)) + ' <span data-tag="' + esc(k) + '" style="font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(8,145,178,.22);color:#67e8f9;display:none;vertical-align:1px">Khusus</span></span>' +
+              ROLES.map(function (r) {
+                return '<span style="width:58px;display:flex;justify-content:center">' + (f.r[r] === 'o'
+                  ? '<input type="checkbox" data-k="' + esc(k) + '" data-r="' + r + '"' + (isOn(k, r) ? ' checked' : '') + ' title="' + RLAB[r] + '" style="width:17px;height:17px;cursor:pointer;accent-color:#0891b2">'
+                  : '<span style="opacity:.3">–</span>') + '</span>';
+              }).join('') + '</div>';
           }).join('') + '</div>';
       }).join('') + '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px -18px -14px;position:sticky;bottom:-14px;padding:12px 18px 14px;background:#0f172a;border-top:1px solid rgba(255,255,255,.1)">' +
         '<button data-save style="all:unset;cursor:pointer;padding:10px 18px;border-radius:999px;background:#0891b2;color:#fff;font-weight:800;font-size:13px">Simpan</button>' +
         '<button data-reset style="all:unset;cursor:pointer;padding:10px 18px;border-radius:999px;background:rgba(255,255,255,.08);font-weight:700;font-size:13px">Kembalikan ke paket</button>' +
         '<span id="tw-fx-msg" style="align-self:center;font-size:12px;opacity:.8"></span></div>';
-    var box = shell('Centang untuk memberi fitur, hapus centang untuk mencabut. Hanya berlaku untuk toko ini.', body); if (!box) return;
+    var box = shell('Centang per peran untuk memberi fitur, hapus centang untuk mencabut. Hanya berlaku untuk toko ini.', body); if (!box) return;
     var msg = box.querySelector('#tw-fx-msg');
     function sync() {
-      [].forEach.call(box.querySelectorAll('[data-tag]'), function (t) { var k = t.getAttribute('data-tag'); t.style.display = (X[k] === true || X[k] === false) ? 'inline-block' : 'none'; });
+      [].forEach.call(box.querySelectorAll('[data-tag]'), function (t) { t.style.display = isKh(t.getAttribute('data-tag')) ? 'inline-block' : 'none'; });
       var n = nKhusus(); box.querySelector('#tw-fx-n').textContent = n ? n + ' fitur khusus' : 'Mengikuti paket';
     }
     [].forEach.call(box.querySelectorAll('[data-k]'), function (c) {
-      c.onchange = function () { var k = c.getAttribute('data-k'), base = baseOn(byKey[k], tn); if (c.checked === base) delete X[k]; else X[k] = c.checked; msg.textContent = ''; sync(); };
+      c.onchange = function () { var k = c.getAttribute('data-k'), r = c.getAttribute('data-r'), base = baseRole(byKey[k], r, tn); var o = X[k] || {}; if (c.checked === base) delete o[r]; else o[r] = c.checked; if (Object.keys(o).length) X[k] = o; else delete X[k]; msg.textContent = ''; sync(); };
     });
     box.querySelector('[data-back]').onclick = open;
     function save(obj, done) {
@@ -114,7 +121,7 @@
       if (!nKhusus()) { msg.textContent = 'Toko ini sudah mengikuti paket.'; return; }
       var ok = typeof fmAsk === 'function' ? await fmAsk('Kembalikan semua fitur ' + (tn.nama || tn.id) + ' ke isi paket ' + (TIER[tier] || 'Basic') + '?') : confirm('Kembalikan ke paket?');
       if (!ok) return;
-      save({}, function () { X = {}; [].forEach.call(box.querySelectorAll('[data-k]'), function (c) { c.checked = baseOn(byKey[c.getAttribute('data-k')], tn); }); sync(); });
+      save({}, function () { X = {}; [].forEach.call(box.querySelectorAll('[data-k]'), function (c) { c.checked = baseRole(byKey[c.getAttribute('data-k')], c.getAttribute('data-r'), tn); }); sync(); });
     };
     sync();
   }
