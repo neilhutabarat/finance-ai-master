@@ -19,6 +19,12 @@
       'html[data-fm-latar-hdr]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body header.oneui-hero{background-color:transparent!important;background-repeat:no-repeat!important;background-size:auto!important}' +
       'html[data-fm-latar-hdr="dk"]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body header.oneui-hero{background-image:radial-gradient(300px 220px at var(--cx,50%) var(--cy,-60%),rgba(255,255,255,.10),transparent 70%),linear-gradient(155deg,#1f1f24 0%,#101013 40%,#08080a 72%,#141418 100%)!important}' +
       'html[data-fm-latar-hdr="lt"]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body header.oneui-hero{background-image:radial-gradient(300px 220px at var(--cx,50%) var(--cy,-60%),rgba(0,0,0,.045),transparent 70%),linear-gradient(155deg,#e9e9ee 0%,#f5f5f8 40%,#fcfcfd 72%,#f0f0f3 100%)!important}' +
+      'html[data-fm-latar-pro][data-fm-latar-card="dk"]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body :is(main .ios-glass,main .white-ice-glass-card){background-image:radial-gradient(300px 220px at var(--cx,50%) var(--cy,-60%),rgba(255,222,150,.13),transparent 70%),linear-gradient(155deg,#2b2111 0%,#130f08 40%,#080604 72%,#1d160a 100%)!important;box-shadow:inset 0 0 0 1px rgba(205,167,92,.34),0 10px 26px -14px rgba(0,0,0,.6)!important}' +
+      'html[data-fm-latar-pro][data-fm-latar-card="lt"]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body :is(main .ios-glass,main .white-ice-glass-card){background-image:radial-gradient(300px 220px at var(--cx,50%) var(--cy,-60%),rgba(140,100,30,.07),transparent 70%),linear-gradient(155deg,#ecdfc3 0%,#f6efdf 40%,#fcf9f2 72%,#f0e5cd 100%)!important;box-shadow:inset 0 0 0 1px rgba(160,120,40,.28),0 10px 26px -16px rgba(90,60,10,.35)!important}' +
+      'html[data-fm-latar-pro][data-fm-latar-hdr="dk"]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body header.oneui-hero{background-image:radial-gradient(300px 220px at var(--cx,50%) var(--cy,-60%),rgba(255,222,150,.13),transparent 70%),linear-gradient(155deg,#2b2111 0%,#130f08 40%,#080604 72%,#1d160a 100%)!important;box-shadow:inset 0 0 0 1px rgba(205,167,92,.34),0 10px 26px -14px rgba(0,0,0,.6)!important}' +
+      'html[data-fm-latar-pro][data-fm-latar-hdr="lt"]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body header.oneui-hero{background-image:radial-gradient(300px 220px at var(--cx,50%) var(--cy,-60%),rgba(140,100,30,.07),transparent 70%),linear-gradient(155deg,#ecdfc3 0%,#f6efdf 40%,#fcf9f2 72%,#f0e5cd 100%)!important;box-shadow:inset 0 0 0 1px rgba(160,120,40,.28),0 10px 26px -16px rgba(90,60,10,.35)!important}' +
+      'html[data-fm-latar-pro]:not(#_):not(#__):not(#___):not(#____):not(#_____):not(#______) body main :is(.ios-glass,.white-ice-glass-card) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=button]):not([type=submit]),select,textarea):focus{border-color:#c49a45!important}' +
+      'html[data-fm-latar-pro]:not(#_):not(#__):not(#___):not(#____) body #fm-latar{background:radial-gradient(620px 460px at var(--mx) var(--my),rgba(255,222,150,.16),transparent 65%),linear-gradient(155deg,#33270f 0%,#120d06 38%,#000 70%,#22190b 100%)!important}' +
       'html body #fm-latar#fm-latar{filter:none!important}html body #fm-latar#fm-latar.si{filter:invert(1) hue-rotate(180deg)!important}';
     document.head.appendChild(s);
   }
@@ -103,6 +109,14 @@
     popLater();
   }
   if (document.body) popInit(); else document.addEventListener('DOMContentLoaded', popInit);
+  /* paket Pro aktif (asli atau hasil upgrade/coba): warna latar & kartu ikut kartu Pro (hitam-emas / sampanye) */
+  function syncPro() {
+    var pro = false;
+    try { var R = { basic: 1, plus: 2, pro: 3 }, b = 'basic'; try { b = window.FM_PLANS.tierOf(window.getActiveTenant ? getActiveTenant() : null) || 'basic'; } catch (e) {}
+      var u = (window.FM_UPG && FM_UPG.tier()) || ''; pro = (R[u] || 0) >= 3 || R[b] >= 3; } catch (e) {}
+    if (pro) h.setAttribute('data-fm-latar-pro', '1'); else h.removeAttribute('data-fm-latar-pro');
+  }
+  setTimeout(syncPro, 300); setInterval(syncPro, 4000);
   window.FM_LATAR = { ancInv: ancInv, light: light };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
