@@ -37,7 +37,7 @@
     var c = document.querySelector('main .ios-glass, main .white-ice-glass-card');
     if (c) { var odd = ancInv(c.firstElementChild || c) ^ (/invert/.test(getComputedStyle(c).filter) ? 1 : 0); h.setAttribute('data-fm-latar-card', ((light() ? 0 : 1) ^ odd) ? 'dk' : 'lt'); }
     var hd = document.querySelector('header.oneui-hero');
-    if (hd) { var o2 = ancInv(hd.firstElementChild || hd) ^ (/invert/.test(getComputedStyle(hd).filter) ? 1 : 0); h.setAttribute('data-fm-latar-hdr', ((light() ? 0 : 1) ^ o2) ? 'dk' : 'lt'); }
+    if (hd) { var tn = hd.querySelector('h1,h2,p,span,div') || hd, m = (getComputedStyle(tn).color.match(/[\d.]+/g) || [0, 0, 0]), lum = (0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2]) / 255; h.setAttribute('data-fm-latar-hdr', lum > 0.5 ? 'dk' : 'lt'); }
   }
   function move(e) {
     mx = e.clientX / Math.max(1, innerWidth) * 100; my = e.clientY / Math.max(1, innerHeight) * 100;
