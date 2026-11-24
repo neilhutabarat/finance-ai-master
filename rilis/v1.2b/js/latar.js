@@ -58,6 +58,51 @@
     window.addEventListener('fm:gelap', sync);
     setTimeout(sync, 1500);
   }
+
+  /* Pop-up mudah dibaca: panel pop-up yang tembus pandang dibuat padat (warna sama, tanpa transparansi),
+     dan latar di belakangnya diredupkan + diburamkan supaya isi halaman tidak ikut terbaca. */
+  var popT = 0;
+  function rgba(c) { var m = String(c).match(/rgba?\(([^)]+)\)/); if (!m) return null; var p = m[1].split(/[,\s\/]+/).filter(Boolean).map(parseFloat); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; }
+  function solid(el) {
+    if (!el || el.nodeType !== 1 || el.hasAttribute('data-fm-solid')) return;
+    var c = rgba(getComputedStyle(el).backgroundColor);
+    if (!c || c.a >= 0.97) return;
+    if (c.a < 0.05) return; // tidak berlatar sama sekali: biarkan (wadah tata letak)
+    el.setAttribute('data-fm-solid', '1');
+    el.style.setProperty('background-color', 'rgb(' + c.r + ',' + c.g + ',' + c.b + ')', 'important');
+    el.style.setProperty('-webkit-backdrop-filter', 'none', 'important'); el.style.setProperty('backdrop-filter', 'none', 'important');
+  }
+  function popups() {
+    popT = 0;
+    var W = innerWidth, H = innerHeight;
+    [].forEach.call(document.body ? document.body.children : [], function (ov) {
+      if (ov.id === 'fm-latar' || /^fm-upg/.test(ov.id || '') || ov.tagName === 'SCRIPT' || ov.tagName === 'STYLE') return;
+      var cs = getComputedStyle(ov);
+      if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden') return;
+      var r = ov.getBoundingClientRect();
+      if (r.width < W * 0.9 || r.height < H * 0.9) return;
+      if (!ov.hasAttribute('data-fm-solid-ov')) {
+        var oc = rgba(cs.backgroundColor);
+        if (oc && oc.a > 0.02) {
+          ov.setAttribute('data-fm-solid-ov', '1');
+          if (oc.a < 0.5) ov.style.setProperty('background-color', 'rgba(' + oc.r + ',' + oc.g + ',' + oc.b + ',.55)', 'important');
+          ov.style.setProperty('-webkit-backdrop-filter', 'blur(6px)', 'important'); ov.style.setProperty('backdrop-filter', 'blur(6px)', 'important');
+        }
+      }
+      /* panel = anak (atau cucu, bila anaknya hanya pembungkus) yang lebih kecil dari layar */
+      [].forEach.call(ov.children, function (k) {
+        var kr = k.getBoundingClientRect(); if (!kr.width || !kr.height) return;
+        if (kr.width < W * 0.98 || kr.height < H * 0.98) { solid(k); return; }
+        [].forEach.call(k.children, function (g) { var gr = g.getBoundingClientRect(); if (gr.width && gr.height && (gr.width < W * 0.98 || gr.height < H * 0.98)) solid(g); });
+      });
+    });
+  }
+  function popLater() { if (!popT) popT = setTimeout(popups, 60); }
+  function popInit() {
+    try { new MutationObserver(popLater).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style', 'hidden', 'open'] }); } catch (e) {}
+    popLater();
+  }
+  if (document.body) popInit(); else document.addEventListener('DOMContentLoaded', popInit);
   window.FM_LATAR = { ancInv: ancInv, light: light };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
