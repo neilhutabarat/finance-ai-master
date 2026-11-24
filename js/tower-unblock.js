@@ -4,7 +4,7 @@
 (function () {
   'use strict';
   if (!/provider/.test(location.pathname)) return;
-  var RL = { staff: 'Admin / Kasir', manager: 'Manager', owner: 'Owner', partner: 'Mitra' };
+  var RL = { staff: 'Admin / Kasir', manager: 'Manager', owner: 'Owner', partner: 'Mitra', acct: 'Login toko' };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   /* pakai koneksi Tower (db = FM_AUTH.towerDb()), bukan koneksi bawaan yang tidak masuk sebagai Tower */
   function fs() { try { if (typeof db !== 'undefined' && db) return db; } catch (e) {} try { return FM_AUTH.towerDb(); } catch (e) { return null; } }
