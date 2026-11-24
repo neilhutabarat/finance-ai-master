@@ -780,6 +780,7 @@
             (hutangOn ? '<button type="button" class="v12-pm-tab" data-mpm="hutang">Hutang</button>' : '') +
           '</div>' +
         '</div>' +
+        '<div id="v12-m-bankwrap" class="hidden"><label>Akun Tujuan</label><select id="v12-m-bank"></select><p id="v12-m-bankwarn" class="hidden" style="font-size:10.5px;font-weight:700;color:#d97706;margin-top:4px"></p></div>' +
         '<div id="v12-m-hutangwrap" class="hidden space-y-2 p-3 rounded-2xl bg-amber-50 border border-amber-200">' +
           '<label>Tempo Pembayaran (TOP)</label>' +
           '<div class="v12-pm-tabs" id="v12-m-top">' +
@@ -883,12 +884,29 @@
       return { disc: disc, net: net, target: target };
     }
 
+    function fillModalBank() {
+      var wrap = document.getElementById('v12-m-bankwrap'), sel = document.getElementById('v12-m-bank'), warn = document.getElementById('v12-m-bankwarn');
+      if (!wrap) return;
+      var need = curPm === 'qris' || curPm === 'bank' || curPm === 'petty';
+      wrap.classList.toggle('hidden', !need);
+      if (!need) return;
+      var cat = curPm === 'petty' ? 'petty' : 'bank', accs = [];
+      try { accs = ((typeof STORE !== 'undefined' && STORE.getCOA) ? STORE.getCOA() : []).filter(function (c) { return c.category === cat; }); } catch (e) {}
+      var cur = sel.value;
+      sel.innerHTML = accs.map(function (b) { return '<option value="' + String(b.code).replace(/"/g, '') + '">[' + b.code + '] ' + String(b.name).replace(/</g, '&lt;') + '</option>'; }).join('');
+      sel.style.display = accs.length ? '' : 'none';
+      if (accs.some(function (b) { return b.code === cur; })) sel.value = cur;
+      warn.classList.toggle('hidden', accs.length > 0);
+      warn.textContent = accs.length ? '' : (cat === 'petty' ? 'Belum ada akun Petty Cash di COA. Transaksi tetap tercatat tanpa akun tujuan.' : 'Belum ada akun bank di COA. Transaksi tetap tercatat tanpa akun tujuan.');
+    }
+
     function setModalPm(pm) {
       curPm = pm;
       [].forEach.call(modal.querySelectorAll('[data-mpm]'), function (b) {
         b.classList.toggle('on', b.getAttribute('data-mpm') === curPm);
       });
       document.getElementById('v12-m-cashwrap').classList.toggle('hidden', curPm !== 'tunai');
+      fillModalBank();
       document.getElementById('v12-m-splitwrap').classList.toggle('hidden', curPm !== 'split');
       document.getElementById('v12-m-hutangwrap').classList.toggle('hidden', curPm !== 'hutang');
       if (curPm === 'hutang') document.getElementById('v12-m-hstat').textContent = 'Jatuh tempo: ' + dmyOf(topDue());
@@ -995,6 +1013,8 @@
           leftSel.value = sm1 === 'transfer' ? 'bank' : sm1;
         }
         if (typeof onPayMethodChange === 'function') onPayMethodChange();
+        var mb = document.getElementById('v12-m-bank'), lb = document.getElementById('pay-bank-acc');
+        if (curPm !== 'split' && mb && lb && mb.value && curPm !== 'tunai') lb.value = mb.value;
       }
 
       close();

@@ -467,7 +467,7 @@
                         <input type="text" id="tx-staff" placeholder="Nama petugas" class="w-full glass-input rounded-2xl p-3 text-xs font-bold outline-none">
                     </div>
 
-                    <div>
+                    <div style="display:none" id="pay-method-wrap">
                         <label class="text-[10px] text-slate-500 block font-bold mb-1">Metode Bayar / Terima</label>
                         <select id="pay-method" onchange="onPayMethodChange()" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold bg-white text-slate-800">
                             <option value="tunai">Tunai</option>
@@ -2053,6 +2053,6 @@
             try { const pm = document.getElementById('pay-method'); if (pm && pm.value === 'bank') fillBankAccOptions(); } catch (e) { console.warn(e); }
         });
     </script>
-    <script src="js/kasir-v12.js?v=12b5"></script>
+    <script src="js/kasir-v12.js?v=12b6"></script>
 </body>
 </html>
