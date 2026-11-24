@@ -453,9 +453,9 @@
     _lockCol = (prefix === 'ts'); /* kolom gembok hanya saat mengubah fitur toko yang sudah ada */
     var box = 'border:1px solid rgba(255,255,255,.1);border-radius:12px;margin-bottom:8px;overflow:hidden';
     var sm = 'padding:8px 10px;cursor:pointer;font-weight:800;font-size:12.5px;display:flex;align-items:center;gap:8px;list-style:none';
-    var h = '<div style="font-weight:800;margin-bottom:2px">Fitur toko</div>' +
+    var h = (isPaketCat ? '' : '<div style="font-weight:800;margin-bottom:2px">Fitur toko</div>' +
       '<div style="opacity:.65;margin-bottom:6px">Merah = fitur inti (terkunci). Hijau = bebas dicentang atau dicabut; yang tidak dicentang hilang dari tampilan klien. Penanda <b style="color:#4ade80">BASIC</b>/<b style="color:#fbbf24">PLUS</b> hanya pembeda tingkat.' + (_lockCol ? ' Kolom <b>🔒</b> = gembok: fitur yang digembok tetap ada walau toko dikembalikan ke Basic.' : '') + '</div>' +
-      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span style="opacity:.65;font-size:11px">Template cepat:</span><span id="' + prefix + '-presets" style="display:contents">' + presetButtons(prefix) + '</span></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px"><span style="opacity:.65;font-size:11px">Template cepat:</span><span id="' + prefix + '-presets" style="display:contents">' + presetButtons(prefix) + '</span></div>') +
       '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><b id="' + prefix + '-cnt-all" style="font-size:11.5px"></b><span style="flex:1"></span><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',true);FM_PLANS.cnt(\'' + prefix + '\')" style="' + BSM + '">Centang semua</button><button type="button" onclick="FM_PLANS.setAll(\'' + prefix + '\',false);FM_PLANS.cnt(\'' + prefix + '\')" style="' + BSM + '">Kosongkan semua</button></div>';
     var core = FEATURES.filter(function (f) { return !f.soon && isCore(f); });
     /* kotak cari: ketik sebagian nama fitur, baris lain disembunyikan */
