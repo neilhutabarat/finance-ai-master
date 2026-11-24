@@ -262,6 +262,14 @@ service cloud.firestore {
       allow delete: if tower();
     }
 
+    // Penghitung pengunjung website oneilverse.com: siapa saja boleh membaca dan menambah 1, tidak boleh mengubah angka lain.
+    match /web_stats/{d} {
+      allow get: if true;
+      allow create: if request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == 1;
+      allow update: if request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == resource.data.n + 1;
+      allow list, delete: if tower();
+    }
+
     match /{document=**} {
       allow read, write: if tower();
     }
