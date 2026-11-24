@@ -26,7 +26,7 @@
   var ov = null;
   function shell(sub, body) {
     if (typeof towerOverlay !== 'function') { alert('Tower belum siap, muat ulang halaman.'); return null; }
-    ov = towerOverlay('tw-featx', 'Fitur Khusus Toko', sub, '<div id="tw-fx" style="padding:4px 18px 14px;font-size:13px">' + body + '</div>');
+    ov = towerOverlay('tw-featx', 'Fitur Khusus Toko', sub, '<div id="tw-fx" style="padding:4px 18px 14px;font-size:13px;overflow-y:auto;min-height:0;flex:1 1 auto">' + body + '</div>');
     return ov.el.querySelector('#tw-fx');
   }
 
@@ -64,7 +64,8 @@
     var tier = tierOf(tn), FEATS = (P() && P().FEATURES) || [], CATS = (P() && P().CATS) || [];
     var byKey = {}; FEATS.forEach(function (f) { byKey[f.key] = f; });
     var used = {}, groups = [];
-    CATS.forEach(function (c) { var ks = (c.keys || []).filter(function (k) { return optional(byKey[k]); }); ks.forEach(function (k) { used[k] = 1; }); if (ks.length) groups.push([c.label.replace(/\s*\(.*\)$/, ''), ks]); });
+    /* bagian Oneilverse 2 (susunan pulau) belum dirilis: tidak ditampilkan, sama seperti di Atur Isi Paket */
+    CATS.forEach(function (c) { if (c.on2) { (c.keys || []).forEach(function (k) { used[k] = 1; }); return; } var ks = (c.keys || []).filter(function (k) { return optional(byKey[k]); }); ks.forEach(function (k) { used[k] = 1; }); if (ks.length) groups.push([c.label.replace(/\s*\(.*\)$/, ''), ks]); });
     var rest = FEATS.filter(function (f) { return optional(f) && !used[f.key]; }).map(function (f) { return f.key; });
     if (rest.length) groups.push(['Lainnya', rest]);
 

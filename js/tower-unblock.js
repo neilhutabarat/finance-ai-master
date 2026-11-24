@@ -19,7 +19,7 @@
   }
   function open() {
     if (typeof towerOverlay !== 'function') return alert('Tower belum siap, muat ulang halaman.');
-    var ov = towerOverlay('tw-unblock', 'Buka Blokir Login', 'Peran yang terkunci karena salah PIN. Membuka blokir tidak mengubah PIN.', '<div id="tw-unb-list" style="font-size:13px;opacity:.8">Memuat…</div>');
+    var ov = towerOverlay('tw-unblock', 'Buka Blokir Login', 'Peran yang terkunci karena salah PIN. Membuka blokir tidak mengubah PIN.', '<div id="tw-unb-list" style="font-size:13px;opacity:.8;overflow-y:auto;min-height:0;flex:1 1 auto">Memuat…</div>');
     load(ov);
   }
   function load(ov) {
