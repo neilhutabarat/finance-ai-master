@@ -95,8 +95,6 @@
       '#fm-upg .u-cards::-webkit-scrollbar{display:none}' +
       '#fm-upg .u-card{all:unset;box-sizing:border-box;flex:0 0 min(80vw,284px);aspect-ratio:5/8.3;scroll-snap-align:center;border-radius:24px;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:20px 20px 16px;color:#fff;font-family:' + F + ';--mx:30%;--my:10%;--rx:0deg;--ry:0deg;background:linear-gradient(155deg,#26262b 0%,#0a0a0c 38%,#000 70%,#16161a 100%);box-shadow:0 26px 50px rgba(0,0,0,.7),inset 0 0 0 1px #3a3a41,inset 0 1px 0 rgba(255,255,255,.16);transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease-out}' +
       '#fm-upg .u-card.pro{background:linear-gradient(155deg,#3a2c12 0%,#14100a 36%,#000 68%,#241b0b 100%);box-shadow:0 26px 50px rgba(0,0,0,.7),0 0 0 1px #6f5320,0 0 0 3px #000,0 0 0 4.5px #e5c373,0 0 28px rgba(229,195,115,.28),inset 0 1px 0 rgba(255,232,170,.45)}' +
-      '#fm-upg .u-card::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.03) 0 1px,transparent 1px 6px);pointer-events:none}' +
-      '#fm-upg .u-card.pro::before{background:repeating-linear-gradient(115deg,rgba(229,195,115,.06) 0 1px,transparent 1px 6px)}' +
       '#fm-upg .u-foil{position:absolute;inset:0;pointer-events:none;background:radial-gradient(260px 200px at var(--mx) var(--my),rgba(255,255,255,.2),transparent 62%);mix-blend-mode:screen}' +
       '#fm-upg .pro .u-foil{background:radial-gradient(280px 220px at var(--mx) var(--my),rgba(255,226,150,.38),transparent 62%)}' +
       '#fm-upg .u-card::after{content:"";position:absolute;top:-30%;left:-70%;width:38%;height:160%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.18),transparent);transform:rotate(12deg);animation:fmUpgSheen 1.8s ease-out 1 .35s both;pointer-events:none}' +
@@ -112,6 +110,9 @@
       '#fm-upg .u-nm{display:flex;align-items:baseline;gap:10px;font-family:Didot,"Bodoni 72","Playfair Display",Georgia,serif;font-size:50px;line-height:1;font-weight:700;margin-top:20px;position:relative;color:#f4f4f5}' +
       '#fm-upg .u-nm i{font-style:normal;display:inline-block;transform:skewX(-14deg);font-family:' + F + ';font-size:34px;font-weight:800;margin-left:-4px}' +
       '#fm-upg .pro .u-nm{background:linear-gradient(120deg,#f8e7b0,#d4a94f 42%,#fff2c8 58%,#c49a45);-webkit-background-clip:text;background-clip:text;color:transparent}' +
+      '#fm-upg .u-pl{display:inline-block;transform:skewX(-14deg);font-size:15px;font-weight:800;letter-spacing:0;margin-left:-4px;color:#fff}' +
+      '#fm-upg .u-pp{font-size:8.5px;font-weight:800;letter-spacing:.14em;padding:3px 6px 2px;border-radius:4px;background:#17140c;color:#cda75c;box-shadow:inset 0 0 0 1px rgba(205,167,92,.5);margin-left:-2px}' +
+      '#fm-upg .plus .u-vip{background:linear-gradient(135deg,#fff,#c9c9d0);color:#000;font-size:18px;letter-spacing:0;padding:3px 10px;font-family:' + F + '}' +
       '#fm-upg .u-vip{font-size:9.5px;font-weight:800;letter-spacing:.22em;padding:4px 8px;border-radius:5px;background:linear-gradient(135deg,#f6e0a0,#c49a45);color:#1a1405;align-self:center;font-family:' + F + '}' +
       '#fm-upg .u-tl{display:block;font-size:11.5px;color:#9a9aa3;margin-top:6px;letter-spacing:.03em;position:relative}' +
       '#fm-upg .pro .u-tl{color:#c9ab6a}' +
@@ -167,15 +168,15 @@
   var TICK = function (c) { return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="' + c + '" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'; };
   function logoSvg(px, c) { try { return window.FM_LOGO ? FM_LOGO.mark(px, { tile: false, color: c }) : ''; } catch (e) { return ''; } }
   function cardHtml(t) {
-    var a = activeOf(t), tag = a ? (a.kind === 'coba' ? 'Coba · ' + leftText(untilOf(a)) : (a.status === 'AKTIF' ? 'Aktif' : 'Sementara')) : (trialUsed(t) ? 'Lihat isi' : 'Coba gratis 24 jam');
+    var a = activeOf(t), tag = a ? (a.kind === 'coba' ? 'Coba · ' + leftText(untilOf(a)) : 'Aktif') : (trialUsed(t) ? 'Lihat isi' : 'Coba gratis 24 jam');
     var rows = flyerRows(t), col = t === 'pro' ? GOLD : '#fff', max = t === 'pro' ? 5 : 6, mk = t === 'pro' ? '#e5c373' : '#ffffff', tt = tn();
     var li = rows.slice(0, max).map(function (r) { return '<li>' + TICK(col) + '<span>' + esc(r.name) + '</span></li>'; }).join('');
     if (!rows.length) li = '<li class="more"><span>Daftar manfaat sedang disiapkan</span></li>';
     if (rows.length > max) li += '<li class="more"><span>+ ' + (rows.length - max) + ' fitur lainnya</span></li>';
     if (t === 'pro' && rows.length) li = '<li>' + TICK(col) + '<span><b>Semua isi Plus</b></span></li>' + li;
     return '<button class="u-card ' + t + '" data-t="' + t + '" aria-label="Paket ' + NAME[t] + '"><span class="u-foil"></span><span class="u-wm">' + logoSvg(250, mk) + '</span>' +
-      '<span class="u-top"><span class="u-lg">' + logoSvg(22, mk) + 'ONEILVERSE</span><svg class="u-nfc" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="' + mk + '" stroke-width="1.7" stroke-linecap="round"><path d="M8 7.5a6.5 6.5 0 0 1 0 9M12 5a10 10 0 0 1 0 14M16 2.5a13.5 13.5 0 0 1 0 19"/></svg></span>' +
-      '<span class="u-nm">' + NAME[t] + (t === 'plus' ? '<i>+</i>' : '<span class="u-vip">VVIP</span>') + '</span><span class="u-tl">' + (t === 'pro' ? 'Akses penuh, tanpa batas' : 'Naik kelas untuk usaha Anda') + '</span>' +
+      '<span class="u-top"><span class="u-lg">' + logoSvg(22, mk) + 'ONEILVERSE' + (t === 'plus' ? '<b class="u-pl">+</b>' : '<b class="u-pp">PRO</b>') + '</span><svg class="u-nfc" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="' + mk + '" stroke-width="1.7" stroke-linecap="round"><path d="M8 7.5a6.5 6.5 0 0 1 0 9M12 5a10 10 0 0 1 0 14M16 2.5a13.5 13.5 0 0 1 0 19"/></svg></span>' +
+      '<span class="u-nm">' + NAME[t] + '<span class="u-vip">' + (t === 'plus' ? '+' : 'PRO') + '</span></span><span class="u-tl">' + (t === 'pro' ? 'Akses penuh, tanpa batas' : 'Naik kelas untuk usaha Anda') + '</span>' +
       '<ul class="u-ben">' + li + '</ul>' +
       '<span class="u-foot"><span class="u-pr">mulai<b>' + rp(price(t, 'bulan')) + '</b>per bulan</span><span class="u-tag">' + esc(tag) + '</span></span>' +
       '<span class="u-hold"><span>Pemegang kartu</span><span>' + esc((tt && tt.nama) || tid()) + '</span></span></button>';
@@ -187,7 +188,7 @@
   function vHome() {
     var vt = visibleTiers(), pend = pending();
     var h = head('Tingkatkan toko Anda', 'Geser dan tekan kartu untuk melihat semua isi paket. Coba gratis 24 jam, sekali untuk tiap paket.');
-    if (pend) h += '<div class="u-note u-warn">Pengajuan ' + NAME[pend.tier] + ' menunggu konfirmasi. Paket aktif sementara sampai ' + esc(dstr(untilOf(pend))) + '.</div>';
+    if (pend) h += '<div class="u-note u-warn">Paket ' + NAME[pend.tier] + ' aktif. Pembayaran sedang diverifikasi.</div>';
     h += vt.length ? '<div class="u-cards">' + vt.map(cardHtml).join('') + '</div>' : '<div class="u-note">Toko ini sudah memakai paket tertinggi.</div>';
     return h;
   }
@@ -198,7 +199,7 @@
     order.forEach(function (g) { h += '<div class="u-grp">' + esc(g) + '</div>'; by[g].forEach(function (r) { h += '<div class="u-row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="' + (t === 'pro' ? GOLD : '#fff') + '" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto;margin-top:2px"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><div><b>' + esc(r.name) + '</b>' + (r.d ? '<span>' + esc(r.d) + '</span>' : '') + '</div></div>'; }); });
     h += '<div class="u-note" style="margin-top:14px">Mulai ' + rp(price(t, 'bulan')) + ' / bulan, atau ' + rp(price(t, 'tahun')) + ' / tahun (bayar 10 bulan, gratis 2 bulan).</div>';
     if (S.note) h += '<div class="u-note u-warn">' + esc(S.note) + '</div>';
-    if (a) h += '<div class="u-note">' + (a.kind === 'coba' ? 'Masa coba berjalan, sisa ' + leftText(untilOf(a)) + '.' : (a.status === 'AKTIF' ? 'Paket aktif sampai ' + esc(dstr(untilOf(a))) + '.' : 'Aktif sementara sampai ' + esc(dstr(untilOf(a))) + ', menunggu konfirmasi.')) + '</div>';
+    if (a) h += '<div class="u-note">' + (a.kind === 'coba' ? 'Masa coba berjalan, sisa ' + leftText(untilOf(a)) + '.' : (a.status === 'AKTIF' ? 'Paket aktif sampai ' + esc(dstr(untilOf(a))) + '.' : 'Paket aktif. Pembayaran sedang diverifikasi.')) + '</div>';
     else if (!trialUsed(t)) h += '<button class="u-b ' + (t === 'pro' ? 'gold' : 'main') + '" data-a="trial">Coba gratis 24 jam</button>';
     else h += '<div class="u-sub" style="margin-top:10px;text-align:center">Masa coba paket ini sudah dipakai.</div>';
     if (!CAN_BUY) h += '<button class="u-b off" disabled>Berlangganan lewat Manager atau Owner</button>';
@@ -231,20 +232,19 @@
   }
   var CONF = [
     ['Sudah membayar?', 'Pastikan pembayaran QRIS sudah berhasil dan nominalnya sesuai ', 'Ya, sudah bayar'],
-    ['Bukti sudah dikirim?', 'Bukti transfer sudah dikirim ke WhatsApp penyedia aplikasi. Tanpa bukti, pengajuan tidak bisa dikonfirmasi.', 'Ya, bukti terkirim'],
-    ['Aktif sementara 24 jam', 'Paket langsung aktif selama 24 jam. Jika penyedia aplikasi belum menerima pembayaran dan bukti, paket kembali seperti semula.', 'Saya mengerti, aktifkan']
+    ['Bukti sudah dikirim?', 'Bukti transfer sudah dikirim ke WhatsApp penyedia aplikasi. Tanpa bukti, pengajuan tidak bisa dikonfirmasi.', 'Ya, aktifkan paket']
   ];
   function vConf(i) {
-    var c = CONF[i], dots = '<div class="u-dots">' + [0, 1, 2].map(function (k) { return '<i class="' + (k <= i ? 'on' : '') + '"></i>'; }).join('') + '</div>';
+    var c = CONF[i], dots = '<div class="u-dots">' + [0, 1].map(function (k) { return '<i class="' + (k <= i ? 'on' : '') + '"></i>'; }).join('') + '</div>';
     return head(c[0], '', i === 0 ? 'pay' : 'c' + i) + dots + '<div class="u-note" style="margin-top:0">' + esc(c[1]) + (i === 0 ? '<b>' + rp(price(S.tier, S.per)) + '</b>.' : '') + '</div>' +
-      (S.note ? '<div class="u-note u-warn">' + esc(S.note) + '</div>' : '') + '<button class="u-b ' + (S.tier === 'pro' ? 'gold' : 'main') + '" ' + (S.busy ? 'disabled ' : '') + 'data-go="' + (i < 2 ? 'c' + (i + 2) : 'send') + '">' + (S.busy ? 'Mengirim...' : c[2]) + '</button><button class="u-b" data-go="pay">Batal</button>';
+      (S.note ? '<div class="u-note u-warn">' + esc(S.note) + '</div>' : '') + '<button class="u-b ' + (S.tier === 'pro' ? 'gold' : 'main') + '" ' + (S.busy ? 'disabled ' : '') + 'data-go="' + (i < 1 ? 'c2' : 'send') + '">' + (S.busy ? 'Mengirim...' : c[2]) + '</button><button class="u-b" data-go="pay">Batal</button>';
   }
   function vTrial() {
     return head('Mulai coba ' + NAME[S.tier] + '?', '', 'flyer') + '<div class="u-note" style="margin-top:12px">Paket ' + NAME[S.tier] + ' aktif 24 jam sejak sekarang. Masa coba hanya sekali untuk tiap paket di toko ini.</div>' +
       (S.note ? '<div class="u-note u-warn">' + esc(S.note) + '</div>' : '') + '<button class="u-b ' + (S.tier === 'pro' ? 'gold' : 'main') + '" ' + (S.busy ? 'disabled ' : '') + 'data-a="trialgo">' + (S.busy ? 'Memulai...' : 'Mulai coba 24 jam') + '</button><button class="u-b" data-go="flyer">Batal</button>';
   }
   function vDone() {
-    return head(S.done === 'coba' ? 'Masa coba dimulai' : 'Pengajuan terkirim', '') + '<div class="u-note" style="margin-top:12px">' + (S.done === 'coba' ? 'Paket ' + NAME[S.tier] + ' aktif 24 jam. Muat ulang halaman supaya semua fitur terbuka.' : 'Paket ' + NAME[S.tier] + ' aktif sementara 24 jam. Setelah penyedia aplikasi mengonfirmasi, masa langganan dihitung sejak Anda menekan tombol tadi. Muat ulang halaman supaya fitur terbuka.') + '</div><button class="u-b ' + (S.tier === 'pro' ? 'gold' : 'main') + '" data-a="reload">Muat ulang sekarang</button>';
+    return head(S.done === 'coba' ? 'Masa coba dimulai' : 'Paket aktif', '') + '<div class="u-note" style="margin-top:12px">' + (S.done === 'coba' ? 'Paket ' + NAME[S.tier] + ' aktif 24 jam. Muat ulang halaman supaya semua fitur terbuka.' : 'Paket ' + NAME[S.tier] + ' sudah aktif. Terima kasih. Muat ulang halaman supaya semua fitur terbuka.') + '</div><button class="u-b ' + (S.tier === 'pro' ? 'gold' : 'main') + '" data-a="reload">Muat ulang sekarang</button>';
   }
   function render() {
     if (!ov || ov.style.display === 'none') { chip(); return; }
@@ -274,8 +274,8 @@
   }
   function send() {
     if (!CAN_BUY) return;
-    if (!hasDb()) { S.note = 'Tidak bisa terhubung sekarang. Periksa internet atau login ulang.'; S.v = 'c3'; return render(); }
-    if (pending()) { S.note = 'Masih ada pengajuan yang menunggu konfirmasi.'; S.v = 'c3'; return render(); }
+    if (!hasDb()) { S.note = 'Tidak bisa terhubung sekarang. Periksa internet atau login ulang.'; S.v = 'c2'; return render(); }
+    if (pending()) { S.note = 'Masih ada pengajuan yang menunggu konfirmasi.'; S.v = 'c2'; return render(); }
     var t = S.tier, now = Date.now(), x = base(t); x.id = 'upg_' + now; x.kind = 'beli'; x.status = 'BARU'; x.period = S.per; x.months = S.per === 'tahun' ? 12 : 1; x.price = price(t, S.per); x.acks = 3;
     S.busy = true; render();
     db.collection('provider_tickets').doc(x.id).set(x).then(function () { S.busy = false; S.v = 'done'; S.done = 'beli'; addLocal(x); render(); }).catch(fail);
