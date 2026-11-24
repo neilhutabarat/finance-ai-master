@@ -1,0 +1,269 @@
+rules_version = '2';
+// Oneil Shield 3.0 — aturan server (Firestore Rules).
+// Perubahan dari versi lama (firestore.rules.lama), semuanya menutup celah tanpa mengubah alur kerja normal:
+//  1. login_security : tanpa login hanya boleh MENAMBAH hitungan salah PIN; reset hanya setelah login sah atau oleh Tower.
+//  2. provider_tickets: tiket upgrade baru hanya boleh COBA/BARU dengan masa 24 jam; coba gratis 1x per paket per toko.
+//  3. tx_<toko>      : Kasir hanya boleh menambah, menandai closing, dan mengganti metode bayar Hutang saat pelunasan.
+//                      Ubah/hapus transaksi sah hanya Manager/Owner.
+//  4. on_dm          : DM hanya bisa dibaca/ditulis toko pemilik percakapan, Tower, dan operator CS (app_meta/operators).
+//  5. login_log & security_reports: hanya toko sendiri dan Tower.
+//  6. provider_settings/rates: perangkat toko hanya boleh menyegarkan kurs otomatis dengan angka wajar; emas & lainnya hanya Tower.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Akun Tower (dibuat di Firebase Console > Authentication > Users), dikenali lewat UID
+    function tower() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'password'
+        && request.auth.uid == 'FqCWf11KWieXuNJ3e6fE0jQ4KMz1';
+    }
+    function signedIn() { return request.auth != null; }
+    function acc() { return get(/databases/$(database)/documents/tenant_access/$(request.auth.uid)).data; }
+    function hasAcc() { return signedIn() && exists(/databases/$(database)/documents/tenant_access/$(request.auth.uid)); }
+    function mine(t) { return signedIn() && acc().tenant == t; }
+    // sama seperti mine(), tapi tidak peka huruf besar/kecil (kunci dokumen sebagian ditulis huruf kecil / besar)
+    function sameT(t) { return hasAcc() && string(acc().tenant).lower() == string(t).lower(); }
+    function writer(t) { return mine(t) && acc().role in ['staff', 'manager', 'owner']; }
+    function admin(t) { return mine(t) && acc().role in ['manager', 'owner']; }
+    function gajiRead(t) { return mine(t) && (acc().role == 'manager' || (acc().role == 'owner' && get(/databases/$(database)/documents/tenant_ctrl/$(t)).data.get('gajiOwner', false) == true)); }
+    function gajiWrite(t) { return mine(t) && acc().role == 'manager'; }
+    function liveTenant(t) {
+      return !exists(/databases/$(database)/documents/tenant_ctrl/$(t))
+        || get(/databases/$(database)/documents/tenant_ctrl/$(t)).data.get('suspended', false) != true;
+    }
+    // operator CS (ON Messenger) selain akun Tower: daftar UID di app_meta/operators { uids: [...] }
+    function isOp() {
+      return signedIn() && exists(/databases/$(database)/documents/app_meta/operators)
+        && request.auth.uid in get(/databases/$(database)/documents/app_meta/operators).data.get('uids', []);
+    }
+
+    match /tenant_access/{uid} {
+      allow read: if tower() || (signedIn() && request.auth.uid == uid);
+      allow write: if tower();
+      allow create: if signedIn() && acc().role == 'owner'
+        && request.resource.data.tenant == acc().tenant
+        && request.resource.data.role in ['staff', 'manager'];
+      allow update: if signedIn() && acc().role == 'owner'
+        && resource.data.tenant == acc().tenant
+        && request.resource.data.tenant == acc().tenant
+        && request.resource.data.role in ['staff', 'manager'];
+      allow delete: if signedIn() && acc().role == 'owner'
+        && resource.data.tenant == acc().tenant
+        && resource.data.role in ['staff', 'manager'];
+    }
+
+    match /tenant_access_cfg/{t} {
+      allow get: if true;
+      allow list: if tower();
+      allow write: if tower();
+      allow update: if signedIn() && acc().role == 'owner' && acc().tenant == t
+        && request.resource.data.gen.owner == resource.data.gen.owner
+        && request.resource.data.uid.owner == resource.data.uid.owner;
+    }
+
+    // ---- data toko: transaksi (tx_), produk & stok (tp_), piutang (pu_), absensi (ab_), gaji (gaji_) ----
+    // Kasir (staff) boleh mengubah transaksi sah HANYA untuk: menandai closing (isClosed -> true),
+    // dan mengganti metode bayar dari Hutang saat piutang dilunasi. Selain itu hanya Manager/Owner.
+    function staffTxUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isClosed', 'pay'])
+        && (!('isClosed' in request.resource.data.diff(resource.data).affectedKeys()) || request.resource.data.isClosed == true)
+        && (!('pay' in request.resource.data.diff(resource.data).affectedKeys()) || resource.data.get('pay', '') == 'hutang');
+    }
+    match /{col}/{doc} {
+      allow read: if (col.matches('(tx|tp|pu|ab)_.*') && (tower() || mine(col.split('_')[1])));
+
+      allow create: if col.matches('tx_.*') && (tower() || (writer(col.split('_')[1]) && liveTenant(col.split('_')[1])));
+      allow update: if col.matches('tx_.*') && (tower() || (liveTenant(col.split('_')[1])
+        && (admin(col.split('_')[1]) || (writer(col.split('_')[1]) && staffTxUpdate()))));
+      allow delete: if col.matches('tx_.*') && (tower() || (admin(col.split('_')[1]) && liveTenant(col.split('_')[1])));
+
+      allow create, update, delete: if (col.matches('(tp|pu|ab)_.*') && (tower() || (writer(col.split('_')[1]) && liveTenant(col.split('_')[1]))));
+
+      allow read: if col.matches('gaji_.*') && (tower() || gajiRead(col.split('_')[1]));
+      allow create, update, delete: if col.matches('gaji_.*') && (tower() || (gajiWrite(col.split('_')[1]) && liveTenant(col.split('_')[1])));
+    }
+
+    match /tenant_ctrl/{t} {
+      allow read: if tower() || mine(t);
+      allow write: if tower();
+    }
+
+    match /tenant_presence/{p} {
+      allow read: if tower() || (signedIn() && mine(resource.data.tenantId));
+      allow create, update: if tower() || writer(request.resource.data.tenantId);
+      allow delete: if tower() || writer(resource.data.tenantId);
+    }
+
+    match /tenants_registry/{k} {
+      allow get: if true;
+      allow list, write: if tower();
+    }
+
+    match /app_meta/{k} {
+      allow get: if true;
+      allow list, write: if tower();
+    }
+
+    match /tenant_settings/{t} {
+      allow get: if true;
+      allow list: if tower() || mine(t);
+      allow write: if tower() || (admin(t) && liveTenant(t));
+    }
+    match /tenant_logos/{t} {
+      allow read: if tower() || mine(t);
+      allow write: if tower() || (admin(t) && liveTenant(t));
+    }
+
+    // Kurs: perangkat toko menyegarkan otomatis 2x sehari. Hanya kolom kurs yang boleh diubah, dengan angka USD yang wajar.
+    function ratesOk() {
+      return request.resource.size() < 4000
+        && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys()
+             .hasOnly(['rates', 'updatedAt', 'slot', 'source', 'sourceUpdatedAt', 'lock'])
+        && (!('rates' in request.resource.data)
+            || (request.resource.data.rates.get('USD', 0) is number
+                && request.resource.data.rates.get('USD', 0) > 5000
+                && request.resource.data.rates.get('USD', 0) < 50000));
+    }
+    match /provider_settings/{d} {
+      allow read: if signedIn();
+      allow write: if tower() || (d == 'rates' && signedIn()
+        && acc().role in ['manager', 'owner'] && ratesOk());
+    }
+
+    // Tiket ke Tower. Tiket upgrade buatan toko hanya boleh "coba" (COBA) atau "diajukan" (BARU), masa maksimal ~24 jam.
+    // Tiket coba memakai ID tetap coba_<toko>_<paket>, jadi tiap paket hanya bisa dicoba sekali (update hanya Tower).
+    function upgradeTicketOk(id) {
+      return request.resource.data.get('tier', '') in ['plus', 'pro']
+        && !('activeUntil' in request.resource.data)
+        && request.resource.data.get('until', 0) is number
+        && request.resource.data.get('until', 0) <= request.time.toMillis() + 93600000
+        && ((request.resource.data.get('kind', '') == 'coba' && request.resource.data.get('status', '') == 'COBA'
+             && id == 'coba_' + request.resource.data.tenantId + '_' + request.resource.data.tier)
+          || (request.resource.data.get('kind', '') == 'beli' && request.resource.data.get('status', '') == 'BARU'));
+    }
+    match /provider_tickets/{id} {
+      allow create: if signedIn() && writer(request.resource.data.tenantId)
+        && (request.resource.data.get('type', '') != 'upgrade' || upgradeTicketOk(id));
+      allow read: if tower() || (signedIn() && mine(resource.data.tenantId));
+      allow update, delete: if tower();
+    }
+
+    match /provider_notices/{id} {
+      allow read: if signedIn();
+      allow write: if tower();
+    }
+
+    match /manager_audit_logs/{id} {
+      allow create: if signedIn() && writer(request.resource.data.tenantId) && request.resource.size() < 20000;
+      allow read: if tower() || (signedIn() && admin(resource.data.tenantId));
+      allow update, delete: if tower();
+    }
+
+    match /former_tenants/{k} {
+      allow get: if true;
+      allow list, create, delete: if tower();
+      allow update: if tower() || (request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['downloadRequested', 'requestedAt', 'contactName', 'contactEmail'])
+        && request.resource.size() < 4000
+        && request.resource.data.get('contactName', '') is string
+        && request.resource.data.get('contactName', '').size() <= 120
+        && request.resource.data.get('contactEmail', '') is string
+        && request.resource.data.get('contactEmail', '').size() <= 160);
+    }
+
+    function chatCfg() { return get(/databases/$(database)/documents/global_chat_cfg/main).data; }
+    function chatOn(tid) {
+      return !exists(/databases/$(database)/documents/global_chat_cfg/main)
+        || (chatCfg().get('enabled', true) == true && !(tid in chatCfg().get('muted', [])));
+    }
+    function kasirChatOn(t) {
+      return !exists(/databases/$(database)/documents/tenant_settings/$(t))
+        || get(/databases/$(database)/documents/tenant_settings/$(t)).data.get('chatKasir', true) == true;
+    }
+    match /global_chat/{id} {
+      allow read: if signedIn();
+      allow create: if request.resource.data.keys().hasOnly(['tid', 'role', 'label', 'text', 'ms', 'at'])
+        && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 140
+        && request.resource.data.label is string && request.resource.data.label.size() <= 24
+        && request.resource.data.ms is number && request.resource.data.ms > request.time.toMillis() - 600000
+        && ((tower() && request.resource.data.tid == 'DEV' && request.resource.data.role == 'dev')
+            || (signedIn() && request.resource.data.role in ['staff', 'owner'] && writer(request.resource.data.tid)
+                && acc().role == request.resource.data.role && chatOn(request.resource.data.tid)
+                && (request.resource.data.role != 'staff' || kasirChatOn(request.resource.data.tid))
+                && !request.resource.data.text.lower().matches('.*(http|www\\.|\\.com|\\.net|\\.org|wa\\.me).*')));
+      allow update, delete: if tower();
+    }
+    match /global_chat_cfg/{d} {
+      allow read: if signedIn();
+      allow write: if tower();
+    }
+
+    // ON Messenger: DM ke Ony (CS Live) & antar ID toko. ID percakapan = "<TOKO_A>__<TOKO_B>" (atau "DEV__<TOKO>").
+    function dmMember(pair) { return sameT(pair.split('__')[0]) || sameT(pair.split('__')[1]); }
+    match /on_dm/{pair} {
+      allow read: if tower() || isOp() || dmMember(pair);
+      allow create, update: if (tower() || isOp() || dmMember(pair)) && request.resource.size() < 2000;
+      allow delete: if tower();
+    }
+    match /on_dm/{pair}/messages/{id} {
+      allow read: if tower() || isOp() || dmMember(pair);
+      allow create: if (tower() || isOp() || dmMember(pair)) && request.resource.size() < 4000;
+      allow update, delete: if tower() || isOp();
+    }
+
+    match /error_logs/{id} {
+      allow create: if signedIn() && mine(request.resource.data.tenantId)
+        && request.resource.data.keys().size() <= 14
+        && request.resource.data.msg is string && request.resource.data.msg.size() <= 400;
+      allow read, update, delete: if tower();
+    }
+    match /login_logs/{id} {
+      allow create: if signedIn() && mine(request.resource.data.tenantId)
+        && request.resource.data.keys().size() <= 14;
+      allow read, update, delete: if tower();
+    }
+
+    // Kunci PIN salah (Oneil Shield). Kunci dokumen: <toko>_<peran>[_<slot>], huruf kecil.
+    // Tanpa login: hanya boleh membuat catatan baru yang kosong/1x salah, atau MENAIKKAN hitungan/tingkat kunci.
+    // Menurunkan/mereset hanya setelah login sah ke toko itu (dan tidak sedang diblokir) atau oleh Tower.
+    function secFieldsOk() {
+      return request.resource.data.keys().hasOnly(['fails', 'tier', 'lockUntil', 'isBlocked', 'updatedAt'])
+        && request.resource.size() < 2000
+        && request.resource.data.get('tier', 0) is int && request.resource.data.get('tier', 0) <= 2
+        && request.resource.data.get('lockUntil', 0) <= request.time.toMillis() + 660000;
+    }
+    function secOnlyUp() {
+      return request.resource.data.get('tier', 0) >= resource.data.get('tier', 0)
+        && (resource.data.get('isBlocked', false) != true || request.resource.data.get('isBlocked', false) == true)
+        && (request.resource.data.get('tier', 0) > resource.data.get('tier', 0)
+            || request.resource.data.get('isBlocked', false) == true
+            || (request.resource.data.get('fails', 0) >= resource.data.get('fails', 0)
+                && request.resource.data.get('lockUntil', 0) >= resource.data.get('lockUntil', 0)));
+    }
+    match /login_security/{k} {
+      allow get: if true;
+      allow list, delete: if tower();
+      allow create: if tower() || (secFieldsOk()
+        && request.resource.data.get('tier', 0) == 0 && request.resource.data.get('isBlocked', false) == false
+        && request.resource.data.get('lockUntil', 0) == 0 && request.resource.data.get('fails', 0) <= 1);
+      allow update: if tower() || (secFieldsOk()
+        && (secOnlyUp() || (sameT(k.split('_')[0]) && resource.data.get('isBlocked', false) != true)));
+    }
+
+    match /login_log/{id} {
+      allow create: if signedIn() && sameT(request.resource.data.get('tenantId', '')) && request.resource.size() < 2000;
+      allow read: if tower() || (hasAcc() && resource.data.tenantId == acc().tenant);
+      allow update, delete: if tower();
+    }
+
+    match /security_reports/{id} {
+      allow read: if tower() || sameT(id.split('_')[0]);
+      allow create, update: if (tower() || sameT(id.split('_')[0])) && request.resource.size() < 4000;
+      allow delete: if tower();
+    }
+
+    match /{document=**} {
+      allow read, write: if tower();
+    }
+  }
+}

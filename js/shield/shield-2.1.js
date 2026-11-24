@@ -124,10 +124,21 @@
     }).catch(function () { return Object.assign({}, BLANK_SEC, { fails: 1 }); });
   }
 
+  /* Log login toko ini, terbaru dulu. Disaring per toko (wajib oleh aturan server Shield 3.0) lalu diurutkan di perangkat,
+     supaya tidak butuh index gabungan baru. Mengembalikan objek mirip snapshot (forEach -> doc.data()). */
+  function recentLog(f, key, tid, n) {
+    return f.collection('login_log').where('acctKey', '==', key).where('tenantId', '==', tid).get().then(function (snap) {
+      var a = []; snap.forEach(function (d) { a.push(d); });
+      a.sort(function (x, y) { return (y.data().at || 0) - (x.data().at || 0); });
+      a = a.slice(0, n);
+      return { empty: !a.length, size: a.length, docs: a, forEach: function (fn) { a.forEach(fn); } };
+    });
+  }
+
   function writeLoginLog(tid, role, slot) {
     var f = fsdb(); if (!f) return Promise.resolve({ isNewDevice: false });
     var key = secKey(tid, role, slot), dev = deviceId(), lbl = deviceLabel();
-    return f.collection('login_log').where('acctKey', '==', key).orderBy('at', 'desc').limit(15).get().then(function (snap) {
+    return recentLog(f, key, tid, 15).then(function (snap) {
       var known = false, hadAny = false;
       snap.forEach(function (doc) { hadAny = true; if (doc.data().deviceId === dev) known = true; });
       var isNew = hadAny && !known;
@@ -150,7 +161,7 @@
   function recentLogins(tid, role, slot, n) {
     var f = fsdb(); if (!f) return Promise.resolve([]);
     var key = secKey(tid, role, slot);
-    return f.collection('login_log').where('acctKey', '==', key).orderBy('at', 'desc').limit(n || 8).get()
+    return recentLog(f, key, tid, n || 8)
       .then(function (snap) { var out = []; snap.forEach(function (d) { out.push(d.data()); }); return out; })
       .catch(function () { return []; });
   }
