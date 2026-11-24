@@ -22,6 +22,7 @@
     { id: 'layanan', title: 'Paket & Tagihan', hint: 'Langganan, biaya & fitur sewa', c: '#f97316', items: [
       { key: 'paket_billing', t: 'Ubah Paket Toko', ic: 'paket_billing', run: "towerPick('paket')", d: 'Basic, Plus, Pro & durasi' },
       { key: 'isi_paket_fitur', t: 'Atur Isi Paket', ic: 'isi_paket_fitur', run: "openModal('paket_fitur')", d: 'Fitur bawaan tiap paket' },
+      { key: 'fitur_khusus', t: 'Fitur Khusus Toko', ic: 'isi_paket_fitur', run: "FM_TFX.open()", d: 'Beri atau cabut fitur untuk satu toko' },
       { key: 'upgrade_req', t: 'Permintaan Upgrade', ic: 'upgrade_req', run: "FM_TUPG.open()", badge: 'stat-upg-pending', d: 'Konfirmasi paket yang diajukan klien' },
       { key: 'billing_toko', t: 'Tagihan per Toko', ic: 'billing_toko', run: "towerPick('billing')", d: 'Biaya & pembayaran satu toko' },
       { key: 'billing_jaringan', t: 'Tagihan Semua Toko', ic: 'billing_jaringan', find: 'Billing Jaringan', d: 'Rekap tagihan & jatuh tempo' },

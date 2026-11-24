@@ -350,7 +350,15 @@
     for (var id in R) { if (!Object.prototype.hasOwnProperty.call(R, id)) continue; if (rentalActive(id, now)) { var ks = (R[id] && Array.isArray(R[id].keys)) ? R[id].keys : packKeys(id); if (ks.indexOf(key) >= 0) return true; } }
     return false;
   }
+  /* Fitur khusus per toko (Tower > Fitur Khusus Toko): tenant_ctrl/<toko>.featX = { kunci: true | false }.
+     true = diberi walau tidak termasuk paket, false = dicabut walau termasuk paket. Berlaku untuk semua peran yang memakai fitur itu. */
+  function featX() {
+    var c = window.TENANT_CTRL;
+    if (c) return (c.featX && typeof c.featX === 'object') ? c.featX : {};
+    try { var t = tenant(), v = JSON.parse(localStorage.getItem('fm_featx_' + (t && t.id ? t.id : '')) || '{}'); return (v && typeof v === 'object') ? v : {}; } catch (e) { return {}; }
+  }
   function has(key, role, tn) {
+    if (!tn) { var fx = featX()[key]; if (fx === true || fx === false) { var ff = find(key); var rr = role || pageRole(); if (ff && !ff.soon && ff.r[rr] === 'o') return fx; } }
     if (hasBase(key, role, tn)) return true;
     var f = find(key); if (!f || f.soon) return false;
     role = role || pageRole();
@@ -659,7 +667,7 @@
 
   /* Kirim Struk lewat WhatsApp dicabut dari aplikasi (v1.2b). Di halaman Tower fitur ini disembunyikan dari Atur Isi Paket; toko v1.2 yang sedang berjalan tidak disentuh. */
   if (/provider/.test(location.pathname)) { for (var iw = FEATURES.length - 1; iw >= 0; iw--) if (FEATURES[iw].key === 'wa_receipt') FEATURES.splice(iw, 1); }
-  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, periods: PERIODS, permUntil: PERM_UNTIL, price: sprice, sold: ssold, free: sfree, features: featList, bundles: function () { return (CAT && CAT.bundles) || []; }, trialOn: function () { return !(CAT && CAT.trial === false); }, quote: squote, disc: sdisc, untilFor: untilForPeriod, cat: function () { return CAT; }, setCat: storeSetCat, fetchCat: fetchCat, catAt: function () { return CAT_AT; }, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
+  window.FM_PLANS = { STORE: { products: SPRODUCTS, packs: SPACKS, all: SALL, trialDays: TRIAL_DAYS, item: sitem, periods: PERIODS, permUntil: PERM_UNTIL, price: sprice, sold: ssold, free: sfree, features: featList, bundles: function () { return (CAT && CAT.bundles) || []; }, trialOn: function () { return !(CAT && CAT.trial === false); }, quote: squote, disc: sdisc, untilFor: untilForPeriod, cat: function () { return CAT; }, setCat: storeSetCat, fetchCat: fetchCat, catAt: function () { return CAT_AT; }, keysOf: packKeys, active: rentalActive, rentals: rentals, sig: rentSig, loadedSig: function () { return LOADED_SIG; } }, hasBase: hasBase, CATS: CATS, FEATURES: FEATURES, ROLES: ROLES, RLABEL: RLABEL, has: has, activeList: activeList, applyDom: applyDom, checklistHtml: checklistHtml, cariFitur: cariFitur,
     ISLES: ISL_G, readChecklist: readChecklist, readLocks: readLocks, applyTierLocked: applyTierLocked, featTier: featTier, fillFrom: fillFrom, tierDefaults: tierDefaults, paketFeatures: paketFeatures, tierOf: tierOf, setAll: setAll, cnt: cnt, setCat: setCat, PRESETS: PRESETS, applyPreset: applyPreset, saveAsPreset: saveAsPreset, deletePreset: deletePreset, openModal: openModal, pageRole: pageRole, tier: function () { return 'basic'; }, lock: function () { return false; }, lockedHtml: function () { return ''; },
     PAKET: { cat: function () { return PAKET_CAT; }, setCat: setPaketCat, fetchCat: fetchPaketCat, isExpired: isExpired, lastPaidTier: lastPaidTier } };
 })();

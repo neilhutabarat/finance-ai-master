@@ -465,6 +465,8 @@
                 }
             } catch (eRs) {}
             try { localStorage.setItem('fm_rentals_' + tenant.id, JSON.stringify((d && d.rentals) || {})); } catch (eR) {}
+            /* fitur khusus toko dari Tower: simpan, dan muat ulang sekali bila berubah supaya tombol fitur ikut berubah */
+            try { var fxk = 'fm_featx_' + tenant.id, fxn = JSON.stringify((d && d.featX) || {}), fxo = localStorage.getItem(fxk); localStorage.setItem(fxk, fxn); if ((fxo === null ? '{}' : fxo) !== fxn) { location.reload(); return; } } catch (eF) {}
             /* kejelasan kaca per toko (1-5), diatur Tower; kosong = ikut pengaturan umum */
             try { var rv = d && (d.rain === 'on' || d.rain === 'off') ? d.rain : null; var rs = JSON.stringify({ id: tenant.id, v: rv }); if (localStorage.getItem('fm_rain_s') !== rs) { localStorage.setItem('fm_rain_s', rs); window.dispatchEvent(new CustomEvent('fm:glass')); } } catch (eRn) {}
             try { var gv = d ? parseInt(d.glass, 10) : 0; var gs = JSON.stringify({ id: tenant.id, v: (gv >= 1 && gv <= 8) ? gv : null }); if (localStorage.getItem('fm_glass_s') !== gs) { localStorage.setItem('fm_glass_s', gs); window.dispatchEvent(new CustomEvent('fm:glass')); } } catch (eG) {}
