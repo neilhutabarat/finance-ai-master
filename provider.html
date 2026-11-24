@@ -1540,19 +1540,21 @@
             if (sb) sb.textContent = 'Simpan Isi Paket ' + (tab === 'basic' ? 'Basic' : tab === 'plus' ? 'Plus' : 'Pro');
             document.getElementById('pf-body').innerHTML = FM_PLANS.checklistHtml('pf-' + tab, paketCat[tab] || {}, true);
         }
-        /* Susunan paket rekomendasi (disepakati 24 Nov 2026). Tiap paket hanya berisi tambahannya; Plus mewarisi Basic, Pro mewarisi Plus. */
+        /* Susunan paket rekomendasi (disepakati 24 Nov 2026), ditulis per tambahan; saat dipakai, tiap tab berisi lengkap (Plus = Basic + Plus, Pro = semua). */
         const PAKET_REC = {
             basic: ['mutasi_wa', 'bukti', 'diskon', 'piutang', 'absensi', 'wallpaper', 'theme', 'bahasa', 'billing_card', 'chat', 'coa', 'clock', 'weather', 'rates'],
             plus: ['tax', 'stok', 'stok_input', 'stok_closing', 'stok_habis', 'jual_produk', 'satuan_ganda', 'barcode', 'ledger', 'arus_kas', 'anggaran', 'rekon', 'gaji', 'gaji_auto', 'dashboard', 'laporan_bulanan', 'backup', 'import_tx', 'offline_penuh'],
             pro: ['stok_admin', 'stok_scan', 'neraca_ai', 'penjelasan', 'perubahan_modal', 'penyusutan', 'pajak_bulanan', 'harian_wa', 'grafik', 'audit', 'export_csv', 'analisa', 'instruksi']
         };
+        /* tab Plus menampilkan isi Basic + Plus, tab Pro menampilkan semuanya, supaya paket yang lebih tinggi selalu terlihat lebih lengkap */
+        function inT(k, t) { const L = t === 'pro' ? ['basic', 'plus', 'pro'] : t === 'plus' ? ['basic', 'plus'] : ['basic']; return L.some(function (x) { return PAKET_REC[x].indexOf(k) >= 0; }); }
         async function pfApplyRec() {
             if (!(await fmAsk('Isi semua centang Basic, Plus, dan Pro dengan susunan rekomendasi? Centang yang sekarang akan diganti. Tekan Simpan setelahnya supaya tersimpan.'))) return;
             ['basic', 'plus', 'pro'].forEach(function (t) {
                 const out = {};
                 FM_PLANS.FEATURES.forEach(function (f) {
                     if (f.soon) return;
-                    ['kasir', 'manager', 'owner'].forEach(function (r) { if (f.r[r] !== 'o') return; out[f.key] = out[f.key] || {}; out[f.key][r] = PAKET_REC[t].indexOf(f.key) >= 0; });
+                    ['kasir', 'manager', 'owner'].forEach(function (r) { if (f.r[r] !== 'o') return; out[f.key] = out[f.key] || {}; out[f.key][r] = inT(f.key, t); });
                 });
                 paketCat[t] = out;
             });
