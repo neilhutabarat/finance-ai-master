@@ -7,6 +7,12 @@
 (function () {
     'use strict';
     var overlayId = 'ctrl-suspend-overlay';
+    /* halaman login toko ini (selalu dengan ?toko=), supaya tombol Keluar tidak membuka toko lain */
+    function ctrlLoginUrl() {
+        var t = '';
+        try { t = (typeof fmTokoParam === 'function' ? fmTokoParam() : new URLSearchParams(location.search).get('toko')) || sessionStorage.getItem('fm_last_toko') || ''; } catch (e) {}
+        return 'index.html' + (t ? '?toko=' + encodeURIComponent(t) : '');
+    }
 
     function esc(v) {
         return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
@@ -34,7 +40,7 @@
         var b = document.getElementById('ctrl-suspend-exit');
         if (b) b.onclick = function () {
             if (typeof window.logout === 'function') { try { window.logout(); return; } catch (e) {} }
-            window.location.replace('index.html');
+            window.location.replace(ctrlLoginUrl());
         };
     }
 
@@ -59,7 +65,7 @@
         var b = document.getElementById('ctrl-demo-exit');
         if (b) b.onclick = function () {
             if (typeof window.logout === 'function') { try { window.logout(); return; } catch (e) {} }
-            window.location.replace('index.html');
+            window.location.replace(ctrlLoginUrl());
         };
     }
     function demoPill(dm) {
@@ -373,7 +379,7 @@
         var b = document.getElementById('ctrl-quota-exit');
         if (b) b.onclick = function () {
             if (typeof window.logout === 'function') { try { window.logout(); return; } catch (e) {} }
-            window.location.replace('index.html');
+            window.location.replace(ctrlLoginUrl());
         };
     }
 

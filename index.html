@@ -537,7 +537,18 @@
             window.location.href = targetUrl + param;
         }
 
+        /* Portal: app.oneilverse.com tanpa ?toko= tidak terkunci ke toko mana pun (termasuk toko Oneilverse).
+           ID yang diketik membuka halaman login toko itu sendiri. */
+        function portalGo() {
+            const inp = document.getElementById('input-tenant-id');
+            const id = String(inp && inp.value || '').trim().replace(/\s+/g, '');
+            if (!id) { alert('Masukkan ID toko Anda dulu.'); if (inp) inp.focus(); return; }
+            if (!/^[A-Za-z0-9_-]{3,40}$/.test(id)) { alert('ID toko tidak valid. Periksa kembali ID toko Anda.'); return; }
+            location.replace('index.html?toko=' + encodeURIComponent(id));
+        }
+
         function handleLogin() {
+            if (!urlParams.get('toko')) return portalGo();
             const picker = document.getElementById('tenant-picker');
             const selectedKey = resolveTenantKey(picker);
             activeTenant = lookupTenant(selectedKey);
@@ -674,6 +685,8 @@
                     lockedInput.readOnly = false;
                     lockedInput.value = '';
                     lockedInput.placeholder = 'Masukkan ID Toko Anda...';
+                    lockedInput.classList.remove('cursor-not-allowed');
+                    lockedInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); portalGo(); } });
                 }
             } else if (!['id26110901', 'id261110b', 'id261110a', 'oneilverse'].includes(paramToko.toLowerCase())) {
                 picker.classList.add('hidden');
