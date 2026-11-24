@@ -629,7 +629,7 @@
                         </div>
                         <button onclick="pfApplyRec()" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs transition">Pakai susunan rekomendasi (Basic, Plus &amp; Pro)</button>
                         <div id="pf-body" class="space-y-1"></div>
-                        <div style="position:sticky;bottom:-22px;margin:0 -24px -22px;padding:12px 24px 16px;background:#070a12;z-index:2"><button id="pf-save-btn" onclick="savePaketFitur()" class="w-full py-3 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-black text-sm transition" style="box-shadow:0 -10px 24px -12px rgba(15,23,42,.35)">Simpan Isi Paket</button></div>
+                        
                     </div>
                 </div>
 
@@ -795,7 +795,8 @@
 
             </div>
 
-            <div class="px-6 py-3 border-t border-white/10 bg-slate-900 flex justify-end">
+            <div class="px-6 py-3 border-t border-white/10 bg-slate-900 flex justify-end gap-2">
+                <button id="pf-save-btn" onclick="savePaketFitur()" style="display:none;background:#0891b2 !important;color:#fff !important;font-weight:800;border:0;cursor:pointer">Simpan</button>
                 <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-slate-900/10 hover:bg-slate-900/20 text-white text-xs font-bold transition">
                     Tutup
                 </button>
@@ -1535,7 +1536,7 @@
                     : 'background:rgba(15,23,42,.55);color:#cbd5e1;border:1px solid rgba(255,255,255,.12);box-shadow:none';
             });
             var sb = document.getElementById('pf-save-btn');
-            if (sb) sb.textContent = 'Simpan Isi Paket ' + (tab === 'basic' ? 'Basic' : tab === 'plus' ? 'Plus' : 'Pro');
+            if (sb) sb.textContent = 'Simpan';
             document.getElementById('pf-body').innerHTML = FM_PLANS.checklistHtml('pf-' + tab, paketCat[tab] || {}, true);
         }
         /* Susunan paket rekomendasi (disepakati 24 Nov 2026), ditulis per tambahan; saat dipakai, tiap tab berisi lengkap (Plus = Basic + Plus, Pro = semua). */
@@ -1557,7 +1558,7 @@
                 paketCat[t] = out;
             });
             pfSwitchTab(pfTab);
-            const sb = document.getElementById('pf-save-btn'); if (sb) sb.textContent = 'Simpan susunan Basic, Plus & Pro';
+            
         }
         function savePaketFitur() {
             if (!(typeof db !== 'undefined' && db)) return alert('Firestore belum terhubung.');
@@ -3628,6 +3629,7 @@
         }
 
         window.openModal = function(type) {
+            { const sv = document.getElementById('pf-save-btn'); if (sv) sv.style.display = type === 'paket_fitur' ? 'inline-block' : 'none'; }
             { const bk = document.getElementById('modal-back'); if (bk) bk.classList.toggle('hidden', !window.__twBack); }
             if (type !== 'tenant_settings' && tsStore) { tsStore.stop(); tsStore = null; }
             ['akun_login', 'billing_net', 'tax_net', 'provider_monthly_history', 'network_monthly_history', 'leaderboard', 'provider_input_tx', 'provider_coa_mgmt', 'broadcast_modal', 'add_tenant', 'pricing', 'paket_fitur', 'rates', 'former', 'tenant_settings', 'inspect', 'tickets', 'release_notes'].forEach(k => {
