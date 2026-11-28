@@ -42,8 +42,9 @@
         function restParseCoa(txt) {
             try {
                 var f = JSON.parse(txt).fields || {};
-                var arr = f.coa && f.coa.arrayValue && f.coa.arrayValue.values;
-                if (!arr) return { exists: true, coa: null, keys: Object.keys(f).join(',') };
+                var hasCoaField = !!(f.coa && f.coa.arrayValue);
+                if (!hasCoaField) return { exists: true, coa: null, keys: Object.keys(f).join(',') };
+                var arr = f.coa.arrayValue.values || [];
                 var out = [];
                 arr.forEach(function (v) {
                     var m = v.mapValue && v.mapValue.fields; if (!m) return;
@@ -77,8 +78,8 @@
                 }
                 var docId = ids[i++];
                 restGet(docId, function (r) {
-                    tried.push(docId + ' → ' + (r.coa ? r.coa.length + ' akun' : (r.exists ? 'ada, tanpa daftar akun (isi: ' + (r.keys || 'kosong') + ')' : 'tidak ada' + (r.code ? ' (' + r.code + ')' : ''))));
-                    if (r.coa && r.coa.length) {
+                    tried.push(docId + ' → ' + (Array.isArray(r.coa) ? r.coa.length + ' akun' : (r.exists ? 'ada, tanpa daftar akun (isi: ' + (r.keys || 'kosong') + ')' : 'tidak ada' + (r.code ? ' (' + r.code + ')' : ''))));
+                    if (Array.isArray(r.coa)) {
                         st.docId = docId; st.coa = r.coa; st.coaLoaded = true; st.serverSeen = true;
                         okBanner(); notify();
                         if (docId !== id && hasDb) { try { resubscribe(docId); } catch (e) {} }
